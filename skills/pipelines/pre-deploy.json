@@ -1,0 +1,39 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "pre-deploy",
+  "description": "Pre-deployment checklist: testing strategy → security review → deployment strategy. Use before any release to staging or production.",
+  "mode": "sequential",
+  "skills": [
+    {
+      "name": "testing-strategy",
+      "version": "^1.1.0",
+      "max_retries": 2
+    },
+    {
+      "name": "security-review",
+      "version": "^1.0.0",
+      "max_retries": 2
+    },
+    {
+      "name": "deployment-strategy",
+      "version": "^1.0.0",
+      "max_retries": 2
+    }
+  ],
+  "parallel_groups": [],
+  "gates": [
+    {
+      "after_skill": "security-review",
+      "type": "human_approval",
+      "label": "Approve security posture before deployment",
+      "timeout": 3600
+    },
+    {
+      "after_skill": "deployment-strategy",
+      "type": "human_approval",
+      "label": "Final deploy approval",
+      "timeout": 3600
+    }
+  ],
+  "async_skills": []
+}

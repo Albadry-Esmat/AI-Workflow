@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Node (website subdirectory dependencies are covered by website/.gitignore)
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+
+# Editor
+.vscode/
+.idea/
+
+# Build artefacts
+website/.next/
+website/out/
+website/build/
+website/.vercel/
+
+# Logs
+*.log

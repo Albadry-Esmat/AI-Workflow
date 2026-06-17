@@ -1,0 +1,412 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/system-state.json",
+  "title": "ASE-OS System State",
+  "description": "The authoritative state model for the ASE-OS pipeline. All agents and skills read and write through state-manager using this schema. Only state-manager may write directly; all other skills receive scoped slices.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "pipeline_template",
+    "created_at",
+    "updated_at",
+    "token_budget",
+    "project_spec",
+    "architecture",
+    "dependency_graph",
+    "task_graph",
+    "code_map",
+    "skill_registry",
+    "decision_log",
+    "documentation_state",
+    "test_state",
+    "security_state",
+    "pipeline_state",
+    "dispatch_map",
+    "event_log",
+    "snapshots",
+    "rollback_log",
+    "adr_index"
+  ],
+  "properties": {
+
+    "session_id": {
+      "type": "string",
+      "description": "Unique identifier for this pipeline session (UUID v4)",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+
+    "pipeline_template": {
+      "type": "string",
+      "description": "Name of the pipeline template driving this session",
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy"]
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session creation timestamp (ISO 8601)"
+    },
+
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last state mutation timestamp (ISO 8601)"
+    },
+
+    "token_budget": {
+      "type": "object",
+      "description": "Current token budget tracking for the active pipeline session",
+      "additionalProperties": false,
+      "required": ["tier", "max_tokens", "consumed_tokens", "remaining_tokens"],
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["quick", "deep", "partial_pipeline", "full_pipeline"]
+        },
+        "max_tokens": { "type": "integer", "minimum": 1 },
+        "consumed_tokens": { "type": "integer", "minimum": 0 },
+        "remaining_tokens": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "project_spec": {
+      "type": "object",
+      "description": "Structured requirements output from requirement-analyzer",
+      "properties": {
+        "requirements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/requirement" }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "domain": { "type": "string" },
+        "last_updated": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "architecture": {
+      "type": "object",
+      "description": "System architecture output from architecture-design",
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/module" }
+        },
+        "data_flow": { "type": "array", "items": { "type": "object" } },
+        "integration_points": { "type": "array", "items": { "type": "object" } },
+        "technical_decisions": { "type": "array", "items": { "type": "object" } },
+        "last_updated": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "dependency_graph": {
+      "type": "object",
+      "description": "Directed dependency graph maintained by dependency-analyzer",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "files": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["id"]
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "type": { "type": "string", "enum": ["internal", "cross-module", "external"] },
+              "depth": { "type": "integer" }
+            },
+            "required": ["from", "to", "type"]
+          }
+        },
+        "last_updated": { "type": "string", "format": "date-time" },
+        "cycle_report": {
+          "type": "object",
+          "properties": {
+            "cycles": { "type": "array" },
+            "severity": { "type": "string", "enum": ["none", "warning", "error"] }
+          }
+        }
+      }
+    },
+
+    "task_graph": {
+      "type": "object",
+      "description": "Feature plan task graph from feature-planning",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/task" }
+        },
+        "milestones": { "type": "array", "items": { "type": "object" } },
+        "current_phase": { "type": "string" },
+        "last_updated": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "code_map": {
+      "type": "object",
+      "description": "File tree with module assignments and change history",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string" },
+          "language": { "type": "string" },
+          "content_hash": { "type": "string" },
+          "last_modified": { "type": "string", "format": "date-time" },
+          "generated_by": { "type": "string" }
+        },
+        "required": ["module", "content_hash"]
+      }
+    },
+
+    "skill_registry": {
+      "type": "object",
+      "description": "Snapshot of available skills and their statuses (read from skills/registry.json)",
+      "properties": {
+        "version": { "type": "string" },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "version": { "type": "string" },
+              "status": { "type": "string", "enum": ["active", "deprecated", "retired"] }
+            },
+            "required": ["name", "version", "status"]
+          }
+        }
+      }
+    },
+
+    "decision_log": {
+      "type": "object",
+      "description": "Index of Architecture Decision Records",
+      "properties": {
+        "adrs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "pattern": "^ADR-[0-9]{4}$" },
+              "title": { "type": "string" },
+              "status": { "type": "string", "enum": ["proposed", "accepted", "deprecated", "superseded"] },
+              "path": { "type": "string" },
+              "date": { "type": "string", "format": "date" }
+            },
+            "required": ["id", "title", "status", "path"]
+          }
+        }
+      }
+    },
+
+    "documentation_state": {
+      "type": "object",
+      "description": "Documentation coverage and sync status",
+      "properties": {
+        "last_sync": { "type": "string", "format": "date-time" },
+        "stale_sections": { "type": "array", "items": { "type": "string" } },
+        "coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+
+    "test_state": {
+      "type": "object",
+      "description": "Test coverage targets and last run results",
+      "properties": {
+        "coverage_target": { "type": "number", "minimum": 0, "maximum": 100 },
+        "current_coverage": { "type": "number", "minimum": 0, "maximum": 100 },
+        "last_run": { "type": "string", "format": "date-time" },
+        "failing_tests": { "type": "array", "items": { "type": "string" } },
+        "invalidated_tests": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "security_state": {
+      "type": "object",
+      "description": "Security findings and audit status (restricted read: security-review only)",
+      "properties": {
+        "last_audit": { "type": "string", "format": "date-time" },
+        "open_findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+              "module": { "type": "string" },
+              "status": { "type": "string", "enum": ["open", "remediated", "accepted"] }
+            },
+            "required": ["id", "severity", "status"]
+          }
+        },
+        "gate_status": { "type": "string", "enum": ["pass", "fail", "pending"] }
+      }
+    },
+
+    "pipeline_state": {
+      "type": "object",
+      "description": "Current execution state of the active pipeline",
+      "properties": {
+        "current_phase": { "type": "string" },
+        "active_skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skill": { "type": "string" },
+              "status": { "type": "string", "enum": ["pending", "running", "completed", "failed", "cancelled"] },
+              "started_at": { "type": "string", "format": "date-time" }
+            },
+            "required": ["skill", "status"]
+          }
+        },
+        "completed_phases": { "type": "array", "items": { "type": "string" } },
+        "failed_phases": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "dispatch_map": {
+      "type": "object",
+      "description": "Event-to-skill handler dispatch map managed by event-router",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "skill": { "type": "string" },
+            "priority": { "type": "integer" },
+            "filter": { "type": "object" },
+            "async": { "type": "boolean" }
+          },
+          "required": ["skill", "priority"]
+        }
+      }
+    },
+
+    "event_log": {
+      "type": "array",
+      "description": "Append-only log of all events processed in this session (id + type + source only — no full payloads)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "source_skill": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "type", "source_skill", "timestamp"]
+      }
+    },
+
+    "snapshots": {
+      "type": "array",
+      "description": "Ordered list of state snapshots taken by state-manager",
+      "items": { "$ref": "#/$defs/snapshot" }
+    },
+
+    "rollback_log": {
+      "type": "array",
+      "description": "Log of all rollback operations executed in this session",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "trigger_reason": { "type": "string" },
+          "failed_snapshot_id": { "type": "string" },
+          "restored_snapshot_id": { "type": "string" },
+          "modules_affected": { "type": "array", "items": { "type": "string" } },
+          "recovery_time_ms": { "type": "integer" },
+          "success": { "type": "boolean" }
+        },
+        "required": ["timestamp", "trigger_reason", "restored_snapshot_id", "success"]
+      }
+    },
+
+    "adr_index": {
+      "type": "array",
+      "description": "Index of all ADRs in the session — mirrors decision_log.adrs but maintained by adr-generator",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "pattern": "^ADR-[0-9]{4}$" },
+          "title": { "type": "string" },
+          "status": { "type": "string" },
+          "path": { "type": "string" },
+          "date": { "type": "string", "format": "date" }
+        },
+        "required": ["id", "title", "status", "path"]
+      }
+    }
+  },
+
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^REQ-[0-9]+$" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+        "priority": { "type": "string", "enum": ["must", "should", "could", "wont"] },
+        "status": { "type": "string", "enum": ["open", "in_progress", "done", "rejected"] }
+      },
+      "required": ["id", "title", "acceptance_criteria", "priority", "status"]
+    },
+    "module": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "public_api": { "type": "array", "items": { "type": "object" } },
+        "dependencies": { "type": "array", "items": { "type": "string" } },
+        "files": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["name", "public_api", "dependencies"]
+    },
+    "task": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "module": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "done", "blocked"] },
+        "depends_on": { "type": "array", "items": { "type": "string" } },
+        "estimated_complexity": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] }
+      },
+      "required": ["id", "title", "status"]
+    },
+    "snapshot": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["stable", "failed", "pre_rollback"] },
+        "scope": { "type": "string" },
+        "keys_included": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "label", "timestamp", "status", "keys_included"]
+    }
+  }
+}

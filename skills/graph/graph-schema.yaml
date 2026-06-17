@@ -1,0 +1,146 @@
+# Skill Graph Schema
+#
+# Version:  1.0.0
+# Updated:  2026-06-16
+# Validates: skills/graph/skill-graph.yaml
+
+schema:
+  name: SkillGraph
+  version: "1.0.0"
+
+# ── NODE SCHEMA ───────────────────────────────────────────────────────
+node:
+  required: [id, name, domain, mastery_level, version, status, layer]
+  properties:
+
+    id:
+      type: string
+      pattern: "^SKL-\\d{3}$"
+      description: Stable unique skill identifier
+
+    name:
+      type: string
+      pattern: "^[a-z0-9-]+$"
+      description: Lowercase hyphenated skill name (matches directory/file name)
+
+    domain:
+      type: string
+      enum: [requirements, architecture, planning, review, testing, security,
+             deployment, documentation, validation, system, meta]
+
+    mastery_level:
+      type: string
+      enum: [beginner, intermediate, advanced]
+
+    version:
+      type: string
+      pattern: "^\\d+\\.\\d+\\.\\d+$"
+
+    status:
+      type: string
+      enum: [active, deprecated, experimental]
+
+    layer:
+      type: string
+      enum: [pipeline-entry, pipeline-core, pipeline-quality,
+             pipeline-release, pipeline-support, utility, meta]
+      description: >
+        Execution layer this skill belongs to.
+        Enforces the architectural direction constraint:
+        higher layers may depend on lower layers, not the reverse.
+      layer_order:
+        - pipeline-entry    # layer 1 — entry point
+        - pipeline-core     # layer 2
+        - pipeline-quality  # layer 3
+        - pipeline-release  # layer 4
+        - pipeline-support  # layer 5 (async, non-blocking)
+        - utility           # layer 6 (stateless utility, any layer may call)
+        - meta              # layer 7 (governs other layers, not in main pipeline)
+
+# ── EDGE SCHEMA ──────────────────────────────────────────────────────
+edge:
+  required: [from, to, type]
+  properties:
+
+    from:
+      type: string
+      pattern: "^SKL-\\d{3}$"
+      description: Source node ID
+
+    to:
+      type: string
+      pattern: "^SKL-\\d{3}$"
+      description: Target node ID
+
+    type:
+      type: string
+      enum: [dependency, composition, extension, co_occurrence]
+      descriptions:
+        dependency: >
+          Hard requirement. The 'from' skill cannot execute without the 'to' skill's
+          output. Creates a strict ordering constraint. Must be acyclic.
+        composition: >
+          The 'from' skill orchestrates or invokes the 'to' skill as a subprocess.
+          Used only by meta-skills (orchestrator, skill-authoring). Must be acyclic.
+        extension: >
+          The 'from' skill is a specialization of the 'to' skill. One-directional.
+          The 'from' skill inherits the contract of the 'to' skill.
+        co_occurrence: >
+          The two skills are frequently used together but neither depends on the
+          other. Symmetric — direction is not meaningful.
+
+    label:
+      type: string
+      description: Human-readable description of why this edge exists
+
+# ── GRAPH INVARIANTS ─────────────────────────────────────────────────
+invariants:
+
+  - name: no_cycles
+    applies_to: [dependency, composition, extension]
+    rule: >
+      The subgraph formed by dependency, composition, and extension edges
+      must be a directed acyclic graph (DAG). Cycle detection runs on every
+      new edge addition.
+
+  - name: direction_follows_layer
+    applies_to: [dependency]
+    rule: >
+      A dependency edge may only go from a higher-layer node to an equal or
+      lower-layer node (e.g., pipeline-quality may depend on pipeline-core,
+      but pipeline-core may NOT depend on pipeline-quality). Exception: utility
+      layer skills may be depended upon from any layer.
+
+  - name: composition_meta_only
+    applies_to: [composition]
+    rule: >
+      Only meta-layer skills (SKL-010 orchestrator, SKL-012 skill-authoring)
+      may have outgoing composition edges.
+
+  - name: co_occurrence_symmetric
+    applies_to: [co_occurrence]
+    rule: >
+      co_occurrence edges are symmetric. If edge A→B exists with type
+      co_occurrence, the reverse B→A is implied and need not be declared.
+
+  - name: no_self_loops
+    applies_to: [all]
+    rule: from != to on every edge
+
+  - name: no_duplicate_edges
+    applies_to: [all]
+    rule: No two edges may have the same (from, to, type) triple
+
+# ── GRAPH METRICS ────────────────────────────────────────────────────
+metrics:
+  computed_fields:
+    in_degree:
+      description: Number of incoming edges per node (skills others depend on)
+    out_degree:
+      description: Number of outgoing edges per node (how many skills this one needs)
+    fan_in:
+      description: in_degree for dependency edges only — measures reusability
+    critical_path:
+      description: Longest dependency chain from any source node to any sink node
+    hub_nodes:
+      description: Nodes with in_degree > 3 — high-value shared skills

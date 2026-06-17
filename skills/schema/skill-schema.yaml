@@ -1,0 +1,133 @@
+# Skill Schema Definition
+#
+# Version:  1.0.0
+# Updated:  2026-06-16
+# Used by:  skills/index.yaml validation
+#
+# All entries in skills/index.yaml MUST conform to this schema.
+# See skills/schema/validation-rules.md for human-readable enforcement rules.
+
+schema:
+  name: SkillIndexEntry
+  version: "1.0.0"
+
+fields:
+
+  id:
+    type: string
+    required: true
+    pattern: "^SKL-\\d{3}$"
+    description: Stable unique identifier. Assigned once, never changed.
+    example: "SKL-001"
+
+  name:
+    type: string
+    required: true
+    max_length: 50
+    description: Human-readable skill name. Title-cased.
+    example: "Clean Code Review"
+
+  short_description:
+    type: string
+    required: true
+    max_length: 120
+    rules:
+      - Must be exactly one sentence
+      - Must not end with a period
+      - Must not exceed 120 characters
+      - Must describe what the skill does, not how
+    example: "Analyze code against SOLID principles and detect anti-patterns"
+
+  reference_path:
+    type: string
+    required: true
+    pattern: "^skills/knowledge/.+\\.md$"
+    rules:
+      - File must exist on disk
+      - Must point to a skills/knowledge/ file
+    example: "skills/knowledge/clean-code.md"
+
+  reference_sections:
+    type: array
+    required: false
+    items:
+      type: string
+      pattern: "^## .+"
+    description: >
+      Optional list of specific sections within the reference file
+      to highlight for this skill's most relevant content.
+    example:
+      - "## Principles"
+      - "## Anti-patterns"
+
+  executable_skill:
+    type: string
+    required: false
+    pattern: "^skills/.+\\.md$"
+    description: >
+      Path to the AI-executable skill spec (13-section format).
+      If absent, the skill is knowledge-only with no executable counterpart.
+    example: "skills/review/clean-code-review.md"
+
+  tags:
+    type: array
+    required: false
+    items:
+      type: string
+      pattern: "^[a-z0-9-]+$"
+    description: Lowercase hyphenated keywords for grouping and search.
+    example: [code-quality, solid, clean-code]
+
+  version:
+    type: string
+    required: true
+    pattern: "^\\d+\\.\\d+\\.\\d+$"
+    description: Semver version of the skill's reference document.
+    example: "1.1.0"
+
+  depends_on:
+    type: array
+    required: false
+    items:
+      type: string
+      pattern: "^SKL-\\d{3}$"
+    description: >
+      List of skill IDs this skill depends on. Used for learning paths
+      and pipeline execution ordering. Must reference existing IDs.
+    example: [SKL-001, SKL-002]
+
+  mastery_level:
+    type: string
+    required: false
+    enum: [beginner, intermediate, advanced]
+    description: >
+      The level of proficiency expected to apply this skill effectively.
+      Used for role-based learning paths and onboarding flows.
+    example: "intermediate"
+
+  use_when:
+    type: string
+    required: false
+    description: >
+      One or two sentences describing the context in which this skill
+      should be applied. Answers: "When do I reach for this?"
+    example: "Starting any new feature where requirements are unstructured."
+
+  do_not_use_when:
+    type: string
+    required: false
+    description: >
+      Explicit contra-indications. Answers: "When should I NOT use this?"
+      Reduces misapplication of the skill.
+    example: "Requirements are already fully specified and validated."
+
+validation:
+  rules:
+    - Every entry must have a unique id matching pattern SKL-NNN
+    - Every reference_path must resolve to an existing file on disk
+    - Every executable_skill path, if present, must resolve to an existing file
+    - Every depends_on reference must point to an ID that exists in the same index
+    - No two entries may share the same id, name, or reference_path
+    - short_description must not duplicate name — it must add information
+    - tags must be lowercase and hyphenated (no spaces, no uppercase)
+    - version must be valid semver (MAJOR.MINOR.PATCH)

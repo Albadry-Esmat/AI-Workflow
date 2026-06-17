@@ -1,0 +1,117 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "github-copilot/claude-sonnet-4.6",
+  "hooks": {
+    "after_skill_output": {
+      "agents": ["doc-maintainer"],
+      "description": "Auto-trigger doc-maintainer after any skill produces output that changes system state"
+    },
+    "after_file_write": {
+      "match": ["skills/**", ".opencode/agent/**", "opencode.json"],
+      "agents": ["doc-maintainer"],
+      "description": "Auto-trigger doc-maintainer when any skill file, agent file, or config changes"
+    }
+  },
+  "agent": {
+    "primary": {
+      "mode": "primary",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "ask" },
+      "description": "Main orchestrator — drives the full AI pipeline, approves HITL gates, and coordinates all subagents"
+    },
+    "analyzer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
+      "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
+    },
+    "architect": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "System architecture design — modules, data flow, integration points, tech decisions. Invoked after requirements are validated.",
+      "skill": ".opencode/skills/architecture-design/SKILL.md"
+    },
+    "planner": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
+      "skill": ".opencode/skills/feature-planning/SKILL.md"
+    },
+    "reviewer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Code quality analysis (SOLID, clean architecture, anti-patterns) and security review. Invoked during the implementation phase.",
+      "skills": [
+        ".opencode/skills/clean-code-review/SKILL.md",
+        ".opencode/skills/security-review/SKILL.md"
+      ]
+    },
+    "tester": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Test strategy, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
+      "skill": ".opencode/skills/testing-strategy/SKILL.md"
+    },
+    "builder": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Incremental code generation and targeted code repair. Invoked after feature planning and impact analysis are complete.",
+      "skills": [
+        ".opencode/skills/code-generator/SKILL.md",
+        ".opencode/skills/code-repair/SKILL.md"
+      ]
+    },
+    "impact-analyzer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
+      "skills": [
+        ".opencode/skills/dependency-analyzer/SKILL.md",
+        ".opencode/skills/change-impact-analyzer/SKILL.md"
+      ]
+    },
+    "test-generator": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
+      "skill": ".opencode/skills/test-generator/SKILL.md"
+    },
+    "recovery": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Last-resort recovery agent — reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
+      "skill": ".opencode/skills/rollback-manager/SKILL.md"
+    },
+    "deployer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
+      "skill": ".opencode/skills/deployment-strategy/SKILL.md"
+    },
+    "documenter": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
+      "skill": ".opencode/skills/documentation-generator/SKILL.md"
+    },
+    "doc-maintainer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
+      "skill": ".opencode/skills/doc-maintainer/SKILL.md"
+    }
+  }
+}
+

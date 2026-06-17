@@ -1,0 +1,134 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "full-pipeline",
+  "version": "2.0.0",
+  "description": "Full idea-to-production pipeline: requirements → architecture → dependency graph → impact analysis → code generation → review + test generation + security → deployment → docs",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "adr-generator",        "version": "^1.0.0", "max_retries": 1, "async": true }
+      ]
+    },
+    {
+      "id": "phase-3-graph",
+      "label": "Dependency Graph",
+      "skills": [
+        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-planning",
+      "label": "Planning",
+      "skills": [
+        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-impact",
+      "label": "Impact Analysis",
+      "skills": [
+        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-execution",
+      "label": "Code Generation",
+      "skills": [
+        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-quality",
+      "label": "Quality + Testing",
+      "parallel": true,
+      "skills": [
+        { "name": "clean-code-review",  "version": "^1.1.0", "max_retries": 2 },
+        { "name": "testing-strategy",   "version": "^1.1.0", "max_retries": 2 },
+        { "name": "security-review",    "version": "^1.0.0", "max_retries": 2 },
+        { "name": "test-generator",     "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8-repair",
+      "label": "Repair (conditional)",
+      "condition": "test.failed OR build.broken",
+      "skills": [
+        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+      ]
+    },
+    {
+      "id": "phase-9-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-10-docs",
+      "label": "Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",           "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["clean-code-review", "testing-strategy", "security-review", "test-generator"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Validate requirements scope with stakeholder",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2-architecture",
+      "type": "human_approval",
+      "label": "Sign off on architecture before planning",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-planning",
+      "type": "human_approval",
+      "label": "Approve roadmap and impact surface before implementation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-impact",
+      "type": "auto",
+      "label": "Block if impact_severity=critical",
+      "condition": "change_impact.impact_severity !== 'critical'"
+    },
+    {
+      "after_phase": "phase-7-quality",
+      "type": "human_approval",
+      "label": "Approve security posture and coverage before deployment",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-9-deploy",
+      "type": "human_approval",
+      "label": "Final deploy approval",
+      "timeout": 3600
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 3,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+}

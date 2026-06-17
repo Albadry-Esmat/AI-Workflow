@@ -1,0 +1,87 @@
+"use client";
+import { motion } from "framer-motion";
+
+const PRINCIPLES = [
+  {
+    number: "01",
+    title: "Skill-Driven Execution",
+    color: "from-cyan-500 to-cyan-400",
+    border: "border-cyan-500/20",
+    glow: "group-hover:shadow-cyan-500/10",
+    description:
+      "All operations execute through reusable, versioned Skills — deterministic capability units with defined inputs, outputs, and execution rules. No ad-hoc prompting. No capability exists outside a skill.",
+    tags: ["Versioned", "Composable", "Schema-validated"],
+  },
+  {
+    number: "02",
+    title: "Event-Driven Architecture",
+    color: "from-violet-500 to-violet-400",
+    border: "border-violet-500/20",
+    glow: "group-hover:shadow-violet-500/10",
+    description:
+      "Every change — code, architecture, tests, documentation — emits a structured event that triggers controlled downstream updates automatically. Nothing propagates manually.",
+    tags: ["Automatic propagation", "Deduplication", "Audit log"],
+  },
+  {
+    number: "03",
+    title: "State-Centric Control",
+    color: "from-pink-500 to-pink-400",
+    border: "border-pink-500/20",
+    glow: "group-hover:shadow-pink-500/10",
+    description:
+      "A single structured system state governs all operations. All agents read and write through controlled diffs — never directly. Every mutation is logged, versioned, and reversible.",
+    tags: ["Snapshots", "Rollback", "Single writer"],
+  },
+];
+
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.15 } } };
+const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+
+export function PrinciplesSection() {
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-24">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-12 text-center"
+      >
+        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          Three Non-Negotiable Principles
+        </h2>
+        <p className="text-zinc-400 max-w-xl mx-auto">
+          Every decision in ASE-OS traces back to one of these three foundations.
+        </p>
+      </motion.div>
+
+      <motion.div
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        {PRINCIPLES.map((p) => (
+          <motion.div
+            key={p.number}
+            variants={item}
+            className={`group relative rounded-xl border ${p.border} bg-zinc-900/50 p-6 hover:bg-zinc-900 transition-all duration-300 hover:shadow-xl ${p.glow}`}
+          >
+            <div className={`mb-4 text-4xl font-black bg-gradient-to-br ${p.color} bg-clip-text text-transparent`}>
+              {p.number}
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-3">{p.title}</h3>
+            <p className="text-zinc-400 text-sm leading-relaxed mb-4">{p.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {p.tags.map((tag) => (
+                <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
+  );
+}

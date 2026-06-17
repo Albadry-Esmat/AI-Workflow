@@ -1,0 +1,542 @@
+{
+  "version": "1.5.0",
+  "description": "Central registry of all skills in the Skill System Standard",
+  "parallel_groups": [
+    {
+      "id": "quality-parallel",
+      "skills": ["clean-code-review", "testing-strategy", "security-review"],
+      "description": "Code review, testing strategy, and security review run concurrently during implementation phase"
+    }
+  ],
+  "skills": [
+    {
+      "name": "requirement-analyzer",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "requirements",
+      "path": ".opencode/skills/requirement-analyzer/SKILL.md",
+      "description": "Extracts, normalizes, and validates requirements from raw input",
+      "inputs": ["raw_input", "context", "domain_hints"],
+      "outputs": ["requirements", "open_questions", "assumptions", "risks", "metadata", "metrics", "feedback"],
+      "consumes_from": null,
+      "produces_for": ["architecture-design@^1.1.0"],
+      "orchestration": "MUST run first — entry point for all feature work",
+      "feedback_routes": []
+    },
+    {
+      "name": "architecture-design",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "architecture",
+      "path": ".opencode/skills/architecture-design/SKILL.md",
+      "description": "Produces system architecture from structured requirements",
+      "inputs": ["requirements", "constraints", "existing_architecture"],
+      "outputs": ["modules", "data_flow", "integration_points", "technical_decisions", "component_diagram", "metadata", "metrics", "feedback"],
+      "consumes_from": ["requirement-analyzer@^1.1.0"],
+      "produces_for": ["feature-planning@^1.1.0"],
+      "orchestration": "MUST run second — depends on requirement-analyzer output",
+      "feedback_routes": [
+        {
+          "target_skill": "requirement-analyzer",
+          "condition": "missing_requirements_detected",
+          "description": "Re-run requirement analysis when architecture reveals undefined actors or unstated preconditions"
+        }
+      ]
+    },
+    {
+      "name": "feature-planning",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "planning",
+      "path": ".opencode/skills/feature-planning/SKILL.md",
+      "description": "Breaks architecture into tasks with dependencies and roadmap",
+      "inputs": ["requirements", "modules", "integration_points", "team_capacity", "milestones"],
+      "outputs": ["tasks", "dependency_map", "phases", "milestones", "risks", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0"],
+      "produces_for": ["clean-code-review@^1.1.0", "testing-strategy@^1.1.0"],
+      "orchestration": "MUST run third — produces implementation plan",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "orphan_tasks_detected",
+          "description": "Re-run architecture when planning finds tasks that cannot map to any module"
+        }
+      ]
+    },
+    {
+      "name": "clean-code-review",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "review",
+      "path": ".opencode/skills/clean-code-review/SKILL.md",
+      "description": "Analyzes code against SOLID and clean architecture principles",
+      "inputs": ["code", "language", "context", "strictness"],
+      "outputs": ["issues", "complexity_report", "improvements", "summary", "metrics", "feedback"],
+      "consumes_from": ["feature-planning@^1.1.0"],
+      "produces_for": ["security-review@^1.0.0", "documentation-generator@^1.0.0"],
+      "orchestration": "Runs in parallel with testing-strategy during implementation",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "module_boundary_violation",
+          "description": "Re-run architecture when code review reveals module boundary violations or coupling issues"
+        },
+        {
+          "target_skill": "feature-planning",
+          "condition": "task_scope_mismatch",
+          "description": "Re-run planning when reviewed code reveals tasks were scoped incorrectly"
+        }
+      ]
+    },
+    {
+      "name": "testing-strategy",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "testing",
+      "path": ".opencode/skills/testing-strategy/SKILL.md",
+      "description": "Produces comprehensive test plan with coverage targets and quality gates",
+      "inputs": ["requirements", "modules", "tasks", "existing_tests", "quality_gates"],
+      "outputs": ["test_plan", "test_cases", "edge_cases", "coverage_checklist", "quality_gates", "risks", "metrics", "feedback"],
+      "consumes_from": ["feature-planning@^1.1.0"],
+      "produces_for": ["deployment-strategy@^1.0.0"],
+      "orchestration": "Runs in parallel with clean-code-review during implementation",
+      "feedback_routes": [
+        {
+          "target_skill": "requirement-analyzer",
+          "condition": "missing_requirement_detected",
+          "description": "Re-run requirement analysis when test planning reveals gaps in requirement coverage"
+        },
+        {
+          "target_skill": "feature-planning",
+          "condition": "untestable_task_detected",
+          "description": "Re-run planning when tasks are too vague to produce concrete test cases"
+        }
+      ]
+    },
+    {
+      "name": "schema-validator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "validation",
+      "path": ".opencode/skills/schema-validator/SKILL.md",
+      "description": "Validates JSON output against a declared schema",
+      "inputs": ["data", "schema"],
+      "outputs": ["valid", "issues", "metrics", "feedback"],
+      "consumes_from": null,
+      "produces_for": null,
+      "orchestration": "Utility skill — invoked by orchestrator between pipeline steps",
+      "feedback_routes": []
+    },
+    {
+      "name": "security-review",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "security",
+      "path": ".opencode/skills/security-review/SKILL.md",
+      "description": "Analyzes architecture and code for security vulnerabilities and threats",
+      "inputs": ["architecture", "code_snippets", "threat_model_context"],
+      "outputs": ["vulnerabilities", "threat_model", "remediation", "risks", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0", "clean-code-review@^1.1.0"],
+      "produces_for": null,
+      "orchestration": "Runs after architecture-design and during/after clean-code-review",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "architectural_security_flaw",
+          "description": "Re-run architecture when security review detects structural vulnerabilities (e.g., missing auth layer, insecure data flow)"
+        },
+        {
+          "target_skill": "requirement-analyzer",
+          "condition": "missing_security_requirement",
+          "description": "Re-run requirements when threat modeling reveals security requirements that were not specified"
+        }
+      ]
+    },
+    {
+      "name": "deployment-strategy",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "deployment",
+      "path": ".opencode/skills/deployment-strategy/SKILL.md",
+      "description": "Defines deployment pipeline, environment promotion, rollback criteria",
+      "inputs": ["architecture", "test_plan", "quality_gates"],
+      "outputs": ["environments", "promotion_rules", "rollback_criteria", "feature_flags", "deployment_plan", "risks", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0", "testing-strategy@^1.1.0"],
+      "produces_for": null,
+      "orchestration": "Runs after testing-strategy — final step before production",
+      "feedback_routes": [
+        {
+          "target_skill": "testing-strategy",
+          "condition": "quality_gate_insufficient",
+          "description": "Re-run testing when deployment strategy reveals that quality gates are insufficient for safe promotion"
+        }
+      ]
+    },
+    {
+      "name": "documentation-generator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "documentation",
+      "path": ".opencode/skills/documentation-generator/SKILL.md",
+      "description": "Auto-generates documentation from requirements, architecture, and code analysis",
+      "inputs": ["requirements", "architecture", "code_review", "format"],
+      "outputs": ["documents", "metrics", "feedback"],
+      "consumes_from": ["requirement-analyzer@^1.1.0", "architecture-design@^1.1.0", "clean-code-review@^1.1.0"],
+      "produces_for": null,
+      "orchestration": "Runs asynchronously after upstream skills complete — non-blocking",
+      "feedback_routes": []
+    },
+    {
+      "name": "orchestrator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "system",
+      "path": ".opencode/skills/orchestrator/SKILL.md",
+      "description": "Meta-skill that executes the skill pipeline with routing, validation, and HITL gates",
+      "inputs": ["pipeline_config", "initial_payload", "session_context"],
+      "outputs": ["pipeline_result", "execution_log", "session_context", "gate_decisions", "metrics"],
+      "consumes_from": null,
+      "produces_for": null,
+      "orchestration": "Meta-skill — invokes all other skills per pipeline definition",
+      "feedback_routes": []
+    },
+    {
+      "name": "doc-maintainer",
+      "version": "1.1.0",
+      "status": "active",
+      "domain": "documentation",
+      "path": ".opencode/skills/doc-maintainer/SKILL.md",
+      "description": "Autonomous documentation maintenance engine — detects changes, creates/updates .md files, ensures consistency",
+      "inputs": ["change_event", "change_type", "scope", "details", "docs_snapshot", "detection_mode", "dry_run", "git_diff_raw", "staleness_threshold_days"],
+      "outputs": ["decision_summary", "action_type", "files_affected", "changes_made", "new_files", "consistency_report", "dry_run_report", "staleness_issues", "rollback_info", "metrics", "feedback"],
+      "consumes_from": null,
+      "produces_for": null,
+      "orchestration": "System maintenance skill — runs on change detection, not pipeline execution",
+      "feedback_routes": []
+    },
+    {
+      "name": "skill-authoring",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/skill-authoring/SKILL.md",
+      "description": "Meta-skill — designs, generates, validates, and governs all other skills",
+      "inputs": ["intent", "domain", "operation", "source_material", "existing_skill_id", "dependency_hints", "target_mastery_level", "validation_mode"],
+      "outputs": ["skill_metadata_entry", "skill_md_content", "knowledge_file_content", "graph_delta", "validation_report", "registration_status", "version_assignment", "activation_tests", "quality_score", "metrics", "feedback"],
+      "consumes_from": ["schema-validator@^1.0.0", "doc-maintainer@^1.1.0"],
+      "produces_for": null,
+      "orchestration": "Meta-skill — invoked to create or govern any other skill in the system",
+      "feedback_routes": []
+    },
+    {
+      "name": "context-memory",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "system",
+      "path": ".opencode/skills/context-memory/SKILL.md",
+      "description": "Manages session state schema, compression rules, and multi-turn pipeline resumption protocol",
+      "inputs": ["session_context", "pipeline_step", "action"],
+      "outputs": ["hydrated_context", "compressed_context", "resumption_point"],
+      "consumes_from": null,
+      "produces_for": ["orchestrator@^1.0.0"],
+      "orchestration": "Utility protocol — invoked by orchestrator to serialize, compress, and restore session state",
+      "feedback_routes": []
+    },
+    {
+      "name": "observability",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "system",
+      "path": ".opencode/skills/observability/SKILL.md",
+      "description": "Defines standardized metrics schema and collection points for all skills and the orchestrator",
+      "inputs": ["skill_name", "execution_event", "metrics_data"],
+      "outputs": ["metrics_report", "health_status", "alerts"],
+      "consumes_from": null,
+      "produces_for": null,
+      "orchestration": "Utility protocol — applied by every skill and the orchestrator at defined collection points",
+      "feedback_routes": []
+    },
+    {
+      "name": "quality-scoring",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/quality-scoring/SKILL.md",
+      "description": "Scores a skill on 7 dimensions against the quality rubric to determine registration eligibility",
+      "inputs": ["skill_md_content", "knowledge_file_content", "index_entry", "graph_delta"],
+      "outputs": ["quality_score", "grade", "recommendations"],
+      "consumes_from": null,
+      "produces_for": ["skill-authoring@^1.0.0"],
+      "orchestration": "Meta utility — invoked by skill-authoring (SKL-012) as part of the registration gate",
+      "feedback_routes": []
+    },
+    {
+      "name": "skill-lifecycle",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/skill-lifecycle/SKILL.md",
+      "description": "Governs skill progression through 12 lifecycle stages from intent discovery to retirement",
+      "inputs": ["skill_id", "current_stage", "action"],
+      "outputs": ["next_stage", "gate_result", "deprecation_plan"],
+      "consumes_from": null,
+      "produces_for": null,
+      "orchestration": "Governance meta-skill — invoked to check or advance any skill's lifecycle stage",
+      "feedback_routes": []
+    },
+    {
+      "name": "trigger-engineering",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/trigger-engineering/SKILL.md",
+      "description": "Defines and refines skill trigger conditions with positive, negative, and conflict-resolution rules",
+      "inputs": ["skill_name", "adjacent_skills", "sample_contexts"],
+      "outputs": ["trigger_definition", "conflict_resolution_rules", "activation_tests"],
+      "consumes_from": null,
+      "produces_for": ["skill-authoring@^1.0.0"],
+      "orchestration": "Meta utility — invoked during skill design to produce activation trigger specs",
+      "feedback_routes": []
+    },
+    {
+      "name": "validation-rules",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/validation-rules/SKILL.md",
+      "description": "Enforces structural and content rules on skills/index.yaml entries before and after registration",
+      "inputs": ["index_entry", "mode"],
+      "outputs": ["validation_report", "rule_violations", "pass_fail"],
+      "consumes_from": ["schema-validator@^1.0.0"],
+      "produces_for": ["skill-authoring@^1.0.0"],
+      "orchestration": "Validation utility — invoked by skill-authoring during Step 8 (multi-layer validation)",
+      "feedback_routes": []
+    },
+    {
+      "name": "versioning",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/versioning/SKILL.md",
+      "description": "Assigns semver version bumps for skill changes and enforces registry and changelog versioning policy",
+      "inputs": ["skill_id", "change_description", "change_type"],
+      "outputs": ["version_bump", "new_version", "breaking_change_flag", "changelog_entry"],
+      "consumes_from": null,
+      "produces_for": ["skill-authoring@^1.0.0"],
+      "orchestration": "Governance utility — invoked during skill evolution or release to determine correct version bump",
+      "feedback_routes": []
+    },
+    {
+      "name": "create-sub-agent",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "meta",
+      "path": ".opencode/skills/create-sub-agent/SKILL.md",
+      "description": "Compiles a capability requirement into a fully-specified orchestrator-controlled sub-agent spec with I/O contracts and tool permissions",
+      "inputs": ["capability_name", "responsibility", "input_fields", "output_fields", "allowed_tools", "forbidden_tools", "depends_on", "tags", "version"],
+      "outputs": ["metadata", "input_contract", "output_contract", "execution_workflow", "tool_permissions", "orchestration_rules", "failure_handling", "validation_checklist", "activation_tests", "skill_md_content", "status", "errors", "metrics", "feedback"],
+      "consumes_from": ["schema-validator@^1.0.0"],
+      "produces_for": null,
+      "orchestration": "Meta-skill — invoked to scaffold a new sub-agent module from a capability specification",
+      "feedback_routes": []
+    },
+    {
+      "name": "state-manager",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "orchestration",
+      "path": ".opencode/skills/state-manager/SKILL.md",
+      "description": "Reads, writes, diffs, snapshots, and restores shared system state — the sole write interface to cross-skill state",
+      "inputs": ["operation", "key", "value", "snapshot_id", "diff_keys"],
+      "outputs": ["value", "snapshot_id", "diff_result", "restore_result", "metrics", "feedback"],
+      "consumes_from": null,
+      "produces_for": ["orchestrator@^1.0.0", "context-memory@^1.0.0"],
+      "orchestration": "Infrastructure primitive — invoked by every skill that reads or writes shared state",
+      "feedback_routes": []
+    },
+    {
+      "name": "context-compressor",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "orchestration",
+      "path": ".opencode/skills/context-compressor/SKILL.md",
+      "description": "Semantically compresses large context payloads to fit within token budget tiers without losing decision-critical information",
+      "inputs": ["content", "compression_target", "budget_tier", "preserve_keys"],
+      "outputs": ["compressed_content", "compression_ratio", "dropped_keys", "metrics", "feedback"],
+      "consumes_from": null,
+      "produces_for": ["orchestrator@^1.0.0", "context-memory@^1.0.0"],
+      "orchestration": "Invoked automatically when context pressure exceeds the active token budget tier",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "compression_ratio_too_low",
+          "description": "Alert orchestrator when content cannot be compressed below budget without critical data loss"
+        }
+      ]
+    },
+    {
+      "name": "dependency-analyzer",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "architecture",
+      "path": ".opencode/skills/dependency-analyzer/SKILL.md",
+      "description": "Builds and maintains a directed dependency graph; detects cycles; computes module ripple effects",
+      "inputs": ["operation", "code_map", "changed_files", "query_target", "modules", "existing_graph"],
+      "outputs": ["dependency_graph", "affected_modules", "cycle_report", "graph_stats", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0", "state-manager@^1.0.0"],
+      "produces_for": ["change-impact-analyzer@^1.0.0"],
+      "orchestration": "Runs after every code.changed event and before any change-impact-analyzer invocation",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "cross_module_cycle_detected",
+          "description": "Re-run architecture design when a cross-module dependency cycle is detected"
+        }
+      ]
+    },
+    {
+      "name": "change-impact-analyzer",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "architecture",
+      "path": ".opencode/skills/change-impact-analyzer/SKILL.md",
+      "description": "Computes full impact surface of a proposed change across modules, APIs, tests, docs, and security boundaries",
+      "inputs": ["change_description", "change_type", "affected_files", "architecture", "dependency_graph", "test_state", "security_state"],
+      "outputs": ["module_impact", "api_change_report", "test_impact", "documentation_impact", "security_impact", "required_skills", "impact_severity", "metrics", "feedback"],
+      "consumes_from": ["dependency-analyzer@^1.0.0", "state-manager@^1.0.0"],
+      "produces_for": ["orchestrator@^1.0.0"],
+      "orchestration": "MUST run before any code modification — gates the execution of all downstream skills",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "breaking_api_change_detected",
+          "description": "Re-run architecture design when a breaking API change is detected"
+        },
+        {
+          "target_skill": "security-review",
+          "condition": "security_boundary_crossed",
+          "description": "Mandatory security review when a change touches auth, session, or data access boundaries"
+        }
+      ]
+    },
+    {
+      "name": "event-router",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "orchestration",
+      "path": ".opencode/skills/event-router/SKILL.md",
+      "description": "Routes system events to registered skill handlers; maintains event-to-skill dispatch map; deduplicates events",
+      "inputs": ["operation", "event", "handler_spec", "event_type", "event_id", "dispatch_map"],
+      "outputs": ["dispatch_list", "unhandled", "deduplicated", "updated_dispatch_map", "handler_list", "metrics", "feedback"],
+      "consumes_from": ["state-manager@^1.0.0", "orchestrator@^1.0.0"],
+      "produces_for": ["orchestrator@^1.0.0"],
+      "orchestration": "Sits on the event bus — every system event passes through before reaching skill executors",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "unhandled_event_flood",
+          "description": "Alert orchestrator when >10 unhandled events occur in one session"
+        }
+      ]
+    },
+    {
+      "name": "code-generator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "implementation",
+      "path": ".opencode/skills/code-generator/SKILL.md",
+      "description": "Generates implementation files, scaffolding, and interface stubs from architecture modules, feature plans, or interface contracts",
+      "inputs": ["generation_target", "spec", "language", "style_guide", "existing_code_map", "architecture", "dry_run"],
+      "outputs": ["artifacts", "validation_result", "unresolved_imports", "conflict_files", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0", "feature-planning@^1.1.0", "state-manager@^1.0.0"],
+      "produces_for": ["clean-code-review@^1.1.0", "test-generator@^1.0.0"],
+      "orchestration": "Runs after feature-planning; output always routed to clean-code-review and test-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "architecture-design",
+          "condition": "unresolved_imports_exceed_threshold",
+          "description": "Re-run architecture design when >30% of imports cannot be resolved from the architecture"
+        }
+      ]
+    },
+    {
+      "name": "adr-generator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "documentation",
+      "path": ".opencode/skills/adr-generator/SKILL.md",
+      "description": "Produces immutable Architecture Decision Records from architectural choices, tradeoffs, and alternatives",
+      "inputs": ["decision_title", "decision_context", "decision_made", "alternatives", "consequences", "decision_date", "status", "supersedes", "related_skills", "output_path"],
+      "outputs": ["adr_id", "file_path", "adr_preview", "superseded_adr", "metrics", "feedback"],
+      "consumes_from": ["architecture-design@^1.1.0", "state-manager@^1.0.0"],
+      "produces_for": ["doc-maintainer@^1.0.0"],
+      "orchestration": "Invoked automatically by architecture-design after every major decision; on-demand for any significant technical choice",
+      "feedback_routes": []
+    },
+    {
+      "name": "test-generator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "testing",
+      "path": ".opencode/skills/test-generator/SKILL.md",
+      "description": "Generates unit, integration, and edge-case test suites from code artifacts, interface contracts, or testing strategies",
+      "inputs": ["generation_mode", "target", "language", "test_framework", "testing_strategy", "coverage_report", "invalidated_tests", "dry_run"],
+      "outputs": ["test_files", "test_case_summary", "validation_result", "coverage_estimate", "metrics", "feedback"],
+      "consumes_from": ["testing-strategy@^1.1.0", "code-generator@^1.0.0", "change-impact-analyzer@^1.0.0"],
+      "produces_for": ["state-manager@^1.0.0"],
+      "orchestration": "Runs after code-generator and on test.failed events when tests are invalidated",
+      "feedback_routes": [
+        {
+          "target_skill": "testing-strategy",
+          "condition": "coverage_estimate_below_threshold",
+          "description": "Alert testing-strategy when generated coverage estimate is below the defined target"
+        }
+      ]
+    },
+    {
+      "name": "code-repair",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "implementation",
+      "path": ".opencode/skills/code-repair/SKILL.md",
+      "description": "Diagnoses and applies minimal, validated fixes to failing tests, compile errors, type errors, and lint violations",
+      "inputs": ["repair_type", "failing_artifact", "error_report", "test_output", "architecture", "dependency_graph", "max_iterations"],
+      "outputs": ["repaired_artifact", "root_cause", "repair_outcome", "validation_result", "metrics", "feedback"],
+      "consumes_from": ["clean-code-review@^1.1.0", "code-generator@^1.0.0", "state-manager@^1.0.0"],
+      "produces_for": ["state-manager@^1.0.0", "rollback-manager@^1.0.0"],
+      "orchestration": "Triggered by test.failed events and broken build signals; output routed back through clean-code-review",
+      "feedback_routes": [
+        {
+          "target_skill": "clean-code-review",
+          "condition": "repair_escalated",
+          "description": "Route to clean-code-review when all repair candidates fail for human-level refactoring"
+        },
+        {
+          "target_skill": "security-review",
+          "condition": "security_boundary_in_repair_path",
+          "description": "Mandatory security review when repair touches an auth or data access boundary"
+        }
+      ]
+    },
+    {
+      "name": "rollback-manager",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "orchestration",
+      "path": ".opencode/skills/rollback-manager/SKILL.md",
+      "description": "Safely reverts system state to a prior snapshot on deployment failure, critical pipeline error, or unrecoverable code change",
+      "inputs": ["rollback_scope", "trigger_reason", "target_snapshot_id", "affected_modules", "cancel_in_progress", "dry_run", "state_manager_context"],
+      "outputs": ["rollback_plan", "rollback_result", "rollback_report", "target_snapshot", "dry_run_only", "metrics", "feedback"],
+      "consumes_from": ["state-manager@^1.0.0", "event-router@^1.0.0"],
+      "produces_for": ["state-manager@^1.0.0"],
+      "orchestration": "Last-resort recovery — triggered on critical pipeline failures, deployment failures, and unrecoverable code errors",
+      "feedback_routes": [
+        {
+          "target_skill": "deployment-strategy",
+          "condition": "deployment_rollback_executed",
+          "description": "Notify deployment-strategy to update environment state after a deployment rollback"
+        }
+      ]
+    }
+  ]
+}

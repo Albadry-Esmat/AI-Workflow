@@ -1,0 +1,22 @@
+# Skill Entry Template
+#
+# Copy this file to create a new entry in skills/index.yaml.
+# Replace all <PLACEHOLDER> values.
+# Validate against: skills/schema/skill-schema.yaml
+
+- id: SKL-<NNN>                           # e.g. SKL-012 — assign next available number
+  name: <Skill Name>                       # Title-cased, max 50 chars
+  short_description: <One sentence describing what this skill does, max 120 chars, no period>
+  reference_path: skills/knowledge/<kebab-name>.md   # must exist on disk
+  reference_sections:                      # optional — most relevant sections in the knowledge file
+    - "## Principles"
+    - "## Anti-patterns"
+  executable_skill: skills/<domain>/<skill-name>.md   # optional — path to 13-section spec
+  tags: [<tag1>, <tag2>, <tag3>]           # lowercase, hyphenated, no spaces
+  version: "1.0.0"                         # semver of the knowledge document
+  depends_on: []                           # list of SKL-NNN IDs this skill requires
+  mastery_level: intermediate              # beginner | intermediate | advanced
+  use_when: >
+    <One or two sentences: when should this skill be applied?>
+  do_not_use_when: >
+    <One or two sentences: when should this skill NOT be applied?>

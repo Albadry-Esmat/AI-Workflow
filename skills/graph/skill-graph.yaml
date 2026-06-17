@@ -1,0 +1,652 @@
+# Skill Dependency Graph
+#
+# Version:  1.4.0
+# Updated:  2026-06-16
+# Schema:   skills/graph/graph-schema.yaml
+#
+# This file is the authoritative directed acyclic graph (DAG) of all skills.
+# It is updated automatically by skill-authoring (SKL-012) on every registration.
+#
+# Edge types:
+#   dependency    Hard requirement — skill A CANNOT run without skill B's output
+#   composition   Skill A orchestrates skill B as a subprocess
+#   extension     Skill A is a specialization of skill B
+#   co_occurrence Skill A and B are frequently used together (no direction constraint)
+
+meta:
+  version: "1.6.0"
+  last_updated: "2026-06-17"
+  total_nodes: 30
+  total_edges: 67
+  schema: "skills/graph/graph-schema.yaml"
+
+# ─────────────────────────────────────────────
+# NODES
+# ─────────────────────────────────────────────
+nodes:
+
+  - id: SKL-001
+    name: requirement-analysis
+    domain: requirements
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-entry
+
+  - id: SKL-002
+    name: architecture-design
+    domain: architecture
+    mastery_level: advanced
+    version: "1.1.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-003
+    name: feature-planning
+    domain: planning
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-004
+    name: clean-code-review
+    domain: review
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-005
+    name: testing-strategy
+    domain: testing
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-006
+    name: security-review
+    domain: security
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-007
+    name: deployment-strategy
+    domain: deployment
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-release
+
+  - id: SKL-008
+    name: documentation-generation
+    domain: documentation
+    mastery_level: beginner
+    version: "1.0.0"
+    status: active
+    layer: pipeline-support
+
+  - id: SKL-009
+    name: schema-validation
+    domain: validation
+    mastery_level: beginner
+    version: "1.0.0"
+    status: active
+    layer: utility
+
+  - id: SKL-010
+    name: orchestration
+    domain: system
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-011
+    name: documentation-maintenance
+    domain: documentation
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-support
+
+  - id: SKL-012
+    name: skill-authoring
+    domain: meta
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-013
+    name: context-memory
+    domain: system
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: utility
+
+  - id: SKL-014
+    name: observability
+    domain: system
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: utility
+
+  - id: SKL-015
+    name: quality-scoring
+    domain: meta
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-016
+    name: skill-lifecycle
+    domain: meta
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-017
+    name: trigger-engineering
+    domain: meta
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-018
+    name: validation-rules
+    domain: meta
+    mastery_level: beginner
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-019
+    name: versioning
+    domain: meta
+    mastery_level: beginner
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  - id: SKL-020
+    name: create-sub-agent
+    domain: meta
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: meta
+
+  # ── NEW INFRASTRUCTURE & EXECUTION SKILLS (SKL-021 to SKL-030) ──────
+
+  - id: SKL-021
+    name: state-manager
+    domain: orchestration
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: infrastructure
+
+  - id: SKL-022
+    name: context-compressor
+    domain: orchestration
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: infrastructure
+
+  - id: SKL-023
+    name: dependency-analyzer
+    domain: architecture
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-024
+    name: change-impact-analyzer
+    domain: architecture
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-025
+    name: event-router
+    domain: orchestration
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: infrastructure
+
+  - id: SKL-026
+    name: code-generator
+    domain: implementation
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-execution
+
+  - id: SKL-027
+    name: adr-generator
+    domain: documentation
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-execution
+
+  - id: SKL-028
+    name: test-generator
+    domain: testing
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-execution
+
+  - id: SKL-029
+    name: code-repair
+    domain: implementation
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-execution
+
+  - id: SKL-030
+    name: rollback-manager
+    domain: orchestration
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-safety
+
+# ─────────────────────────────────────────────
+# EDGES
+# ─────────────────────────────────────────────
+edges:
+
+  # ── DEPENDENCY edges (hard requirements) ──────────────────────────
+  - from: SKL-001
+    to: SKL-002
+    type: dependency
+    label: "requirements → architecture needs validated requirements"
+
+  - from: SKL-001
+    to: SKL-003
+    type: dependency
+    label: "requirements → feature-planning needs requirement IDs for traceability"
+
+  - from: SKL-001
+    to: SKL-005
+    type: dependency
+    label: "requirements → testing needs requirement IDs for test case mapping"
+
+  - from: SKL-001
+    to: SKL-008
+    type: dependency
+    label: "requirements → documentation generation needs requirement summaries"
+
+  - from: SKL-002
+    to: SKL-003
+    type: dependency
+    label: "architecture → feature-planning derives tasks from modules"
+
+  - from: SKL-002
+    to: SKL-005
+    type: dependency
+    label: "architecture → testing needs module boundaries for coverage targets"
+
+  - from: SKL-002
+    to: SKL-006
+    type: dependency
+    label: "architecture → security review needs architecture for threat modeling"
+
+  - from: SKL-002
+    to: SKL-007
+    type: dependency
+    label: "architecture → deployment strategy needs module topology"
+
+  - from: SKL-002
+    to: SKL-008
+    type: dependency
+    label: "architecture → documentation generation uses modules + integration points"
+
+  - from: SKL-003
+    to: SKL-004
+    type: dependency
+    label: "feature-planning → code review scope defined by task breakdown"
+
+  - from: SKL-003
+    to: SKL-005
+    type: dependency
+    label: "feature-planning → testing strategy maps test cases to tasks"
+
+  - from: SKL-004
+    to: SKL-006
+    type: dependency
+    label: "code-review → security review uses code snippets from review"
+
+  - from: SKL-004
+    to: SKL-008
+    type: dependency
+    label: "code-review → documentation generation uses quality findings for onboarding"
+
+  - from: SKL-005
+    to: SKL-007
+    type: dependency
+    label: "testing → deployment strategy uses quality gates for promotion rules"
+
+  - from: SKL-008
+    to: SKL-011
+    type: dependency
+    label: "doc-generation → doc-maintenance keeps generated docs in sync"
+
+  - from: SKL-009
+    to: SKL-011
+    type: dependency
+    label: "schema-validation → doc-maintainer validates new doc file structure"
+
+  - from: SKL-009
+    to: SKL-012
+    type: dependency
+    label: "schema-validation → skill-authoring validates generated skill schemas"
+
+  - from: SKL-011
+    to: SKL-012
+    type: dependency
+    label: "doc-maintenance → skill-authoring triggers doc updates after registration"
+
+  # ── COMPOSITION edges (orchestration) ─────────────────────────────
+  - from: SKL-010
+    to: SKL-001
+    type: composition
+    label: "orchestrator drives requirement-analysis as pipeline entry"
+
+  - from: SKL-010
+    to: SKL-002
+    type: composition
+    label: "orchestrator drives architecture-design"
+
+  - from: SKL-010
+    to: SKL-003
+    type: composition
+    label: "orchestrator drives feature-planning"
+
+  - from: SKL-010
+    to: SKL-004
+    type: composition
+    label: "orchestrator drives clean-code-review"
+
+  - from: SKL-010
+    to: SKL-005
+    type: composition
+    label: "orchestrator drives testing-strategy"
+
+  - from: SKL-010
+    to: SKL-006
+    type: composition
+    label: "orchestrator drives security-review"
+
+  - from: SKL-010
+    to: SKL-007
+    type: composition
+    label: "orchestrator drives deployment-strategy"
+
+  - from: SKL-010
+    to: SKL-009
+    type: composition
+    label: "orchestrator invokes schema-validator after every step"
+
+  # ── EXTENSION edges (specialization) ──────────────────────────────
+  - from: SKL-011
+    to: SKL-008
+    type: extension
+    label: "doc-maintenance extends doc-generation (maintenance specializes generation)"
+
+  - from: SKL-012
+    to: SKL-010
+    type: extension
+    label: "skill-authoring extends orchestration at the meta level (creates what orchestrator runs)"
+
+  # ── CO_OCCURRENCE edges (frequent pairing, no direction) ──────────
+  - from: SKL-004
+    to: SKL-006
+    type: co_occurrence
+    label: "code-review and security-review run together in full-audit mode"
+
+  - from: SKL-005
+    to: SKL-007
+    type: co_occurrence
+    label: "testing and deployment strategy are always planned together pre-release"
+
+  - from: SKL-008
+    to: SKL-011
+    type: co_occurrence
+    label: "doc generation and maintenance are tightly coupled in the documentation domain"
+
+  # ── NEW META-SKILL EDGES (SKL-013 to SKL-020) ─────────────────────
+
+  # COMPOSITION: orchestrator drives context-memory for state management
+  - from: SKL-010
+    to: SKL-013
+    type: composition
+    label: "orchestrator invokes context-memory to serialize, compress, and restore session state"
+
+  # COMPOSITION: every skill applies observability metrics protocol
+  - from: SKL-010
+    to: SKL-014
+    type: composition
+    label: "orchestrator aggregates per-skill observability metrics into pipeline report"
+
+  # DEPENDENCY: skill-authoring uses quality-scoring as its registration gate
+  - from: SKL-015
+    to: SKL-012
+    type: dependency
+    label: "quality-scoring is consumed by skill-authoring to gate registration at quality_score >= 60"
+
+  # DEPENDENCY: skill-authoring uses trigger-engineering to define routing
+  - from: SKL-017
+    to: SKL-012
+    type: dependency
+    label: "trigger-engineering produces activation tests consumed by skill-authoring during validation"
+
+  # DEPENDENCY: validation-rules uses schema-validator to validate index entries
+  - from: SKL-009
+    to: SKL-018
+    type: dependency
+    label: "validation-rules depends on schema-validator to check index.yaml field conformance"
+
+  # DEPENDENCY: skill-authoring uses validation-rules in Step 8
+  - from: SKL-018
+    to: SKL-012
+    type: dependency
+    label: "validation-rules produces validation_report consumed by skill-authoring Step 8"
+
+  # DEPENDENCY: skill-authoring uses versioning to assign version numbers
+  - from: SKL-019
+    to: SKL-012
+    type: dependency
+    label: "versioning produces version_assignment consumed by skill-authoring Step 9"
+
+  # DEPENDENCY: create-sub-agent uses schema-validator to validate input contracts
+  - from: SKL-009
+    to: SKL-020
+    type: dependency
+    label: "create-sub-agent uses schema-validator to validate input and output contracts"
+
+  # CO-OCCURRENCE: skill-lifecycle and skill-authoring are always used together in skill evolution
+  - from: SKL-016
+    to: SKL-012
+    type: co_occurrence
+    label: "skill-lifecycle and skill-authoring are co-used in every skill evolution and retirement workflow"
+
+  # CO-OCCURRENCE: quality-scoring and skill-lifecycle are paired in monitoring and evolution
+  - from: SKL-015
+    to: SKL-016
+    type: co_occurrence
+    label: "quality-scoring and skill-lifecycle used together during monitoring stage to decide evolution or deprecation"
+
+  # CO-OCCURRENCE: versioning and skill-lifecycle are paired during MAJOR changes
+  - from: SKL-019
+    to: SKL-016
+    type: co_occurrence
+    label: "versioning and skill-lifecycle co-occur during deprecation and retirement stage transitions"
+
+  # CO-OCCURRENCE: create-sub-agent and skill-authoring are adjacent meta tools
+  - from: SKL-020
+    to: SKL-012
+    type: co_occurrence
+    label: "create-sub-agent and skill-authoring are co-used when scaffolding a new skill that includes a sub-agent"
+
+  # ── NEW INFRASTRUCTURE & EXECUTION EDGES (SKL-021 to SKL-030) ────────
+
+  # COMPOSITION: orchestrator invokes state-manager for all cross-skill state operations
+  - from: SKL-010
+    to: SKL-021
+    type: composition
+    label: "orchestrator invokes state-manager for every read, write, snapshot, and restore of shared state"
+
+  # COMPOSITION: context-memory uses state-manager for persistence and restore
+  - from: SKL-013
+    to: SKL-021
+    type: composition
+    label: "context-memory delegates all state persistence and restoration to state-manager"
+
+  # DEPENDENCY: context-memory depends on context-compressor for compression
+  - from: SKL-013
+    to: SKL-022
+    type: dependency
+    label: "context-memory uses context-compressor to compress session state when token budget is exceeded"
+
+  # COMPOSITION: orchestrator invokes context-compressor on high token pressure
+  - from: SKL-010
+    to: SKL-022
+    type: composition
+    label: "orchestrator invokes context-compressor automatically when context.pressure_high event fires"
+
+  # DEPENDENCY: dependency-analyzer requires architecture module definitions
+  - from: SKL-023
+    to: SKL-002
+    type: dependency
+    label: "dependency-analyzer requires architecture module list to map files to owning modules"
+
+  # COMPOSITION: dependency-analyzer reads and writes dependency graph via state-manager
+  - from: SKL-023
+    to: SKL-021
+    type: composition
+    label: "dependency-analyzer reads code_map and writes updated dependency_graph via state-manager"
+
+  # DEPENDENCY: change-impact-analyzer consumes dependency graph from dependency-analyzer
+  - from: SKL-024
+    to: SKL-023
+    type: dependency
+    label: "change-impact-analyzer uses dependency_graph from dependency-analyzer for transitive impact traversal"
+
+  # COMPOSITION: orchestrator mandates change-impact-analyzer before every execution step
+  - from: SKL-010
+    to: SKL-024
+    type: composition
+    label: "orchestrator invokes change-impact-analyzer before any code modification to compute required_skills"
+
+  # DEPENDENCY: event-router reads dispatch map and event log from state-manager
+  - from: SKL-025
+    to: SKL-021
+    type: dependency
+    label: "event-router reads dispatch_map and event_log from state-manager for routing and deduplication"
+
+  # COMPOSITION: orchestrator uses event-router for all event dispatch
+  - from: SKL-010
+    to: SKL-025
+    type: composition
+    label: "orchestrator routes every system event through event-router before reaching skill executors"
+
+  # DEPENDENCY: code-generator requires architecture module definitions
+  - from: SKL-026
+    to: SKL-002
+    type: dependency
+    label: "code-generator requires architecture modules for import resolution and contract adherence"
+
+  # DEPENDENCY: code-generator requires feature plan for task-to-module mapping
+  - from: SKL-026
+    to: SKL-003
+    type: dependency
+    label: "code-generator uses feature-planning task list to determine which modules and stubs to generate"
+
+  # CO-OCCURRENCE: clean-code-review always runs immediately after code-generator
+  - from: SKL-004
+    to: SKL-026
+    type: co_occurrence
+    label: "clean-code-review is mandated after every code-generator output — never skip this pairing"
+
+  # DEPENDENCY: adr-generator requires architecture decisions as primary input
+  - from: SKL-027
+    to: SKL-002
+    type: dependency
+    label: "adr-generator is invoked by architecture-design and requires its decision output as primary input"
+
+  # CO-OCCURRENCE: doc-maintainer and adr-generator co-occur whenever ADRs are produced
+  - from: SKL-007
+    to: SKL-027
+    type: co_occurrence
+    label: "doc-maintainer runs after adr-generator to sync /docs/adr index and cross-references"
+
+  # DEPENDENCY: test-generator uses testing-strategy for tier targets and edge case list
+  - from: SKL-028
+    to: SKL-005
+    type: dependency
+    label: "test-generator uses testing-strategy tier targets and edge_cases list to guide test case generation"
+
+  # DEPENDENCY: test-generator generates tests for code-generator artifacts
+  - from: SKL-028
+    to: SKL-026
+    type: dependency
+    label: "test-generator takes code-generator artifacts as primary target for test suite generation"
+
+  # DEPENDENCY: test-generator uses change-impact-analyzer to identify invalidated tests
+  - from: SKL-028
+    to: SKL-024
+    type: dependency
+    label: "test-generator uses change-impact-analyzer invalidated_tests list to regenerate only affected tests"
+
+  # DEPENDENCY: code-repair fixes artifacts produced by code-generator
+  - from: SKL-029
+    to: SKL-026
+    type: dependency
+    label: "code-repair targets code-generator artifacts when they produce compile errors or test failures"
+
+  # DEPENDENCY: code-repair receives test.failed events routed by event-router
+  - from: SKL-029
+    to: SKL-025
+    type: dependency
+    label: "code-repair is activated by test.failed events dispatched through event-router"
+
+  # DEPENDENCY: rollback-manager reads snapshots from state-manager
+  - from: SKL-030
+    to: SKL-021
+    type: dependency
+    label: "rollback-manager reads all snapshots and pipeline state from state-manager to compute rollback plan"
+
+  # DEPENDENCY: rollback-manager receives critical failure events via event-router
+  - from: SKL-030
+    to: SKL-025
+    type: dependency
+    label: "rollback-manager is triggered by critical failure events dispatched through event-router"
+
+  # COMPOSITION: orchestrator uses rollback-manager as the last-resort recovery mechanism
+  - from: SKL-010
+    to: SKL-030
+    type: composition
+    label: "orchestrator invokes rollback-manager when impact_severity=critical and code-repair is exhausted"
+
+  # DEPENDENCY: code-repair escalation can trigger rollback-manager when all repair candidates fail
+  - from: SKL-029
+    to: SKL-030
+    type: dependency
+    label: "code-repair escalation path (repair_outcome.escalated=true) activates rollback-manager for state recovery"
