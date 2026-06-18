@@ -1,6 +1,7 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "requirements-only",
+  "version": "1.0.0",
   "description": "Extract, normalize, and validate requirements from raw input. Stops after requirement analysis — use when scoping a feature before committing to design.",
   "mode": "sequential",
   "skills": [

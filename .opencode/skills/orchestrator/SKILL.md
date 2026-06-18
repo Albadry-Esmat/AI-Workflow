@@ -1,8 +1,8 @@
 ---
 name: orchestrator
-version: 1.0.0
+version: 1.1.0
 domain: system
-description: Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".
+description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
 ---
 
@@ -74,6 +74,13 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 ## Execution Logic
 
 ```
+Step 0 — Normalize prompt via prompt-normalizer (SKL-040)
+  Pass initial_payload.raw_input to prompt-normalizer.
+  If action = "ask_clarification": emit clarification request and HALT — do not begin pipeline.
+  If action = "request_pipeline_selection": present pipeline options to user and HALT.
+  If action = "route_immediately": use normalized_prompt and detected pipeline for Step 1.
+  Output: normalized_payload, selected_pipeline
+
 Step 1 — Resolve pipeline from registry
   Look up each skill name in registry.json. Resolve file path, version, input/output schemas.
   Validate that all dependencies (consumes_from) are satisfied.
@@ -97,6 +104,9 @@ Step 3 — Execute skills (mode-dependent)
     e) If validation fails AND no retries → emit error, pause pipeline
     f) Check HITL gate (if configured for this skill) — pause and wait for approval/rejection
     g) Append output to session_context
+  Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
+    writes from each group MUST be serialized (one at a time, mutex-locked). Concurrent
+    skill execution is allowed; concurrent writes to session_context are not.
   Output: intermediate results per step
 
 Step 4 — Handle feedback loops
@@ -116,10 +126,19 @@ Step 5 — Check HITL gates
     If modified: apply modifications, re-validate, continue
   Output: gate decision log
 
-Step 6 — Assemble final result
+Step 6 — ADR sync
+  After any skill that emits an ADR artifact: write to scope "adr_index" (canonical source).
+  Do NOT write to decision_log.adrs — that scope is deprecated.
+  Output: updated adr_index
+
+Step 7 — Assemble final result + session summary
   Combine all skill outputs, execution log, gate decisions, metrics.
   Persist final session_context to `.opencode/state/sessions/<session_id>.json` with `status: "completed"`.
   Update `.opencode/state/last_session.txt` with the session_id.
+  Generate session summary node for graphify:
+    Run: graphify update . (AST-only, no API cost) to keep the knowledge graph current.
+    Append session summary entry to `.opencode/state/session_summaries.jsonl`:
+      { session_id, pipeline_template, skills_run, outcome, timestamp, key_decisions[] }
   Output: complete pipeline result
 ```
 
@@ -149,7 +168,32 @@ Gates are configured in `pipeline_config.gates`. Each gate defines:
 - After `architecture-design` — sign off on architecture before planning
 - After `feature-planning` — approve roadmap before implementation
 - After `security-review` — approve security posture before deployment
-- After `deployment-strategy` — final deploy approval
+- After `implementation-completeness-guard` — block advancement if readiness score below threshold
+- After `deployment-strategy` — **mandatory non-bypassable release gate** (see Release Gate Policy below)
+
+### Release Gate Policy
+
+The deployment gate is a system-level invariant. It differs from all other gates:
+
+| Property | Standard Gates | Deployment Gate |
+|----------|---------------|-----------------|
+| `type` | `human_approval` | `human_approval` |
+| `timeout` | 3600s (default) | **0 (wait indefinitely)** |
+| `bypass_on_timeout` | `true` | **`false` — never bypass** |
+| Auto-continue | Allowed | **Prohibited** |
+| Skip allowed | Yes (configurable) | **No — hardcoded** |
+
+The orchestrator MUST enforce the following check before executing any deployment action:
+
+```
+if pipeline_config.gates does not include a gate with:
+    after_skill = "deployment-strategy"
+    type = "human_approval"
+    bypass_on_timeout = false
+→ REJECT pipeline execution with error: {"error": "MISSING_DEPLOYMENT_GATE"}
+```
+
+The orchestrator MUST present the `deployment_approval_request` artifact from the deployment-strategy output as the gate approval content.
 
 ## Token Optimization
 
@@ -188,6 +232,11 @@ Gates are configured in `pipeline_config.gates`. Each gate defines:
 - Max retries per skill: 5. Pipeline halts if a skill fails all retries.
 - The orchestrator is the ONLY skill that may directly invoke other skills.
 - HITL gate decisions are append-only — they cannot be modified after being recorded.
+- **The deployment gate MUST NOT be bypassed.** Any pipeline_config without a non-bypassable deployment gate on `deployment-strategy` is rejected before execution starts.
+- **Guard skill verdicts with `verdict: "block"` MUST halt the pipeline gate immediately.** The orchestrator MUST NOT advance past a guard that returned `block`.
+- **Parallel write-back serialization (D3):** When `mode: "parallel"` or `parallel_groups` are used, concurrent skill execution is permitted, but writes to `session_context` MUST be serialized. Implement a write queue: each group's output is appended to `session_context` only after the previous group's write completes. Race conditions in session_context are a pipeline-integrity error.
+- **ADR canonical source:** All ADR writes go to `scope: "adr_index"` via state-manager. Do NOT write to `decision_log.adrs` (deprecated). The `adr_index` scope is the single source of truth for all architecture decisions.
+- **Prompt normalization gate:** Step 0 (prompt-normalizer SKL-040) MUST complete before any pipeline resolution begins. A `halt` or `ask_clarification` result from SKL-040 terminates the orchestrator immediately with a clarification request to the user.
 
 ## 8. Security Considerations
 

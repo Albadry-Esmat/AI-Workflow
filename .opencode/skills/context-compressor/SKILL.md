@@ -2,7 +2,7 @@
 name: context-compressor
 version: 1.0.0
 domain: system
-description: Use when compressing large code, history, or artifact context into semantic summaries to fit within token budgets. Triggers on: "compress context", "summarize code", "reduce token usage", "context too large", "token budget exceeded", "compress artifacts".
+description: 'Use when compressing large code, history, or artifact context into semantic summaries to fit within token budgets. Triggers on: "compress context", "summarize code", "reduce token usage", "context too large", "token budget exceeded", "compress artifacts".'
 author: system
 ---
 

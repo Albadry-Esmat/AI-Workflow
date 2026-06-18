@@ -1,0 +1,1 @@
+{"nodes": [{"id": "event_router_skill", "label": "event-router", "file_type": "code", "source_file": ".opencode/skills/event-router/SKILL.md"}], "edges": [{"source": "event_router_skill", "target": "doc_maintainer_skill", "relation": "calls", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": ".opencode/skills/event-router/SKILL.md"}], "hyperedges": []}

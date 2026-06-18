@@ -1,23 +1,34 @@
 # How to Use — Developer & AI Agent Guide
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 2.2.0 | **Last updated:** 2026-06-18
 
 ## For Developers
 
 ### How to Add a New Feature
 
 ```
-1. Start with raw input (feature description)
-2. Run requirement-analyzer to normalize requirements
-3. Review open_questions and assumptions — resolve with stakeholder
-4. Run architecture-design to get module definitions
-5. Run feature-planning to get tasks and roadmap
-6. Implement code per task breakdown
-7. Run clean-code-review on implemented code
-8. Run testing-strategy to define test cases
-9. Run security-review to check for vulnerabilities
-10. Run deployment-strategy to define release plan
-11. Run documentation-generator to produce docs
+ 1. Start with raw input (feature description)
+ 2. Run requirement-analyzer → structured requirements, open_questions   [Phase 1]
+ 3. Resolve open_questions with stakeholder; HITL gate approves scope   [HITL gate]
+ 4. Run architecture-design; adr-generator captures decisions (async)   [Phase 2]
+ 5. Run frontend-ux-architect + database-architect in parallel          [Phase 2b]
+ 6. HITL gate: approve architecture, UX design, and DB schema           [HITL gate]
+ 7. Run dependency-analyzer to build / refresh module dependency graph  [Phase 3]
+ 8. Run feature-planning → tasks, dependency map, roadmap               [Phase 4]
+ 9. HITL gate: approve roadmap and impact surface                       [HITL gate]
+10. Run change-impact-analyzer; pipeline blocks if severity = critical  [Phase 5]
+11. Run code-generator to produce implementation artifacts              [Phase 6]
+12. Run in parallel: clean-code-review, testing-strategy,               [Phase 7]
+    security-review, test-generator
+13. HITL gate: approve security posture and test coverage               [HITL gate]
+14. Run guard layer in parallel: database-guard, performance-guard,     [Phase 7b]
+    ui-ux-compliance-guard — any 'block' verdict halts the pipeline
+15. If test.failed OR build.broken → run code-repair (conditional)      [Phase 8]
+16. Run implementation-completeness-auditor to score coverage           [Phase 8b]
+17. Run implementation-completeness-guard; blocks if score < 85%        [Phase 8c]
+18. Run deployment-strategy to define release plan and promotion rules  [Phase 9]
+19. Provide mandatory deployment approval — non-bypassable HITL gate    [HITL gate]
+20. documentation-generator + doc-maintainer execute asynchronously     [Phase 10]
 ```
 
 ### How to Create a New Skill

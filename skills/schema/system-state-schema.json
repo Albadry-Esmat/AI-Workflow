@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel"]
     },
 
     "created_at": {
@@ -201,7 +201,7 @@
 
     "decision_log": {
       "type": "object",
-      "description": "Index of Architecture Decision Records",
+      "description": "@deprecated — use adr_index instead. decision_log.adrs is maintained for backward compatibility only. The canonical ADR source is the top-level adr_index array, maintained by adr-generator (SKL-027) and written via state-manager scope: 'adr_index'.",
       "properties": {
         "adrs": {
           "type": "array",

@@ -1,6 +1,6 @@
 # Architecture — System Architecture
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 2.0.0 | **Last updated:** 2026-06-17
 
 ## Component Model
 
@@ -126,8 +126,44 @@ Human-in-the-loop gates pause the pipeline at:
 
 1. After requirement analysis — validate scope
 2. After architecture design — sign off on design
-3. After feature planning — approve roadmap
-4. After security review — approve security posture
-5. Before deployment — final go/no-go
+3. After frontend-ux-architect — UX architecture approval
+4. After database-architect — database schema approval
+5. After feature planning — approve roadmap
+6. After security review — approve security posture
+7. After implementation-completeness-auditor — completeness sign-off
+8. **Before deployment — mandatory non-bypassable deployment gate (no timeout)**
 
-See [Governance](governance.md) for gate rules and [Workflows](workflows.md) for flow integration.
+See [Governance](governance.md) for gate rules, guard skill details, and the deployment gate policy.
+
+## UI/UX and Database Architecture Layers
+
+As of v2.0.0, the system has two additional design-phase skill layers that run in parallel after `architecture-design`:
+
+```
+architecture-design (SKL-002)
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+frontend-   database-
+ux-architect architect
+(SKL-031)   (SKL-032)
+    │         │
+    ▼         ▼
+ui-ux-     database-
+compliance  guard
+guard       (SKL-034)
+(SKL-036)
+```
+
+### Frontend UI/UX Architect (SKL-031)
+
+Produces the UI/UX architecture specification: screen inventory, navigation map, component contracts, interaction patterns, accessibility report, and token requirements. Consumed by the `ui-ux-compliance-guard` (SKL-036).
+
+### Database Architect (SKL-032)
+
+Produces the data model: entity definitions, ERD, relationships, indexes, migration plan, and security annotations. Consumed by the `database-guard` (SKL-034).
+
+## Guard Layer
+
+As of v2.0.0, four guard skills run as `validation_check` gates in the pipeline. See [Governance](governance.md#guard-skills-layer-2) for the full guard inventory and verdict contract.

@@ -1,7 +1,7 @@
 # Skills Index — Central Source of Truth
 #
-# Version:  1.5.0
-# Updated:  2026-06-17
+# Version:  2.5.0
+# Updated:  2026-06-18
 # Schema:   skills/schema/skill-schema.yaml
 # Docs:     docs/skills-registry.md
 #
@@ -14,9 +14,9 @@
 # Validation rules: skills/schema/validation-rules.md
 
 meta:
-  version: "1.5.0"
+  version: "2.5.0"
   schema: "skills/schema/skill-schema.yaml"
-  last_updated: "2026-06-17"
+  last_updated: "2026-06-18"
   description: "Central skills index for the AI Workflow system"
 
 skills:
@@ -31,7 +31,7 @@ skills:
       - "## Source References"
     executable_skill: .opencode/skills/requirement-analyzer/SKILL.md
     tags: [requirements, analysis, ambiguity, clarification, normalization, invest]
-    version: "1.1.0"
+    version: "1.2.0"
     depends_on: []
     mastery_level: intermediate
     use_when: >
@@ -51,7 +51,7 @@ skills:
       - "## Source References"
     executable_skill: .opencode/skills/architecture-design/SKILL.md
     tags: [architecture, ddd, solid, modules, design, boundaries, clean-architecture]
-    version: "1.1.0"
+    version: "1.2.0"
     depends_on: [SKL-001]
     mastery_level: advanced
     use_when: >
@@ -70,7 +70,7 @@ skills:
       - "## Anti-patterns"
     executable_skill: .opencode/skills/feature-planning/SKILL.md
     tags: [planning, tasks, roadmap, story-points, agile, milestones, dependencies]
-    version: "1.1.0"
+    version: "1.2.0"
     depends_on: [SKL-001, SKL-002]
     mastery_level: intermediate
     use_when: >
@@ -111,7 +111,7 @@ skills:
       - "## Source References"
     executable_skill: .opencode/skills/testing-strategy/SKILL.md
     tags: [testing, tdd, coverage, quality-gates, unit-tests, integration, pyramid]
-    version: "1.1.0"
+    version: "1.2.0"
     depends_on: [SKL-001, SKL-002, SKL-003]
     mastery_level: intermediate
     use_when: >
@@ -198,7 +198,7 @@ skills:
     reference_path: skills/knowledge/orchestration.md
     executable_skill: .opencode/skills/orchestrator/SKILL.md
     tags: [orchestration, pipeline, routing, hitl, meta-skill, retry, feedback-loop]
-    version: "1.0.0"
+    version: "1.1.0"
     depends_on: [SKL-001, SKL-002, SKL-003, SKL-004, SKL-005, SKL-006, SKL-007, SKL-009]
     mastery_level: advanced
     use_when: >
@@ -378,7 +378,7 @@ skills:
     reference_path: skills/knowledge/state-manager.md
     executable_skill: .opencode/skills/state-manager/SKILL.md
     tags: [state, persistence, snapshot, restore, session, shared-state]
-    version: "1.0.0"
+    version: "1.1.0"
     depends_on: []
     mastery_level: advanced
     use_when: >
@@ -408,7 +408,7 @@ skills:
     reference_path: skills/knowledge/dependency-analyzer.md
     executable_skill: .opencode/skills/dependency-analyzer/SKILL.md
     tags: [dependencies, graph, cycles, ripple-effect, impact, modules]
-    version: "1.0.0"
+    version: "1.1.0"
     depends_on: [SKL-002]
     mastery_level: advanced
     use_when: >
@@ -423,7 +423,7 @@ skills:
     reference_path: skills/knowledge/change-impact-analyzer.md
     executable_skill: .opencode/skills/change-impact-analyzer/SKILL.md
     tags: [impact, change, blast-radius, api, tests, security, modules]
-    version: "1.0.0"
+    version: "1.1.0"
     depends_on: [SKL-023, SKL-021]
     mastery_level: advanced
     use_when: >
@@ -453,7 +453,7 @@ skills:
     reference_path: skills/knowledge/code-generator.md
     executable_skill: .opencode/skills/code-generator/SKILL.md
     tags: [code-generation, scaffolding, implementation, boilerplate, stubs, modules]
-    version: "1.0.0"
+    version: "1.1.0"
     depends_on: [SKL-002, SKL-003]
     mastery_level: advanced
     use_when: >
@@ -475,7 +475,7 @@ skills:
       Documenting a significant architectural or technical decision, capturing alternatives
       considered and their tradeoffs, or superseding a prior ADR.
     do_not_use_when: >
-      General documentation — use documentation-generator (SKL-008) or doc-maintainer (SKL-007) instead.
+      General documentation — use documentation-generator (SKL-008) or doc-maintainer (SKL-011) instead.
 
   - id: SKL-028
     name: Test Generator
@@ -522,3 +522,205 @@ skills:
     do_not_use_when: >
       Minor code fixes — use code-repair (SKL-029) for recoverable failures. Rollback is for
       unrecoverable failures and deployment reversions only.
+
+  # ── NEW DOMAIN & GUARD SKILLS (SKL-031 to SKL-037) ──────────────────
+
+  - id: SKL-031
+    name: Frontend UI/UX Architect
+    short_description: Design and validate screen structure, navigation, component contracts, accessibility, and design token rules for any UI feature
+    reference_path: skills/knowledge/frontend-ux-architect.md
+    reference_sections:
+      - "## Principles"
+      - "## Screen Architecture"
+      - "## Accessibility Standards"
+      - "## Anti-Patterns"
+    executable_skill: .opencode/skills/frontend-ux-architect/SKILL.md
+    tags: [ui-ux, design, components, accessibility, wcag, design-tokens, navigation, responsive]
+    version: "1.0.0"
+    depends_on: [SKL-001, SKL-002]
+    mastery_level: advanced
+    use_when: >
+      Designing or validating any user interface layer — screen structure, component contracts,
+      navigation architecture, interaction patterns, or accessibility compliance.
+    do_not_use_when: >
+      Features with no user interface (pure API, background jobs, CLI tools).
+
+  - id: SKL-032
+    name: Database Architect
+    short_description: Design normalized schemas, ERDs, indexing strategies, audit logging, soft-delete patterns, and migration plans for any data model
+    reference_path: skills/knowledge/database-architect.md
+    reference_sections:
+      - "## Principles"
+      - "## Normalization Reference"
+      - "## Indexing Strategy"
+      - "## Anti-Patterns"
+    executable_skill: .opencode/skills/database-architect/SKILL.md
+    tags: [database, schema, erd, normalization, indexing, migrations, audit-logging, soft-delete]
+    version: "1.0.0"
+    depends_on: [SKL-001, SKL-002]
+    mastery_level: advanced
+    use_when: >
+      Designing or reviewing any data persistence layer — entity definitions, relationships,
+      migration strategies, indexing, or audit logging.
+    do_not_use_when: >
+      Features with no persistent state. For in-memory or ephemeral data, use architecture-design (SKL-002).
+
+  - id: SKL-033
+    name: Implementation Completeness Auditor
+    short_description: Cross-check all requirements against delivered code, tests, UI, DB, and docs; produce a readiness score (0–100) and traceability matrix
+    reference_path: skills/knowledge/implementation-completeness-auditor.md
+    reference_sections:
+      - "## Principles"
+      - "## Coverage Dimensions"
+      - "## Gap Classifications"
+      - "## Readiness Score Calculation"
+    executable_skill: .opencode/skills/implementation-completeness-auditor/SKILL.md
+    tags: [completeness, audit, traceability, readiness-score, gap-analysis, requirements-coverage]
+    version: "1.1.0"
+    depends_on: [SKL-001, SKL-002, SKL-003, SKL-026]
+    mastery_level: intermediate
+    use_when: >
+      Verifying that all requirements have been fully implemented before release — detecting
+      missing features, stubs, untested code, and undocumented functionality.
+    do_not_use_when: >
+      Early development stages where implementation is known to be incomplete.
+      Use at the end of an implementation cycle, not during it.
+
+  - id: SKL-034
+    name: Database Guard
+    short_description: Enforce database schema safety by blocking destructive migrations, missing FK indexes, unannotated PII, and missing cascade rules
+    reference_path: skills/knowledge/database-architect.md
+    reference_sections:
+      - "## Anti-Patterns"
+      - "## Security Rules"
+    executable_skill: .opencode/skills/database-guard/SKILL.md
+    tags: [guard, governance, database, migrations, pii, fk-index, schema-safety]
+    version: "1.0.0"
+    depends_on: [SKL-032]
+    mastery_level: intermediate
+    use_when: >
+      Validating any proposed schema change or migration before it is applied.
+      Runs as a validation_check gate in the pipeline after database-architect output.
+    do_not_use_when: >
+      No database changes in the current pipeline cycle.
+
+  - id: SKL-035
+    name: Performance Guard
+    short_description: Detect N+1 query patterns, missing query indexes, bulk operation anti-patterns, and blocking calls before they reach production
+    reference_path: skills/knowledge/architecture-design.md
+    reference_sections:
+      - "## Principles"
+    executable_skill: .opencode/skills/performance-guard/SKILL.md
+    tags: [guard, governance, performance, n-plus-one, indexes, bulk-operations, blocking]
+    version: "1.0.0"
+    depends_on: [SKL-002, SKL-004]
+    mastery_level: intermediate
+    use_when: >
+      Validating implementation for performance regressions after code generation
+      or before release. Runs as a validation_check gate in the pipeline.
+    do_not_use_when: >
+      No implementation artifacts exist yet (runs after code-generator, not before).
+
+  - id: SKL-036
+    name: UI/UX Compliance Guard
+    short_description: Block hardcoded design values, missing component states, prop contract violations, and accessibility issues in UI implementations
+    reference_path: skills/knowledge/frontend-ux-architect.md
+    reference_sections:
+      - "## Anti-Patterns"
+      - "## Accessibility Standards"
+      - "## Theme System"
+    executable_skill: .opencode/skills/ui-ux-compliance-guard/SKILL.md
+    tags: [guard, governance, ui-ux, design-system, accessibility, component-contracts, hardcoded-values]
+    version: "1.0.0"
+    depends_on: [SKL-031]
+    mastery_level: intermediate
+    use_when: >
+      Validating UI component implementations against the contracts defined in frontend-ux-architect.
+      Runs as a validation_check gate after UI code generation.
+    do_not_use_when: >
+      No UI components have been implemented yet, or the feature has no UI layer.
+
+  - id: SKL-037
+    name: Implementation Completeness Guard
+    short_description: Enforce the release readiness threshold by blocking pipeline advancement when the completeness audit score is below the configured minimum
+    reference_path: skills/knowledge/implementation-completeness-auditor.md
+    reference_sections:
+      - "## Readiness Score Calculation"
+      - "## Principles"
+    executable_skill: .opencode/skills/implementation-completeness-guard/SKILL.md
+    tags: [guard, governance, completeness, readiness-score, release-gate, threshold]
+    version: "1.0.0"
+    depends_on: [SKL-033]
+    mastery_level: beginner
+    use_when: >
+      Enforcing the release readiness threshold before deployment approval.
+      Always runs after implementation-completeness-auditor in a release pipeline.
+    do_not_use_when: >
+      implementation-completeness-auditor (SKL-033) has not been run in this pipeline cycle.
+
+  # ── WEBSITE GENERATION SKILLS (SKL-038 to SKL-039) ──────────────────────────
+
+  - id: SKL-038
+    name: Design System Generator
+    short_description: Generate design token files, component stubs, Storybook configuration, and theme config from a UX architecture spec
+    reference_path: skills/knowledge/frontend-ux-architect.md
+    reference_sections:
+      - "## Principles"
+      - "## Theme System"
+    executable_skill: .opencode/skills/design-system-generator/SKILL.md
+    tags: [design-system, tokens, components, storybook, tailwind, css-variables, scaffolding, theming]
+    version: "1.0.0"
+    depends_on: [SKL-031]
+    mastery_level: intermediate
+    use_when: >
+      Generating the concrete design system file artifacts — token files, component stubs,
+      Storybook configuration, and theme config — from the token requirements and component
+      contracts produced by frontend-ux-architect. Runs before code-generator so that token
+      names and component interfaces are established before implementation begins.
+    do_not_use_when: >
+      frontend-ux-architect (SKL-031) has not run yet — this skill requires token_requirements
+      and component_contracts as inputs. Also skip for projects with no UI layer.
+
+  - id: SKL-039
+    name: SEO Optimizer
+    short_description: Generate sitemap, robots.txt, JSON-LD structured data, Open Graph meta tags, and Core Web Vitals budget for any public-facing website
+    reference_path: skills/knowledge/frontend-ux-architect.md
+    reference_sections:
+      - "## Principles"
+    executable_skill: .opencode/skills/seo-optimizer/SKILL.md
+    tags: [seo, sitemap, structured-data, open-graph, meta-tags, core-web-vitals, robots-txt, json-ld]
+    version: "1.0.0"
+    depends_on: [SKL-001, SKL-031]
+    mastery_level: intermediate
+    use_when: >
+      Generating SEO artifacts and enforcing web performance standards for any public-facing website.
+      Runs after code-generator and before deployment-strategy so that SEO compliance is
+      verified before the site goes live.
+    do_not_use_when: >
+      Internal tools, admin panels, or developer portals without a public SEO requirement.
+      API-only backends with no frontend. Private applications behind authentication walls.
+
+  # ── META / ORCHESTRATION SKILLS (SKL-040+) ──────────────────────────────────
+
+  - id: SKL-040
+    name: Prompt Normalizer
+    short_description: Extract structured intent from a raw user prompt and produce a routing-ready normalized prompt or a single targeted clarification question
+    reference_path: skills/knowledge/prompt-normalizer.md
+    reference_sections:
+      - "## Principles"
+      - "## Anti-patterns"
+      - "## Examples"
+    executable_skill: .opencode/skills/prompt-normalizer/SKILL.md
+    tags: [prompt-normalization, intent-extraction, routing, meta, pre-processing, disambiguation]
+    version: "1.0.0"
+    depends_on: []
+    related_skills: [SKL-001, SKL-010, SKL-025]
+    mastery_level: intermediate
+    use_when: >
+      A raw user prompt is vague, missing routing keywords, or potentially ambiguous
+      before pipeline entry. Invoke before the routing table is consulted, when no
+      routing trigger keyword is matched with high confidence.
+    do_not_use_when: >
+      The prompt already contains unambiguous pipeline trigger keywords that map
+      cleanly to a routing table entry. Also skip for internal system events —
+      use event-router (SKL-025) instead.

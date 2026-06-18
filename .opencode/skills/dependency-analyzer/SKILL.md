@@ -1,8 +1,8 @@
 ---
 name: dependency-analyzer
-version: 1.0.0
+version: 1.1.0
 domain: architecture
-description: Use when analyzing module or library dependency graphs, detecting cycles, finding affected modules, or computing ripple effects of a change. Triggers on: "analyze dependencies", "what depends on this", "dependency graph", "find affected modules", "ripple effect", "dependency cycle".
+description: 'Use when analyzing module or library dependency graphs, detecting cycles, finding affected modules, or computing ripple effects of a change. Triggers on: "analyze dependencies", "what depends on this", "dependency graph", "find affected modules", "ripple effect", "dependency cycle".'
 author: system
 ---
 
@@ -43,6 +43,7 @@ Build and maintain a directed dependency graph across modules, files, and librar
 
 - Architecture modules from `architecture-design` (SKL-002) output — required for `build`.
 - Current code map from system state (`state-manager` read of `code_map` scope).
+- **Retrieval-first (graphify):** For `query` and `cycle_check` operations, first attempt `graphify query "<query_target>"` or `graphify path "<A>" "<B>"` to obtain a scoped subgraph. This avoids loading the full dependency_graph from state (token savings: ~60–80% on iterative sessions). Fall back to full state load only if `graphify-out/graph.json` is absent or the query returns no results.
 
 ## Execution Logic
 
@@ -60,7 +61,10 @@ Step 2 — Build or load graph
            Classify edges: internal (same module), cross-module, external (library).
   update:  Load existing_graph. For each changed file, re-parse imports.
            Remove stale edges from changed files. Add new edges.
-  query/cycle_check: Load existing_graph directly.
+  query/cycle_check:
+           Retrieval-first: Run `graphify query "<query_target>"` to get scoped subgraph.
+           If graphify unavailable or returns 0 nodes: load existing_graph from
+             state-manager (scope: "dependency_graph") as fallback.
   Output: dependency_graph
 
 Step 3 — Detect cycles

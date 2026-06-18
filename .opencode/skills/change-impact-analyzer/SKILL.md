@@ -1,8 +1,8 @@
 ---
 name: change-impact-analyzer
-version: 1.0.0
+version: 1.1.0
 domain: architecture
-description: Use when computing the full impact surface of a proposed change before executing it. Triggers on: "what is the impact of this change", "impact analysis", "what will break", "change impact", "blast radius", "before I change this".
+description: 'Use when computing the full impact surface of a proposed change before executing it. Triggers on: "what is the impact of this change", "impact analysis", "what will break", "change impact", "blast radius", "before I change this".'
 author: system
 ---
 
@@ -45,17 +45,25 @@ Before any modification is executed, compute the complete impact surface across 
 
 - Architecture from `architecture-design` output (or system state `architecture` scope).
 - Dependency graph from `dependency-analyzer` output (or system state `dependency_graph` scope).
+- **Retrieval-first (graphify):** For module mapping and transitive impact steps, first attempt:
+  - `graphify query "<changed_module>"` — retrieves the immediate neighbor subgraph (avoids full architecture load).
+  - `graphify path "<changed_module>" "<dependent_module>"` — shortest path for specific consumer chains.
+  Fall back to full state reads of `architecture` and `dependency_graph` only if `graphify-out/graph.json` is absent. Token savings: ~50–70% on typical impact analysis calls.
 
 ## Execution Logic
 
 ```
 Step 1 — Map changed files to modules
+  Retrieval-first: Run `graphify query "<changed_file>"` to resolve owning module.
+  If graphify unavailable: identify owning module from architecture state slice.
   For each file in affected_files: identify owning module from architecture.
   Flag files that belong to no module as "unassigned" (warning).
   Output: module_assignments
 
 Step 2 — Compute module impact
-  Using dependency_graph: find all modules that transitively depend on the changed modules.
+  Retrieval-first: Run `graphify query "<changed_module>"` to get transitive dependents.
+  For specific consumer chains: run `graphify path "<changed_module>" "<consumer>"`.
+  If graphify unavailable: traverse full dependency_graph from state.
   Classify each: direct (depth 1), transitive (depth 2+), isolated (no dependents).
   Output: module_impact_list
 

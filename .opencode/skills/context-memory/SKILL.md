@@ -1,6 +1,6 @@
 ---
 name: context-memory
-description: Use when managing session state, persisting context between turns, or preventing state bleed across executions in multi-turn skill orchestration. Triggers on: "remember this", "persist context", "restore session", "state management", "multi-turn".
+description: 'Use when managing session state, persisting context between turns, or preventing state bleed across executions in multi-turn skill orchestration. Triggers on: "remember this", "persist context", "restore session", "state management", "multi-turn".'
 ---
 
 # Context Memory Protocol
@@ -46,6 +46,11 @@ Every pipeline execution produces a `session_context` object that can be persist
     "total_tokens_out": 42000,
     "total_duration_ms": 123400,
     "orchestrator_version": "1.0.0"
+  },
+  "context_ttl": {
+    "expires_at": "ISO8601",
+    "policy": "30d | session | pipeline",
+    "auto_archive": true
   }
 }
 ```
@@ -125,11 +130,16 @@ The orchestrator:
 
 ## Token Budget Per Session
 
-| Session Type | Max Total Tokens (in + out) |
-|-------------|---------------------------|
-| Quick (1-2 skills) | 32K |
-| Standard (3-5 skills) | 64K |
-| Deep (6+ skills, multiple feedback loops) | 128K |
+The `token_budget.tier` field in system state MUST be one of the four valid enum values from `system-state-schema.json`:
+
+| `token_budget.tier` | Session Type | Max Total Tokens (in + out) |
+|--------------------|--------------|---------------------------|
+| `quick` | 1–2 skills, single feedback loop | 32K |
+| `partial_pipeline` | 3–5 skills | 64K |
+| `deep` | 6+ skills, multiple feedback loops | 128K |
+| `full_pipeline` | All pipeline phases, multi-team feedback | 256K |
+
+> **Note:** The previously documented `standard` tier does not exist in the schema. Any session using `standard` MUST be migrated to `partial_pipeline`.
 
 When budget is exhausted mid-pipeline, the orchestrator:
 1. Saves the `session_context` with `status: "halted"`.

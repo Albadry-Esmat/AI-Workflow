@@ -1,8 +1,8 @@
 ---
 name: architecture-design
-version: 1.1.0
+version: 1.2.0
 domain: architecture
-description: Use when asked to design a system architecture, define modules or services, plan data flow, choose technology stack, or map integration points. Triggers on: "design the architecture", "system design", "define modules", "how should the system be structured", "what tech stack".
+description: 'Use when asked to design a system architecture, define modules or services, plan data flow, choose technology stack, or map integration points. Triggers on: "design the architecture", "system design", "define modules", "how should the system be structured", "what tech stack".'
 author: system
 ---
 
@@ -64,10 +64,18 @@ Translate a validated requirements document into a concrete system architecture.
 
 - Requirements document from `requirement-analyzer` (or equivalent structured input).
 - Constraint list if available (technology stack, budget, timeline).
+- **Graphify retrieval-first:** Before design, run `graphify query "existing modules and architectural patterns"` if `graphify-out/graph.json` exists. Use retrieved module nodes to discover established boundaries and avoid architectural drift — do not recreate modules that already exist with a stable boundary. Fall back to full derivation from requirements if graph unavailable.
 
 ## Execution Logic
 
 ```
+Step 0 — Retrieve existing architecture context (graphify)
+  If graphify-out/graph.json exists: run graphify query "existing modules, boundaries, and architectural patterns".
+  Use retrieved nodes to: identify already-defined module boundaries (Step 2), surface proven pattern choices
+  already in use (Step 5), and avoid duplicating integration points already modelled (Step 4).
+  Fall back silently to Step 1 if graph unavailable.
+  Output: existing_arch_context { module_names[], patterns_in_use[], integration_types[] }
+
 Step 1 — Analyze functional clusters
   Group requirements by functional affinity. Each cluster becomes a candidate module.
   Output: module candidates with mapped requirement IDs
@@ -271,7 +279,7 @@ Step 7 — Assemble architecture document
 ```yaml
 composes:
   - skill: architecture-design
-    version: "^1.1.0"
+    version: "^1.2.0"
     input_map: { "requirements": "validated_requirements" }
     output_map: { "modules": "system_modules", "data_flow": "data_flow" }
 ```

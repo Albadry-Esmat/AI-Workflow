@@ -1,0 +1,188 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "admin-panel",
+  "version": "1.0.0",
+  "description": "End-to-end pipeline for internal admin and control panel interfaces: security and RBAC emphasis, no SEO phase (internal pages are noindex by default), heightened security review gate, and strict database guard for privileged data operations",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+      ]
+    },
+    {
+      "id": "phase-2b-design",
+      "label": "UI/UX + Database Design",
+      "parallel": true,
+      "skills": [
+        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-graph",
+      "label": "Dependency Graph",
+      "skills": [
+        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-planning",
+      "label": "Planning",
+      "skills": [
+        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-impact",
+      "label": "Impact Analysis",
+      "skills": [
+        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-execution",
+      "label": "Code Generation",
+      "skills": [
+        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-quality",
+      "label": "Quality + Testing",
+      "parallel": true,
+      "skills": [
+        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2 },
+        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
+        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7b-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-8-repair",
+      "label": "Repair (conditional)",
+      "condition": "test.failed OR build.broken",
+      "skills": [
+        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+      ]
+    },
+    {
+      "id": "phase-8b-audit",
+      "label": "Completeness Audit",
+      "skills": [
+        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8c-release-guard",
+      "label": "Release Gate",
+      "skills": [
+        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-9-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-10-docs",
+      "label": "Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["frontend-ux-architect", "database-architect"],
+    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Validate admin panel requirements — confirm RBAC model, privileged operations, and data access scope",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2-architecture",
+      "type": "human_approval",
+      "label": "Sign off on architecture — confirm auth boundaries, role hierarchy, and privileged data access patterns",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2b-design",
+      "type": "human_approval",
+      "label": "Approve UX architecture (RBAC layout, destructive action flows) and database schema",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-planning",
+      "type": "human_approval",
+      "label": "Approve roadmap before implementation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-impact",
+      "type": "condition",
+      "label": "Block if impact_severity=critical",
+      "condition": "change_impact.impact_severity !== 'critical'"
+    },
+    {
+      "after_phase": "phase-7b-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-7-quality",
+      "type": "human_approval",
+      "label": "Mandatory security sign-off — admin panels have elevated risk; all security findings must be resolved",
+      "timeout": 7200
+    },
+    {
+      "after_phase": "phase-8c-release-guard",
+      "type": "condition",
+      "label": "Block if completeness guard verdict is 'block'",
+      "condition": "release_guard.verdict === 'pass'"
+    },
+    {
+      "after_phase": "phase-9-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 3,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+}

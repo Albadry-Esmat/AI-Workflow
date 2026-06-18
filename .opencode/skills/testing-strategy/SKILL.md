@@ -1,8 +1,8 @@
 ---
 name: testing-strategy
-version: 1.1.0
+version: 1.2.0
 domain: testing
-description: Use when asked to define a testing strategy, write a test plan, identify edge cases, set coverage targets, or specify unit/integration/e2e tests. Triggers on: "testing strategy", "test plan", "write tests", "how should we test", "test coverage", "edge cases", "quality gates", "e2e tests".
+description: 'Use when asked to define a testing strategy, write a test plan, identify edge cases, set coverage targets, or specify unit/integration/e2e tests. Triggers on: "testing strategy", "test plan", "write tests", "how should we test", "test coverage", "edge cases", "quality gates", "e2e tests".'
 author: system
 ---
 
@@ -36,7 +36,13 @@ Generate a complete testing strategy that ensures production readiness. The skil
         "properties": {
           "id": { "type": "string" },
           "description": { "type": "string" },
-          "module": { "type": "string" }
+          "module": { "type": "string" },
+          "req_ids": { "type": "array", "items": { "type": "string" } },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Testable conditions from feature-planning — used as primary edge case seeds"
+          }
         }
       }
     },
@@ -79,9 +85,17 @@ Step 3 — Define integration tests
   Output: integration test list with setup requirements
 
 Step 4 — Identify edge cases
-  For each requirement, enumerate boundary conditions.
-  Empty states, null inputs, concurrent access, rate limits, overflow.
-  Output: edge case list per requirement
+  Primary source — acceptance criteria from tasks (if tasks[] provided with acceptance_criteria):
+    For each task.acceptance_criteria entry, derive:
+      At least one happy-path test case (the criterion succeeds as stated).
+      At least one edge case (the criterion fails or is stressed at its boundary).
+      Example AC: "Given valid JWT, when GET /users/:id, then 200 + user object"
+        → edge cases: expired JWT (401), non-existent user (404), DB timeout (503).
+    Tag all AC-derived cases with `"ac_derived": true` for traceability.
+  Secondary source — requirement boundary analysis:
+    For each requirement not already covered by AC-derived cases, enumerate boundary conditions.
+    Empty states, null inputs, concurrent access, rate limits, overflow.
+  Output: edge case list per requirement (with ac_derived flag for AC-sourced cases)
 
 Step 5 — Establish coverage targets
   Set minimum coverage thresholds per module and per test level.
@@ -231,6 +245,7 @@ Step 7 — Generate test plan
 - Edge cases MUST reference a valid `requirement_id` from input.
 - Coverage targets MUST sum to >= 60% minimum across all modules.
 - Quality gates MUST include at minimum: unit tests pass, coverage check, no critical/high bugs.
+- If `tasks[].acceptance_criteria` is provided, every AC entry MUST produce at least one test case (TC) and one edge case (EC). AC coverage is tracked in the `test_cases[].requirements_covered` field.
 
 ## Security Considerations
 
@@ -277,7 +292,7 @@ Step 7 — Generate test plan
 ```yaml
 composes:
   - skill: testing-strategy
-    version: "^1.1.0"
+    version: "^1.2.0"
     input_map: { "requirements": "requirements", "modules": "modules" }
     output_map: { "test_plan": "test_plan", "quality_gates": "quality_gates" }
   - skill: deployment-strategy

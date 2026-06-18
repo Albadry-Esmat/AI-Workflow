@@ -14,8 +14,8 @@ export default function ArchitecturePage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-16 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">Architecture</h1>
-        <p className="text-zinc-400 max-w-2xl mx-auto">
+        <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 dark:text-white mb-4">Architecture</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
           Three interconnected layers: a minimal multi-agent execution layer, a structured system state,
           and a versioned skill dependency graph with {graph.meta.total_nodes} nodes and {graph.meta.total_edges} edges.
         </p>

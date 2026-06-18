@@ -1,0 +1,1 @@
+{"nodes": [{"id": "doc_maintainer_agent", "label": "Doc-Maintainer Agent", "file_type": "code", "source_file": ".opencode/agent/doc-maintainer.md"}], "edges": [{"source": "doc_maintainer_agent", "target": "doc_maintainer_skill", "relation": "calls", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": ".opencode/agent/doc-maintainer.md"}], "hyperedges": []}

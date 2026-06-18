@@ -2,7 +2,7 @@
 name: security-review
 version: 1.0.0
 domain: security
-description: Use when asked to review security, find vulnerabilities, perform threat modeling, or assess risks in code or architecture. Triggers on: "security review", "find vulnerabilities", "threat modeling", "is this secure", "security risks", "OWASP", "penetration test", "security audit".
+description: 'Use when asked to review security, find vulnerabilities, perform threat modeling, or assess risks in code or architecture. Triggers on: "security review", "find vulnerabilities", "threat modeling", "is this secure", "security risks", "OWASP", "penetration test", "security audit".'
 author: system
 ---
 

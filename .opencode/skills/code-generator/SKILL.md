@@ -1,8 +1,8 @@
 ---
 name: code-generator
-version: 1.0.0
+version: 1.1.0
 domain: implementation
-description: Use when generating new code artifacts from architecture modules, feature plans, or interface contracts. Triggers on: "generate code", "implement this module", "scaffold this feature", "write the implementation", "generate from spec", "create boilerplate".
+description: 'Use when generating new code artifacts from architecture modules, feature plans, or interface contracts. Triggers on: "generate code", "implement this module", "scaffold this feature", "write the implementation", "generate from spec", "create boilerplate".'
 author: system
 ---
 
@@ -74,10 +74,18 @@ Step 3 — Generate code artifacts
     No conflict: generate directly.
   Output: generated_files list { path, content, language, target_type }
 
-Step 4 — Generate documentation stubs
-  For each public interface or exported function: generate JSDoc / docstring stub.
-  Mark all stubs with `// TODO: fill in description` for doc-maintainer to complete.
-  Output: documented_files (generated_files with doc stubs injected)
+Step 4 — Generate documentation stubs and requirement annotations
+  For each public interface, exported function, or class: generate a JSDoc / docstring stub.
+  If the artifact implements a task from the feature_plan, inject @req annotations before the stub body:
+    TypeScript/JS: /** @req TASK-0001 REQ-USR-001 Brief requirement description */
+    Python:        # @req TASK-0001 REQ-USR-001 Brief requirement description
+    Go/Rust:       // @req TASK-0001 REQ-USR-001 Brief requirement description
+  Rules for @req injection:
+    - Use the task's req_ids[] from feature_plan to determine which REQ IDs to annotate.
+    - If a function covers multiple requirements (multiple req_ids), emit one @req line per REQ ID.
+    - If no task mapping is available, emit `// @req UNKNOWN — link to requirement when known`.
+  Mark all doc stubs with `// TODO: fill in description` for doc-maintainer to complete.
+  Output: documented_files (generated_files with doc stubs and @req annotations injected)
 
 Step 5 — Validate generated code structure
   Parse generated code: check for syntax errors (language-specific parser).
@@ -183,6 +191,8 @@ Step 6 — Assemble output
 - `dry_run` mode does not write to state and does not emit `code.changed` events.
 - Maximum artifacts per invocation: 20 files. Larger scaffolds must be batched.
 - No hard-coded credentials, tokens, or environment-specific values in generated code — use placeholder constants only.
+- Every public function or class that implements a feature-plan task MUST carry at least one `@req TASK-XXXX REQ-NNN` annotation. Omission is a generation warning, not an error, but MUST be logged in `feedback`.
+- `@req` annotations use the format `@req {TASK-ID} {REQ-ID}` — both IDs required. Multiple requirements emit multiple lines.
 
 ## Security Considerations
 
@@ -202,6 +212,7 @@ Step 6 — Assemble output
 - [ ] Conflict detection runs against existing_code_map
 - [ ] Syntax validation runs on all generated files
 - [ ] No credentials or environment-specific values in output
+- [ ] Every public artifact mapped to a feature-plan task carries at least one @req annotation
 
 ## Failure Scenarios
 

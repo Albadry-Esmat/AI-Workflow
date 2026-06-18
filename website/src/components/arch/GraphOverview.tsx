@@ -20,24 +20,30 @@ export function GraphOverview({ graph }: Props) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-white mb-2 text-center">Skill Dependency Graph</h2>
-      <p className="text-zinc-400 text-sm text-center mb-4">
+      <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2 text-center">Skill Dependency Graph</h2>
+      <p className="text-zinc-600 dark:text-zinc-400 text-sm text-center mb-4">
         v{graph.meta.version} · {graph.meta.total_nodes} nodes · {graph.meta.total_edges} edges
       </p>
 
       {/* Edge type legend */}
-      <div className="flex flex-wrap justify-center gap-4 mb-10 text-xs text-zinc-400">
-        {Object.entries(edgeTypeCounts).map(([type, count]) => (
-          <div key={type} className="flex items-center gap-1.5">
-            <div className={`h-2 w-5 rounded-full ${
-              type === "dependency"   ? "bg-cyan-500" :
-              type === "composition"  ? "bg-violet-500" :
-              type === "co_occurrence"? "bg-amber-500" : "bg-zinc-500"
-            }`} />
-            <span>{type}</span>
-            <span className="text-zinc-600">({count})</span>
-          </div>
-        ))}
+      <div className="flex flex-wrap justify-center gap-4 mb-10 text-xs text-zinc-500 dark:text-zinc-400">
+        {Object.entries(edgeTypeCounts).map(([type, count]) => {
+          const label =
+            type === "dependency"    ? "depends on" :
+            type === "composition"   ? "uses" :
+            type === "co_occurrence" ? "often paired with" : type;
+          return (
+            <div key={type} className="flex items-center gap-1.5">
+              <div className={`h-2 w-5 rounded-full ${
+                type === "dependency"    ? "bg-cyan-500" :
+                type === "composition"   ? "bg-violet-500" :
+                type === "co_occurrence" ? "bg-amber-500" : "bg-zinc-500"
+              }`} />
+              <span>{label}</span>
+              <span className="text-zinc-400 dark:text-zinc-600">({count})</span>
+            </div>
+          );
+        })}
       </div>
 
       {/* Domain groups */}
@@ -55,13 +61,13 @@ export function GraphOverview({ graph }: Props) {
               <div className={`text-sm font-semibold ${c.text} mb-3 capitalize flex items-center gap-2`}>
                 <span className={`h-2 w-2 rounded-full ${c.dot}`} />
                 {domain}
-                <span className="text-zinc-500 font-normal text-xs">({nodes.length} skills)</span>
+                <span className="text-zinc-400 dark:text-zinc-500 font-normal text-xs">({nodes.length} skills)</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {nodes.map((n) => (
                   <span
                     key={n.id}
-                    className="font-mono text-xs rounded-md border border-zinc-700 bg-zinc-900/60 text-zinc-300 px-2 py-1"
+                    className="font-mono text-xs rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-300 px-2 py-1"
                   >
                     <span className="text-zinc-600">{n.id} </span>{n.name}
                   </span>

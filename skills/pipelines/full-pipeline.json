@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "2.0.0",
-  "description": "Full idea-to-production pipeline: requirements → architecture → dependency graph → impact analysis → code generation → review + test generation + security → deployment → docs",
+  "version": "2.1.0",
+  "description": "Full idea-to-production pipeline (v2.1.0): requirements → architecture + UX/DB design → dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → deployment → docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -17,7 +17,16 @@
       "label": "Architecture",
       "skills": [
         { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "adr-generator",        "version": "^1.0.0", "max_retries": 1, "async": true }
+        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+      ]
+    },
+    {
+      "id": "phase-2b-design",
+      "label": "UI/UX + Database Design",
+      "parallel": true,
+      "skills": [
+        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
       ]
     },
     {
@@ -53,10 +62,20 @@
       "label": "Quality + Testing",
       "parallel": true,
       "skills": [
-        { "name": "clean-code-review",  "version": "^1.1.0", "max_retries": 2 },
-        { "name": "testing-strategy",   "version": "^1.1.0", "max_retries": 2 },
-        { "name": "security-review",    "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",     "version": "^1.0.0", "max_retries": 2 }
+        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2 },
+        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
+        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7b-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "database-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
       ]
     },
     {
@@ -68,10 +87,24 @@
       ]
     },
     {
+      "id": "phase-8b-audit",
+      "label": "Completeness Audit",
+      "skills": [
+        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8c-release-guard",
+      "label": "Release Gate",
+      "skills": [
+        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
       "id": "phase-9-deploy",
       "label": "Deployment",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.0.0", "max_retries": 2 }
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
       ]
     },
     {
@@ -80,12 +113,14 @@
       "async": true,
       "skills": [
         { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",           "version": "^1.0.0", "max_retries": 1 }
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
       ]
     }
   ],
   "parallel_groups": [
-    ["clean-code-review", "testing-strategy", "security-review", "test-generator"]
+    ["frontend-ux-architect", "database-architect"],
+    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
   ],
   "gates": [
     {
@@ -97,7 +132,13 @@
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
-      "label": "Sign off on architecture before planning",
+      "label": "Sign off on architecture before design layer",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2b-design",
+      "type": "human_approval",
+      "label": "Approve UX architecture and database schema before planning",
       "timeout": 3600
     },
     {
@@ -108,21 +149,34 @@
     },
     {
       "after_phase": "phase-5-impact",
-      "type": "auto",
+      "type": "condition",
       "label": "Block if impact_severity=critical",
       "condition": "change_impact.impact_severity !== 'critical'"
     },
     {
+      "after_phase": "phase-7b-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Approve security posture and coverage before deployment",
+      "label": "Approve security posture and coverage before audit",
       "timeout": 3600
+    },
+    {
+      "after_phase": "phase-8c-release-guard",
+      "type": "condition",
+      "label": "Block if completeness guard verdict is 'block'",
+      "condition": "release_guard.verdict === 'pass'"
     },
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Final deploy approval",
-      "timeout": 3600
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
     }
   ],
   "recovery": {

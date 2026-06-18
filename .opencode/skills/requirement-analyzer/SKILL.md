@@ -1,8 +1,8 @@
 ---
 name: requirement-analyzer
-version: 1.1.0
+version: 1.2.0
 domain: requirements
-description: Use when given raw requirements, a feature request, or a user story that needs to be analyzed, clarified, and structured. Triggers on: "analyze requirements", "extract requirements", "what are the requirements", "clarify this requirement", "requirement analysis", "turn this into requirements".
+description: 'Use when given raw requirements, a feature request, or a user story that needs to be analyzed, clarified, and structured. Triggers on: "analyze requirements", "extract requirements", "what are the requirements", "clarify this requirement", "requirement analysis", "turn this into requirements".'
 author: system
 ---
 
@@ -37,10 +37,18 @@ Transform unstructured or semi-structured requirement input into a normalized, u
 
 - Must have system glossary if `domain_hints` is absent and domain vocabulary is used.
 - Prior requirement-analyzer output if this is a refinement pass.
+- **Graphify retrieval-first:** Before analysis, run `graphify query "existing requirements and domain entities"` if `graphify-out/graph.json` exists. Use retrieved nodes to: align domain vocabulary in normalization (Step 2), avoid generating duplicate REQ IDs, and pre-seed `domain_hints` with entity names already present in the codebase. Fall back to raw parsing if graph unavailable.
 
 ## Execution Logic
 
 ```
+Step 0 — Retrieve domain context (graphify)
+  If graphify-out/graph.json exists: run graphify query "domain entities and existing requirements".
+  Use retrieved nodes to: align domain vocabulary before normalization, surface existing REQ IDs to
+  avoid numbering collisions, and seed domain_hints if not provided by caller.
+  Fall back silently to Step 1 if graph unavailable.
+  Output: domain_context { entity_names[], existing_req_ids[], vocabulary_terms[] }
+
 Step 1 — Parse and tokenize raw input
   Split into candidate requirement statements. Remove noise (greetings, sign-offs, metadata).
   Output: list of raw statements
@@ -220,7 +228,7 @@ Step 7 — Assemble structured document
 # Example: full-analysis meta-skill
 composes:
   - skill: requirement-analyzer
-    version: "^1.1.0"
+    version: "^1.2.0"
     input_map: { "raw_input": "user_request" }
     output_map: { "requirements": "normalized_requirements" }
 ```

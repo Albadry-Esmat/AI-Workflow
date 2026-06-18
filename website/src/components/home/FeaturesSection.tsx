@@ -2,69 +2,98 @@
 import { motion } from "framer-motion";
 import {
   GitBranch, ShieldCheck, FileCode2, TestTube2,
-  BookOpen, RefreshCw, Zap, Lock
+  BookOpen, RefreshCw, Zap, Lock,
+  AlertTriangle, BarChart2, Route, Sparkles,
 } from "lucide-react";
 
 const FEATURES = [
   {
     icon: GitBranch,
-    title: "Automatic Architecture Enforcement",
-    description: "Every code change is validated against the architecture before execution. Cross-module boundary violations are blocked, not warned.",
+    title: "Architecture Enforcement",
+    description: "Every code change is checked against the architecture before it runs. If code crosses a module boundary it shouldn't, the system blocks it — not just warns.",
     color: "text-cyan-400",
     bg: "bg-cyan-500/10",
   },
   {
     icon: Zap,
-    title: "Event-Driven Propagation",
-    description: "A code change automatically triggers code review, test invalidation, documentation sync, and impact analysis — with zero manual steps.",
+    title: "Automatic Follow-Through",
+    description: "Change a file and the system automatically kicks off code review, test checks, doc updates, and impact analysis. No manual steps, no forgetting.",
     color: "text-violet-400",
     bg: "bg-violet-500/10",
   },
   {
     icon: ShieldCheck,
-    title: "Security by Design",
-    description: "Security review is non-bypassable when a change touches auth, session, or data access boundaries. It is an invariant, not a review step.",
+    title: "Security That Can't Be Skipped",
+    description: "When a change touches authentication, sessions, or data access, a security review runs automatically. There is no override path.",
     color: "text-red-400",
     bg: "bg-red-500/10",
   },
   {
     icon: FileCode2,
-    title: "Contract-First Code Generation",
-    description: "Code is generated from explicit architecture contracts — not from prose. Every generated file is traceable to a module specification.",
+    title: "Code From Specs, Not Prompts",
+    description: "All generated code comes from architecture specs. Every file is traceable to a module definition and carries a @req annotation — nothing is invented on the fly.",
     color: "text-teal-400",
     bg: "bg-teal-500/10",
   },
   {
     icon: TestTube2,
-    title: "Automated Test Generation",
-    description: "Tests are generated from code artifacts and testing strategies. When code changes invalidate tests, new ones are regenerated automatically.",
+    title: "Tests That Stay Current",
+    description: "Tests are generated from the code that was written. When code changes, new tests are generated to match — automatically.",
     color: "text-green-400",
     bg: "bg-green-500/10",
   },
   {
     icon: BookOpen,
-    title: "Zero-Drift Documentation",
-    description: "Documentation is generated from system state. Every code or architecture change triggers an automatic doc sync — documentation never falls behind.",
+    title: "Docs That Never Fall Behind",
+    description: "Documentation is generated from the live system state. Every code or architecture change triggers an automatic sync — docs are always current.",
     color: "text-pink-400",
     bg: "bg-pink-500/10",
   },
   {
     icon: RefreshCw,
-    title: "Instant Rollback Recovery",
-    description: "State snapshots are taken before every mutation. On critical failure, the system rolls back to a known-good state and generates a post-mortem.",
+    title: "One-Step Rollback",
+    description: "The system takes a snapshot before every change. If something breaks, rolling back to the last known-good state takes a single step.",
     color: "text-orange-400",
     bg: "bg-orange-500/10",
   },
   {
     icon: Lock,
-    title: "Token Budget Enforcement",
-    description: "Hard per-operation token ceilings prevent runaway context costs. Semantic compression kicks in automatically when budget pressure is detected.",
+    title: "Token Budget Guardrails",
+    description: "Every operation has a token ceiling. When context grows too large, the system compresses it automatically — nothing silently goes over budget.",
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
   },
+  {
+    icon: AlertTriangle,
+    title: "Four-Layer Guard System",
+    description: "Before any release, four guards run in parallel: database safety, N+1 query detection, UI/UX compliance, and release readiness. A single block halts the pipeline.",
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+  },
+  {
+    icon: BarChart2,
+    title: "Release Readiness Score",
+    description: "Before deployment, the system cross-checks every requirement against code, tests, UI screens, DB entities, and docs. You get a 0–100 readiness score and full traceability matrix.",
+    color: "text-lime-400",
+    bg: "bg-lime-500/10",
+  },
+  {
+    icon: Route,
+    title: "End-to-End Traceability",
+    description: "Every task carries acceptance criteria and Definition of Done items. Code is annotated with @req tags. You can trace any requirement to the exact file and test that implements it.",
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
+  },
+  {
+    icon: Sparkles,
+    title: "Intelligent Prompt Routing",
+    description: "Vague prompts are normalized before they reach the pipeline. The prompt-normalizer extracts intent and either routes confidently or asks a single targeted clarification — never guesses.",
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
+  },
 ];
 
-const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
 export function FeaturesSection() {
@@ -76,10 +105,10 @@ export function FeaturesSection() {
         viewport={{ once: true }}
         className="mb-14 text-center"
       >
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+        <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-4">
           What ASE-OS Does For You
         </h2>
-        <p className="text-zinc-400 max-w-xl mx-auto">
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto">
           Every capability is built-in, automatic, and non-bypassable — not a plugin or an option.
         </p>
       </motion.div>
@@ -95,13 +124,13 @@ export function FeaturesSection() {
           <motion.div
             key={f.title}
             variants={item}
-            className="group rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 hover:bg-zinc-900 hover:border-zinc-700 transition-all duration-200"
+            className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40 p-5 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-200"
           >
             <div className={`mb-3 inline-flex rounded-lg ${f.bg} p-2`}>
               <f.icon size={18} className={f.color} />
             </div>
-            <h3 className="text-sm font-semibold text-white mb-2">{f.title}</h3>
-            <p className="text-xs text-zinc-500 leading-relaxed">{f.description}</p>
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-2">{f.title}</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">{f.description}</p>
           </motion.div>
         ))}
       </motion.div>

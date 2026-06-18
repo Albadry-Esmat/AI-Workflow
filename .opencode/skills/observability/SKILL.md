@@ -1,6 +1,6 @@
 ---
 name: observability
-description: Use when adding metrics collection, monitoring, or observability to skills or the orchestrator pipeline. Triggers on: "add metrics", "monitor skills", "observability", "track execution", "how do I measure", "pipeline metrics", "execution monitoring".
+description: 'Use when adding metrics collection, monitoring, or observability to skills or the orchestrator pipeline. Triggers on: "add metrics", "monitor skills", "observability", "track execution", "how do I measure", "pipeline metrics", "execution monitoring".'
 ---
 
 # Observability & Metrics

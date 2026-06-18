@@ -2,7 +2,7 @@
 name: create-sub-agent
 version: 1.0.0
 domain: meta
-description: Use when asked to create, define, design, or generate a new sub-agent or atomic execution worker. Triggers on: "create sub-agent", "generate sub-agent", "build sub-agent", "define sub-agent", "new sub-agent skill", "I need a sub-agent that".
+description: 'Use when asked to create, define, design, or generate a new sub-agent or atomic execution worker. Triggers on: "create sub-agent", "generate sub-agent", "build sub-agent", "define sub-agent", "new sub-agent skill", "I need a sub-agent that".'
 author: system
 ---
 

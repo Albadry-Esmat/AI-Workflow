@@ -2,7 +2,7 @@
 name: adr-generator
 version: 1.0.0
 domain: documentation
-description: Use when creating Architecture Decision Records from architectural choices, tech stack selections, or design tradeoffs. Triggers on: "write an ADR", "document this decision", "create an architecture decision record", "record this tradeoff", "why did we choose this".
+description: 'Use when creating Architecture Decision Records from architectural choices, tech stack selections, or design tradeoffs. Triggers on: "write an ADR", "document this decision", "create an architecture decision record", "record this tradeoff", "why did we choose this".'
 author: system
 ---
 

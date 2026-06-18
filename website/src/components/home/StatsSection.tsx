@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { DOMAIN_COLORS } from "@/lib/colors";
+import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 
 interface Props {
   stats: {
@@ -17,13 +18,13 @@ interface Props {
 export function StatsSection({ stats, domains }: Props) {
   const METRICS = [
     { value: stats.totalSkills,         label: "Total Skills",       sub: `Registry v${stats.registryVersion}` },
-    { value: stats.totalEdges,          label: "Dependency Edges",   sub: "In skill graph DAG" },
-    { value: stats.totalPipelinePhases, label: "Pipeline Phases",    sub: "Full idea-to-deploy" },
-    { value: stats.totalAgents,         label: "Agents",             sub: "Thin, skill-bound" },
+    { value: stats.totalEdges,          label: "Dependency Edges",   sub: "In the skill graph" },
+    { value: stats.totalPipelinePhases, label: "Pipeline Phases",    sub: "From idea to deployment" },
+    { value: stats.totalAgents,         label: "Agents",             sub: "Each bound to specific skills" },
   ];
 
   return (
-    <section className="border-y border-zinc-800 bg-zinc-900/30 py-20">
+    <section className="border-y border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Main metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
@@ -36,11 +37,11 @@ export function StatsSection({ stats, domains }: Props) {
               transition={{ delay: i * 0.1 }}
               className="text-center"
             >
-              <div className="text-4xl sm:text-5xl font-black font-mono text-white mb-1">
-                {m.value}
+              <div className="text-4xl sm:text-5xl font-black font-mono text-zinc-900 dark:text-white mb-1">
+                <AnimatedCounter to={m.value} />
               </div>
-              <div className="text-sm font-medium text-zinc-300">{m.label}</div>
-              <div className="text-xs text-zinc-500 mt-0.5">{m.sub}</div>
+              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{m.label}</div>
+              <div className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{m.sub}</div>
             </motion.div>
           ))}
         </div>
@@ -52,7 +53,7 @@ export function StatsSection({ stats, domains }: Props) {
           viewport={{ once: true }}
           className="mx-auto max-w-3xl"
         >
-          <p className="text-center text-sm text-zinc-500 mb-6">Skills by domain</p>
+          <p className="text-center text-sm text-zinc-400 dark:text-zinc-500 mb-6">Skills by domain</p>
           <div className="flex flex-wrap justify-center gap-3">
             {domains.map(([domain, count]) => {
               const c = DOMAIN_COLORS[domain] ?? DOMAIN_COLORS["meta"];

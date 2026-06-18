@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 interface Props {
   stats: { totalSkills: number; totalPipelinePhases: number; totalAgents: number; registryVersion: string };
 }
@@ -38,7 +39,7 @@ export function HeroSection({ stats }: Props) {
           transition={{ delay: 0.2 }}
           className="text-5xl sm:text-7xl font-bold tracking-tight mb-6"
         >
-          <span className="text-white">AI Software</span>
+          <span className="text-zinc-900 dark:text-white">AI Software</span>
           <br />
           <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent gradient-animate">
             Engineering OS
@@ -50,10 +51,11 @@ export function HeroSection({ stats }: Props) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mx-auto max-w-2xl text-lg sm:text-xl text-zinc-400 mb-10 leading-relaxed"
+          className="mx-auto max-w-2xl text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10 leading-relaxed"
         >
-          A unified, skill-driven system that designs, generates, tests, and documents
-          software autonomously — from requirements to deployment, with no manual drift.
+          A unified, skill-driven system that takes your idea all the way from requirements
+          to deployed software — automatically, with no manual wiring and no documentation
+          drift.
         </motion.p>
 
         {/* CTAs */}
@@ -71,7 +73,7 @@ export function HeroSection({ stats }: Props) {
           </Link>
           <Link
             href="/how-it-works"
-            className="rounded-lg border border-zinc-700 hover:border-zinc-500 px-6 py-3 text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
+            className="rounded-lg border border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 px-6 py-3 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
           >
             See How It Works →
           </Link>
@@ -82,7 +84,7 @@ export function HeroSection({ stats }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-16 flex flex-wrap justify-center gap-6 text-sm text-zinc-500"
+          className="mt-16 flex flex-wrap justify-center gap-6 text-sm text-zinc-500 dark:text-zinc-500"
         >
           {[
             { value: stats.totalSkills,          label: "Skills" },
@@ -90,7 +92,7 @@ export function HeroSection({ stats }: Props) {
             { value: stats.totalAgents,          label: "Agents" },
           ].map((s) => (
             <div key={s.label} className="flex items-center gap-2">
-              <span className="font-mono font-bold text-zinc-200 text-base">{s.value}</span>
+              <AnimatedCounter to={s.value} className="font-mono font-bold text-zinc-700 dark:text-zinc-200 text-base" />
               <span>{s.label}</span>
             </div>
           ))}
@@ -102,12 +104,12 @@ export function HeroSection({ stats }: Props) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-zinc-600 text-xs"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-zinc-400 dark:text-zinc-600 text-xs"
       >
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ repeat: Infinity, duration: 1.6 }}
-          className="h-4 w-0.5 bg-zinc-700 rounded-full"
+          className="h-4 w-0.5 bg-zinc-300 dark:bg-zinc-700 rounded-full"
         />
         scroll
       </motion.div>

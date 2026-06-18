@@ -12,6 +12,10 @@ export const DOMAIN_COLORS: Record<string, { bg: string; text: string; border: s
   meta:           { bg: "bg-slate-500/10",   text: "text-slate-400",   border: "border-slate-500/30",   dot: "bg-slate-400"   },
   orchestration:  { bg: "bg-indigo-500/10",  text: "text-indigo-400",  border: "border-indigo-500/30",  dot: "bg-indigo-400"  },
   implementation: { bg: "bg-teal-500/10",    text: "text-teal-400",    border: "border-teal-500/30",    dot: "bg-teal-400"    },
+  design:         { bg: "bg-fuchsia-500/10", text: "text-fuchsia-400", border: "border-fuchsia-500/30", dot: "bg-fuchsia-400" },
+  database:       { bg: "bg-sky-500/10",     text: "text-sky-400",     border: "border-sky-500/30",     dot: "bg-sky-400"     },
+  quality:        { bg: "bg-lime-500/10",    text: "text-lime-400",    border: "border-lime-500/30",    dot: "bg-lime-400"    },
+  governance:     { bg: "bg-rose-500/10",    text: "text-rose-400",    border: "border-rose-500/30",    dot: "bg-rose-400"    },
 };
 
 export const MASTERY_COLORS: Record<string, string> = {

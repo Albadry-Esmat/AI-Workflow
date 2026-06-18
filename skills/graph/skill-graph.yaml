@@ -1,7 +1,7 @@
 # Skill Dependency Graph
 #
-# Version:  1.4.0
-# Updated:  2026-06-16
+# Version:  2.2.0
+# Updated:  2026-06-18
 # Schema:   skills/graph/graph-schema.yaml
 #
 # This file is the authoritative directed acyclic graph (DAG) of all skills.
@@ -14,10 +14,10 @@
 #   co_occurrence Skill A and B are frequently used together (no direction constraint)
 
 meta:
-  version: "1.6.0"
-  last_updated: "2026-06-17"
-  total_nodes: 30
-  total_edges: 67
+  version: "2.2.0"
+  last_updated: "2026-06-18"
+  total_nodes: 40
+  total_edges: 100
   schema: "skills/graph/graph-schema.yaml"
 
 # ─────────────────────────────────────────────
@@ -29,7 +29,7 @@ nodes:
     name: requirement-analysis
     domain: requirements
     mastery_level: intermediate
-    version: "1.1.0"
+    version: "1.2.0"
     status: active
     layer: pipeline-entry
 
@@ -37,7 +37,7 @@ nodes:
     name: architecture-design
     domain: architecture
     mastery_level: advanced
-    version: "1.1.0"
+    version: "1.2.0"
     status: active
     layer: pipeline-core
 
@@ -45,7 +45,7 @@ nodes:
     name: feature-planning
     domain: planning
     mastery_level: intermediate
-    version: "1.1.0"
+    version: "1.2.0"
     status: active
     layer: pipeline-core
 
@@ -61,7 +61,7 @@ nodes:
     name: testing-strategy
     domain: testing
     mastery_level: intermediate
-    version: "1.1.0"
+    version: "1.2.0"
     status: active
     layer: pipeline-quality
 
@@ -101,7 +101,7 @@ nodes:
     name: orchestration
     domain: system
     mastery_level: advanced
-    version: "1.0.0"
+    version: "1.1.0"
     status: active
     layer: meta
 
@@ -191,7 +191,7 @@ nodes:
     name: state-manager
     domain: orchestration
     mastery_level: advanced
-    version: "1.0.0"
+    version: "1.1.0"
     status: active
     layer: infrastructure
 
@@ -207,7 +207,7 @@ nodes:
     name: dependency-analyzer
     domain: architecture
     mastery_level: advanced
-    version: "1.0.0"
+    version: "1.1.0"
     status: active
     layer: pipeline-core
 
@@ -215,7 +215,7 @@ nodes:
     name: change-impact-analyzer
     domain: architecture
     mastery_level: advanced
-    version: "1.0.0"
+    version: "1.1.0"
     status: active
     layer: pipeline-core
 
@@ -231,7 +231,7 @@ nodes:
     name: code-generator
     domain: implementation
     mastery_level: advanced
-    version: "1.0.0"
+    version: "1.1.0"
     status: active
     layer: pipeline-execution
 
@@ -266,6 +266,88 @@ nodes:
     version: "1.0.0"
     status: active
     layer: pipeline-safety
+
+  # ── NEW DOMAIN & GUARD SKILLS (SKL-031 to SKL-037) ──────────────────
+
+  - id: SKL-031
+    name: frontend-ux-architect
+    domain: design
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-032
+    name: database-architect
+    domain: database
+    mastery_level: advanced
+    version: "1.0.0"
+    status: active
+    layer: pipeline-core
+
+  - id: SKL-033
+    name: implementation-completeness-auditor
+    domain: quality
+    mastery_level: intermediate
+    version: "1.1.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-034
+    name: database-guard
+    domain: governance
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-035
+    name: performance-guard
+    domain: governance
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-036
+    name: ui-ux-compliance-guard
+    domain: governance
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-037
+    name: implementation-completeness-guard
+    domain: governance
+    mastery_level: beginner
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-038
+    name: design-system-generator
+    domain: design
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-execution
+
+  - id: SKL-039
+    name: seo-optimizer
+    domain: quality
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: pipeline-quality
+
+  - id: SKL-040
+    name: prompt-normalizer
+    domain: meta
+    mastery_level: intermediate
+    version: "1.0.0"
+    status: active
+    layer: orchestration
 
 # ─────────────────────────────────────────────
 # EDGES
@@ -650,3 +732,204 @@ edges:
     to: SKL-030
     type: dependency
     label: "code-repair escalation path (repair_outcome.escalated=true) activates rollback-manager for state recovery"
+
+  # ── NEW DOMAIN SKILL EDGES (SKL-031 to SKL-037) ─────────────────────
+
+  # DEPENDENCY: frontend-ux-architect requires validated requirements
+  - from: SKL-001
+    to: SKL-031
+    type: dependency
+    label: "requirements → frontend-ux-architect needs UI-bearing requirements for screen inventory"
+
+  # DEPENDENCY: frontend-ux-architect requires architecture module list
+  - from: SKL-002
+    to: SKL-031
+    type: dependency
+    label: "architecture → frontend-ux-architect maps modules to UI regions and navigation zones"
+
+  # DEPENDENCY: database-architect requires validated requirements
+  - from: SKL-001
+    to: SKL-032
+    type: dependency
+    label: "requirements → database-architect needs data-bearing requirements for entity design"
+
+  # DEPENDENCY: database-architect requires architecture module list
+  - from: SKL-002
+    to: SKL-032
+    type: dependency
+    label: "architecture → database-architect maps module boundaries to schema ownership domains"
+
+  # DEPENDENCY: implementation-completeness-auditor requires requirements
+  - from: SKL-001
+    to: SKL-033
+    type: dependency
+    label: "requirements → completeness-auditor uses requirement IDs as the audit contract"
+
+  # DEPENDENCY: implementation-completeness-auditor requires feature plan for task-to-req mapping
+  - from: SKL-003
+    to: SKL-033
+    type: dependency
+    label: "feature-planning → completeness-auditor uses task assignments to map code artifacts to requirements"
+
+  # DEPENDENCY: implementation-completeness-auditor reads code_map via state-manager
+  - from: SKL-021
+    to: SKL-033
+    type: dependency
+    label: "state-manager → completeness-auditor reads code_map and test_state from shared system state"
+
+  # DEPENDENCY: implementation-completeness-auditor requires architecture context to map modules to requirements
+  - from: SKL-002
+    to: SKL-033
+    type: dependency
+    label: "architecture-design module map is required to trace requirement coverage across implementation artifacts"
+
+  # DEPENDENCY: implementation-completeness-auditor uses code-generator artifacts as the primary target
+  - from: SKL-026
+    to: SKL-033
+    type: dependency
+    label: "code-generator artifacts are the primary subject of completeness auditing"
+
+  # DEPENDENCY: database-guard requires database-architect output
+  - from: SKL-032
+    to: SKL-034
+    type: dependency
+    label: "database-architect output (migration_plan, db_entities) is the primary input to database-guard"
+
+  # DEPENDENCY: performance-guard requires architecture for module-level performance context
+  - from: SKL-002
+    to: SKL-035
+    type: dependency
+    label: "architecture → performance-guard uses module topology to scope query pattern detection"
+
+  # CO-OCCURRENCE: performance-guard and clean-code-review run together in full quality pass
+  - from: SKL-004
+    to: SKL-035
+    type: co_occurrence
+    label: "clean-code-review and performance-guard co-occur in every full implementation quality pass"
+
+  # DEPENDENCY: ui-ux-compliance-guard requires frontend-ux-architect component contracts
+  - from: SKL-031
+    to: SKL-036
+    type: dependency
+    label: "frontend-ux-architect component_contracts are the validation target for ui-ux-compliance-guard"
+
+  # DEPENDENCY: implementation-completeness-guard requires completeness-auditor score
+  - from: SKL-033
+    to: SKL-037
+    type: dependency
+    label: "implementation-completeness-auditor readiness_score and gaps are the sole inputs to the completeness guard"
+
+  # COMPOSITION: orchestrator drives frontend-ux-architect in design phase
+  - from: SKL-010
+    to: SKL-031
+    type: composition
+    label: "orchestrator drives frontend-ux-architect after architecture-design in the UI pipeline"
+
+  # COMPOSITION: orchestrator drives database-architect in design phase
+  - from: SKL-010
+    to: SKL-032
+    type: composition
+    label: "orchestrator drives database-architect after architecture-design in the data pipeline"
+
+  # COMPOSITION: orchestrator drives implementation-completeness-auditor before release gate
+  - from: SKL-010
+    to: SKL-033
+    type: composition
+    label: "orchestrator invokes completeness-auditor as the last quality check before the deployment gate"
+
+  # COMPOSITION: orchestrator invokes guard skills as validation_check gates
+  - from: SKL-010
+    to: SKL-034
+    type: composition
+    label: "orchestrator invokes database-guard as a validation_check gate after database-architect"
+
+  - from: SKL-010
+    to: SKL-035
+    type: composition
+    label: "orchestrator invokes performance-guard as a validation_check gate after code-generator"
+
+  - from: SKL-010
+    to: SKL-036
+    type: composition
+    label: "orchestrator invokes ui-ux-compliance-guard as a validation_check gate after UI code generation"
+
+  - from: SKL-010
+    to: SKL-037
+    type: composition
+    label: "orchestrator invokes implementation-completeness-guard as the final release gate before deployment-strategy"
+
+  # CO-OCCURRENCE: frontend-ux-architect and database-architect run in parallel after architecture-design
+  - from: SKL-031
+    to: SKL-032
+    type: co_occurrence
+    label: "frontend-ux-architect and database-architect are designed in parallel — both depend on architecture-design"
+
+  # CO-OCCURRENCE: completeness-guard and deployment-strategy are the final pre-release sequence
+  - from: SKL-037
+    to: SKL-007
+    type: co_occurrence
+    label: "implementation-completeness-guard must pass before deployment-strategy generates the approval request"
+
+  # ── WEBSITE GENERATION SKILL EDGES (SKL-038 to SKL-039) ─────────────────────
+
+  # DEPENDENCY: design-system-generator requires frontend-ux-architect output
+  - from: SKL-031
+    to: SKL-038
+    type: dependency
+    label: "frontend-ux-architect token_requirements and component_contracts are the sole inputs to design-system-generator"
+
+  # DEPENDENCY: seo-optimizer requires requirement-analyzer for page intent classification
+  - from: SKL-001
+    to: SKL-039
+    type: dependency
+    label: "requirement-analyzer validated requirements drive structured data type selection and page intent classification in seo-optimizer"
+
+  # DEPENDENCY: seo-optimizer requires frontend-ux-architect screen inventory
+  - from: SKL-031
+    to: SKL-039
+    type: dependency
+    label: "frontend-ux-architect screen inventory (routes, layout_types) is the primary input to seo-optimizer for sitemap and meta tag generation"
+
+  # DEPENDENCY: code-generator consumes design-system-generator file manifest
+  - from: SKL-038
+    to: SKL-026
+    type: dependency
+    label: "design-system-generator token files and component stubs establish the design contract that code-generator implements"
+
+  # DEPENDENCY: deployment-strategy consumes seo-optimizer artifacts
+  - from: SKL-039
+    to: SKL-007
+    type: dependency
+    label: "seo-optimizer sitemap, robots.txt, and CWV budget must be bundled into the deployment artifact"
+
+  # COMPOSITION: orchestrator drives design-system-generator in website pipelines
+  - from: SKL-010
+    to: SKL-038
+    type: composition
+    label: "orchestrator drives design-system-generator after frontend-ux-architect in website pipeline design system phase"
+
+  # COMPOSITION: orchestrator drives seo-optimizer in website pipelines
+  - from: SKL-010
+    to: SKL-039
+    type: composition
+    label: "orchestrator drives seo-optimizer after code-generator and before deployment-strategy in website pipelines"
+
+  # ── META / ORCHESTRATION SKILL EDGES (SKL-040) ───────────────────────────────
+
+  # COMPOSITION: orchestrator invokes prompt-normalizer as step 0 before routing table lookup
+  - from: SKL-010
+    to: SKL-040
+    type: composition
+    label: "orchestrator invokes prompt-normalizer before routing table lookup to normalize vague user prompts"
+
+  # CO-OCCURRENCE: prompt-normalizer output feeds into requirement-analyzer in requirements pipelines
+  - from: SKL-040
+    to: SKL-001
+    type: co_occurrence
+    label: "normalized prompt from prompt-normalizer is the primary input to requirement-analyzer in requirements pipelines"
+
+  # CO-OCCURRENCE: prompt-normalizer and event-router are sibling pre-routing meta skills
+  - from: SKL-025
+    to: SKL-040
+    type: co_occurrence
+    label: "event-router handles internal system events; prompt-normalizer handles human-typed prompts — both run before pipeline routing"

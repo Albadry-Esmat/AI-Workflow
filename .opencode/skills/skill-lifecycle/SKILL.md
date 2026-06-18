@@ -1,6 +1,6 @@
 ---
 name: skill-lifecycle
-description: Use when checking or advancing a skill through its lifecycle stages — from draft to active to deprecated to retired. Triggers on: "skill lifecycle", "what stage is this skill", "retire this skill", "deprecate skill", "promote skill to active", "skill status".
+description: 'Use when checking or advancing a skill through its lifecycle stages — from draft to active to deprecated to retired. Triggers on: "skill lifecycle", "what stage is this skill", "retire this skill", "deprecate skill", "promote skill to active", "skill status".'
 ---
 
 # Skill Lifecycle — End-to-End Governance

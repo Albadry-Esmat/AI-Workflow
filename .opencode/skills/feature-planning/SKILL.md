@@ -1,8 +1,8 @@
 ---
 name: feature-planning
-version: 1.1.0
+version: 1.2.0
 domain: planning
-description: Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".
+description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
 ---
 
@@ -47,19 +47,32 @@ Translate the architecture design into actionable development tasks. The skill p
 ## Required Context
 
 - Output from `architecture-design` (modules, integration points).
-- Requirements from `requirement-analyzer`.
+- Requirements from `requirement-analyzer` (must include `id` field for REQ→TASK traceability).
+- **Graphify retrieval-first:** Before decomposition, run `graphify query "existing task patterns and module decomposition"` if `graphify-out/graph.json` exists. Use retrieved patterns to align task granularity with established conventions and avoid duplicating tasks for already-implemented modules. Fall back to full derivation if graph unavailable.
 
 ## Execution Logic
 
 ```
+Step 0 — Retrieve existing patterns (graphify)
+  If graphify-out/graph.json exists: run graphify query "task decomposition and module patterns for <module names>".
+  Use retrieved nodes to discover established task granularity and avoid re-decomposing already-implemented modules.
+  Fall back to full derivation from modules input if graph unavailable.
+  Output: existing_patterns context
+
 Step 1 — Decompose modules into tasks
   For each module, generate granular implementation tasks.
   One task per atomic change (e.g., "Define User entity", "Create POST /users endpoint", "Write unit tests for UserService").
   Output: flat task list with module reference
 
-Step 2 — Assign requirements to tasks
-  Link each task to the requirement(s) it fulfills.
-  Output: tasks with requirement traceability
+Step 2 — Assign requirements, DoD, and acceptance criteria
+  For each task, link to the requirement(s) it fulfills (req_ids[]).
+  Derive definition_of_done: a concrete checklist of conditions the task must satisfy to be considered complete.
+    Standard DoD items: "Code implemented", "Unit tests written and passing", "Code reviewed", "Docs updated".
+    Add domain-specific items where applicable (e.g., "Schema migrated and rolled back successfully" for DB tasks).
+  Derive acceptance_criteria: testable conditions in Given/When/Then or plain-English format.
+    Each criterion must be independently verifiable by a test case.
+    Example: "Given a valid JWT, when GET /users/:id is called, then the user object is returned with status 200."
+  Output: tasks with req_ids, definition_of_done, and acceptance_criteria populated
 
 Step 3 — Estimate complexity
   Assign story points using Fibonacci sequence (1, 2, 3, 5, 8, 13, 21).
@@ -84,16 +97,19 @@ Step 6 — Assign milestones
   If team_capacity provided, calculate sprint allocation.
   Output: milestone schedule
 
-Step 7 — Generate roadmap
-  Combine phases, milestones, and dependencies into final execution plan.
-  Output: complete implementation roadmap
+Step 7 — Build req_task_map and generate roadmap
+  Assemble req_task_map: for every requirement ID in input, list the TASK-IDs that fulfill it.
+  Every requirement must appear — any requirement with zero tasks is flagged as UNPLANNED risk.
+  Combine phases, milestones, dependency graph, and req_task_map into final execution plan.
+  Output: complete implementation roadmap with req_task_map
 ```
 
 ## Outputs
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `tasks` | `array[object]` | Atomic tasks (id, module, description, complexity, requirements) |
+| `tasks` | `array[object]` | Atomic tasks (id, module, description, complexity, req_ids, definition_of_done, acceptance_criteria, status) |
+| `req_task_map` | `object` | Forward-link map: REQ-ID → [TASK-IDs] that fulfill it — authoritative traceability source |
 | `dependency_map` | `object` | Dependency graph with critical path |
 | `phases` | `array[object]` | Delivery phases (name, tasks, rationale) |
 | `milestones` | `array[object]` | Milestones (name, target, tasks_included, estimated_duration) |
@@ -118,11 +134,20 @@ Step 7 — Generate roadmap
           "description": { "type": "string" },
           "complexity": { "type": "integer", "enum": [1, 2, 3, 5, 8, 13, 21] },
           "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
-          "requirements": { "type": "array", "items": { "type": "string" } },
-          "blocked_by": { "type": "array", "items": { "type": "string" } }
+          "req_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "requirements": { "type": "array", "items": { "type": "string" }, "description": "Deprecated alias for req_ids — use req_ids for new plans" },
+          "blocked_by": { "type": "array", "items": { "type": "string" } },
+          "status": { "type": "string", "enum": ["pending", "in_progress", "in_review", "complete", "blocked"], "default": "pending" },
+          "definition_of_done": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "acceptance_criteria": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
         },
-        "required": ["id", "module", "description", "complexity", "requirements"]
+        "required": ["id", "module", "description", "complexity", "req_ids", "definition_of_done", "acceptance_criteria"]
       }
+    },
+    "req_task_map": {
+      "type": "object",
+      "description": "Forward-link map: each REQ-ID mapped to array of TASK-IDs that fulfill it — authoritative traceability source for implementation-completeness-auditor",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
     },
     "dependency_map": {
       "type": "object",
@@ -182,7 +207,7 @@ Step 7 — Generate roadmap
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
   },
-  "required": ["tasks", "dependency_map", "phases", "milestones", "risks", "metrics", "feedback"],
+  "required": ["tasks", "req_task_map", "dependency_map", "phases", "milestones", "risks", "metrics", "feedback"],
   "$defs": {
     "metrics": {
       "type": "object",
@@ -213,10 +238,13 @@ Step 7 — Generate roadmap
 ## Rules & Constraints
 
 - No task larger than 21 story points. Split tasks exceeding 21 into smaller sub-tasks.
-- Every task MUST trace to at least one requirement.
+- Every task MUST trace to at least one requirement via `req_ids[]`. Tasks with no `req_ids` are rejected.
+- Every task MUST include at least one `definition_of_done` item and at least one `acceptance_criteria` entry.
+- `req_task_map` MUST include an entry for every requirement in the input. A requirement with zero tasks is flagged as a CRITICAL UNPLANNED risk.
 - Critical path MUST be acyclic. Raise error if cycle detected.
 - `blocked_by` field MUST only reference task IDs that exist in the same plan.
 - Phases MUST be ordered sequentially. No skipping phases.
+- Task `status` defaults to `pending`. Only the orchestrator may advance status to `in_review` or `complete`.
 
 ## Security Considerations
 
@@ -235,10 +263,14 @@ Step 7 — Generate roadmap
 
 - [ ] All task IDs unique
 - [ ] Every `blocked_by` reference resolves to an existing task ID
+- [ ] Every task has `req_ids` with at least one requirement ID
+- [ ] Every task has at least one `definition_of_done` item
+- [ ] Every task has at least one `acceptance_criteria` entry
+- [ ] `req_task_map` contains an entry for every requirement in the input
 - [ ] Critical path is computed and present
 - [ ] Phase 1 has zero external dependencies (foundation first)
 - [ ] No task has complexity 0 or negative
-- [ ] All requirements from input are covered by at least one task
+- [ ] All requirements from input are covered by at least one task (via req_task_map)
 
 ## Failure Scenarios
 
@@ -265,7 +297,7 @@ Step 7 — Generate roadmap
 ```yaml
 composes:
   - skill: feature-planning
-    version: "^1.1.0"
+    version: "^1.2.0"
     input_map: { "modules": "architecture_modules", "requirements": "requirements" }
-    output_map: { "tasks": "implementation_tasks", "milestones": "delivery_milestones" }
+    output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones" }
 ```

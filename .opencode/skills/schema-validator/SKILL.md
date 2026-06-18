@@ -2,7 +2,7 @@
 name: schema-validator
 version: 1.0.0
 domain: validation
-description: Use when validating a JSON object or payload against a JSON Schema. Triggers on: "validate this JSON", "check the schema", "does this match the schema", "schema validation", "validate payload", "JSON schema check".
+description: 'Use when validating a JSON object or payload against a JSON Schema. Triggers on: "validate this JSON", "check the schema", "does this match the schema", "schema validation", "validate payload", "JSON schema check".'
 author: system
 ---
 

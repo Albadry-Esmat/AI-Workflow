@@ -2,7 +2,7 @@
 name: code-repair
 version: 1.0.0
 domain: implementation
-description: Use when fixing failing tests, compiler errors, linter violations, or type errors in existing code. Triggers on: "fix this error", "repair failing tests", "fix type errors", "fix linter violations", "the build is broken", "tests are failing".
+description: 'Use when fixing failing tests, compiler errors, linter violations, or type errors in existing code. Triggers on: "fix this error", "repair failing tests", "fix type errors", "fix linter violations", "the build is broken", "tests are failing".'
 author: system
 ---
 

@@ -2,7 +2,7 @@
 name: rollback-manager
 version: 1.0.0
 domain: orchestration
-description: Use when reverting a failed deployment, undoing a broken code change, restoring prior system state, or recovering from a critical pipeline failure. Triggers on: "roll back this change", "undo the deployment", "restore prior state", "revert to snapshot", "pipeline recovery", "rollback".
+description: 'Use when reverting a failed deployment, undoing a broken code change, restoring prior system state, or recovering from a critical pipeline failure. Triggers on: "roll back this change", "undo the deployment", "restore prior state", "revert to snapshot", "pipeline recovery", "rollback".'
 author: system
 ---
 

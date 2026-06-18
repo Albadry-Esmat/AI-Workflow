@@ -1,6 +1,7 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "quick-review",
+  "version": "1.0.0",
   "description": "Code quality and security audit on existing code. Runs clean-code-review and security-review in parallel — use for pull request reviews or periodic quality audits.",
   "mode": "parallel",
   "skills": [

@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 1.3.0 | **Last updated:** 2026-06-16
+**Version:** 2.3.0 | **Last updated:** 2026-06-18
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 11 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 40 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `skills/<domain>/<skill>.md` | 13-section AI-executable specifications |
 
@@ -100,12 +100,14 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 |----------|-------|
 | Domain | `deployment` |
 | File | `skills/deployment/deployment-strategy.md` |
-| Version | 1.0.0 |
-| Purpose | Environment model, promotion, rollback, IaC scaffold |
+| Version | 1.1.0 |
+| Purpose | Environment model, promotion, rollback, IaC scaffold, deployment approval request |
 | Consumes from | `architecture-design`, `testing-strategy` |
 | Produces for | None |
 
-**Key outputs:** `environments`, `promotion_rules`, `rollback_criteria`, `feature_flags`
+**Key outputs:** `environments`, `promotion_rules`, `rollback_criteria`, `feature_flags`, `deployment_approval_request`
+
+> `deployment_approval_request` is a mandatory output. The pipeline halts after this skill and awaits explicit user approval before any deployment action occurs.
 
 ### 8. Documentation Generator
 
@@ -128,7 +130,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 |----------|-------|
 | Domain | `system` |
 | File | `skills/orchestrator/orchestrator.md` |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Purpose | Execute pipeline, route artifacts, validate, manage HITL |
 | Consumes from | Registry |
 | Produces for | Pipeline result |
@@ -189,3 +191,141 @@ feature-planning                   │
 - Skills emit `feedback` entries to signal issues to upstream skills (see [Architecture](architecture.md#feedback-loops)).
 - All skill versions follow semver. See [Versioning](versioning.md).
 - Adding/changing a skill requires updating this file AND `changelog.md`.
+
+## New Domain Skills (v2.0.0)
+
+### 31. Frontend UI/UX Architect
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-031 |
+| Domain | `design` |
+| File | `.opencode/skills/frontend-ux-architect/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Design screen structure, navigation, component contracts, accessibility, and token rules |
+| Consumes from | `requirement-analyzer`, `architecture-design` |
+| Produces for | `ui-ux-compliance-guard`, `implementation-completeness-auditor` |
+
+**Key outputs:** `screens`, `navigation_map`, `component_contracts`, `accessibility_report`, `token_requirements`
+
+### 32. Database Architect
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-032 |
+| Domain | `database` |
+| File | `.opencode/skills/database-architect/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Design normalized schemas, ERDs, indexing strategies, audit logging, and migration plans |
+| Consumes from | `requirement-analyzer`, `architecture-design` |
+| Produces for | `database-guard`, `implementation-completeness-auditor` |
+
+**Key outputs:** `entities`, `relationships`, `erd`, `indexes`, `migration_plan`, `security_annotations`, `violations`
+
+### 33. Implementation Completeness Auditor
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-033 |
+| Domain | `quality` |
+| File | `.opencode/skills/implementation-completeness-auditor/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Cross-check all requirements against code, tests, UI, DB, and docs; produce readiness score |
+| Consumes from | `requirement-analyzer`, `feature-planning`, `code-generator`, `state-manager` |
+| Produces for | `implementation-completeness-guard` |
+
+**Key outputs:** `readiness_score` (0–100), `readiness_level`, `gap_summary`, `gaps`, `traceability_matrix`
+
+## Guard Skills (v2.0.0)
+
+Guard skills run as `validation_check` gates. A `block` verdict halts the pipeline immediately. See [Governance](governance.md#guard-skills-layer-2) for full details.
+
+### 34. Database Guard
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-034 |
+| Domain | `governance` |
+| File | `.opencode/skills/database-guard/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Block destructive migrations, missing FK indexes, unannotated PII, missing cascade rules |
+| Consumes from | `database-architect` |
+| Verdict | `pass` / `block` |
+
+### 35. Performance Guard
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-035 |
+| Domain | `governance` |
+| File | `.opencode/skills/performance-guard/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Block N+1 query patterns, missing query indexes, bulk operation anti-patterns |
+| Consumes from | `architecture-design`, `clean-code-review` (code_map) |
+| Verdict | `pass` / `block` |
+
+### 36. UI/UX Compliance Guard
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-036 |
+| Domain | `governance` |
+| File | `.opencode/skills/ui-ux-compliance-guard/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Block hardcoded colors, missing component states, prop violations, accessibility issues |
+| Consumes from | `frontend-ux-architect` |
+| Verdict | `pass` / `block` |
+
+### 37. Implementation Completeness Guard
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-037 |
+| Domain | `governance` |
+| File | `.opencode/skills/implementation-completeness-guard/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Block release when readiness score < threshold (default: 85) or critical requirements missing |
+| Consumes from | `implementation-completeness-auditor` |
+| Verdict | `pass` / `block` |
+
+### 38. Design System Generator
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-038 |
+| Domain | `design` |
+| File | `.opencode/skills/design-system-generator/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Generate design token files, component stubs, and Storybook configuration from UX architecture output |
+| Consumes from | `frontend-ux-architect` |
+| Produces for | `code-generator` |
+
+**Key outputs:** design token files (`tokens.json`, `tailwind.config.js`), component stub files, Storybook config, component usage guide
+
+### 39. SEO Optimizer
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-039 |
+| Domain | `quality` |
+| File | `.opencode/skills/seo-optimizer/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Generate sitemap, robots.txt, JSON-LD structured data, Open Graph tags, and Core Web Vitals budget for public-facing web products |
+| Consumes from | `architecture-design`, `code-generator` |
+| Produces for | `deployment-strategy` |
+
+**Key outputs:** `sitemap.xml`, `robots.txt`, JSON-LD markup, OG/Twitter meta tags, CWV budget spec, SEO compliance report
+
+### 40. Prompt Normalizer
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-040 |
+| Domain | `meta` |
+| File | `.opencode/skills/prompt-normalizer/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Extract structured intent from a raw user prompt before pipeline routing; produce a normalized routing-ready prompt or a single targeted clarification question |
+| Consumes from | — (step 0, no upstream skill) |
+| Produces for | `orchestrator` |
+
+**Key outputs:** `intent_object`, `normalized_prompt`, `routing_decision` (confidence + suggested_pipeline), `clarification_request`, `action` (route_immediately / ask_clarification / request_pipeline_selection)

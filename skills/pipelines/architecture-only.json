@@ -1,6 +1,7 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "architecture-only",
+  "version": "1.0.0",
   "description": "Quick architecture review: requirements → architecture design. Use when you have existing requirements and need an architecture decision only.",
   "mode": "sequential",
   "skills": [

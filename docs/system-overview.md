@@ -1,6 +1,6 @@
 # System Overview — AI Workflow
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 2.2.0 | **Last updated:** 2026-06-18
 
 ## What This System Is
 
@@ -22,28 +22,44 @@ A production-grade AI agent ecosystem that transforms raw ideas into deployed so
 [Raw Input]
      │
      ▼
-┌────────────────────────────────────────────────────────────┐
-│                    ORCHESTRATOR                             │
-│  (registry resolution, schema validation, routing, HITL)   │
-└────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┘
-     │    │    │    │    │    │    │    │    │    │    │    │
-     ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼
-  Req   Arch Plan Code  Sec  Test Dep  Doc  Val  Mem  Obs  Gov
-  Ana   Des  ning Rev   Rev      loy  Gen  ida      erv  ern
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           PRIMARY ORCHESTRATOR                                │
+│        (registry resolution, schema validation, routing, HITL gates)         │
+└────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────┘
+     │            │            │            │            │            │
+     ▼            ▼            ▼            ▼            ▼            ▼
+  analyzer     architect     planner      builder     reviewer      tester
+
+  impact-       test-        deployer    documenter    doc-         recovery
+  analyzer    generator                              maintainer
 ```
 
 ## Key Capabilities
 
 - **Requirement Analysis** — Extract, normalize, and validate requirements from raw input
-- **Architecture Design** — Define modules, data flow, integration points, tech decisions
+- **Architecture Design** — Define modules, data flow, integration points, and tech decisions
+- **ADR Generation** — Capture and version architecture decisions as structured records
+- **UI/UX Architecture** — Design frontend component hierarchies, design tokens, and UX flows
+- **Database Architecture** — Define schemas, migration plans, indexes, and cascade rules
+- **Design System Generation** — Produce design-system artifacts from UX architecture output
+- **Dependency Analysis** — Build and maintain directed module dependency graphs; detect cycles
 - **Feature Planning** — Break down architecture into tasks, dependencies, and roadmap
-- **Code Review** — Validate code against SOLID, clean architecture, detect anti-patterns
-- **Security Review** — Threat modeling, OWASP mapping, vulnerability remediation
-- **Testing Strategy** — Test plans, coverage targets, quality gates
-- **Deployment Strategy** — Environments, promotion rules, rollback, feature flags
-- **Documentation Generation** — Auto-generate API docs, ADRs, READMEs from pipeline data
-- **Schema Validation** — Runtime JSON Schema validation between pipeline steps
-- **Context Memory** — Session persistence, compression, multi-turn state management
+- **Impact Analysis** — Compute change blast radius before any code modification
+- **Code Generation** — Produce incremental, architecture-aligned code from feature plans
+- **Clean Code Review** — Validate code against SOLID, clean architecture; detect anti-patterns
+- **Security Review** — Threat modeling (STRIDE), OWASP mapping, vulnerability remediation
+- **Testing Strategy** — Test plans, coverage targets, quality gates, edge-case identification
+- **Test Generation** — Generate unit, integration, and edge-case test suites from code artifacts
+- **Code Repair** — Targeted fixes for failing tests, type errors, and linter violations
+- **Guard Layer** — Database safety, performance, UI/UX compliance, and completeness guards
+- **SEO Optimization** — Metadata, semantic markup, and crawlability improvements
+- **Completeness Audit** — Verify implementation coverage against requirements before release
+- **Deployment Strategy** — Environments, promotion rules, rollback plans, and feature flags
+- **Documentation Generation** — Auto-generate API docs, ADRs, and READMEs from pipeline data
+- **Documentation Maintenance** — Detect and repair stale docs after every system change
+- **Rollback & Recovery** — Revert pipeline state to prior snapshot on critical failure
+- **Context Memory & Compression** — Session persistence, token compression, multi-turn state
+- **Observability** — Standardized metrics emission, pipeline monitoring, and execution tracking
 
 ## Scope
 

@@ -63,11 +63,12 @@ fields:
   executable_skill:
     type: string
     required: false
-    pattern: "^skills/.+\\.md$"
+    pattern: "^(\\.opencode/|skills/).+\\.md$"
     description: >
       Path to the AI-executable skill spec (13-section format).
+      Accepts both .opencode/skills/... and skills/... path prefixes.
       If absent, the skill is knowledge-only with no executable counterpart.
-    example: "skills/review/clean-code-review.md"
+    example: ".opencode/skills/clean-code-review/SKILL.md"
 
   tags:
     type: array

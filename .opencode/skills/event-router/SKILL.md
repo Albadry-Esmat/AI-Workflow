@@ -2,7 +2,7 @@
 name: event-router
 version: 1.0.0
 domain: orchestration
-description: Use when routing system events to their downstream skill handlers, building event-to-skill dispatch maps, or preventing duplicate event processing. Triggers on: "route this event", "event dispatch", "what skill handles this event", "event-driven execution", "trigger skill from event".
+description: 'Use when routing system events to their downstream skill handlers, building event-to-skill dispatch maps, or preventing duplicate event processing. Triggers on: "route this event", "event dispatch", "what skill handles this event", "event-driven execution", "trigger skill from event".'
 author: system
 ---
 

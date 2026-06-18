@@ -2,7 +2,7 @@
 name: documentation-generator
 version: 1.0.0
 domain: documentation
-description: Use when asked to generate documentation from scratch — API docs, ADRs, READMEs, or onboarding guides — based on requirements, architecture, or code. Triggers on: "generate docs", "write a README", "create API docs", "write an ADR", "onboarding guide", "document this".
+description: 'Use when asked to generate documentation from scratch — API docs, ADRs, READMEs, or onboarding guides — based on requirements, architecture, or code. Triggers on: "generate docs", "write a README", "create API docs", "write an ADR", "onboarding guide", "document this".'
 author: system
 ---
 

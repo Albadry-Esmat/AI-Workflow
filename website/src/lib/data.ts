@@ -114,7 +114,7 @@ export interface PipelinePhase {
 export interface PipelineGate {
   after_phase?: string;
   after_skill?: string;
-  type: "human_approval" | "auto";
+  type: "human_approval" | "auto" | "condition";
   label: string;
   timeout?: number;
   condition?: string;
@@ -137,6 +137,22 @@ export interface AgentConfig {
     skills?: string[];
     permission: Record<string, string>;
   };
+}
+
+export interface PipelineTemplate {
+  id: string;          // filename without .json
+  name: string;
+  version: string;
+  description: string;
+  phases: PipelinePhase[];
+  gates: PipelineGate[];
+  recovery?: { on_critical_failure: string; max_repair_iterations: number };
+}
+
+export interface ChangelogSection {
+  version: string;     // e.g. "2.5.0"
+  date: string;        // e.g. "2026-06-18"
+  groups: { label: string; items: string[] }[];
 }
 
 // ─── Loaders ─────────────────────────────────────────────────────────────────
@@ -178,7 +194,26 @@ export function loadSkillSpec(skillName: string): SkillSpec | null {
   const filePath = projectPath(".opencode", "skills", skillName, "SKILL.md");
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf8");
-  const { data, content } = matter(raw);
+
+  let data: Record<string, string> = {};
+  let content = raw;
+
+  try {
+    const parsed = matter(raw);
+    data = parsed.data as Record<string, string>;
+    content = parsed.content;
+  } catch {
+    // Frontmatter YAML parse failed (e.g. unquoted colons/double-quotes in description).
+    // Strip the ---...--- block manually and surface just the markdown body.
+    content = raw.replace(/^---[\s\S]*?---\s*\n/, "");
+    // Best-effort: extract simple key: value pairs via regex
+    const fmBlock = raw.match(/^---([\s\S]*?)---/)?.[1] ?? "";
+    for (const line of fmBlock.split("\n")) {
+      const m = line.match(/^(\w[\w-]*):\s+(.+)$/);
+      if (m) data[m[1]] = m[2];
+    }
+  }
+
   return {
     frontmatter: data as SkillSpec["frontmatter"],
     content,
@@ -219,8 +254,84 @@ export function loadSkillDetail(skillId: string): SkillEntry | null {
   return { ...skill, spec: spec ?? undefined };
 }
 
-// ─── Stats (auto-derived from live files) ────────────────────────────────────
+// ─── All pipeline templates ──────────────────────────────────────────────────
 
+const PIPELINE_FILES = [
+  { id: "full-pipeline",       label: "Full Pipeline"        },
+  { id: "consumer-website",    label: "Consumer Website"     },
+  { id: "developer-portal",    label: "Developer Portal"     },
+  { id: "admin-panel",         label: "Admin Panel"          },
+  { id: "pre-deploy",          label: "Pre-Deploy"           },
+  { id: "quick-review",        label: "Quick Review"         },
+  { id: "requirements-only",   label: "Requirements Only"    },
+  { id: "architecture-only",   label: "Architecture Only"    },
+] as const;
+
+export function loadAllPipelines(): PipelineTemplate[] {
+  return PIPELINE_FILES.map(({ id }) => {
+    const filePath = projectPath("skills", "pipelines", `${id}.json`);
+    const raw = fs.readFileSync(filePath, "utf8");
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+    // Normalize flat-format pipelines (skills[]) to phases[] for uniform rendering
+    let phases: PipelinePhase[] = (parsed.phases as PipelinePhase[]) ?? [];
+    if (phases.length === 0 && Array.isArray(parsed.skills)) {
+      phases = [{
+        id: "main",
+        label: parsed.name ? String(parsed.name).replace(/-/g, " ") : "Main",
+        skills: parsed.skills as PipelinePhase["skills"],
+      }];
+    }
+
+    return {
+      id,
+      name:        String(parsed.name ?? id),
+      version:     String(parsed.version ?? "1.0.0"),
+      description: String(parsed.description ?? ""),
+      phases,
+      gates:       (parsed.gates as PipelineGate[]) ?? [],
+      recovery:    parsed.recovery as PipelineTemplate["recovery"],
+    };
+  });
+}
+
+// ─── Changelog ───────────────────────────────────────────────────────────────
+
+export function loadChangelog(): ChangelogSection[] {
+  const filePath = projectPath("docs", "changelog.md");
+  const raw = fs.readFileSync(filePath, "utf8");
+
+  const sections: ChangelogSection[] = [];
+  // Split on version headings: ## [X.Y.Z] — YYYY-MM-DD
+  const parts = raw.split(/^(?=## \[\d)/m);
+
+  for (const part of parts) {
+    const header = part.match(/^## \[(\d+\.\d+\.\d+)\] — (\d{4}-\d{2}-\d{2})/);
+    if (!header) continue;
+    const version = header[1];
+    const date = header[2];
+
+    const groups: { label: string; items: string[] }[] = [];
+    // Split on ### sub-headings
+    const subparts = part.split(/^(?=### )/m);
+    for (const sub of subparts) {
+      const subHeader = sub.match(/^### (.+)/);
+      if (!subHeader) continue;
+      const label = subHeader[1].trim();
+      const items = sub
+        .replace(/^### .+\n/, "")
+        .split("\n")
+        .filter((l) => l.trim().startsWith("-") || l.trim().startsWith("*"))
+        .map((l) => l.replace(/^[\s*-]+/, "").trim())
+        .filter(Boolean);
+      if (items.length > 0) groups.push({ label, items });
+    }
+    sections.push({ version, date, groups });
+  }
+  return sections;
+}
+
+// ─── Stats (auto-derived from live files) ────────────────────────────────────
 export function loadSiteStats() {
   const skills = loadSkillIndex();
   const graph = loadSkillGraph();

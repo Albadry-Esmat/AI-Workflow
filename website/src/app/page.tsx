@@ -3,6 +3,7 @@ import { DOMAIN_COLORS } from "@/lib/colors";
 import { HeroSection } from "@/components/home/HeroSection";
 import { PrinciplesSection } from "@/components/home/PrinciplesSection";
 import { StatsSection } from "@/components/home/StatsSection";
+import { WhatsNewBanner } from "@/components/home/WhatsNewBanner";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { CtaSection } from "@/components/home/CtaSection";
 
@@ -18,8 +19,9 @@ export default function HomePage() {
       <HeroSection stats={stats} />
       <PrinciplesSection />
       <StatsSection stats={stats} domains={domains} />
+      <WhatsNewBanner />
       <FeaturesSection />
-      <CtaSection />
+      <CtaSection stats={stats} />
     </>
   );
 }

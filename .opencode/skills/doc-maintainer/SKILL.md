@@ -2,7 +2,7 @@
 name: doc-maintainer
 version: 1.1.0
 domain: documentation
-description: Use after any system change to detect what documentation is outdated and update or create .md files in /docs. Triggers on: "update the docs", "docs are outdated", "keep docs in sync", "documentation is wrong", "sync documentation", after code or architecture changes.
+description: 'Use after any system change to detect what documentation is outdated and update or create .md files in /docs. Triggers on: "update the docs", "docs are outdated", "keep docs in sync", "documentation is wrong", "sync documentation", after code or architecture changes.'
 author: system
 ---
 

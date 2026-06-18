@@ -1,9 +1,9 @@
 # ASE-OS — AI Software Engineering Operating System
 ## Final Goal Specification
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Last updated:** 2026-06-17
-**Status:** Active — Skill System Complete, Implementation Pending
+**Status:** Active — Skill System v2.0.0 Complete (37 skills), Runtime Implementation Pending
 
 ---
 
@@ -346,18 +346,16 @@ The ASE-OS is built on top of the existing skill infrastructure in this reposito
 
 **New skills required to complete ASE-OS** (not yet in registry):
 
-| Skill Needed | ASE-OS Component |
+> All previously listed required skills (SKL-021–030) have been implemented and are active.
+
+**New skills required to complete ASE-OS — next phase** (implementation runtime):
+
+| Skill / Component Needed | ASE-OS Component |
 |---|---|
-| `code-generator` | Builder agent — incremental code generation |
-| `change-impact-analyzer` | Change impact analysis system (§3.9) |
-| `state-manager` | System state read/write/diff operations |
-| `event-router` | Event-driven execution engine (§3.5) |
-| `rollback-manager` | Recovery and stability system (§3.10) |
-| `dependency-analyzer` | Dependency graph maintenance |
-| `test-generator` | Automated test case generation from spec |
-| `code-repair` | Targeted repair on failing tests or builds |
-| `context-compressor` | Token optimization — semantic summarization |
-| `adr-generator` | Architecture Decision Record automation |
+| Runtime executor | Orchestrator Engine — actual execution, not specification |
+| State persistence | System State Model — populate `.opencode/state/sessions/` |
+| Event bus | Event-Driven Execution Engine (§3.5) — wire event_router to actual triggers |
+| CI/CD pipeline | `.github/workflows/` — automated skill validation and schema checks |
 
 ---
 

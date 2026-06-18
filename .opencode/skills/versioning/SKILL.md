@@ -1,6 +1,6 @@
 ---
 name: versioning
-description: Use when assigning, bumping, or deciding skill version numbers. Triggers on: "version this skill", "bump the version", "what version should this be", "semver", "MAJOR vs MINOR vs PATCH", "increment version", "skill versioning".
+description: 'Use when assigning, bumping, or deciding skill version numbers. Triggers on: "version this skill", "bump the version", "what version should this be", "semver", "MAJOR vs MINOR vs PATCH", "increment version", "skill versioning".'
 ---
 
 # Versioning Governance

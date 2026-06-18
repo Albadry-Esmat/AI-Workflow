@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pipeline-schema.json",
+  "title": "PipelineConfig",
+  "description": "Schema for pipeline configuration objects passed to the orchestrator skill (SKL-010). Supports both flat (skills[]) and phased (phases[]) pipeline formats.",
+  "version": "2.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference."
+    },
+    "name": {
+      "type": "string",
+      "description": "Unique pipeline identifier (slug format, e.g. 'full-pipeline')."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver version of this pipeline config."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the pipeline's purpose and intended use."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["sequential", "parallel", "hybrid"],
+      "default": "sequential",
+      "description": "Execution mode. sequential runs skills one by one. parallel runs independent groups concurrently. hybrid uses parallel_groups definition."
+    },
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Flat ordered list of skills (simple pipeline format). Use this OR phases[], not both.",
+      "items": { "$ref": "#/$defs/skill_step" }
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered list of pipeline phases (structured pipeline format). Use this OR skills[], not both.",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "skills"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique phase identifier (e.g. 'phase-1-requirements')."
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable phase label shown in progress UIs."
+          },
+          "parallel": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, all skills in this phase run concurrently."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Expression evaluated before running the phase. Phase is skipped if falsy."
+          },
+          "async": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the phase runs asynchronously (fire-and-forget) and does not block pipeline progression."
+          },
+          "skills": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/skill_step" }
+          }
+        }
+      }
+    },
+    "parallel_groups": {
+      "type": "array",
+      "description": "Groups of skill names that can execute concurrently. Only used when mode is 'parallel' or 'hybrid'.",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "items": { "type": "string" }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "description": "HITL and validation gates that pause or block pipeline progression.",
+      "items": { "$ref": "#/$defs/gate" }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Recovery configuration when a critical failure occurs.",
+      "properties": {
+        "on_critical_failure": {
+          "type": "string",
+          "description": "Skill name to invoke on critical failure (typically 'rollback-manager')."
+        },
+        "max_repair_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Maximum repair loop iterations before aborting."
+        },
+        "rollback_scope": {
+          "type": "string",
+          "enum": ["pipeline_stage", "pipeline_run", "full_system"],
+          "description": "Scope of rollback when recovery is triggered."
+        }
+      }
+    },
+    "async_skills": {
+      "type": "array",
+      "description": "Names of skills that run asynchronously (fire-and-forget). Must match skill names defined in skills[] or phases[].",
+      "items": { "type": "string" }
+    },
+    "on_failure": {
+      "type": "string",
+      "enum": ["halt", "skip", "rollback"],
+      "default": "halt",
+      "description": "Behavior when a skill fails all retries. halt stops the pipeline. skip continues to next skill. rollback triggers rollback-manager."
+    },
+    "full_trace": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, all intermediate artifacts are retained in the pipeline result. Increases token usage significantly."
+    }
+  },
+  "oneOf": [
+    { "required": ["skills"] },
+    { "required": ["phases"] }
+  ],
+  "$defs": {
+    "skill_step": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "description": "A single skill invocation within a pipeline.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Skill name as registered in skills/index.yaml (e.g. 'requirement-analyzer')."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\^?\\d+\\.\\d+\\.\\d+$",
+          "description": "Semver or semver-range for the skill version. If omitted, latest is used."
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Static input overrides for this skill."
+        },
+        "skip_validation": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, skips schema validation of this skill's output."
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 2,
+          "description": "Maximum retry attempts before the pipeline halts this step."
+        },
+        "async": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, skill runs asynchronously and does not block pipeline progression."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["skill", "validation_check"],
+          "default": "skill",
+          "description": "Execution type. validation_check skills must emit a verdict field (pass/block). A block verdict halts the pipeline."
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "description": "A gate that pauses or blocks pipeline progression.",
+      "properties": {
+        "after_skill": {
+          "type": "string",
+          "description": "Gate fires after this skill name completes (flat pipeline format)."
+        },
+        "after_phase": {
+          "type": "string",
+          "description": "Gate fires after this phase ID completes (phases pipeline format)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["human_approval", "validation_check", "condition", "auto"],
+          "description": "Gate enforcement mode. human_approval requires user confirmation. validation_check auto-passes if output is valid. condition evaluates a JS-like expression. auto is an alias for condition."
+        },
+        "condition": {
+          "type": "string",
+          "description": "Expression evaluated against prior skill/phase output. Required when type is 'condition' or 'auto'."
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Seconds to wait for manual gate approval. 0 = wait indefinitely. Default: 3600.",
+          "default": 3600
+        },
+        "bypass_on_timeout": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, gate auto-continues when timeout is reached. Defaults to false (safe). Set to true only for non-critical informational gates. MUST be false for deployment gates."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label shown in the approval request UI."
+        }
+      }
+    }
+  }
+}

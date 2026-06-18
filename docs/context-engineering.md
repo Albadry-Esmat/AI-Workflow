@@ -1,6 +1,6 @@
 # Context Engineering — Memory & Retrieval
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 2.2.0 | **Last updated:** 2026-06-18
 
 ## Context Model
 
@@ -24,29 +24,82 @@ Level 3: Session Context (turn-scoped, persisted)
 
 ```json
 {
-  "session_id": "uuid",
-  "pipeline": "full | partial",
-  "created_at": "ISO8601",
-  "status": "in_progress | completed | halted | failed",
-  "gates_passed": ["gate-1"],
-  "feedback_loops": 0,
-  "current_step": "architecture-design",
-  "skills": {
-    "requirement-analyzer": {
-      "status": "completed",
-      "version": "1.1.0",
-      "output": { ... },
-      "metrics": { ... }
-    }
+  "session_id": "550e8400-e29b-41d4-a716-446655440000",
+  "pipeline_template": "full-pipeline",
+  "created_at": "2026-06-18T09:00:00Z",
+  "updated_at": "2026-06-18T10:30:00Z",
+  "token_budget": {
+    "tier": "full_pipeline",
+    "max_tokens": 200000,
+    "consumed_tokens": 42000,
+    "remaining_tokens": 158000
   },
-  "artifacts": {
-    "requirements": { ... },
-    "architecture": null
+  "project_spec": {
+    "requirements": [ ... ],
+    "open_questions": [ ... ],
+    "assumptions": [ ... ],
+    "risks": [ ... ],
+    "domain": "e-commerce"
   },
-  "metadata": {
-    "total_tokens_in": 15000,
-    "total_tokens_out": 42000
-  }
+  "architecture": {
+    "modules": [ ... ],
+    "data_flow": [ ... ],
+    "integration_points": [ ... ],
+    "technical_decisions": [ ... ]
+  },
+  "dependency_graph": {
+    "nodes": [ ... ],
+    "edges": [ ... ],
+    "cycle_report": { "cycles": [], "severity": "none" }
+  },
+  "task_graph": {
+    "tasks": [ ... ],
+    "milestones": [ ... ],
+    "current_phase": "phase-6-execution"
+  },
+  "code_map": {
+    "src/api/routes.ts": { "module": "api", "content_hash": "abc123", "language": "typescript" }
+  },
+  "skill_registry": { "version": "2.1.0", "skills": [ ... ] },
+  "decision_log": {
+    "adrs": [{ "id": "ADR-0001", "title": "Use PostgreSQL", "status": "accepted", "path": "docs/adrs/ADR-0001.md" }]
+  },
+  "documentation_state": {
+    "last_sync": "2026-06-18T09:00:00Z",
+    "stale_sections": [],
+    "coverage_percent": 92
+  },
+  "test_state": {
+    "coverage_target": 80,
+    "current_coverage": 84,
+    "last_run": "2026-06-18T10:00:00Z",
+    "failing_tests": [],
+    "invalidated_tests": []
+  },
+  "security_state": {
+    "last_audit": "2026-06-18T10:00:00Z",
+    "open_findings": [],
+    "gate_status": "pass"
+  },
+  "pipeline_state": {
+    "current_phase": "phase-6-execution",
+    "active_skills": [{ "skill": "code-generator", "status": "running", "started_at": "..." }],
+    "completed_phases": ["phase-1-requirements", "phase-2-architecture"],
+    "failed_phases": []
+  },
+  "dispatch_map": {
+    "code.generated": [{ "skill": "clean-code-review", "priority": 1, "async": false }]
+  },
+  "event_log": [
+    { "id": "evt-001", "type": "phase.completed", "source_skill": "feature-planning", "timestamp": "..." }
+  ],
+  "snapshots": [
+    { "id": "snap-001", "label": "post-architecture", "timestamp": "...", "status": "stable", "keys_included": ["architecture", "project_spec"] }
+  ],
+  "rollback_log": [],
+  "adr_index": [
+    { "id": "ADR-0001", "title": "Use PostgreSQL", "status": "accepted", "path": "docs/adrs/ADR-0001.md" }
+  ]
 }
 ```
 

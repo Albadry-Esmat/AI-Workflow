@@ -2,7 +2,7 @@
 name: skill-authoring
 version: 1.0.0
 domain: meta
-description: Use ONLY when creating, refactoring, splitting, validating, or evolving a skill in the skill system. Triggers on: "create a new skill", "add a skill", "refactor this skill", "split this skill", "validate this skill", "evolve the skill", "skill authoring". Do NOT use for general code tasks.
+description: 'Use ONLY when creating, refactoring, splitting, validating, or evolving a skill in the skill system. Triggers on: "create a new skill", "add a skill", "refactor this skill", "split this skill", "validate this skill", "evolve the skill", "skill authoring". Do NOT use for general code tasks.'
 author: system
 ---
 

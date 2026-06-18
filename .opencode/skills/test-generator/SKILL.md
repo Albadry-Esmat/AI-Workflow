@@ -2,7 +2,7 @@
 name: test-generator
 version: 1.0.0
 domain: testing
-description: Use when generating unit tests, integration tests, or edge-case test suites from code artifacts or specifications. Triggers on: "generate tests", "write tests for this", "create test suite", "generate unit tests", "test coverage", "generate from spec".
+description: 'Use when generating unit tests, integration tests, or edge-case test suites from code artifacts or specifications. Triggers on: "generate tests", "write tests for this", "create test suite", "generate unit tests", "test coverage", "generate from spec".'
 author: system
 ---
 

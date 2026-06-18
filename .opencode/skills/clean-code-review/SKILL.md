@@ -2,7 +2,7 @@
 name: clean-code-review
 version: 1.1.0
 domain: review
-description: Use when asked to review code quality, check SOLID principles, find anti-patterns, detect duplication, or produce refactoring suggestions. Triggers on: "review this code", "code review", "refactor", "is this clean code", "SOLID", "anti-patterns", "code quality".
+description: 'Use when asked to review code quality, check SOLID principles, find anti-patterns, detect duplication, or produce refactoring suggestions. Triggers on: "review this code", "code review", "refactor", "is this clean code", "SOLID", "anti-patterns", "code quality".'
 author: system
 ---
 

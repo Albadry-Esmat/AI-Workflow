@@ -1,8 +1,8 @@
 ---
 name: deployment-strategy
-version: 1.0.0
+version: 1.1.0
 domain: deployment
-description: Use when asked to define a deployment strategy, set up environments, plan CI/CD pipelines, configure feature flags, or produce infrastructure-as-code. Triggers on: "deployment strategy", "how do we deploy", "CI/CD", "rollback", "feature flags", "infrastructure", "IaC".
+description: 'Use when asked to define a deployment strategy, set up environments, plan CI/CD pipelines, configure feature flags, or produce infrastructure-as-code. Triggers on: "deployment strategy", "how do we deploy", "CI/CD", "rollback", "feature flags", "infrastructure", "IaC".'
 author: system
 ---
 
@@ -84,6 +84,18 @@ Step 6 — Infrastructure-as-Code scaffolding
 Step 7 — Assemble deployment plan
   Combine all into structured deployment strategy.
   Output: complete deployment plan
+
+Step 8 — Generate Deployment Approval Request
+  Compile a formal deployment_approval_request artifact containing:
+    - release_summary: one-paragraph description of what is being deployed
+    - guard_verdicts: verdicts from all guard skills run in this pipeline cycle
+    - readiness_score: score from implementation-completeness-guard (if available)
+    - deployment_plan: pattern, environments, estimated duration
+    - rollback_summary: rollback procedure and estimated recovery time
+    - risks: all risks with impact >= high
+    - action_required: "approve_or_reject" — explicitly states no automatic deployment will occur
+  The pipeline MUST halt at this point. Deployment CANNOT proceed without explicit user confirmation.
+  Output: deployment_approval_request artifact
 ```
 
 ## Outputs
@@ -96,6 +108,7 @@ Step 7 — Assemble deployment plan
 | `feature_flags` | `object` | Feature flag governance (naming, lifecycle, types, ownership) |
 | `deployment_plan` | `object` | Deployment strategy (pattern, schedule, health_check, monitoring) |
 | `risks` | `array[object]` | Deployment risks (description, impact, mitigation) |
+| `deployment_approval_request` | `object` | **Mandatory** — formal approval request artifact; pipeline halts until user confirms |
 | `metrics` | `object` | Deployment analysis metrics |
 | `feedback` | `array[object]` | Feedback loop entries |
 
@@ -177,6 +190,53 @@ Step 7 — Assemble deployment plan
         "required": ["description", "impact", "mitigation"]
       }
     },
+    "deployment_approval_request": {
+      "type": "object",
+      "description": "Mandatory formal approval request. The pipeline MUST halt here. No deployment occurs without explicit user confirmation.",
+      "required": ["release_summary", "action_required", "deployment_plan_summary", "rollback_summary"],
+      "properties": {
+        "release_summary":       { "type": "string", "description": "One-paragraph description of what is being deployed and why." },
+        "guard_verdicts": {
+          "type": "array",
+          "description": "All guard skill verdicts collected during this pipeline cycle.",
+          "items": {
+            "type": "object",
+            "required": ["guard", "verdict"],
+            "properties": {
+              "guard":      { "type": "string" },
+              "verdict":    { "type": "string", "enum": ["pass", "block", "not_run"] },
+              "violations": { "type": "integer" }
+            }
+          }
+        },
+        "readiness_score":        { "type": "integer", "minimum": 0, "maximum": 100 },
+        "deployment_plan_summary": {
+          "type": "object",
+          "properties": {
+            "pattern":            { "type": "string" },
+            "environments":       { "type": "array", "items": { "type": "string" } },
+            "estimated_duration": { "type": "string" }
+          }
+        },
+        "rollback_summary": {
+          "type": "object",
+          "properties": {
+            "procedure":            { "type": "string" },
+            "estimated_recovery":   { "type": "string" }
+          }
+        },
+        "high_risks": {
+          "type": "array",
+          "description": "Risks with impact: critical or high only.",
+          "items": { "type": "object" }
+        },
+        "action_required": {
+          "type": "string",
+          "enum": ["approve_or_reject"],
+          "description": "Always 'approve_or_reject'. The pipeline has stopped and awaits explicit user decision."
+        }
+      }
+    },
     "metrics": {
       "type": "object",
       "properties": {
@@ -197,7 +257,7 @@ Step 7 — Assemble deployment plan
       "items": { "$ref": "#/$defs/feedback_entry" }
     }
   },
-  "required": ["environments", "promotion_rules", "rollback_criteria", "feature_flags", "deployment_plan", "risks", "metrics", "feedback"],
+  "required": ["environments", "promotion_rules", "rollback_criteria", "feature_flags", "deployment_plan", "risks", "deployment_approval_request", "metrics", "feedback"],
   "$defs": {
     "feedback_entry": {
       "type": "object",
@@ -220,6 +280,8 @@ Step 7 — Assemble deployment plan
 - Production promotion MUST require manual approval gate.
 - Rollback procedure for production MUST be automated (auto_rollback or flag_toggle).
 - Feature flags MUST have a retire step in their lifecycle.
+- `deployment_approval_request` MUST always be present in the output — it is never optional.
+- `deployment_approval_request.action_required` MUST always be `"approve_or_reject"` — the pipeline MUST NOT continue automatically past this point under any condition.
 
 ## Security Considerations
 
@@ -236,6 +298,8 @@ Step 7 — Assemble deployment plan
 - [ ] Feature flags have complete lifecycle (create → activate → deactivate → retire)
 - [ ] Deployment pattern is appropriate for system criticality
 - [ ] IaC scaffold references no hardcoded secrets
+- [ ] deployment_approval_request is present with all required fields populated
+- [ ] deployment_approval_request.action_required = "approve_or_reject"
 
 ## Failure Scenarios
 
@@ -258,10 +322,14 @@ Step 7 — Assemble deployment plan
 
 | Gate | Trigger | Timeout | Behavior |
 |------|---------|---------|----------|
-| Deploy approval | Always — production deployment requires explicit sign-off | 3600s | Pause, present full deployment plan, rollback criteria, and environment topology |
+| Deploy approval | **Always — mandatory, non-bypassable** | 0 (wait indefinitely) | Pipeline halts after Step 8. The deployment_approval_request artifact is presented to the user. Deployment CANNOT proceed under any condition without explicit `approve` response. Auto-continue on timeout is DISABLED for this gate. |
 
-- Gate presents: environments, promotion rules, rollback triggers, estimated deployment duration.
-- If rejected: revise promotion rules or rollback strategy, re-run from Step 2.
+- Gate presents: `deployment_approval_request` in full — release summary, guard verdicts, readiness score, deployment plan, rollback summary, high risks.
+- **Approved**: orchestrator advances to the deployment execution step.
+- **Rejected**: pipeline halts, partial results returned, no deployment occurs.
+- **Modified**: apply modifications to promotion rules or rollback strategy, re-run from Step 2, re-generate approval request.
+
+> **Governance invariant**: deployment is strictly manual and user-controlled. This gate cannot be bypassed, skipped, or auto-continued regardless of timeout.
 
 ## 13. Skill Composition
 

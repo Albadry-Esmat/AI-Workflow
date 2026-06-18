@@ -1,17 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/claude-sonnet-4.6",
-  "hooks": {
-    "after_skill_output": {
-      "agents": ["doc-maintainer"],
-      "description": "Auto-trigger doc-maintainer after any skill produces output that changes system state"
-    },
-    "after_file_write": {
-      "match": ["skills/**", ".opencode/agent/**", "opencode.json"],
-      "agents": ["doc-maintainer"],
-      "description": "Auto-trigger doc-maintainer when any skill file, agent file, or config changes"
-    }
-  },
   "agent": {
     "primary": {
       "mode": "primary",
@@ -30,8 +19,12 @@
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "System architecture design — modules, data flow, integration points, tech decisions. Invoked after requirements are validated.",
-      "skill": ".opencode/skills/architecture-design/SKILL.md"
+      "description": "System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
+      "skills": [
+        ".opencode/skills/architecture-design/SKILL.md",
+        ".opencode/skills/frontend-ux-architect/SKILL.md",
+        ".opencode/skills/database-architect/SKILL.md"
+      ]
     },
     "planner": {
       "mode": "subagent",
@@ -44,10 +37,15 @@
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Code quality analysis (SOLID, clean architecture, anti-patterns) and security review. Invoked during the implementation phase.",
+      "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, and implementation completeness. Invoked during the implementation phase.",
       "skills": [
         ".opencode/skills/clean-code-review/SKILL.md",
-        ".opencode/skills/security-review/SKILL.md"
+        ".opencode/skills/security-review/SKILL.md",
+        ".opencode/skills/implementation-completeness-auditor/SKILL.md",
+        ".opencode/skills/database-guard/SKILL.md",
+        ".opencode/skills/performance-guard/SKILL.md",
+        ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
+        ".opencode/skills/implementation-completeness-guard/SKILL.md"
       ]
     },
     "tester": {
@@ -61,10 +59,12 @@
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Incremental code generation and targeted code repair. Invoked after feature planning and impact analysis are complete.",
+      "description": "Incremental code generation, targeted code repair, design system file generation, and SEO artifact generation. Invoked after feature planning and impact analysis are complete.",
       "skills": [
         ".opencode/skills/code-generator/SKILL.md",
-        ".opencode/skills/code-repair/SKILL.md"
+        ".opencode/skills/code-repair/SKILL.md",
+        ".opencode/skills/design-system-generator/SKILL.md",
+        ".opencode/skills/seo-optimizer/SKILL.md"
       ]
     },
     "impact-analyzer": {
@@ -79,7 +79,7 @@
     },
     "test-generator": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/gpt-4o-mini",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
       "skill": ".opencode/skills/test-generator/SKILL.md"
@@ -107,7 +107,7 @@
     },
     "doc-maintainer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/gpt-4o-mini",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"

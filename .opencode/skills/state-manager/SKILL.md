@@ -1,8 +1,8 @@
 ---
 name: state-manager
-version: 1.0.0
+version: 1.1.0
 domain: system
-description: Use when reading, writing, diffing, or restoring the ASE-OS system state. Triggers on: "read system state", "update state", "write state diff", "restore state", "system state snapshot", "state consistency".
+description: 'Use when reading, writing, diffing, or restoring the ASE-OS system state. Triggers on: "read system state", "update state", "write state diff", "restore state", "system state snapshot", "state consistency".'
 author: system
 ---
 
@@ -15,7 +15,7 @@ The state-manager is the sole interface to the ASE-OS system state. It provides 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `operation` | `string` | Yes | `read`, `write`, `diff`, `snapshot`, or `restore` |
-| `scope` | `string` | Yes | State section to operate on: `project_spec`, `architecture`, `dependency_graph`, `task_graph`, `code_map`, `skill_registry`, `decision_log`, `documentation_state`, `test_state`, `security_state`, or `all` |
+| `scope` | `string` | Yes | State section to operate on: `project_spec`, `architecture`, `dependency_graph`, `task_graph`, `code_map`, `skill_registry`, `decision_log`, `documentation_state`, `test_state`, `security_state`, `pipeline_state`, `dispatch_map`, `event_log`, `snapshots`, `rollback_log`, `adr_index`, or `all` |
 | `payload` | `object` | No | Data to write (required for `write` operation) |
 | `diff_entry` | `object` | No | Metadata for write audit: `{ skill_id, reason, timestamp }` |
 | `snapshot_id` | `string` | No | Snapshot ID to restore from (required for `restore` operation) |
@@ -29,7 +29,7 @@ The state-manager is the sole interface to the ASE-OS system state. It provides 
   "type": "object",
   "properties": {
     "operation": { "type": "string", "enum": ["read", "write", "diff", "snapshot", "restore"] },
-    "scope": { "type": "string", "enum": ["project_spec", "architecture", "dependency_graph", "task_graph", "code_map", "skill_registry", "decision_log", "documentation_state", "test_state", "security_state", "all"] },
+    "scope": { "type": "string", "enum": ["project_spec", "architecture", "dependency_graph", "task_graph", "code_map", "skill_registry", "decision_log", "documentation_state", "test_state", "security_state", "pipeline_state", "dispatch_map", "event_log", "snapshots", "rollback_log", "adr_index", "all"] },
     "payload": { "type": "object" },
     "diff_entry": {
       "type": "object",
@@ -164,6 +164,7 @@ Step 5 — Assemble output
 - Maximum state size: 512KB. If exceeded, compress via `context-compressor` before writing.
 - The `diff_log` is append-only — entries cannot be deleted or modified.
 - `snapshot` operations do not modify state — they only serialize it.
+- **ADR canonical source:** `scope: "adr_index"` is the single source of truth for Architecture Decision Records. `decision_log.adrs` is deprecated — do not write new ADRs there. Migrate existing reads to `scope: "adr_index"`.
 
 ## Security Considerations
 

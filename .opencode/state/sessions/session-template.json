@@ -1,0 +1,31 @@
+{
+  "$schema": "../../skills/schema/system-state-schema.json",
+  "_comment": "This is a session template. The orchestrator writes a copy of this file to .opencode/state/sessions/<session_id>.json at the start of every pipeline run and updates it after each skill step.",
+  "session_id": "<uuid-v4>",
+  "pipeline_name": "<pipeline-name>",
+  "pipeline_version": "<semver>",
+  "status": "in_progress",
+  "started_at": "<ISO-8601>",
+  "updated_at": "<ISO-8601>",
+  "current_phase": "<phase-id>",
+  "phases_completed": [],
+  "skill_outputs": {},
+  "context_window": {
+    "recent": [],
+    "compressed": []
+  },
+  "gate_decisions": [],
+  "feedback_log": [],
+  "metrics": {
+    "total_tokens_in": 0,
+    "total_tokens_out": 0,
+    "total_duration_ms": 0,
+    "skills_invoked": 0,
+    "retries": 0,
+    "backpropagations": 0
+  },
+  "recovery": {
+    "snapshots": [],
+    "last_stable_phase": null
+  }
+}
