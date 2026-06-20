@@ -1,17 +1,19 @@
 import { loadAllSkills } from "@/lib/data";
 import { ReferenceClient } from "@/components/reference/ReferenceClient";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Full Skills Reference — ASE-OS",
-  description:
-    "Complete specification for all 40 ASE-OS skills — inputs, outputs, orchestration rules, and usage guidelines.",
-  openGraph: {
-    title: "Full Skills Reference — ASE-OS",
-    description:
-      "Complete specification for all 40 ASE-OS skills — inputs, outputs, orchestration rules, and usage guidelines.",
-    type: "website" as const,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const skills = loadAllSkills();
+  return {
+    title: "Full Skills Reference",
+    description: `Complete specification for all ${skills.length} ASE-OS skills — inputs, outputs, orchestration rules, and usage guidelines.`,
+    openGraph: {
+      title: "Full Skills Reference — ASE-OS",
+      description: `Complete specification for all ${skills.length} ASE-OS skills — inputs, outputs, orchestration rules, and usage guidelines.`,
+      type: "website",
+    },
+  };
+}
 
 export default function ReferencePage() {
   const skills = loadAllSkills();

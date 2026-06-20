@@ -56,7 +56,8 @@ const SVG_W = COLS * COL_W;
 const SVG_H = ROWS * ROW_H;
 
 function nodeCenter(id: string) {
-  const n = LAYOUT.find((l) => l.id === id)!;
+  const n = LAYOUT.find((l) => l.id === id);
+  if (!n) return { x: 0, y: 0 };
   const x = n.col * COL_W + COL_W / 2;
   const y = n.row * ROW_H + NODE_H / 2;
   return { x, y };
@@ -120,7 +121,7 @@ export function WorkflowDiagram() {
             >
               <defs>
                 <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L8,3 z" fill="#3f3f46" />
+                  <path d="M0,0 L0,6 L8,3 z" fill="currentColor" />
                 </marker>
               </defs>
               {CONNECTIONS.map(([from, to]) => {
@@ -138,13 +139,14 @@ export function WorkflowDiagram() {
                     key={`${from}-${to}`}
                     d={d}
                     fill="none"
-                    stroke="#3f3f46"
+                    stroke="currentColor"
                     strokeWidth="1.5"
                     markerEnd="url(#arrow)"
                     initial={{ pathLength: 0, opacity: 0 }}
                     whileInView={{ pathLength: 1, opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.3 }}
+                    className="text-zinc-400 dark:text-zinc-600"
                   />
                 );
               })}
@@ -152,7 +154,8 @@ export function WorkflowDiagram() {
 
             {/* Node layer */}
             {LAYOUT.map((item, i) => {
-              const node = NODES.find((n) => n.id === item.id)!;
+              const node = NODES.find((n) => n.id === item.id);
+              if (!node) return null;
               const x = item.col * COL_W + (COL_W - NODE_W) / 2;
               const y = item.row * ROW_H;
               return (

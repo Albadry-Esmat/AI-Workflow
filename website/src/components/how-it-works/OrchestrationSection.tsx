@@ -97,7 +97,7 @@ export function OrchestrationSection() {
               className="rounded-xl border border-zinc-400 dark:border-zinc-600 bg-zinc-200/60 dark:bg-zinc-800/60 p-4 flex items-start gap-3 col-span-2 sm:col-span-1"
             >
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-300 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600">
-                <Cpu size={13} className="text-white" />
+                <Cpu size={13} className="text-zinc-600 dark:text-white" />
               </div>
               <div>
                 <div className="text-xs font-bold text-zinc-900 dark:text-white mb-0.5">Primary</div>

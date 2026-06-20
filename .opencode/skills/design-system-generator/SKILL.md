@@ -1,14 +1,14 @@
 ---
 name: design-system-generator
-version: 1.0.0
+version: 2.0.0
 domain: design
-description: 'Use when generating design system artifacts — token files, component scaffolds, Storybook config, and theme configuration — from a UX architecture spec. Triggers on: "generate the design system", "create token files", "scaffold the component library", "generate Storybook config", "produce theme config", "build the design foundation".'
+description: 'Use when generating design system artifacts — token files, component scaffolds, Storybook config, and theme configuration — from a UX architecture spec. Triggers on: "generate the design system", "create token files", "scaffold the component library", "generate Storybook config", "produce theme config", "build the design foundation", "generate motion tokens", "multi-theme system".'
 author: system
 ---
 
 ## Purpose
 
-Generate the concrete design system artifact layer from the token requirements and component contracts produced by `frontend-ux-architect`. This skill bridges the gap between a UX architecture specification and actual files on disk: it produces design token files (CSS custom properties, Tailwind theme extension, JSON token bundle), typed component stubs (scaffolded with required props and states), and Storybook configuration. It is the authoritative source for the design system file manifest and must run before `code-generator` so that token names and component interfaces are established before implementation begins.
+Generate the concrete design system artifact layer from the token requirements and component contracts produced by `frontend-ux-architect`. This skill bridges the gap between a UX architecture specification and actual files on disk: it produces a multi-tier token file set (CSS custom properties, Tailwind theme extension, JSON token bundle), typed component stubs with all required states, Storybook configuration, and multi-theme system support. In v2.0.0 the skill adds advanced token categories — motion (spring, easing, duration, choreography), elevation (5-level shadow system), blur/glass effects, and variable font configuration — and generates a complete four-theme system (light/dark/high-contrast/accessibility). It is the authoritative source for the design system file manifest and must run before `code-generator` so that token names and component interfaces are established before implementation begins.
 
 ## Inputs
 
@@ -17,6 +17,9 @@ Generate the concrete design system artifact layer from the token requirements a
 | `token_requirements` | `array[object]` | Yes | Token gap list from `frontend-ux-architect` (name, tier, category, reason) |
 | `component_contracts` | `array[object]` | Yes | Component definitions from `frontend-ux-architect` (name, responsibility, props, variants, states) |
 | `design_constraints` | `object` | Yes | Framework, component library, CSS strategy, token format preference |
+| `visual_excellence_targets` | `object` | No | Typography, color, depth, spacing specs from `frontend-ux-architect` v2.0.0 |
+| `motion_spec` | `object` | No | Motion brief from `frontend-ux-architect` or `motion-design-architect` (SKL-052) |
+| `theme_modes` | `array[string]` | No | Theme variants to generate (default: `["light", "dark"]`) |
 | `existing_token_files` | `array[string]` | No | Paths to existing token files to merge rather than replace |
 | `storybook_version` | `string` | No | Target Storybook version (default: `"8"`) |
 
@@ -37,7 +40,7 @@ Generate the concrete design system artifact layer from the token requirements a
         "properties": {
           "name":     { "type": "string" },
           "tier":     { "type": "string", "enum": ["primitive", "semantic", "component"] },
-          "category": { "type": "string", "enum": ["color", "spacing", "typography", "radius", "shadow", "motion", "z-index"] },
+          "category": { "type": "string", "enum": ["color", "spacing", "typography", "radius", "shadow", "motion", "z-index", "blur", "elevation", "glass", "variable-font"] },
           "reason":   { "type": "string" }
         }
       }
@@ -49,11 +52,12 @@ Generate the concrete design system artifact layer from the token requirements a
         "type": "object",
         "required": ["name", "responsibility", "props"],
         "properties": {
-          "name":           { "type": "string" },
-          "responsibility": { "type": "string" },
-          "props":          { "type": "array" },
-          "variants":       { "type": "array", "items": { "type": "string" } },
-          "states":         { "type": "array", "items": { "type": "string" } }
+          "name":                    { "type": "string" },
+          "responsibility":          { "type": "string" },
+          "props":                   { "type": "array" },
+          "variants":                { "type": "array", "items": { "type": "string" } },
+          "states":                  { "type": "array", "items": { "type": "string" } },
+          "enhancement_opportunities": { "type": "array", "items": { "type": "string" } }
         }
       }
     },
@@ -67,11 +71,15 @@ Generate the concrete design system artifact layer from the token requirements a
         "token_format":      { "type": "string", "enum": ["css-variables", "json", "style-dictionary", "tailwind-config"] }
       }
     },
-    "existing_token_files": {
+    "visual_excellence_targets": { "type": "object" },
+    "motion_spec":               { "type": "object" },
+    "theme_modes": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": { "type": "string", "enum": ["light", "dark", "high-contrast", "accessibility"] },
+      "default": ["light", "dark"]
     },
-    "storybook_version": { "type": "string" }
+    "existing_token_files": { "type": "array", "items": { "type": "string" } },
+    "storybook_version":    { "type": "string" }
   }
 }
 ```
@@ -79,55 +87,123 @@ Generate the concrete design system artifact layer from the token requirements a
 ## Required Context
 
 - `token_requirements` and `component_contracts` from `frontend-ux-architect` (SKL-031) — this skill cannot run before SKL-031 completes.
-- `design_constraints.framework` must be known — without it, component stub file extensions and import conventions cannot be determined.
+- `design_constraints.framework` must be known.
 - `existing_token_files` prevents destructive overwrites when incrementally extending an established design system.
+- `motion_spec` enables generation of the motion token tier — without it, motion tokens are stubbed with system defaults.
 
 ## Execution Logic
 
 ```
 Step 1 — Resolve token inventory
   Group token_requirements by tier: primitive → semantic → component.
-  For each required token: derive a naming convention based on design_constraints.token_format.
+  Add implicit required categories if not already present:
+    - motion: always add base motion tokens (duration-instant: 50ms, duration-fast: 120ms,
+              duration-normal: 250ms, duration-slow: 400ms, easing-standard, easing-decelerate,
+              easing-accelerate, spring-default: {stiffness:300, damping:30, mass:1})
+    - elevation: always add 5-level elevation scale (elevation-0 through elevation-4)
+    - blur: always add base blur tokens (blur-sm: 4px, blur-md: 8px, blur-lg: 16px, blur-xl: 24px)
+  If motion_spec provided: derive motion tokens from spring parameters and timing in motion_spec.
+  If visual_excellence_targets provided: derive typography scale from typography_spec.
   Flag any token name conflicts with existing_token_files.
-  Output: resolved token map with names, values (defaulted where derivable), and tier assignments
+  Output: resolved token map with names, values, and tier assignments
 
 Step 2 — Generate primitive token file
-  Emit the foundational color palette, spacing scale, type scale, radius scale, shadow levels.
-  Format: CSS custom properties (--color-brand-500), Tailwind extend block, or JSON object
-           depending on design_constraints.token_format.
+  Emit the foundational values for all token categories:
+    Color palette: full 50–950 scales for brand, neutral, success, warning, error, info
+    Spacing scale: 4px or 8px base unit, 0–96 steps
+    Type scale: modular scale from visual_excellence_targets.typography_spec or default Major Third (1.25)
+    Radius scale: 0, 2, 4, 6, 8, 12, 16, 24, 32, full
+    Shadow levels: 5 levels — elevation-0 (none) through elevation-4 (dramatic)
+    Motion primitives: duration steps, named easing curves (cubic-bezier), spring parameter sets
+    Blur values: 4 blur levels from blur-sm to blur-xl
+    Z-index scale: base, raised, overlay, modal, toast, tooltip
+  Format: per design_constraints.token_format
   Output: primitives.css / primitives.json / tailwind-tokens.js
 
 Step 3 — Generate semantic token file
-  Map semantic tokens to primitives: --color-surface-primary → var(--color-neutral-50).
-  Semantic tokens must cover: background, surface, text, border, interactive, status.
-  Output: semantic.css / semantic.json
+  Map semantic tokens to primitives for each theme mode:
+    Required semantic namespaces:
+      Background:    bg-base, bg-surface, bg-elevated, bg-overlay
+      Text:          text-primary, text-secondary, text-tertiary, text-disabled, text-inverse
+      Border:        border-default, border-focus, border-strong
+      Interactive:   interactive-primary, interactive-primary-hover, interactive-primary-pressed
+                     interactive-secondary, interactive-secondary-hover
+                     interactive-danger, interactive-danger-hover
+      Status:        status-success, status-warning, status-error, status-info
+      Motion:        motion-duration-fast, motion-duration-normal, motion-easing-standard
+                     motion-spring-default (stiffness/damping/mass as custom properties)
+      Elevation:     elevation-0 through elevation-4 (box-shadow values)
+      Glass:         glass-bg (color + opacity), glass-blur (backdrop-filter value)
+                     glass-border (semi-transparent border color)
+  If theme_modes includes "high-contrast":
+    Override semantic colors to meet WCAG AAA (7:1 contrast ratio) on all text/bg pairs
+  If theme_modes includes "accessibility":
+    Override motion durations: instant=0ms, fast=0ms (respects prefers-reduced-motion system setting)
+    Increase all touch targets to 48px minimum
+    Remove glass/blur effects (can cause vestibular disorders)
+  Output: semantic-[theme].css for each theme mode
 
 Step 4 — Generate component token file
-  Emit component-scoped tokens from semantic layer: --btn-bg → var(--color-interactive-primary).
-  One file per component or a single component-tokens file depending on component count.
+  Emit component-scoped tokens from semantic layer:
+    Button:  btn-bg, btn-bg-hover, btn-text, btn-border, btn-radius, btn-padding-x, btn-padding-y
+             btn-motion-duration, btn-motion-easing, btn-press-scale (0.97)
+    Input:   input-bg, input-border, input-border-focus, input-text, input-placeholder
+    Card:    card-bg, card-border, card-radius, card-shadow (→ elevation-1),
+             card-hover-shadow (→ elevation-2), card-motion-duration
+    Badge:   badge-bg, badge-text, badge-radius, badge-padding
+    Modal:   modal-bg, modal-glass-bg, modal-glass-blur, modal-shadow (→ elevation-3)
+    Nav:     nav-bg, nav-glass-bg, nav-glass-blur, nav-border
   Output: component-tokens.css / component-tokens.json
 
-Step 5 — Generate theme configuration
-  If css_strategy is "tailwind": emit tailwind.config.ts extend block with all token keys.
-  If css_strategy is "css-variables": emit :root { ... } blocks with light + dark mode sections.
-  If css_strategy is "style-dictionary": emit style-dictionary config pointing to the token files.
-  Output: theme config file
+Step 5 — Generate multi-theme configuration
+  For each theme mode in theme_modes:
+    If css_strategy is "css-variables":
+      Emit :root { ... } block for light (default).
+      Emit [data-theme="dark"] { ... } override block.
+      Emit [data-theme="high-contrast"] { ... } override block (if requested).
+      Emit @media (prefers-reduced-motion: reduce) { ... } motion override block (always).
+    If css_strategy is "tailwind":
+      Emit tailwind.config.ts with extend block, darkMode: "class", custom theme keys.
+      Emit tailwind-themes plugin for high-contrast and accessibility themes.
+    If css_strategy is "style-dictionary":
+      Emit style-dictionary config with platforms: css, json, ios, android.
+  Output: theme config file(s)
 
-Step 6 — Scaffold component stubs
+Step 6 — Generate variable font configuration (if variable-font in token_requirements)
+  If visual_excellence_targets.typography_spec.variable_font is true:
+    Emit @font-face declarations for Inter Variable, Geist, or specified font.
+    Define font-variation-settings utilities for weight axes (wght 100–900).
+    Emit Tailwind font-weight utilities that map to variation-settings.
+  Output: fonts.css + font-face declarations
+
+Step 7 — Scaffold component stubs
   For each component_contract:
-    Emit a typed stub file: functional component with required props typed, all states as
-    prop variants, empty render returning a semantic HTML element with the component token class.
-    Include JSDoc from responsibility field.
+    Emit a typed stub file with:
+      - Functional component with required props typed
+      - All states as prop variants: default, hover, focus, loading, error, disabled, empty
+      - Data-attribute based state classes for CSS targeting: data-state="loading"
+      - JSDoc from responsibility field
+      - If enhancement_opportunities present: include commented enhancement hints
+    Emit CSS module or className using component token variables.
   Output: one stub file per component (e.g. Button.tsx, Card.tsx)
 
-Step 7 — Generate Storybook configuration
-  Emit .storybook/main.ts with framework auto-detected from design_constraints.framework.
-  Emit one Story file per component (CSF3 format): Default story + one story per variant.
-  Output: .storybook/main.ts + stories/[ComponentName].stories.tsx per component
+Step 8 — Generate Storybook configuration
+  Emit .storybook/main.ts with framework from design_constraints.framework.
+  Emit .storybook/preview.ts:
+    - Import all theme CSS files
+    - Add theme toggle toolbar item (light/dark/high-contrast/accessibility)
+    - Add viewport addon with breakpoints from design_constraints
+    - Add a11y addon for accessibility checking
+  Emit one Story file per component (CSF3 format):
+    - Default story (default theme, default state)
+    - One story per variant × per theme mode
+    - Interaction story for animated components (using play function)
+  Output: .storybook/main.ts + .storybook/preview.ts + stories/[ComponentName].stories.tsx
 
-Step 8 — Assemble file manifest
-  Collect all generated file paths, sizes, and purposes into the output manifest.
+Step 9 — Assemble file manifest
+  Collect all generated file paths with sizes and purposes.
   Validate: every token referenced in component stubs exists in the token files.
+  Validate: every semantic token references a primitive (no orphan semantics).
   Flag any unresolved token references as violations.
   Output: file_manifest with path, type, size_estimate, purpose per file
 ```
@@ -136,13 +212,14 @@ Step 8 — Assemble file manifest
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `token_files` | `array[object]` | Generated token file specs (path, format, content_summary, token_count) |
-| `theme_config` | `object` | Theme configuration file spec (path, strategy, token_references) |
+| `token_files` | `array[object]` | Generated token file specs (path, format, tier, token_count, content_summary) |
+| `theme_config` | `object` | Theme configuration file spec (path, strategy, theme_modes, token_references) |
 | `component_stubs` | `array[object]` | Scaffolded component file specs (path, component_name, props_count, stories_path) |
-| `storybook_config` | `object` | Storybook setup file spec (main_config_path, story_count, framework) |
+| `storybook_config` | `object` | Storybook setup (main_config_path, preview_path, story_count, framework, theme_modes) |
+| `motion_tokens` | `object` | Summary of generated motion token set (duration_steps, easing_curves, spring_presets) |
 | `file_manifest` | `array[object]` | Full list of all generated files (path, type, purpose) |
 | `violations` | `array[object]` | Unresolved token references, naming conflicts, missing required tokens |
-| `metadata` | `object` | token_count, component_count, file_count, version |
+| `metadata` | `object` | token_count, component_count, theme_count, file_count, version |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
 | `feedback` | `array[object]` | Backpropagate to frontend-ux-architect if token gaps cannot be resolved |
 
@@ -170,11 +247,12 @@ Step 8 — Assemble file manifest
     },
     "theme_config": {
       "type": "object",
-      "required": ["path", "strategy"],
+      "required": ["path", "strategy", "theme_modes"],
       "properties": {
-        "path":              { "type": "string" },
-        "strategy":          { "type": "string" },
-        "token_references":  { "type": "integer" }
+        "path":             { "type": "string" },
+        "strategy":         { "type": "string" },
+        "theme_modes":      { "type": "array", "items": { "type": "string" } },
+        "token_references": { "type": "integer" }
       }
     },
     "component_stubs": {
@@ -186,6 +264,7 @@ Step 8 — Assemble file manifest
           "path":           { "type": "string" },
           "component_name": { "type": "string" },
           "props_count":    { "type": "integer" },
+          "states":         { "type": "array", "items": { "type": "string" } },
           "stories_path":   { "type": "string" }
         }
       }
@@ -195,8 +274,18 @@ Step 8 — Assemble file manifest
       "required": ["main_config_path", "story_count"],
       "properties": {
         "main_config_path": { "type": "string" },
+        "preview_path":     { "type": "string" },
         "story_count":      { "type": "integer" },
-        "framework":        { "type": "string" }
+        "framework":        { "type": "string" },
+        "theme_modes":      { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "motion_tokens": {
+      "type": "object",
+      "properties": {
+        "duration_steps":  { "type": "integer" },
+        "easing_curves":   { "type": "array", "items": { "type": "string" } },
+        "spring_presets":  { "type": "array" }
       }
     },
     "file_manifest": {
@@ -206,7 +295,7 @@ Step 8 — Assemble file manifest
         "required": ["path", "type", "purpose"],
         "properties": {
           "path":    { "type": "string" },
-          "type":    { "type": "string", "enum": ["token", "theme", "component", "story", "config"] },
+          "type":    { "type": "string", "enum": ["token", "theme", "component", "story", "config", "font"] },
           "purpose": { "type": "string" }
         }
       }
@@ -229,6 +318,7 @@ Step 8 — Assemble file manifest
       "properties": {
         "token_count":     { "type": "integer" },
         "component_count": { "type": "integer" },
+        "theme_count":     { "type": "integer" },
         "file_count":      { "type": "integer" },
         "version":         { "type": "string" }
       }
@@ -265,64 +355,75 @@ Step 8 — Assemble file manifest
 
 ## Rules & Constraints
 
-- Token files MUST follow the three-tier hierarchy: primitive → semantic → component. No component token may reference a primitive directly — it must go through a semantic token.
-- Every component stub MUST have a corresponding Story file — a component without a story is not considered scaffolded.
-- The `token_format` in `design_constraints` is the single source of truth for output format — do not mix formats within the same project.
-- If `existing_token_files` are provided, new tokens MUST be merged in (not overwritten) and name conflicts MUST be surfaced as `violations`.
-- Component stub files are placeholders — they define the interface and states only. Logic and markup are filled in by `code-generator` (SKL-028).
-- Hardcoded hex values or pixel values in token files are a `critical` violation — all values must be tokenized.
+- Token files MUST follow the three-tier hierarchy: primitive → semantic → component. No component token may reference a primitive directly.
+- Motion tokens MUST always be generated, even when `motion_spec` is absent — use system defaults.
+- A `@media (prefers-reduced-motion: reduce)` block MUST be emitted — motion sensitivity is non-optional.
+- Every component stub MUST have a corresponding Story file.
+- `theme_modes` MUST always include `"light"` — it is the canonical base; all other themes are overrides.
+- The high-contrast theme MUST meet WCAG AAA (7:1) — flagged as `critical` violation if any pair falls below.
+- If `existing_token_files` are provided, new tokens MUST be merged (not overwritten); conflicts surface as `critical` violations.
+- Hardcoded hex values or pixel values in token files are a `critical` violation.
+- Glass tokens (`glass-bg`, `glass-blur`) MUST NOT appear in the accessibility theme — surface as auto-removed with info feedback.
 
 ## Security Considerations
 
-- Token files are build artifacts — they must not contain secrets, API keys, or environment-specific URLs.
-- Component stub files must not import from runtime environment (no `process.env` in stub layer).
-- Theme configuration files that reference CDN URLs for font loading must flag those URLs for security review.
+- Token files are build artifacts — must not contain secrets, API keys, or environment-specific URLs.
+- Component stub files must not import from runtime environment (`process.env`).
+- Theme configuration files referencing CDN URLs for font loading must flag those URLs for security review.
+- WebGL/3D component stubs must include a memory-budget comment declaring max GPU memory usage.
 
 ## Token Optimization
 
-- For large token sets (> 100 tokens): output a summary table (category → count) instead of the full token list in the main response; full list goes into the file manifest.
-- Component stubs are emitted as path + interface summary only — not full file content — unless `dry_run: false` is explicit.
-- Compress component_contracts to name + props + states only during processing.
+- For large token sets (> 100 tokens): output a category summary table instead of the full list.
+- Component stubs emitted as path + interface summary only unless `dry_run: false` is explicit.
+- Compress `component_contracts` to name + props + states only during processing.
 
 ## Quality Checklist
 
 - [ ] Every `token_requirements` entry has a corresponding entry in `token_files`
-- [ ] All three token tiers (primitive, semantic, component) are represented in `token_files`
+- [ ] Motion token category present in `token_files` (always required)
+- [ ] Elevation token category present in `token_files` (always required)
+- [ ] All three token tiers (primitive, semantic, component) represented in `token_files`
 - [ ] Every component in `component_contracts` has a stub file and a story file
-- [ ] `theme_config` references only tokens defined in `token_files` (no dangling references)
-- [ ] `violations` array is empty or all items are `severity: minor`
-- [ ] No raw hex or pixel values appear in token files
+- [ ] `theme_config` includes all requested `theme_modes`
+- [ ] `@media (prefers-reduced-motion)` override block present in output
+- [ ] `violations` array empty or all items are `severity: minor`
+- [ ] No raw hex or pixel values in token files
+- [ ] Glass tokens absent from accessibility theme
 
 ## Failure Scenarios
 
 | Condition | Fallback Behavior |
 |-----------|-------------------|
-| `design_constraints.framework` is unknown | Return error: `{"error": "UNKNOWN_FRAMEWORK", "hint": "Provide framework in design_constraints (react, vue, svelte, angular)"}` |
-| Token naming conflict with existing files | Surface as `critical` violation; do not overwrite — require explicit resolution |
-| `component_contracts` is empty | Return error: `{"error": "NO_COMPONENT_CONTRACTS", "hint": "Run frontend-ux-architect (SKL-031) first to produce component contracts"}` |
-| Storybook version not supported | Default to Storybook 8 CSF3 format; log as `info` feedback |
-| Token tier cycle detected | Return error: `{"error": "TOKEN_CYCLE", "detail": "Component token references a component token — must resolve through semantic layer"}` |
+| `design_constraints.framework` unknown | Return error: `{"error": "UNKNOWN_FRAMEWORK"}` |
+| Token naming conflict with existing files | Surface as `critical` violation; do not overwrite |
+| `component_contracts` empty | Return error: `{"error": "NO_COMPONENT_CONTRACTS", "hint": "Run frontend-ux-architect (SKL-031) first"}` |
+| `theme_modes` includes `high-contrast` but no color contrast metadata | Auto-compute WCAG AAA compliant overrides from primitive palette; flag as `info` |
+| Storybook version unsupported | Default to Storybook 8 CSF3; log as `info` |
+| `motion_spec` absent | Generate motion tokens using system defaults; emit `info` feedback |
 
 ## Human-in-the-Loop Gates
 
 | Gate | Trigger | Timeout | Behavior |
 |------|---------|---------|----------|
-| Design system review | Always — token names and component interfaces are the contract all downstream implementation depends on | 3600s | Present file manifest, token count per tier, and any violations for sign-off before code-generator runs |
+| Design system review | Always | 3600s | Present file manifest, token count per tier, theme modes, motion token summary, and violations for sign-off before code-generator runs |
 
 ## Skill Composition
-
-`design-system-generator` runs after `frontend-ux-architect` and before `code-generator` in any website pipeline:
 
 ```yaml
 composes:
   - skill: design-system-generator
-    version: "^1.0.0"
+    version: "^2.0.0"
     input_map:
-      token_requirements:  "ux_architecture.token_requirements"
-      component_contracts: "ux_architecture.component_contracts"
-      design_constraints:  "architecture.design_constraints"
+      token_requirements:       "ux_architecture.token_requirements"
+      component_contracts:      "ux_architecture.component_contracts"
+      design_constraints:       "architecture.design_constraints"
+      visual_excellence_targets: "ux_architecture.visual_excellence_targets"
+      motion_spec:              "motion_brief"
+      theme_modes:              ["light", "dark", "high-contrast"]
     output_map:
       token_files:      "design_system.token_files"
       component_stubs:  "design_system.component_stubs"
+      motion_tokens:    "design_system.motion_tokens"
       file_manifest:    "design_system.file_manifest"
 ```

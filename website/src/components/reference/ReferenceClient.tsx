@@ -31,6 +31,8 @@ export function ReferenceClient({ skills }: Props) {
             <button
               className="w-full flex items-center gap-4 px-5 py-4 text-left"
               onClick={() => setOpen(isOpen ? null : skill.id)}
+              aria-expanded={isOpen}
+              aria-controls={`${skill.id}-panel`}
             >
               <span className="font-mono text-xs text-zinc-400 dark:text-zinc-600 w-16 shrink-0">{skill.id}</span>
               <div className="flex-1 min-w-0">
@@ -52,6 +54,9 @@ export function ReferenceClient({ skills }: Props) {
             <AnimatePresence>
               {isOpen && (
                 <motion.div
+                  id={`${skill.id}-panel`}
+                  role="region"
+                  aria-label={`${skill.name} details`}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}

@@ -38,8 +38,7 @@ interface Props { agents: AgentConfig }
 
 export function AgentDiagram({ agents }: Props) {
   const agentList = Object.entries(agents);
-  const [primary, ...subagents] = agentList.filter(([k]) => k === "primary")
-    .concat(agentList.filter(([k]) => k !== "primary"));
+  const subagents = agentList.filter(([k]) => k !== "primary");
 
   return (
     <section className="mb-20">

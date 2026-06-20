@@ -74,7 +74,7 @@ export interface SkillSpec {
     version: string;
     domain: string;
     description: string;
-    author: string;
+    author?: string;
   };
   content: string;
 }
@@ -133,6 +133,7 @@ export interface AgentConfig {
   [key: string]: {
     mode: string;
     description: string;
+    model?: string;
     skill?: string;
     skills?: string[];
     permission: Record<string, string>;
@@ -160,21 +161,29 @@ export interface ChangelogSection {
 export function loadSkillIndex(): SkillEntry[] {
   const filePath = projectPath("skills", "index.yaml");
   const raw = fs.readFileSync(filePath, "utf8");
-  const parsed = yaml.load(raw) as { skills: SkillEntry[] };
-  return parsed.skills;
+  const parsed = yaml.load(raw) as { skills: SkillEntry[] } | null;
+  return (parsed ?? { skills: [] }).skills;
+}
+
+/** Internal helper — parses registry.json once and returns both version and entries. */
+function parseRegistry(): { version: string; skills: RegistryEntry[] } {
+  const filePath = projectPath("skills", "registry.json");
+  const raw = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(raw) as { version: string; skills: RegistryEntry[] };
 }
 
 export function loadRegistry(): RegistryEntry[] {
-  const filePath = projectPath("skills", "registry.json");
-  const raw = fs.readFileSync(filePath, "utf8");
-  const parsed = JSON.parse(raw);
-  return parsed.skills as RegistryEntry[];
+  return parseRegistry().skills;
 }
 
 export function loadSkillGraph(): SkillGraph {
   const filePath = projectPath("skills", "graph", "skill-graph.yaml");
   const raw = fs.readFileSync(filePath, "utf8");
-  return yaml.load(raw) as SkillGraph;
+  return (yaml.load(raw) as SkillGraph | null) ?? {
+    meta: { version: "0.0.0", total_nodes: 0, total_edges: 0 },
+    nodes: [],
+    edges: [],
+  };
 }
 
 export function loadPipeline(): Pipeline {
@@ -187,7 +196,7 @@ export function loadAgentConfig(): AgentConfig {
   const filePath = projectPath("opencode.json");
   const raw = fs.readFileSync(filePath, "utf8");
   const parsed = JSON.parse(raw);
-  return parsed.agent as AgentConfig;
+  return (parsed.agent as AgentConfig | undefined) ?? {};
 }
 
 export function loadSkillSpec(skillName: string): SkillSpec | null {
@@ -255,23 +264,32 @@ export function loadSkillDetail(skillId: string): SkillEntry | null {
 }
 
 // ─── All pipeline templates ──────────────────────────────────────────────────
-
-const PIPELINE_FILES = [
-  { id: "full-pipeline",       label: "Full Pipeline"        },
-  { id: "consumer-website",    label: "Consumer Website"     },
-  { id: "developer-portal",    label: "Developer Portal"     },
-  { id: "admin-panel",         label: "Admin Panel"          },
-  { id: "pre-deploy",          label: "Pre-Deploy"           },
-  { id: "quick-review",        label: "Quick Review"         },
-  { id: "requirements-only",   label: "Requirements Only"    },
-  { id: "architecture-only",   label: "Architecture Only"    },
-] as const;
+// Auto-discovered from skills/pipelines/ — no manual list needed.
+// Any .json file added to that directory is picked up on the next build.
 
 export function loadAllPipelines(): PipelineTemplate[] {
-  return PIPELINE_FILES.map(({ id }) => {
-    const filePath = projectPath("skills", "pipelines", `${id}.json`);
-    const raw = fs.readFileSync(filePath, "utf8");
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
+  const pipelinesDir = projectPath("skills", "pipelines");
+
+  let files: string[] = [];
+  try {
+    files = fs
+      .readdirSync(pipelinesDir)
+      .filter((f) => f.endsWith(".json"))
+      .sort(); // stable alphabetical order
+  } catch {
+    return []; // directory missing or unreadable
+  }
+
+  const results: PipelineTemplate[] = [];
+  for (const filename of files) {
+    const id = filename.replace(/\.json$/, "");
+    const filePath = path.join(pipelinesDir, filename);
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(fs.readFileSync(filePath, "utf8")) as Record<string, unknown>;
+    } catch {
+      continue; // skip malformed files
+    }
 
     // Normalize flat-format pipelines (skills[]) to phases[] for uniform rendering
     let phases: PipelinePhase[] = (parsed.phases as PipelinePhase[]) ?? [];
@@ -283,7 +301,7 @@ export function loadAllPipelines(): PipelineTemplate[] {
       }];
     }
 
-    return {
+    results.push({
       id,
       name:        String(parsed.name ?? id),
       version:     String(parsed.version ?? "1.0.0"),
@@ -291,8 +309,9 @@ export function loadAllPipelines(): PipelineTemplate[] {
       phases,
       gates:       (parsed.gates as PipelineGate[]) ?? [],
       recovery:    parsed.recovery as PipelineTemplate["recovery"],
-    };
-  });
+    });
+  }
+  return results;
 }
 
 // ─── Changelog ───────────────────────────────────────────────────────────────
@@ -321,7 +340,7 @@ export function loadChangelog(): ChangelogSection[] {
       const items = sub
         .replace(/^### .+\n/, "")
         .split("\n")
-        .filter((l) => l.trim().startsWith("-") || l.trim().startsWith("*"))
+        .filter((l) => /^[\s]*[-*]\s/.test(l))
         .map((l) => l.replace(/^[\s*-]+/, "").trim())
         .filter(Boolean);
       if (items.length > 0) groups.push({ label, items });
@@ -337,10 +356,10 @@ export function loadSiteStats() {
   const graph = loadSkillGraph();
   const pipeline = loadPipeline();
   const agents = loadAgentConfig();
+  const { version: registryVersion, skills: registryEntries } = parseRegistry();
 
   const domainCounts: Record<string, number> = {};
-  const registry = loadRegistry();
-  registry.forEach((r) => {
+  registryEntries.forEach((r) => {
     domainCounts[r.domain] = (domainCounts[r.domain] ?? 0) + 1;
   });
 
@@ -350,10 +369,6 @@ export function loadSiteStats() {
     totalPipelinePhases: pipeline.phases.length,
     totalAgents: Object.keys(agents).length,
     domainCounts,
-    registryVersion: (() => {
-      const filePath = projectPath("skills", "registry.json");
-      const raw = fs.readFileSync(filePath, "utf8");
-      return JSON.parse(raw).version as string;
-    })(),
+    registryVersion,
   };
 }

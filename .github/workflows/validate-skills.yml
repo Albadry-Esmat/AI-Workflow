@@ -1,0 +1,147 @@
+name: Validate Skills
+
+on:
+  push:
+    paths:
+      - "skills/**"
+      - ".opencode/skills/**"
+      - "opencode.json"
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".opencode/skills/**"
+      - "opencode.json"
+
+jobs:
+  validate:
+    name: Skill Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install ajv-cli (JSON Schema validator)
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate pipeline configs against pipeline-schema.json
+        run: |
+          echo "=== Validating pipeline configs ==="
+          for f in skills/pipelines/*.json; do
+            echo "Checking $f ..."
+            ajv validate \
+              -s skills/schema/pipeline-schema.json \
+              -d "$f" \
+              --spec=draft7 \
+              --allow-union-types \
+              && echo "  PASS: $f" \
+              || { echo "  FAIL: $f"; exit 1; }
+          done
+
+      - name: Check all SKILL.md files have required sections
+        run: |
+          echo "=== Checking SKILL.md section headers ==="
+          REQUIRED_SECTIONS=(
+            "## 1\. Identity"
+            "## 2\. Activation"
+            "## 3\. Inputs"
+            "## 4\. Outputs"
+            "## 5\. Execution"
+            "## 6\. Metrics"
+            "## 7\. Rules"
+            "## 8\. Security"
+            "## 9\. Token Optimization"
+            "## 10\. Failure"
+            "## 11\. Testing"
+            "## 12\. HITL"
+            "## 13\. Composition"
+          )
+          FAILED=0
+          for skill_dir in .opencode/skills/*/; do
+            skill="${skill_dir%.}SKILL.md"
+            skill_file="${skill_dir}SKILL.md"
+            if [ ! -f "$skill_file" ]; then
+              echo "  MISSING: $skill_file"
+              FAILED=1
+              continue
+            fi
+            for section in "${REQUIRED_SECTIONS[@]}"; do
+              if ! grep -qE "$section" "$skill_file"; then
+                echo "  FAIL: $skill_file missing section '$section'"
+                FAILED=1
+              fi
+            done
+            echo "  PASS: $skill_file"
+          done
+          [ "$FAILED" -eq 0 ] || exit 1
+
+      - name: Check all index.yaml skill IDs are unique
+        run: |
+          echo "=== Checking index.yaml for duplicate IDs ==="
+          DUPES=$(grep "^  - id:" skills/index.yaml | sort | uniq -d)
+          if [ -n "$DUPES" ]; then
+            echo "  FAIL: Duplicate skill IDs found:"
+            echo "$DUPES"
+            exit 1
+          fi
+          echo "  PASS: All skill IDs are unique"
+
+      - name: Check index.yaml skill count matches .opencode/skills/ directory count
+        run: |
+          echo "=== Checking skill count consistency ==="
+          INDEX_COUNT=$(grep -c "^  - id:" skills/index.yaml)
+          DIR_COUNT=$(ls -d .opencode/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
+          echo "  index.yaml entries : $INDEX_COUNT"
+          echo "  .opencode/skills/  : $DIR_COUNT"
+          if [ "$INDEX_COUNT" -ne "$DIR_COUNT" ]; then
+            echo "  FAIL: Count mismatch — index.yaml ($INDEX_COUNT) vs .opencode/skills/ ($DIR_COUNT)"
+            exit 1
+          fi
+          echo "  PASS: Counts match ($INDEX_COUNT)"
+
+      - name: Check all opencode.json skill paths exist
+        run: |
+          echo "=== Checking opencode.json skill paths ==="
+          # Extract paths to a temp file to avoid pipe subshell isolation
+          node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('opencode.json', 'utf8'));
+            const paths = [];
+            for (const agent of Object.values(cfg.agent || {})) {
+              if (agent.skill)  paths.push(agent.skill);
+              if (agent.skills) paths.push(...agent.skills);
+            }
+            paths.forEach(p => console.log(p));
+          " > /tmp/skill_paths.txt
+          FAILED=0
+          while read -r path; do
+            if [ ! -f "$path" ]; then
+              echo "  FAIL: Missing skill file referenced in opencode.json: $path"
+              FAILED=1
+            else
+              echo "  PASS: $path"
+            fi
+          done < /tmp/skill_paths.txt
+          [ "$FAILED" -eq 0 ] || exit 1
+
+      - name: Validate graph node count matches index entry count
+        run: |
+          echo "=== Checking skill-graph.yaml node count ==="
+          GRAPH_NODES=$(grep "total_nodes:" skills/graph/skill-graph.yaml | awk '{print $2}')
+          INDEX_COUNT=$(grep -c "^  - id:" skills/index.yaml)
+          echo "  graph total_nodes  : $GRAPH_NODES"
+          echo "  index.yaml entries : $INDEX_COUNT"
+          if [ "$GRAPH_NODES" -ne "$INDEX_COUNT" ]; then
+            echo "  FAIL: Node count mismatch"
+            exit 1
+          fi
+          echo "  PASS: Node counts match ($GRAPH_NODES)"
+
+      - name: Summary
+        if: always()
+        run: echo "=== Skill validation complete ==="

@@ -3,7 +3,7 @@
   "$id": "pipeline-schema.json",
   "title": "PipelineConfig",
   "description": "Schema for pipeline configuration objects passed to the orchestrator skill (SKL-010). Supports both flat (skills[]) and phased (phases[]) pipeline formats.",
-  "version": "2.0.0",
+  "$comment": "schema-version: 2.0.0",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -23,6 +23,11 @@
     "description": {
       "type": "string",
       "description": "Human-readable description of the pipeline's purpose and intended use."
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["ai_agent", "mobile", "saas", "embedded_iot", "web", "api", "data", "general"],
+      "description": "Optional domain classifier for specialist pipelines. Enables domain-aware skill routing and constraint injection."
     },
     "mode": {
       "type": "string",
@@ -67,6 +72,10 @@
             "default": false,
             "description": "If true, the phase runs asynchronously (fire-and-forget) and does not block pipeline progression."
           },
+          "note": {
+            "type": "string",
+            "description": "Optional human-readable annotation for this phase. Shown in progress UIs and pipeline documentation."
+          },
           "skills": {
             "type": "array",
             "minItems": 1,
@@ -86,7 +95,8 @@
     },
     "gates": {
       "type": "array",
-      "description": "HITL and validation gates that pause or block pipeline progression.",
+      "minItems": 1,
+      "description": "HITL and validation gates that pause or block pipeline progression. If declared, must contain at least one gate — an empty gates array is not schema-valid.",
       "items": { "$ref": "#/$defs/gate" }
     },
     "recovery": {
@@ -174,6 +184,18 @@
           "enum": ["skill", "validation_check"],
           "default": "skill",
           "description": "Execution type. validation_check skills must emit a verdict field (pass/block). A block verdict halts the pipeline."
+        },
+        "config": {
+          "type": "object",
+          "description": "Domain-specific configuration passed to the skill invocation (e.g. domain constraints, guard thresholds)."
+        },
+        "input_overrides": {
+          "type": "object",
+          "description": "Runtime input overrides merged with static inputs before skill execution."
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional human-readable annotation for this skill step. Shown in pipeline documentation and trace logs."
         }
       }
     },
@@ -182,6 +204,13 @@
       "required": ["type"],
       "additionalProperties": false,
       "description": "A gate that pauses or blocks pipeline progression.",
+      "if": {
+        "properties": { "timeout": { "const": 0 } },
+        "required": ["timeout"]
+      },
+      "then": {
+        "properties": { "bypass_on_timeout": { "const": false } }
+      },
       "properties": {
         "after_skill": {
           "type": "string",
@@ -209,11 +238,15 @@
         "bypass_on_timeout": {
           "type": "boolean",
           "default": false,
-          "description": "If true, gate auto-continues when timeout is reached. Defaults to false (safe). Set to true only for non-critical informational gates. MUST be false for deployment gates."
+          "description": "If true, gate auto-continues when timeout is reached. Defaults to false (safe). Set to true only for non-critical informational gates. MUST be false for deployment gates — enforced by schema when timeout is 0."
         },
         "label": {
           "type": "string",
           "description": "Human-readable label shown in the approval request UI."
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional human-readable annotation for this gate. Shown in pipeline documentation and approval UIs."
         }
       }
     }

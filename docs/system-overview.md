@@ -1,6 +1,6 @@
 # System Overview — AI Workflow
 
-**Version:** 2.2.0 | **Last updated:** 2026-06-18
+**Version:** 3.0.0 | **Last updated:** 2026-06-21
 
 ## What This System Is
 
@@ -51,15 +51,24 @@ A production-grade AI agent ecosystem that transforms raw ideas into deployed so
 - **Testing Strategy** — Test plans, coverage targets, quality gates, edge-case identification
 - **Test Generation** — Generate unit, integration, and edge-case test suites from code artifacts
 - **Code Repair** — Targeted fixes for failing tests, type errors, and linter violations
-- **Guard Layer** — Database safety, performance, UI/UX compliance, and completeness guards
+- **Guard Layer** — Database safety, performance, UI/UX compliance, **security**, and completeness guards
 - **SEO Optimization** — Metadata, semantic markup, and crawlability improvements
 - **Completeness Audit** — Verify implementation coverage against requirements before release
 - **Deployment Strategy** — Environments, promotion rules, rollback plans, and feature flags
+- **CI/CD Scaffold** — Generate executable GitHub Actions/GitLab CI YAML, Dockerfiles, and Kubernetes manifests from deployment strategy
 - **Documentation Generation** — Auto-generate API docs, ADRs, and READMEs from pipeline data
 - **Documentation Maintenance** — Detect and repair stale docs after every system change
 - **Rollback & Recovery** — Revert pipeline state to prior snapshot on critical failure
 - **Context Memory & Compression** — Session persistence, token compression, multi-turn state
 - **Observability** — Standardized metrics emission, pipeline monitoring, and execution tracking
+- **Behavioral Telemetry** — Anonymized, PII-scrubbed event collection for pipeline health tracking
+- **Session Insights** — Per-skill performance aggregation: invocation counts, failure rates, HITL rejection ratios
+- **Enhancement Dashboard** — Read-only Markdown/JSON report of pipeline performance metrics
+- **Adaptive Proposals** — HITL-gated suggestion engine for skill improvements based on telemetry trends
+- **Adaptation Applicator** — Applies approved proposals with rollback checkpoint, validation gate, and doc sync
+- **Motion Design** — Complete motion token hierarchy, micro-interaction specs, page transitions, and 3D integration
+- **UX Research Synthesis** — User journey maps, heuristic evaluation, friction detection, and UX health scoring
+- **Creative Experience Architecture** — Innovative layout explorations, story-driven flows, immersive background systems
 
 ## Scope
 

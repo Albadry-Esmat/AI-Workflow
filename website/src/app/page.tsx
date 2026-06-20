@@ -1,5 +1,4 @@
-import { loadSiteStats, loadAllSkills } from "@/lib/data";
-import { DOMAIN_COLORS } from "@/lib/colors";
+import { loadSiteStats, loadChangelog } from "@/lib/data";
 import { HeroSection } from "@/components/home/HeroSection";
 import { PrinciplesSection } from "@/components/home/PrinciplesSection";
 import { StatsSection } from "@/components/home/StatsSection";
@@ -9,7 +8,7 @@ import { CtaSection } from "@/components/home/CtaSection";
 
 export default function HomePage() {
   const stats = loadSiteStats();
-  const skills = loadAllSkills();
+  const changelog = loadChangelog();
 
   // count domains
   const domains = Object.entries(stats.domainCounts).sort((a, b) => b[1] - a[1]);
@@ -19,7 +18,7 @@ export default function HomePage() {
       <HeroSection stats={stats} />
       <PrinciplesSection />
       <StatsSection stats={stats} domains={domains} />
-      <WhatsNewBanner />
+      <WhatsNewBanner latestRelease={changelog[0] ?? undefined} stats={stats} />
       <FeaturesSection />
       <CtaSection stats={stats} />
     </>

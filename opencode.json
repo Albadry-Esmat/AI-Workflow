@@ -37,7 +37,7 @@
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, and implementation completeness. Invoked during the implementation phase.",
+      "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, security, and implementation completeness. Invoked during the implementation phase.",
       "skills": [
         ".opencode/skills/clean-code-review/SKILL.md",
         ".opencode/skills/security-review/SKILL.md",
@@ -45,6 +45,7 @@
         ".opencode/skills/database-guard/SKILL.md",
         ".opencode/skills/performance-guard/SKILL.md",
         ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
+        ".opencode/skills/security-guard/SKILL.md",
         ".opencode/skills/implementation-completeness-guard/SKILL.md"
       ]
     },

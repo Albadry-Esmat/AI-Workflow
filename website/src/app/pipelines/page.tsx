@@ -1,16 +1,19 @@
+import type { Metadata } from "next";
 import { loadAllPipelines } from "@/lib/data";
 import { PipelinesClient } from "@/components/pipelines/PipelinesClient";
 
-export const metadata = {
-  title: "Pipeline Templates — ASE-OS",
-  description:
-    "All 8 ASE-OS pipeline templates — full pipeline, consumer website, developer portal, admin panel, pre-deploy, quick review, and more.",
-  openGraph: {
-    title: "Pipeline Templates — ASE-OS",
-    description: "Browse and compare all 8 ASE-OS pipeline templates side by side.",
-    type: "website" as const,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const pipelines = loadAllPipelines();
+  return {
+    title: "Pipeline Templates",
+    description: `All ${pipelines.length} ASE-OS pipeline templates — full pipeline, consumer website, developer portal, admin panel, pre-deploy, quick review, and more.`,
+    openGraph: {
+      title: "Pipeline Templates — ASE-OS",
+      description: `Browse and compare all ${pipelines.length} ASE-OS pipeline templates side by side.`,
+      type: "website",
+    },
+  };
+}
 
 export default function PipelinesPage() {
   const pipelines = loadAllPipelines();

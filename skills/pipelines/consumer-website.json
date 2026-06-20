@@ -25,7 +25,7 @@
       "label": "UI/UX + Database Design",
       "parallel": true,
       "skills": [
-        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "frontend-ux-architect", "version": "^2.0.0", "max_retries": 2 },
         { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
       ]
     },
@@ -33,7 +33,7 @@
       "id": "phase-2c-design-system",
       "label": "Design System Generation",
       "skills": [
-        { "name": "design-system-generator", "version": "^1.0.0", "max_retries": 2 }
+        { "name": "design-system-generator", "version": "^2.0.0", "max_retries": 2 }
       ]
     },
     {
@@ -82,7 +82,8 @@
       "skills": [
         { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
         { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        { "name": "ui-ux-compliance-guard", "version": "^2.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "security-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
       ]
     },
     {
@@ -134,7 +135,7 @@
   "parallel_groups": [
     ["frontend-ux-architect", "database-architect"],
     ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard", "security-guard"]
   ],
   "gates": [
     {

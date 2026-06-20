@@ -53,11 +53,13 @@ export function SkillsClient({ skills }: Props) {
             placeholder="Search name, description, tags, inputs, outputs…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search skills"
             className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 pl-9 pr-9 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
+              aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
             >
               <X size={13} />
@@ -67,6 +69,7 @@ export function SkillsClient({ skills }: Props) {
         <select
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
+          aria-label="Filter by domain"
           className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
         >
           {domains.map((d) => (
@@ -76,6 +79,7 @@ export function SkillsClient({ skills }: Props) {
         <select
           value={mastery}
           onChange={(e) => setMastery(e.target.value)}
+          aria-label="Filter by mastery level"
           className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
         >
           <option value={ALL}>All Levels</option>
@@ -118,7 +122,7 @@ export function SkillsClient({ skills }: Props) {
                 transition={{ duration: 0.18 }}
               >
                 <Link
-                  href={`/reference#${skill.id}`}
+                  href={`/skills/${skill.id}`}
                   className="group block h-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 p-5 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-200"
                 >
                   {/* Header */}

@@ -1,10 +1,196 @@
 # Changelog — System Update History
 
-**Version:** 2.4.0 | **Last updated:** 2026-06-18
+**Version:** 3.0.0 | **Last updated:** 2026-06-21
 
 All notable changes to this project are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+
+---
+
+## [3.0.0] — 2026-06-21
+
+### Added — Frontend UI/UX Enhancement (Phase 1)
+
+**`motion-design-architect` v1.0.0 (SKL-052):**
+- New skill: designs the complete motion system for a product. 10-step execution: motion philosophy derivation (functional/expressive/immersive/cinematic), motion token set (duration/easing/spring/stagger tiers), micro-interaction specs (GPU-safe transform+opacity only), page transition designs (fade/slide/shared-element/morph), scroll experience specs (reveal/parallax/progress-linked), advanced choreography and physics throws, 3D integration specs (Spline/R3F/CSS perspective), accessibility motion ruleset (100% prefers-reduced-motion coverage required), quality preview scoring. Enforces: GPU-composited properties only, stagger ≤ 12 items, choreography ≤ 2000ms, 3D GPU budget declaration mandatory.
+
+**`ux-research-synthesizer` v1.0.0 (SKL-053):**
+- New skill: evaluates any UX design against evidence-based usability principles. 7-step execution: user journey reconstruction with cognitive load and emotional state, full 15-heuristic evaluation (Nielsen's 10 + 5 modern digital extensions), 15 friction pattern detection (F1–F15 library), information architecture scoring (5 dimensions), accessibility experience audit (screen reader / keyboard / cognitive / situational), prioritized recommendations, and UX health score (0–100). ux_health_score ≤ 60 triggers automatic backpropagation to frontend-ux-architect.
+
+**`creative-experience-architect` v1.0.0 (SKL-054):**
+- New skill: architects world-class, emotionally resonant interfaces beyond standard enterprise patterns. 7-step execution: product identity analysis → creative archetype derivation (6 archetypes), innovative layout pattern exploration (bento grid / editorial / command palette / spatial canvas / layered depth / immersive full-screen), story-driven flow design (Act 1 hook → Act 2 educate → Act 3 convert), immersive background specs (5 techniques), premium component enhancement specs (button/card/nav/input/modal/table with micro-delight patterns), expressive typography system spec, ranked creative brief with scoring formula. References: Linear, Raycast, Arc Browser, Stripe, Apple, Figma, Airbnb, Vercel, Notion, Awwwards.
+
+### Changed — Evolved UI/UX Skills (MAJOR version bumps)
+
+**`frontend-ux-architect` v1.1.0 → v2.0.0 (SKL-031):**
+- MAJOR: new input `creativity_level` (`standard` | `premium` | `world-class`) activates premium design reference patterns and expanded visual excellence evaluation.
+- MAJOR: new input `motion_requirements` (array of motion categories) triggers full motion spec generation (Step 10).
+- New Step 9: visual excellence standards — typography spec, color system, depth system (glassmorphism/elevation), spatial harmony.
+- New Step 10: motion specification brief (consumed by SKL-052) — micro-interactions, page transitions, scroll experiences, advanced motion, 3D elements, reduced-motion fallbacks.
+- New layout_type values: `bento`, `editorial`, `immersive` (in addition to existing types).
+- New output fields: `visual_excellence_targets`, `motion_spec`, `creative_recommendations`.
+- Updated `token_requirements.category` enum: adds `blur`, `elevation`, `glass`, `variable-font`.
+- Updated accessibility_report: adds `motion_safe` and `high_contrast_ready` boolean fields.
+- Rule: `motion_safe: true` now required — every animation must have prefers-reduced-motion fallback.
+- Rule: `visual_excellence_targets` mandatory when `creativity_level` ≠ `standard`.
+
+**`design-system-generator` v1.0.0 → v2.0.0 (SKL-038):**
+- MAJOR: new input `visual_excellence_targets` from frontend-ux-architect v2.0.0.
+- MAJOR: new input `motion_spec` — enables motion token generation from spring parameters.
+- MAJOR: new input `theme_modes` array — generates light, dark, high-contrast, and accessibility themes.
+- Step 1: implicit motion tokens always generated (duration, easing, spring, stagger presets).
+- Step 1: implicit elevation tokens always generated (5 elevation levels).
+- Step 1: implicit blur tokens always generated (4 blur levels).
+- Step 3: semantic tokens now cover motion, elevation, and glass namespaces.
+- Step 5: multi-theme config — `data-theme` attribute overrides + `@media (prefers-reduced-motion)` block always emitted.
+- Step 6: variable font configuration from typography_spec (new).
+- Step 8: Storybook preview.ts now includes theme toggle toolbar and a11y addon.
+- New output field: `motion_tokens` summary.
+- Rule: `@media (prefers-reduced-motion)` block always emitted — mandatory.
+- Rule: glass tokens auto-removed from accessibility theme.
+
+**`ui-ux-compliance-guard` v1.0.0 → v2.0.0 (SKL-036):**
+- MAJOR: three new quality score dimensions added to output.
+- New Step 6: `visual_quality_score` (4 dimensions × 25 = 100): consistency, modernity, brand_alignment, professional_appearance.
+- New Step 7: `ux_quality_score` (4 dimensions × 25 = 100): discoverability, learnability, efficiency, accessibility.
+- New Step 8: `motion_quality_score` (4 dimensions × 25 = 100): smoothness, purpose, performance, user_impact (null when no motion_spec).
+- New block condition: `prefers-reduced-motion` guard missing on any animation.
+- New block threshold: `visual_quality_score.total` must meet minimum per `creativity_level` (standard: 40, premium: 70, world-class: 85).
+- New output field: `improvement_recommendations` — generated for all dimensions scoring < 80.
+
+### Changed — Registry, Graph & Indices
+
+- **`skills/registry.json` → v3.0.0**: 3 new entries (SKL-052, SKL-053, SKL-054); version bumps for SKL-031, SKL-036, SKL-038.
+- **`skills/index.yaml` → v3.0.0**: 3 new entries; tags expanded for SKL-031/036/038; 54 total skills.
+- **`skills/graph/skill-graph.yaml` → v2.5.0**: 3 new nodes; 8 new edges; `total_nodes: 54`, `total_edges: 142`.
+- **`skills/knowledge/frontend-ux-architect.md` → v2.0.0**: expanded with advanced layout patterns, motion principles, visual excellence standards, creative reference library, and full anti-pattern list.
+- **`skills/knowledge/motion-design-architect.md` → v1.0.0**: new — motion token architecture, micro-interaction patterns, library selection guide, scroll patterns, 3D decision matrix, performance budgets, accessibility motion standards.
+- **`skills/knowledge/ux-research-synthesizer.md` → v1.0.0**: new — Nielsen's 15 heuristics, friction pattern library, IA quality dimensions, severity classification, UX health formula.
+- **`skills/knowledge/creative-experience-architect.md` → v1.0.0**: new — creative archetype library, layout pattern reference, premium component patterns, typographic excellence guide, background system techniques, story-driven interface structure.
+
+---
+
+## [2.8.0] — 2026-06-20
+
+### Added — Assisted Adaptation Pipeline (Phase 3)
+
+**`adaptive-proposal-generator` v1.0.0 (SKL-050):**
+- Full 13-section SKILL.md. Reads `behavioral_telemetry.session_summary` from session-insights (SKL-048) and up to 10 historical summaries for trend analysis. Five detection algorithms: failure pattern analysis (failure_rate > 30%), HITL rejection analysis (rejection_ratio ≥ 30%), feedback loop gap detection (recurring unhandled transitions), pipeline routing analysis (3+ skills always together → propose new template), inactivity detection (zero invocations over ≥ 5 sessions → propose retire). Generates ranked `AdaptationProposal[]` with confidence scores, effort estimates, and evidence. All proposals have `hitl_status: "pending"` — enforced by output schema `enum: ["pending"]`. Suggestion-only — never writes to any file.
+
+**`adaptation-applicator` v1.0.0 (SKL-051):**
+- Full 13-section SKILL.md. HITL approval check is first and unconditional — any proposal with `hitl_status != "approved"` halts immediately with `HITL_APPROVAL_REQUIRED`. Creates rollback checkpoint (registry + index + graph + opencode.json) before any write. Five change handlers: `new_skill` (delegates to skill-authoring SKL-012), `modify_skill` (updates SKILL.md + bumps version), `retire_skill` (marks deprecated + adds deprecation notice), `new_pipeline` (generates pipeline JSON + validates against pipeline schema), `new_agent` (creates agent instruction file + updates opencode.json). Runs `validate-skills.sh` and `npm run build` after every change. Auto-rollback on validation or build failure. Triggers doc-maintainer (SKL-011) on success. `dry_run: true` supported — always safe.
+
+### Changed — Registry & Governance
+
+- **`skills/registry.json` → v2.8.0**: 2 new entries (SKL-050, SKL-051).
+- **`skills/index.yaml` → v2.8.0**: 2 new entries; section `# ── ASSISTED ADAPTATION SKILLS (SKL-050 to SKL-051)` added; 51 total skills.
+- **`skills/graph/skill-graph.yaml` → v2.4.0**: 2 new nodes (SKL-050, SKL-051); 8 new edges; `total_nodes: 51`, `total_edges: 134`.
+- **`docs/governance.md` → v2.2.0**: Layer 5 Adaptive Governance updated for Phase 3 — core principle changed from "Suggestion-Based, Not Autonomous" to "Assisted Adaptation — Human in the Loop at Every Step"; adaptation execution rules table added; SKL-050/051 coverage added to allowlist; 7 Layer 5 invariants (was 5).
+- **`docs/skills-registry.md` → v2.8.0**: SKL-050 and SKL-051 entries added.
+- **`skills/schema/system-state-schema.json`**: Added `"insights-adaptation-pipeline"` to `pipeline_template` enum. Enables sessions driven by the full observability+adaptation pipeline to have a valid state schema.
+- **`skills/pipelines/insights-adaptation-pipeline.json` v1.0.0**: Named pipeline template for the full SKL-047→SKL-051 chain. Phases: telemetry collection → insights + dashboard (parallel) → adaptive proposals → HITL-gated adaptation application → async doc sync. Three gates: condition gate (skip if no actionable patterns), non-bypassable human-approval gate after proposals, condition gate confirming successful application. Recovery via `rollback-manager`.
+
+---
+
+## [2.7.0] — 2026-06-20
+
+### Added — Lightweight Observability Pipeline (Phase 1–2)
+
+**`behavioral-telemetry-collector` v1.0.0 (SKL-047):**
+- Full 13-section SKILL.md. Opt-out gate is first and unconditional — no data collected if `behavioral_telemetry.opt_out === true`. PII scrubber applied to all string fields before any state write. Collects only enum-bound and numeric fields: `event_type`, `skill_name`, `timestamp`, `session_id`, `duration_ms`, `outcome`, `hitl_verdict`, `pipeline_phase`. Ring-buffer storage: 500-event cap per session (oldest dropped). Timestamps generated internally — never from caller input. Async fire-and-forget — never blocks pipeline.
+- Writes to `state-manager` scope `behavioral_telemetry.events` only.
+
+**`session-insights` v1.0.0 (SKL-048):**
+- Full 13-section SKILL.md. Reads `behavioral_telemetry.events`; computes per-skill metrics: invocation count, success rate, failure rate, p95 latency (5-sample minimum; degrades gracefully), HITL rejection ratio. Session aggregates: total skills invoked, total gates, approval rate, feedback loop count. Anomaly detection: flags skills with failure_rate > 30% or HITL rejection_ratio > 30% (warning feedback — no pipeline halt). Read-only on events array.
+- Writes only to `behavioral_telemetry.session_summary`.
+
+**`enhancement-dashboard` v1.0.0 (SKL-049):**
+- Full 13-section SKILL.md. Read-only renderer — never writes to system state. Converts `session_summary` to structured Markdown + JSON report with 5 sections: header, session overview table, per-skill performance table (sorted by invocation count DESC), anomalies section, and session health verdict (Healthy / Degraded / Failed). Supports `render_format: markdown` (default) or `json_only`. Returns minimal "no telemetry" report if summary absent.
+
+### Added — Pipeline Template
+
+**`insights-pipeline` (enum value added to `system-state-schema.json`):**
+- Added `"insights-pipeline"` to `pipeline_template` enum in `system-state-schema.json`. Enables sessions driven by the observability pipeline to have a valid state schema.
+
+### Changed — Registry & Schema
+
+- **`skills/registry.json` → v2.7.0**: 3 new entries (SKL-047, SKL-048, SKL-049); new `insights-pipeline` parallel group added (`behavioral-telemetry-collector` + `session-insights`).
+- **`skills/schema/system-state-schema.json`**: Added optional `behavioral_telemetry` object field (NOT in `required[]` — backward-compatible for all 46 existing skill consumers). Field includes: `enabled`, `opt_out`, `pii_scrubbed`, `events[]`, `session_summary`, `last_collection_at`. Added `"insights-pipeline"` to `pipeline_template` enum.
+- **`docs/skills-registry.md`** → v2.7.0: entries for SKL-047–049 added.
+- **`docs/architecture.md`** → v2.1.0: new Lightweight Observability Pipeline section with unidirectional module topology diagram and event flow diagram.
+- **`docs/governance.md`** → v2.1.0: governance model updated from 4 layers to 5 layers; Layer 5 Adaptive Governance section added with opt-out rules, PII protection rules, telemetry retention policy, adaptation scope allowlist, and 5 Layer 5 invariants.
+
+### Security
+
+- **`skills/schema/pipeline-schema.json`** (pre-existing vulnerability fixed):
+  - Added `if/then` constraint to gate schema: when `timeout: 0`, `bypass_on_timeout` is enforced as `const: false` at schema validation time. Previously, a crafted pipeline could set `bypass_on_timeout: true` on a zero-timeout gate (including the deployment gate) while passing schema validation silently.
+  - Added `minItems: 1` to top-level `gates` array: an empty `gates: []` declaration is now a schema validation error. Previously, an empty array was schema-valid and would silently omit all configured gate checks.
+
+---
+
+## [2.6.0] — 2026-06-18
+
+### Added — New Domain Specialist Layer (Phase 2c)
+
+**`ai-agent-specialist` v1.0.0 (SKL-043):**
+- Full 13-section SKILL.md. 8-step execution: agent type inference (single_agent/multi_agent/rag_pipeline/tool_use/fine_tuned), architecture pattern selection (ReAct/Supervisor-Worker/RAG/tool-use), prompt engineering standards (injection pattern library), memory architecture (in-context/external/episodic/procedural), token budget and cost model, evaluation framework (functional/safety/performance/regression evals), AI safety controls, and `domain_constraints` assembly.
+- Non-bypassable security-guard rule: `prompt_injection_open` — pipeline cannot advance without code remediation.
+- `safety_level: "high"` activates secondary safety model, mandatory disclaimers, and zero-hallucination policy for medical/legal/financial/child-facing AI.
+
+**`mobile-platform-specialist` v1.0.0 (SKL-044):**
+- Full 13-section SKILL.md. 8-step execution: technology stack inference (native iOS/Android/RN/Flutter/MAUI), architecture pattern selection per stack, offline-first strategy (simple caching/optimistic UI/full CRDT), push notification architecture (APNs/FCM/rich push), mobile security controls (certificate pinning, Keychain/Keystore, server-side IAP validation, jailbreak detection), App Store/Play Store compliance requirements, device matrix (minimum OS versions, screen sizes, performance budgets), and `domain_constraints` assembly.
+- Implementation checklist of 18 items emitted to builder agent.
+- Pipeline: `skills/pipelines/mobile-app.json`.
+
+**`saas-enterprise-architect` v1.0.0 (SKL-045):**
+- Full 13-section SKILL.md. 8-step execution: tenancy model selection (shared_db/schema_per_tenant/db_per_tenant/hybrid with trade-off table), RBAC architecture (platform roles + per-tenant customizable roles), subscription billing (Stripe/Stripe+Lago/Chargebee, dunning schedule, webhook idempotency), enterprise SSO (SAML 2.0 + OIDC + SCIM, JIT provisioning, domain verification), compliance framework controls (SOC 2 TSC, ISO 27001 Annex A, HIPAA technical safeguards, GDPR Articles 17/20/25/30/33, PCI DSS tokenization, FedRAMP FIPS 140-2), white-labeling (custom domains, SSL automation, runtime theme injection), audit logging (append-only, hash-chained, 1-year retention), and `domain_constraints` assembly.
+- Tenant isolation failure flagged as non-bypassable block in security-guard.
+- Implementation checklist of 20 items emitted to builder agent.
+- Pipeline: `skills/pipelines/saas-platform.json`.
+
+**`systems-specialist` v1.0.0 (SKL-046):**
+- Full 13-section SKILL.md. 8-step execution covering both embedded/IoT and game development: system type inference (bare-metal/RTOS/IoT edge/IoT cloud/game_2d/3d/multiplayer), architecture pattern selection (superloop/RTOS task model/ECS/server-authoritative netcode), memory budget (static allocation, per-task stack sizing, VRAM/RAM/audio game budgets), IoT communication protocols (MQTT QoS, CoAP, LoRaWAN payload limits, BLE GATT, CAN bus arbitration), OTA firmware update (dual-bank flash, CRC verify, rollback, signed firmware, staged rollout), safety standard controls (IEC 62443 zones/conduits, ISO 26262 ASIL decomposition, IEC 61508 SIL levels), and `domain_constraints` assembly.
+- Hardcoded credential detection is NON-BYPASSABLE for embedded_iot domain (security-guard).
+- Game development: ECS SoA memory layout, draw call budget enforcement, server-authoritative multiplayer, anti-cheat requirements.
+- Implementation checklist of 17 items (IoT section) + 12 items (game section) emitted to builder agent.
+- Pipeline: `skills/pipelines/iot-embedded.json`.
+
+### Added — New Pipeline Templates
+
+**`skills/pipelines/ai-agent-system.json` v1.0.0:**
+- 17 phases. Domain: `ai_agent`. Adds `phase-2c-domain` (ai-agent-specialist) and `phase-2d-architecture-refine` (architecture-design second pass with domain_constraints). security-guard configured with `domain: "ai_agent"` — prompt injection non-bypassable gate. testing-strategy configured with LLM eval hints (hallucination detection, prompt regression, tool call mocking). 10 HITL gates including dedicated gate for AI domain constraint approval (critical for regulated AI).
+
+**`skills/pipelines/mobile-app.json` v1.0.0:**
+- 17 phases. Domain: `mobile`. Adds `phase-2c-domain` (mobile-platform-specialist) and `phase-2d-architecture-refine`. frontend-ux-architect configured with `platform_hint: "mobile"`. performance-guard configured with mobile budgets (cold start < 2s, 60fps, < 150MB RAM). 11 HITL gates including App Store submission readiness gate.
+
+**`skills/pipelines/saas-platform.json` v1.0.0:**
+- 18 phases. Domain: `saas`. Adds `phase-2c-domain` (saas-enterprise-architect) and `phase-2d-architecture-refine`. database-architect configured with `mode: "multi_tenant"`. security-guard checks tenant scope enforcement and compliance controls. deployment-strategy configured with `blue_green` + tenant staged rollout hints. 12 HITL gates including compliance framework declaration gate.
+
+**`skills/pipelines/iot-embedded.json` v1.0.0:**
+- 17 phases. Domain: `embedded_iot`. Adds `phase-2c-domain` (systems-specialist) and `phase-2d-architecture-refine`. code-generator configured with MISRA-C 2012 coding standard. security-guard configured with `domain: "embedded_iot"` — hardcoded credentials and unsigned OTA are non-bypassable blocks. testing-strategy configured with HIL testing, WCET analysis, MISRA static analysis hints. ci-pipeline-generator configured with embedded build system hints (CMake, PlatformIO, Zephyr West, ESP-IDF).
+
+### Changed — Existing Skill Enhancements
+
+**`architecture-design` → v1.3.0:**
+- Added `domain_constraints` input field (object from any phase-2c domain specialist).
+- Added integration patterns reference table in Step 4: 11 patterns (REST, gRPC, GraphQL, Event/MQ, Shared DB, WebSocket, Webhook, SSE, File/S3, MQTT, CAN Bus) with when-to-use / avoid-when guidance.
+- `domain_constraints.integration_patterns_required` overrides generic pattern defaults.
+
+**`database-architect` → v1.1.0:**
+- Added `domain_constraints` input field (object from `saas-enterprise-architect`).
+- Added Step 0: multi-tenant schema strategy — four paths: shared_db (PostgreSQL RLS policy template), schema_per_tenant (migration orchestration, search_path), db_per_tenant (provisioning automation, connection registry), hybrid (promotion path shared→dedicated).
+
+**`frontend-ux-architect` → v1.1.0:**
+- Added `domain_constraints` input field (object from `mobile-platform-specialist`).
+- Added Step 9 (mobile/PWA): mobile-first layout constraints (iOS/Android platform navigation patterns, 44pt/48dp touch targets, safe area insets, haptic feedback patterns, list virtualization), PWA capability checklist (Service Worker caching strategy, Web App Manifest, install affordance, offline fallback page, app shell architecture), browser compatibility matrix (Baseline 2023+, Safari-specific flags).
+- Old Step 9 (assemble) renumbered to Step 10.
+
+### Changed — Registry & Index
+
+- `skills/registry.json` → v2.6.0: 6 skill entries updated (architecture-design v1.3.0, database-architect v1.1.0, frontend-ux-architect v1.1.0); 4 new entries added (ai-agent-specialist SKL-043, mobile-platform-specialist SKL-044, saas-enterprise-architect SKL-045, systems-specialist SKL-046).
+- `skills/index.yaml` → v2.6.0: same updates; comment header `# ── PHASE 2 DOMAIN SPECIALISTS (SKL-043+)` section extended with SKL-044/045/046 entries.
+- `docs/skills-registry.md` → v2.6.0: entries for SKL-041–046 added; enhanced skills table for v2.6.0 changes.
 
 ---
 

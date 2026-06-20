@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { loadPipeline } from "@/lib/data";
 import { PipelineFlow } from "@/components/pipeline/PipelineFlow";
 import { EventFlowDiagram } from "@/components/pipeline/EventFlowDiagram";
@@ -12,9 +13,14 @@ import { QualityAssuranceSection } from "@/components/how-it-works/QualityAssura
 import { OutputDeliverySection } from "@/components/how-it-works/OutputDeliverySection";
 import { WorkflowDiagram } from "@/components/how-it-works/WorkflowDiagram";
 
-export const metadata = {
-  title: "How It Works — ASE-OS",
+export const metadata: Metadata = {
+  title: "How It Works",
   description: "The full ASE-OS pipeline: from requirements to deployment, explained step by step with diagrams.",
+  openGraph: {
+    title: "How It Works — ASE-OS",
+    description: "The full ASE-OS pipeline: from requirements to deployment, explained step by step with diagrams.",
+    type: "website",
+  },
 };
 
 export default function HowItWorksPage() {

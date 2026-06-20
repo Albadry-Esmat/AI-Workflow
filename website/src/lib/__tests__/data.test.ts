@@ -5,17 +5,17 @@
  * data.ts is a pure I/O layer that reads the live source-of-truth files.
  *
  * Coverage targets:
- *   - loadSkillIndex        : returns 40 skills, each with required fields
- *   - loadRegistry          : returns 40 registry entries
+ *   - loadSkillIndex        : returns skills with required fields (count driven by live data)
+ *   - loadRegistry          : entries count matches index, all have required fields
  *   - loadSkillGraph        : nodes / edges counts match index
- *   - loadPipeline          : 14 phases, recovery block present
+ *   - loadPipeline          : 15 phases, recovery block present
  *   - loadAgentConfig       : known agents exist
  *   - loadSkillSpec         : returns content for known skill; null for unknown;
  *                             tolerates malformed frontmatter (regression guard)
  *   - loadSkillDetail       : enriches skill with registry + spec
  *   - loadSiteStats         : derived stats match raw loader counts
  *   - loadAllSkills         : count matches index, domain is enriched from registry
- *   - loadAllPipelines      : returns 8 templates, all have phases and gates arrays
+ *   - loadAllPipelines      : auto-discovers all pipelines, each has phases and gates arrays
  *   - loadChangelog         : returns sections with version, date, groups
  */
 
@@ -37,15 +37,10 @@ import {
 // ─── loadSkillIndex ───────────────────────────────────────────────────────────
 
 describe("loadSkillIndex", () => {
-  it("returns an array of skills", () => {
+  it("returns a non-empty array of skills", () => {
     const skills = loadSkillIndex();
     expect(Array.isArray(skills)).toBe(true);
     expect(skills.length).toBeGreaterThan(0);
-  });
-
-  it("returns exactly 40 skills", () => {
-    const skills = loadSkillIndex();
-    expect(skills.length).toBe(40);
   });
 
   it("each skill has required fields", () => {
@@ -79,14 +74,16 @@ describe("loadSkillIndex", () => {
 // ─── loadRegistry ────────────────────────────────────────────────────────────
 
 describe("loadRegistry", () => {
-  it("returns an array", () => {
+  it("returns a non-empty array", () => {
     const registry = loadRegistry();
     expect(Array.isArray(registry)).toBe(true);
+    expect(registry.length).toBeGreaterThan(0);
   });
 
-  it("returns exactly 40 registry entries", () => {
+  it("registry entry count matches skill index count", () => {
     const registry = loadRegistry();
-    expect(registry.length).toBe(40);
+    const index = loadSkillIndex();
+    expect(registry.length).toBe(index.length);
   });
 
   it("each entry has inputs, outputs, and a status", () => {
@@ -122,9 +119,9 @@ describe("loadSkillGraph", () => {
 // ─── loadPipeline ─────────────────────────────────────────────────────────────
 
 describe("loadPipeline", () => {
-  it("has 14 phases", () => {
+  it("has 15 phases", () => {
     const pipeline = loadPipeline();
-    expect(pipeline.phases.length).toBe(14);
+    expect(pipeline.phases.length).toBe(15);
   });
 
   it("has a recovery block with required fields", () => {
@@ -186,7 +183,7 @@ describe("loadSkillSpec", () => {
   });
 
   it("does NOT throw when frontmatter contains unquoted colons (regression guard)", () => {
-    // All 39 skills previously had unquoted `: "` in description.
+    // All skills previously had unquoted `: "` in description.
     // The try/catch fallback in loadSkillSpec must handle this gracefully.
     expect(() => loadSkillSpec("trigger-engineering")).not.toThrow();
   });
@@ -221,15 +218,15 @@ describe("loadSkillDetail", () => {
 // ─── loadAllSkills ────────────────────────────────────────────────────────────
 
 describe("loadAllSkills", () => {
-  it("returns 40 enriched skills", () => {
+  it("count matches the skill index", () => {
     const all = loadAllSkills();
-    expect(all.length).toBe(40);
+    const index = loadSkillIndex();
+    expect(all.length).toBe(index.length);
   });
 
   it("all enriched skills have a domain (from registry)", () => {
     const all = loadAllSkills();
     const withDomain = all.filter((s) => s.domain !== undefined);
-    // All skills in the registry should contribute a domain
     expect(withDomain.length).toBeGreaterThan(0);
   });
 });
@@ -269,9 +266,9 @@ describe("loadSiteStats", () => {
 // ─── loadAllPipelines ─────────────────────────────────────────────────────────
 
 describe("loadAllPipelines", () => {
-  it("returns exactly 8 pipeline templates", () => {
+  it("auto-discovers all pipeline JSON files (at least 8)", () => {
     const pipelines = loadAllPipelines();
-    expect(pipelines.length).toBe(8);
+    expect(pipelines.length).toBeGreaterThanOrEqual(8);
   });
 
   it("every template has id, name, version, description", () => {
@@ -299,7 +296,7 @@ describe("loadAllPipelines", () => {
     }
   });
 
-  it("full-pipeline template has the most phases", () => {
+  it("full-pipeline template exists and has the most phases", () => {
     const pipelines = loadAllPipelines();
     const full = pipelines.find((p) => p.id === "full-pipeline");
     expect(full).toBeDefined();
@@ -310,7 +307,7 @@ describe("loadAllPipelines", () => {
 // ─── loadChangelog ────────────────────────────────────────────────────────────
 
 describe("loadChangelog", () => {
-  it("returns an array of version sections", () => {
+  it("returns a non-empty array of version sections", () => {
     const sections = loadChangelog();
     expect(Array.isArray(sections)).toBe(true);
     expect(sections.length).toBeGreaterThan(0);
@@ -325,9 +322,11 @@ describe("loadChangelog", () => {
     }
   });
 
-  it("latest section is v2.5.0", () => {
+  it("latest section version matches the live registry version", () => {
     const sections = loadChangelog();
-    expect(sections[0].version).toBe("2.5.0");
+    const stats = loadSiteStats();
+    // The most recent changelog entry should match the registry version
+    expect(sections[0].version).toBe(stats.registryVersion);
   });
 
   it("version dates match YYYY-MM-DD format", () => {

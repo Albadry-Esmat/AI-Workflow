@@ -9,6 +9,7 @@
 #   4. Skill count in index.yaml matches .opencode/skills/ directory count
 #   5. All skill paths referenced in opencode.json exist on disk
 #   6. skill-graph.yaml total_nodes matches index.yaml entry count
+#   7. Version consistency: registry.json versions match skill-graph.yaml node versions
 #
 # Requires: ajv-cli (npm install -g ajv-cli ajv-formats), node, grep, awk
 
@@ -150,6 +151,43 @@ if [ "$GRAPH_NODES" -eq "$INDEX_COUNT" ]; then
   ok "Node counts match ($GRAPH_NODES)"
 else
   fail "Node count mismatch — graph ($GRAPH_NODES) vs index ($INDEX_COUNT)"
+fi
+
+# ─── 7. Version consistency: registry.json vs skill-graph.yaml ───────────────
+header "Version consistency: registry.json vs skill-graph.yaml"
+if command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const registry = JSON.parse(fs.readFileSync('skills/registry.json', 'utf8'));
+
+    // Parse skill-graph.yaml node versions via simple regex (no yaml dep needed)
+    const yaml = fs.readFileSync('skills/graph/skill-graph.yaml', 'utf8');
+    const graphVersions = {};
+    const nodeBlocks = yaml.split(/\n  - id:/);
+    for (const block of nodeBlocks.slice(1)) {
+      const nameMatch = block.match(/name:\s+(\S+)/);
+      const verMatch  = block.match(/version:\s+(\S+)/);
+      if (nameMatch && verMatch) graphVersions[nameMatch[1]] = verMatch[1];
+    }
+
+    let mismatches = 0;
+    for (const skill of registry.skills) {
+      const graphVer = graphVersions[skill.name];
+      if (!graphVer) continue; // skill not in graph (utility/meta) — skip
+      if (graphVer !== skill.version) {
+        console.error('  MISMATCH: ' + skill.name + ' registry=' + skill.version + ' graph=' + graphVer);
+        mismatches++;
+      }
+    }
+    if (mismatches === 0) {
+      console.log('  PASS: All registry versions match skill-graph.yaml');
+      process.exit(0);
+    } else {
+      process.exit(1);
+    }
+  " && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+else
+  echo "  SKIP: node not found"
 fi
 
 # ─── Summary ──────────────────────────────────────────────────────────────────

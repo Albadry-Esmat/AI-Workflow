@@ -1,6 +1,6 @@
 ---
 name: architecture-design
-version: 1.2.0
+version: 1.3.0
 domain: architecture
 description: 'Use when asked to design a system architecture, define modules or services, plan data flow, choose technology stack, or map integration points. Triggers on: "design the architecture", "system design", "define modules", "how should the system be structured", "what tech stack".'
 author: system
@@ -8,15 +8,16 @@ author: system
 
 ## Purpose
 
-Translate a validated requirements document into a concrete system architecture. The skill defines module boundaries, data flow, integration contracts, and makes technology recommendations with clear trade-off reasoning. It is invoked after requirement analysis is complete.
+Translate a validated requirements document into a concrete system architecture. The skill defines module boundaries, data flow, integration contracts, and makes technology recommendations with clear trade-off reasoning. It is invoked after requirement analysis is complete. When `domain_constraints` is provided by a domain specialist (Phase 2c), those constraints are applied to module design, technology selection, and integration patterns.
 
 ## Inputs
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `requirements` | `array[object]` | Yes | Output from requirement-analyzer (must include id, type, statement) |
-| `constraints` | `array[object]` | No | Technology, budget, or time constraints (field: description, type: "must"|"must_not"|"prefer") |
+| `constraints` | `array[object]` | No | Technology, budget, or time constraints (field: description, type: "must"\|"must_not"\|"prefer") |
 | `existing_architecture` | `object` | No | Description of existing system if this is an extension |
+| `domain_constraints` | `object` | No | **NEW v1.3.0.** Domain-specific constraints from a domain specialist (ai-agent-specialist, mobile-platform-specialist, saas-enterprise-architect, systems-specialist). When present, overrides generic defaults for affected modules. |
 
 **Input Schema:**
 
@@ -53,6 +54,18 @@ Translate a validated requirements document into a concrete system architecture.
       "properties": {
         "description": { "type": "string" },
         "diagram_url": { "type": "string" }
+      }
+    },
+    "domain_constraints": {
+      "type": "object",
+      "description": "Domain-specific constraints from a phase-2c domain specialist. Required fields depend on the domain.",
+      "properties": {
+        "domain":             { "type": "string", "enum": ["ai_agent","mobile","saas","enterprise","embedded_iot","game"] },
+        "required_modules":   { "type": "array", "items": { "type": "string" } },
+        "module_constraints": { "type": "array" },
+        "integration_patterns_required": { "type": "array", "items": { "type": "string" } },
+        "technology_mandates": { "type": "array", "items": { "type": "string" } },
+        "technology_exclusions": { "type": "array", "items": { "type": "string" } }
       }
     }
   },
@@ -93,6 +106,24 @@ Step 3 — Design data flow
 Step 4 — Identify integration points
   For each inter-module dependency, specify contract (API, event, shared database, message queue).
   Include interface shape, error handling protocol, and retry policy.
+
+  Integration pattern selection table (apply when domain_constraints is present or pattern is ambiguous):
+
+  | Pattern             | Use When                                         | Avoid When                                  |
+  |---------------------|--------------------------------------------------|---------------------------------------------|
+  | REST (HTTP/JSON)    | CRUD operations, public API, browser clients     | High-throughput streaming, <1ms latency req |
+  | gRPC                | Internal service-to-service, typed contracts     | Browser clients, simple CRUD               |
+  | GraphQL             | Frontend-driven data fetching, multi-client APIs | Simple single-client API, file transfers    |
+  | Event/Message Queue | Decoupled async workflows, fan-out consumers     | Simple request-response, synchronous needs  |
+  | Shared Database     | Simple monolith or tightly coupled modules only  | Microservices, strong boundary isolation    |
+  | WebSocket           | Real-time bidirectional (chat, live updates)     | Stateless request-response patterns         |
+  | Webhook             | Async third-party → system notifications         | High-volume or low-latency internal events  |
+  | SSE (Server-Sent)   | Server → browser streaming (one direction)       | Client → server or bidirectional streams    |
+  | File/S3             | Large binary assets, batch data transfer         | Real-time, structured queryable data        |
+  | MQTT (IoT)          | Constrained devices, pub/sub telemetry           | High-payload, browser-facing APIs           |
+  | CAN Bus             | Automotive real-time (domain: embedded_iot)      | Any non-automotive/industrial context       |
+
+  Apply domain_constraints.integration_patterns_required if provided — these override defaults.
   Output: integration contract list
 
 Step 5 — Apply patterns and scalability strategy

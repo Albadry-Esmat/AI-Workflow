@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/reference`,       lastModified: new Date(), changeFrequency: "daily",   priority: 0.8  },
     { url: `${BASE_URL}/changelog`,       lastModified: new Date(), changeFrequency: "daily",   priority: 0.7  },
     { url: `${BASE_URL}/getting-started`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7  },
+    { url: `${BASE_URL}/about`,           lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
   ];
 
   const skillRoutes: MetadataRoute.Sitemap = skills.map((skill) => ({

@@ -19,6 +19,7 @@ const NAV_MORE = [
   { href: "/getting-started",label: "Getting Started"},
   { href: "/reference",      label: "Reference"      },
   { href: "/changelog",      label: "Changelog"      },
+  { href: "/about",          label: "About"          },
 ];
 
 interface Props { version?: string }
@@ -35,8 +36,8 @@ export function Navbar({ version }: Props) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-14 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-lg font-bold tracking-tight text-white">
-            ASE<span className="text-cyan-400">-OS</span>
+          <span className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
+            ASE<span className="text-cyan-500 dark:text-cyan-400">-OS</span>
           </span>
           {version && (
             <span className="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-500 font-mono border border-zinc-300 dark:border-zinc-700 rounded px-1.5 py-0.5">
@@ -74,6 +75,8 @@ export function Navbar({ version }: Props) {
           <div className="relative">
             <button
               onClick={() => setMoreOpen((v) => !v)}
+              aria-expanded={moreOpen}
+              aria-haspopup="menu"
               className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded-md transition-colors ${
                 NAV_MORE.some((i) => i.href === path)
                   ? "text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800"

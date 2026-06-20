@@ -1,10 +1,10 @@
 # Governance — Approval Gates & Quality Enforcement
 
-**Version:** 2.0.0 | **Last updated:** 2026-06-17
+**Version:** 2.3.0 | **Last updated:** 2026-06-21
 
 ## Governance Model
 
-The system uses a four-layer governance model:
+The system uses a five-layer governance model:
 
 ```
 Layer 1: Automated Governance (enforced by orchestrator & validator)
@@ -18,6 +18,9 @@ Layer 3: HITL Gates (enforced by orchestrator, decided by humans)
 
 Layer 4: Documentation Governance (enforced by process)
   → Doc sync rules, changelog updates, versioning
+
+Layer 5: Adaptive Governance (enforced by observability pipeline)
+  → Telemetry opt-out, PII protection, read-only insights, no autonomous adaptation
 ```
 
 ## Automated Governance Rules
@@ -62,6 +65,7 @@ Guard skills are enforcement agents that run as `validation_check` gates. A `blo
 | Performance Guard | `performance-guard` (SKL-035) | N+1 query patterns, missing indexes on query-critical columns | architecture-design (SKL-002), clean-code-review (SKL-004) |
 | UI/UX Compliance Guard | `ui-ux-compliance-guard` (SKL-036) | Hardcoded colors, missing required component states, accessibility violations, prop contract violations | frontend-ux-architect (SKL-031) |
 | Implementation Completeness Guard | `implementation-completeness-guard` (SKL-037) | Readiness score < threshold (default: 85), critical requirements marked missing | implementation-completeness-auditor (SKL-033) |
+| Security Guard | `security-guard` (SKL-041) | CVSS score ≥ effective threshold, OWASP Top-10 critical findings present, compliance-scope blocking conditions (PCI/HIPAA/SOC2) | security-review (SKL-006) |
 
 **Previously existing guards (covered by existing skills):**
 
@@ -217,3 +221,86 @@ This section defines the intended token budgets and timeout constraints that the
 ### Change Policy
 
 Any modification to these limits requires updating this file AND `changelog.md`. Raising a limit above the values defined here requires explicit HITL approval before the change takes effect.
+
+## Adaptive Governance (Layer 5)
+
+Layer 5 governs the observability and assisted adaptation pipeline (v2.7.0–v2.8.0): `behavioral-telemetry-collector` (SKL-047), `session-insights` (SKL-048), `enhancement-dashboard` (SKL-049), `adaptive-proposal-generator` (SKL-050), and `adaptation-applicator` (SKL-051).
+
+### Core Principle: Assisted Adaptation — Human in the Loop at Every Step
+
+The observability and adaptation pipeline **observes, suggests, and applies only with explicit human approval**. No automatic changes are made to the registry, routing table, pipeline configurations, or any governance rule based on telemetry data alone. All adaptation is human-initiated and human-approved.
+
+```
+Observability (SKL-047→048→049)    ← read-only; no HITL required
+          ↓
+Proposal Generation (SKL-050)      ← suggestion-only; no HITL required to generate
+          ↓
+⚠️  HITL Gate — human approves/rejects each proposal
+          ↓
+Application (SKL-051)              ← HITL approval mandatory; auto-rollback on failure
+```
+
+### Opt-Out Rules
+
+| Rule | Enforcement | Consequence |
+|------|-------------|-------------|
+| Per-project opt-out flag | Checked as first unconditional step in SKL-047 | No telemetry collected; `collected: false` returned immediately |
+| Opt-out scope | Per session state (`behavioral_telemetry.opt_out`) | Entire session excluded from all 5 adaptation-pipeline skills |
+| Default behavior | Telemetry enabled by default | Projects must explicitly set `opt_out: true` to disable |
+
+### PII Protection Rules
+
+| Rule | Enforcement | Consequence |
+|------|-------------|-------------|
+| PII scrubber runs on every event | SKL-047 Step 3, before any state write | Credential patterns, emails, path traversals redacted |
+| No user content stored | Event schema limited to enum + numeric fields only | Requirement text, code, prompts never stored |
+| `pii_scrubbed: true` flag | Set by SKL-047 after every event write | Signals downstream skills that scrubbing completed |
+| Proposals contain no user content | SKL-050 uses only aggregated statistics | Proposal text is template-based; no user input interpolated |
+
+### Telemetry Retention Policy
+
+| Item | Policy |
+|------|--------|
+| Events storage scope | Current session only — `behavioral_telemetry` in active session state |
+| Events ring-buffer cap | 500 events per session (oldest dropped when exceeded) |
+| Cross-session persistence | Not retained by default — session state follows existing retention policy |
+| `session_summary` | Written to session state by SKL-048; follows same retention policy |
+| `historical_summaries` | Up to 10 prior session summaries retained for trend analysis (optional) |
+
+### Adaptation Scope Allowlist
+
+The following actions are **permitted** without HITL approval:
+
+- Viewing `enhancement-dashboard` (SKL-049) output at any time (read-only)
+- Invoking `session-insights` (SKL-048) at session end (async, non-blocking)
+- Invoking `adaptive-proposal-generator` (SKL-050) to generate proposals (read-only; proposals have `hitl_status: pending`)
+- Using `dry_run: true` on `adaptation-applicator` (SKL-051) to preview changes without writing
+
+The following actions require **explicit HITL approval before taking effect**:
+
+- Any change to `skills/registry.json` based on proposal data (via SKL-051)
+- Any change to `skills/index.yaml`, `skills/graph/skill-graph.yaml`, or pipeline JSON files (via SKL-051)
+- Any change to `opencode.json` agent configuration (via SKL-051)
+- Any change to governance rules or guard thresholds
+- Any change to HITL gate configuration
+
+### Adaptation Execution Rules
+
+| Rule | Enforcement | Consequence |
+|------|-------------|-------------|
+| HITL approval check is first and unconditional | SKL-051 Step 1 | Any proposal with `hitl_status != "approved"` halts with `HITL_APPROVAL_REQUIRED` |
+| Rollback checkpoint before every write | SKL-051 Step 3 | Rollback checkpoint must exist before any file is modified |
+| validate-skills.sh must pass | SKL-051 Step 5 | Auto-rollback on failure; `VALIDATION_FAILED` returned |
+| npm run build must pass | SKL-051 Step 6 | Auto-rollback on failure; `BUILD_FAILED` returned |
+| doc-maintainer triggered on success | SKL-051 Step 7 | Non-blocking; failure is a warning, not a rollback trigger |
+| One proposal per invocation | SKL-051 constraint | Batch application is not supported |
+
+### Layer 5 Invariants
+
+1. The observability pipeline (SKL-047–049) **never halts or blocks** any pipeline gate.
+2. `enhancement-dashboard` (SKL-049) **never writes to system state**.
+3. `session-insights` (SKL-048) **never modifies `behavioral_telemetry.events`** — read-only on events.
+4. `adaptive-proposal-generator` (SKL-050) **never writes to registry, index, graph, or pipeline files** — all output proposals have `hitl_status: pending`.
+5. `adaptation-applicator` (SKL-051) **never proceeds without `hitl_status == "approved"`** — this check is Step 1 and unconditional.
+6. No skill in the adaptation pipeline can modify governance rules, guard skill configurations, or HITL gate thresholds.
+7. Adding or modifying any adaptation pipeline skill requires updating this file AND `changelog.md`.

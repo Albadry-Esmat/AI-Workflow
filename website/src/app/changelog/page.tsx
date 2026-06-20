@@ -2,7 +2,7 @@ import { loadChangelog, loadSiteStats } from "@/lib/data";
 import { ChangelogContent } from "@/components/changelog/ChangelogContent";
 
 export const metadata = {
-  title: "Changelog — ASE-OS",
+  title: "Changelog",
   description:
     "Complete version history of ASE-OS — every skill addition, architecture change, and bug fix from v1.0.0 to present.",
   openGraph: {

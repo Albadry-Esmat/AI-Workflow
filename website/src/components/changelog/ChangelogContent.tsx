@@ -13,6 +13,21 @@ const GROUP_STYLES: Record<string, { icon: typeof Plus; color: string; bg: strin
   Removed:    { icon: ChevronDown,color: "text-rose-400",   bg: "bg-rose-500/10",   border: "border-rose-500/20"   },
 };
 
+/** Finds the matching GROUP_STYLES entry by exact match first, then prefix.
+ *  Handles extended headings like "Added — Lightweight Observability Pipeline". */
+function findGroupStyle(label: string) {
+  if (GROUP_STYLES[label]) return GROUP_STYLES[label];
+  const key = Object.keys(GROUP_STYLES).find((k) => label.startsWith(k));
+  return key ? GROUP_STYLES[key] : null;
+}
+
+/** Returns the base GROUP_STYLES key for a label (e.g. "Added — Subtitle" → "Added"). */
+function findGroupBaseLabel(label: string): string {
+  if (GROUP_STYLES[label]) return label;
+  const key = Object.keys(GROUP_STYLES).find((k) => label.startsWith(k));
+  return key ?? label;
+}
+
 function VersionCard({ section, isLatest }: { section: ChangelogSection; isLatest: boolean }) {
   const [expanded, setExpanded] = useState(isLatest);
 
@@ -37,20 +52,35 @@ function VersionCard({ section, isLatest }: { section: ChangelogSection; isLates
           </span>
           <span className="text-sm text-zinc-400 dark:text-zinc-500">{section.date}</span>
           <div className="hidden sm:flex gap-1.5">
-            {section.groups.map((g) => {
-              const s = GROUP_STYLES[g.label];
-              if (!s) return null;
-              const Icon = s.icon;
-              return (
-                <span
-                  key={g.label}
-                  className={`inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5 border ${s.border} ${s.bg} ${s.color}`}
-                >
-                  <Icon size={10} />
-                  {g.label} ({g.items.length})
-                </span>
-              );
-            })}
+            {/* Deduplicate by base type (e.g. two "Added — …" groups → one "Added (N)" badge) */}
+            {section.groups
+              .reduce<Array<{ baseLabel: string; count: number; style: (typeof GROUP_STYLES)[string] }>>(
+                (acc, g) => {
+                  const style = findGroupStyle(g.label);
+                  if (!style) return acc;
+                  const baseLabel = findGroupBaseLabel(g.label);
+                  const existing = acc.find((b) => b.baseLabel === baseLabel);
+                  if (existing) {
+                    existing.count += g.items.length;
+                  } else {
+                    acc.push({ baseLabel, count: g.items.length, style });
+                  }
+                  return acc;
+                },
+                [],
+              )
+              .map((badge, badgeIdx) => {
+                const Icon = badge.style.icon;
+                return (
+                  <span
+                    key={`${badge.baseLabel}-${badgeIdx}`}
+                    className={`inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5 border ${badge.style.border} ${badge.style.bg} ${badge.style.color}`}
+                  >
+                    <Icon size={10} />
+                    {badge.baseLabel} ({badge.count})
+                  </span>
+                );
+              })}
           </div>
         </div>
         <ChevronDown
@@ -69,11 +99,11 @@ function VersionCard({ section, isLatest }: { section: ChangelogSection; isLates
             className="overflow-hidden"
           >
             <div className="border-t border-zinc-200 dark:border-zinc-800 px-6 pb-6 pt-5 space-y-5">
-              {section.groups.map((group) => {
-                const s = GROUP_STYLES[group.label] ?? GROUP_STYLES["Changed"];
+              {section.groups.map((group, groupIdx) => {
+                const s = findGroupStyle(group.label) ?? GROUP_STYLES["Changed"];
                 const Icon = s.icon;
                 return (
-                  <div key={group.label}>
+                  <div key={`${group.label}-${groupIdx}`}>
                     <div className={`flex items-center gap-2 mb-3 text-sm font-semibold ${s.color}`}>
                       <Icon size={14} />
                       {group.label}
@@ -85,8 +115,8 @@ function VersionCard({ section, isLatest }: { section: ChangelogSection; isLates
                           <span
                             dangerouslySetInnerHTML={{
                               __html: item
-                                // bold **text**
-                                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-zinc-200">$1</strong>')
+                                // bold **text** — no color class; inherits readable parent color
+                                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                                 // inline code `text`
                                 .replace(/`([^`]+)`/g, '<code class="font-mono text-xs text-cyan-400 bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded">$1</code>'),
                             }}

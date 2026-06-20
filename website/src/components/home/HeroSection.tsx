@@ -101,6 +101,7 @@ export function HeroSection({ stats }: Props) {
 
       {/* Scroll hint */}
       <motion.div
+        aria-hidden="true"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}

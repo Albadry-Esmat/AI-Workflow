@@ -1,11 +1,17 @@
+import type { Metadata } from "next";
 import { loadSkillGraph, loadAgentConfig } from "@/lib/data";
 import { AgentDiagram } from "@/components/arch/AgentDiagram";
 import { StateDiagram } from "@/components/arch/StateDiagram";
 import { GraphOverview } from "@/components/arch/GraphOverview";
 
-export const metadata = {
-  title: "Architecture — ASE-OS",
+export const metadata: Metadata = {
+  title: "Architecture",
   description: "System architecture: multi-agent layer, system state model, and skill dependency graph.",
+  openGraph: {
+    title: "Architecture — ASE-OS",
+    description: "System architecture: multi-agent layer, system state model, and skill dependency graph.",
+    type: "website",
+  },
 };
 
 export default function ArchitecturePage() {

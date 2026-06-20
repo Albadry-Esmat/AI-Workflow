@@ -1,6 +1,6 @@
 # Architecture — System Architecture
 
-**Version:** 2.0.0 | **Last updated:** 2026-06-17
+**Version:** 2.1.0 | **Last updated:** 2026-06-20
 
 ## Component Model
 
@@ -167,3 +167,78 @@ Produces the data model: entity definitions, ERD, relationships, indexes, migrat
 ## Guard Layer
 
 As of v2.0.0, four guard skills run as `validation_check` gates in the pipeline. See [Governance](governance.md#guard-skills-layer-2) for the full guard inventory and verdict contract.
+
+## Lightweight Observability Pipeline (v2.7.0)
+
+As of v2.7.0, a three-skill observability pipeline collects anonymized behavioral telemetry and renders a session performance dashboard. It runs **asynchronously and non-blocking** — it does not affect pipeline execution or any existing gate.
+
+### Module Topology
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                      Orchestrator (SKL-010)                          │
+│  At skill.completed, skill.failed, gate.passed, gate.blocked events  │
+│  (async fire-and-forget — does not block pipeline)                   │
+└────────────────────────┬─────────────────────────────────────────────┘
+                         │ async event
+                         ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│          behavioral-telemetry-collector (SKL-047)                    │
+│  1. Opt-out gate (first, unconditional)                              │
+│  2. PII scrubber                                                     │
+│  3. Append anonymized event to behavioral_telemetry.events           │
+└────────────────────────┬─────────────────────────────────────────────┘
+                         │ writes events
+                         ▼
+              ┌──────────────────────┐
+              │  state-manager       │
+              │  behavioral_telemetry│
+              │  .events[]           │
+              └──────────┬───────────┘
+                         │ reads events (at pipeline.ended)
+                         ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│              session-insights (SKL-048)                              │
+│  Per-skill: invocation count, success rate, failure rate, p95 ms,   │
+│  HITL rejection ratio. Session: total gates, approval rate, anomaly  │
+│  flags (>30% failure or rejection). Writes session_summary.          │
+└────────────────────────┬─────────────────────────────────────────────┘
+                         │ writes session_summary
+                         ▼
+              ┌──────────────────────┐
+              │  state-manager       │
+              │  behavioral_telemetry│
+              │  .session_summary    │
+              └──────────┬───────────┘
+                         │ reads summary (on-demand)
+                         ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│              enhancement-dashboard (SKL-049)                         │
+│  Read-only. Renders Markdown + JSON report. No state writes.         │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Event Flow
+
+All data flows are **unidirectional** — no cycles exist in the observability pipeline. This satisfies the cycle-free constraint confirmed by the change-impact-analyzer during planning.
+
+```
+Orchestrator (producer)
+    → behavioral-telemetry-collector (consumer / state writer)
+        → behavioral_telemetry.events (state)
+            → session-insights (reader / summary writer)
+                → behavioral_telemetry.session_summary (state)
+                    → enhancement-dashboard (reader only)
+                        → User (final consumer)
+```
+
+No skill in this pipeline feeds back into the orchestrator or modifies registry, routing, or pipeline configuration.
+
+### Governance
+
+- **Opt-out is unconditional.** If `behavioral_telemetry.opt_out === true`, SKL-047 exits immediately.
+- **PII scrubber** runs on every event before storage — events contain only enum-bound and numeric fields.
+- **Read-only invariant** — SKL-049 never writes to state; SKL-048 only writes `session_summary`.
+- **No autonomous adaptation** — all pipeline configuration changes require explicit HITL approval.
+
+See [Governance — Layer 5](governance.md#adaptive-governance-layer-5) for full adaptive governance rules.

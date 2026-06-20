@@ -9,6 +9,8 @@ import { DOMAIN_COLORS, MASTERY_COLORS } from "@/lib/colors";
 
 interface Props {
   skill: SkillEntry;
+  /** Markdown spec pre-rendered to HTML by the server page component. */
+  specHtml?: string;
 }
 
 import type { Variants } from "framer-motion";
@@ -43,7 +45,7 @@ function SidebarCard({
   );
 }
 
-export function SkillDetail({ skill }: Props) {
+export function SkillDetail({ skill, specHtml }: Props) {
   const domain = skill.domain ?? "meta";
   const dc = DOMAIN_COLORS[domain] ?? DOMAIN_COLORS["meta"];
   const mc = MASTERY_COLORS[skill.mastery_level] ?? "";
@@ -120,12 +122,11 @@ export function SkillDetail({ skill }: Props) {
           <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-4">
             Skill Specification
           </h2>
-          {skill.spec?.content ? (
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30 overflow-auto">
-              <pre className="p-6 text-sm text-zinc-700 dark:text-zinc-300 font-mono leading-relaxed whitespace-pre-wrap break-words">
-                {skill.spec.content}
-              </pre>
-            </div>
+          {specHtml ? (
+            <div
+              className="prose-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30 p-6 overflow-auto"
+              dangerouslySetInnerHTML={{ __html: specHtml }}
+            />
           ) : (
             <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30 p-12 text-center text-zinc-400 dark:text-zinc-600 text-sm">
               Spec not available

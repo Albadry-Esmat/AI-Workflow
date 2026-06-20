@@ -1,6 +1,6 @@
 ---
 name: database-architect
-version: 1.0.0
+version: 1.1.0
 domain: database
 description: 'Use when designing, reviewing, or validating the data model for any feature or system. Triggers on: "design the database", "create the schema", "data model review", "ERD design", "migration strategy", "indexing strategy", "audit logging design", "soft-delete pattern".'
 author: system
@@ -8,7 +8,7 @@ author: system
 
 ## Purpose
 
-Design and validate the data architecture layer for any feature or application. The skill produces normalized database schemas, ERD descriptions, relationship rules, indexing strategies, audit logging definitions, soft-delete patterns, and migration plans. It is the authoritative source for all data model decisions and enforces schema integrity before any implementation begins.
+Design and validate the data architecture layer for any feature or application. The skill produces normalized database schemas, ERD descriptions, relationship rules, indexing strategies, audit logging definitions, soft-delete patterns, and migration plans. It is the authoritative source for all data model decisions and enforces schema integrity before any implementation begins. When `domain_constraints` is provided by `saas-enterprise-architect` (v1.1.0+), the multi-tenant schema strategy — including tenancy model, Row-Level Security policies, and per-tenant migration orchestration — is applied before entity design begins.
 
 ## Inputs
 
@@ -18,6 +18,7 @@ Design and validate the data architecture layer for any feature or application. 
 | `architecture` | `object` | Yes | System architecture from architecture-design (modules, data_flow) |
 | `database_constraints` | `object` | No | Database engine, version, existing schema if extension |
 | `existing_schema` | `array[object]` | No | Already-defined tables to prevent duplication or conflict |
+| `domain_constraints` | `object` | No | **NEW v1.1.0.** Domain constraints from `saas-enterprise-architect`. When `domain_constraints.tenancy_model` is present, multi-tenant schema strategy is applied in Step 0 before entity design. |
 
 **Input Schema:**
 
@@ -69,6 +70,42 @@ Design and validate the data architecture layer for any feature or application. 
 ## Execution Logic
 
 ```
+Step 0 — Apply multi-tenant schema strategy (if domain_constraints.tenancy_model present)
+  Inspect domain_constraints from saas-enterprise-architect:
+
+  tenancy_model == "shared_db":
+    - Add tenant_id UUID/BIGINT NOT NULL column to every business entity table
+    - Define PostgreSQL Row-Level Security (RLS) policy on every table:
+        CREATE POLICY tenant_isolation ON {table}
+          USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
+    - Enforce: every query in Step 5 index analysis must include tenant_id as leading column
+    - Add composite index (tenant_id, primary_filter_column) on all frequently-filtered tables
+    - ORM: add application-level tenant scope/guard (e.g., ActiveRecord default_scope, Django Tenant)
+
+  tenancy_model == "schema_per_tenant":
+    - All entities are defined in a parameterized schema template (not public schema)
+    - Each tenant = one PostgreSQL schema; schema name = tenant slug
+    - search_path is set per connection to the tenant's schema
+    - Migration orchestration: track per-tenant migration state in a control plane table
+      (tenant_migrations: tenant_id, migration_version, applied_at)
+    - Schema creation must be idempotent; test with: CREATE SCHEMA IF NOT EXISTS {tenant_slug}
+    - No cross-schema foreign keys — each schema is a fully isolated unit
+
+  tenancy_model == "db_per_tenant":
+    - Entity definitions are database-level templates; each tenant = separate database
+    - Provisioning: database creation script must be automated (Terraform, Pulumi, or migration API)
+    - Connection strings are per-tenant and must come from a connection registry (never hardcoded)
+    - Backup and restore: per-tenant independent backup schedule
+    - Migration: per-tenant migration runner; central orchestrator tracks state
+
+  tenancy_model == "hybrid":
+    - Define which entity groups are in shared_db (standard tier) vs. db_per_tenant (enterprise tier)
+    - Shared entities: always include tenant_id; RLS required
+    - Dedicated entities: database-level isolation for enterprise tenants
+    - Promotion path: define schema migration steps to promote a tenant from shared to dedicated
+
+  Output: tenancy_schema_strategy { model, rls_policies, tenant_column_spec, migration_orchestration }
+
 Step 1 — Identify data-bearing requirements
   Filter requirements to those that imply persistent state or data retrieval.
   Group by bounded context (one context = one schema ownership domain).

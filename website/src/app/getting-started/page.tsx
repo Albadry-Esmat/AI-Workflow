@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { GettingStartedSteps } from "@/components/getting-started/GettingStartedSteps";
 import { loadSiteStats, loadSkillGraph } from "@/lib/data";
 
-export const metadata = {
-  title: "Getting Started — ASE-OS",
+export const metadata: Metadata = {
+  title: "Getting Started",
   description: "How to set up and run ASE-OS in your agentic development environment.",
+  openGraph: {
+    title: "Getting Started — ASE-OS",
+    description: "How to set up and run ASE-OS in your agentic development environment.",
+    type: "website",
+  },
 };
 
 export default function GettingStartedPage() {

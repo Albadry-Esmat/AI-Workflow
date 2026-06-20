@@ -1,17 +1,19 @@
 import { loadAllSkills } from "@/lib/data";
 import { SkillsClient } from "@/components/skills/SkillsClient";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Skills Directory — ASE-OS",
-  description:
-    "All 40 skills in the ASE-OS registry — filterable by domain, mastery level, and dependencies.",
-  openGraph: {
-    title: "Skills Directory — ASE-OS",
-    description:
-      "Browse all 40 ASE-OS skills: filterable by domain, mastery level, version, and dependency.",
-    type: "website" as const,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const skills = loadAllSkills();
+  return {
+    title: "Skills Directory",
+    description: `All ${skills.length} skills in the ASE-OS registry — filterable by domain, mastery level, and dependencies.`,
+    openGraph: {
+      title: "Skills Directory — ASE-OS",
+      description: `Browse all ${skills.length} ASE-OS skills: filterable by domain, mastery level, version, and dependency.`,
+      type: "website",
+    },
+  };
+}
 
 export default function SkillsPage() {
   const skills = loadAllSkills();

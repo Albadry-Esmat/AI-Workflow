@@ -1,16 +1,20 @@
 import { loadAgentConfig, loadRegistry } from "@/lib/data";
 import { AgentsGrid } from "@/components/agents/AgentsGrid";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Agents — ASE-OS",
-  description:
-    "The 13 ASE-OS agents — each bound to specific skills with defined permissions. Explore the primary orchestrator and every subagent.",
-  openGraph: {
-    title: "Agents — ASE-OS",
-    description: "Explore all 13 ASE-OS agents — orchestrator, subagents, skill bindings, and permission model.",
-    type: "website" as const,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const agents = loadAgentConfig();
+  const count = Object.keys(agents).length;
+  return {
+    title: "Agents",
+    description: `The ${count} ASE-OS agents — each bound to specific skills with defined permissions. Explore the primary orchestrator and every subagent.`,
+    openGraph: {
+      title: "Agents — ASE-OS",
+      description: `Explore all ${count} ASE-OS agents — orchestrator, subagents, skill bindings, and permission model.`,
+      type: "website",
+    },
+  };
+}
 
 export default function AgentsPage() {
   const agents = loadAgentConfig();

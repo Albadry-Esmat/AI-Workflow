@@ -18,5 +18,12 @@ website/out/
 website/build/
 website/.vercel/
 
+# Vercel project metadata (auto-generated, not needed in repo)
+.vercel/
+
+# Graphify generated cache (large AST blobs, auto-regenerated)
+graphify-out/cache/ast/
+graphify-out/20*/
+
 # Logs
 *.log

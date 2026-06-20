@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline"]
     },
 
     "created_at": {
@@ -356,6 +356,81 @@
           "date": { "type": "string", "format": "date" }
         },
         "required": ["id", "title", "status", "path"]
+      }
+    },
+
+    "behavioral_telemetry": {
+      "type": "object",
+      "description": "Optional behavioral telemetry collected by behavioral-telemetry-collector (SKL-047). Only present when telemetry is enabled and opt_out is false. Not in required[] — absence is valid for all existing sessions.",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether behavioral telemetry collection is active for this session."
+        },
+        "opt_out": {
+          "type": "boolean",
+          "description": "Per-project opt-out flag. When true, no telemetry is collected and this object is not populated."
+        },
+        "pii_scrubbed": {
+          "type": "boolean",
+          "description": "Confirms all events in this object have been processed by the PII scrubber before storage."
+        },
+        "events": {
+          "type": "array",
+          "description": "Anonymized skill-execution events collected during this session. Each event contains only numeric and enum metadata — no user text, code, or credentials.",
+          "items": {
+            "type": "object",
+            "required": ["event_type", "skill_name", "timestamp", "session_id"],
+            "additionalProperties": false,
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": ["skill.started", "skill.completed", "skill.failed", "gate.passed", "gate.blocked", "feedback.triggered"]
+              },
+              "skill_name":   { "type": "string" },
+              "timestamp":    { "type": "string", "format": "date-time" },
+              "session_id":   { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+              "duration_ms":  { "type": "integer", "minimum": 0 },
+              "outcome":      { "type": "string", "enum": ["success", "failure", "skipped", "blocked"] },
+              "hitl_verdict": { "type": ["string", "null"], "enum": ["approved", "rejected", "modified", "timeout", null] },
+              "pipeline_phase": { "type": "string" }
+            }
+          }
+        },
+        "session_summary": {
+          "type": "object",
+          "description": "Aggregated insights produced by session-insights (SKL-048) at session end.",
+          "additionalProperties": false,
+          "properties": {
+            "generated_at":          { "type": "string", "format": "date-time" },
+            "total_skills_invoked":  { "type": "integer", "minimum": 0 },
+            "total_hitl_gates":      { "type": "integer", "minimum": 0 },
+            "hitl_approval_rate":    { "type": "number",  "minimum": 0, "maximum": 1 },
+            "pipeline_success":      { "type": "boolean" },
+            "skill_performance": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["skill_name", "invocation_count", "success_rate"],
+                "additionalProperties": false,
+                "properties": {
+                  "skill_name":        { "type": "string" },
+                  "invocation_count":  { "type": "integer", "minimum": 0 },
+                  "success_rate":      { "type": "number",  "minimum": 0, "maximum": 1 },
+                  "failure_rate":      { "type": "number",  "minimum": 0, "maximum": 1 },
+                  "p95_duration_ms":   { "type": "integer", "minimum": 0 },
+                  "hitl_rejection_ratio": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "last_collection_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent telemetry event recorded in this session."
+        }
       }
     }
   },

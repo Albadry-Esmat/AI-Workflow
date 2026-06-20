@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Database, Network, Clock, FileSearch } from "lucide-react";
+import { Database, Network, Clock, FileSearch, Activity } from "lucide-react";
 
 const CONTEXT_LAYERS = [
   {
@@ -29,6 +29,15 @@ const CONTEXT_LAYERS = [
     color: "text-teal-400",
     border: "border-teal-500/30",
     bg: "bg-teal-500/10",
+  },
+  {
+    layer: "L4 — Behavioral Telemetry Buffer",
+    desc: "PII-free ring buffer capturing skill latency, HITL outcomes, and token usage per session. Capped at 500 events. Feeds session-insights analysis at pipeline completion.",
+    capacity: "≤500 events/session",
+    icon: Activity,
+    color: "text-yellow-400",
+    border: "border-yellow-500/30",
+    bg: "bg-yellow-500/10",
   },
 ];
 
@@ -69,13 +78,13 @@ export function BackgroundProcessingSection() {
           className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed"
         >
           Before any agent acts, the orchestrator assembles a targeted context window —
-          pulling only the relevant slice of project knowledge using a three-layer memory architecture.
+          pulling only the relevant slice of project knowledge using a four-layer memory architecture.
         </motion.p>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Memory layers */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {CONTEXT_LAYERS.map((layer, i) => (
             <motion.div
               key={layer.layer}

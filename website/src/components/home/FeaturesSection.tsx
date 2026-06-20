@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   GitBranch, ShieldCheck, FileCode2, TestTube2,
   BookOpen, RefreshCw, Zap, Lock,
-  AlertTriangle, BarChart2, Route, Sparkles,
+  AlertTriangle, BarChart2, Route, Sparkles, Activity, Lightbulb,
 } from "lucide-react";
 
 const FEATURES = [
@@ -90,6 +90,20 @@ const FEATURES = [
     description: "Vague prompts are normalized before they reach the pipeline. The prompt-normalizer extracts intent and either routes confidently or asks a single targeted clarification — never guesses.",
     color: "text-sky-400",
     bg: "bg-sky-500/10",
+  },
+  {
+    icon: Activity,
+    title: "Session Observability",
+    description: "After every pipeline stage, telemetry is captured — skill latency, HITL outcomes, token usage — and analyzed into a read-only enhancement dashboard. Zero PII. Feeds the adaptation engine.",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10",
+  },
+  {
+    icon: Lightbulb,
+    title: "Assisted Self-Enhancement",
+    description: "The system analyzes its own usage patterns and proposes ranked improvements — new skills, modified pipelines, or retired dead weight. Every proposal requires your approval before anything changes.",
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
   },
 ];
 

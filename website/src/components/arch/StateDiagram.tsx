@@ -72,6 +72,20 @@ const STATE_SCOPES = [
     color: "text-pink-400 border-pink-500/20 bg-pink-500/10",
     owner: "state-manager",
   },
+  {
+    key: "behavioral_telemetry",
+    label: "Telemetry",
+    subtitle: "PII-free session telemetry ring buffer",
+    color: "text-yellow-400 border-yellow-500/20 bg-yellow-500/10",
+    owner: "behavioral-telemetry-collector",
+  },
+  {
+    key: "adaptation_proposals",
+    label: "Proposals",
+    subtitle: "HITL-pending improvement proposals",
+    color: "text-lime-400 border-lime-500/20 bg-lime-500/10",
+    owner: "adaptive-proposal-generator",
+  },
 ];
 
 export function StateDiagram() {

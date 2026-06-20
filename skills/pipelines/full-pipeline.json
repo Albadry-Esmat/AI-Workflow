@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "2.1.0",
-  "description": "Full idea-to-production pipeline (v2.1.0): requirements → architecture + UX/DB design → dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → deployment → docs",
+  "version": "2.2.0",
+  "description": "Full idea-to-production pipeline (v2.2.0): requirements → architecture + UX/DB design → design system → dependency graph → impact analysis → code generation → guard layer (incl. security-guard) → quality + testing → completeness audit → deployment → docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -25,8 +25,15 @@
       "label": "UI/UX + Database Design",
       "parallel": true,
       "skills": [
-        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
-        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
+        { "name": "frontend-ux-architect", "version": "^2.0.0", "max_retries": 2 },
+        { "name": "database-architect",    "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2c-design-system",
+      "label": "Design System Generation",
+      "skills": [
+        { "name": "design-system-generator", "version": "^2.0.0", "max_retries": 2 }
       ]
     },
     {
@@ -73,9 +80,10 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "database-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard", "version": "^2.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "security-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
       ]
     },
     {
@@ -120,7 +128,7 @@
   "parallel_groups": [
     ["frontend-ux-architect", "database-architect"],
     ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard", "security-guard"]
   ],
   "gates": [
     {
@@ -138,7 +146,13 @@
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
-      "label": "Approve UX architecture and database schema before planning",
+      "label": "Approve UX architecture and database schema before design system generation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2c-design-system",
+      "type": "human_approval",
+      "label": "Approve design system token files and component stubs before planning",
       "timeout": 3600
     },
     {
