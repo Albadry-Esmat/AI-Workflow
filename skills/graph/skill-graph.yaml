@@ -19,13 +19,13 @@ nodes:
     version: 1.3.0
     status: active
     layer: pipeline-core
-   - id: SKL-003
-     name: feature-planning
-     domain: planning
-     mastery_level: intermediate
-     version: 2.0.0
-     status: active
-     layer: pipeline-core
+  - id: SKL-003
+    name: feature-planning
+    domain: planning
+    mastery_level: intermediate
+    version: 2.0.0
+    status: active
+    layer: pipeline-core
   - id: SKL-004
     name: clean-code-review
     domain: review
@@ -376,41 +376,41 @@ nodes:
     version: 1.0.0
     status: active
     layer: domain
-   - id: SKL-054
-     name: creative-experience-architect
-     domain: design
-     mastery_level: advanced
-     version: 1.0.0
-     status: active
-     layer: domain
-   - id: SKL-055
-     name: defect-manager
-     domain: lifecycle
-     mastery_level: intermediate
-     version: 1.0.0
-     status: active
-     layer: lifecycle
-   - id: SKL-056
-     name: change-request-manager
-     domain: lifecycle
-     mastery_level: intermediate
-     version: 1.0.0
-     status: active
-     layer: lifecycle
-   - id: SKL-057
-     name: work-item-exporter
-     domain: integration
-     mastery_level: beginner
-     version: 1.0.0
-     status: active
-     layer: integration
-   - id: SKL-058
-     name: work-item-lifecycle-guard
-     domain: governance
-     mastery_level: beginner
-     version: 1.0.0
-     status: active
-     layer: governance
+  - id: SKL-054
+    name: creative-experience-architect
+    domain: design
+    mastery_level: advanced
+    version: 1.0.0
+    status: active
+    layer: domain
+  - id: SKL-055
+    name: defect-manager
+    domain: lifecycle
+    mastery_level: intermediate
+    version: 1.0.0
+    status: active
+    layer: lifecycle
+  - id: SKL-056
+    name: change-request-manager
+    domain: lifecycle
+    mastery_level: intermediate
+    version: 1.0.0
+    status: active
+    layer: lifecycle
+  - id: SKL-057
+    name: work-item-exporter
+    domain: integration
+    mastery_level: beginner
+    version: 1.0.0
+    status: active
+    layer: integration
+  - id: SKL-058
+    name: work-item-lifecycle-guard
+    domain: governance
+    mastery_level: beginner
+    version: 1.0.0
+    status: active
+    layer: governance
 edges:
   - from: SKL-001
     to: SKL-002
@@ -976,75 +976,75 @@ edges:
     to: SKL-052
     type: co_occurrence
     label: creative-experience-architect creative_brief feeds motion choreography requirements to motion-design-architect
-   - from: SKL-054
-     to: SKL-053
-     type: co_occurrence
-     label: creative-experience-architect and ux-research-synthesizer co-occur in premium design pipeline
-   - from: SKL-021
-     to: SKL-055
-     type: dependency
-     label: state-manager work_items scope is the read/write interface for defect-manager
-   - from: SKL-003
-     to: SKL-055
-     type: composition
-     label: feature-planning implementation gaps (missings) escalate to defect-manager for FIX+TEST+VALIDATION chain
-   - from: SKL-033
-     to: SKL-055
-     type: composition
-     label: implementation-completeness-auditor missings route to defect-manager to generate FIX tasks
-   - from: SKL-029
-     to: SKL-055
-     type: co_occurrence
-     label: code-repair escalation triggers defect-manager when all repair candidates fail
-   - from: SKL-055
-     to: SKL-029
-     type: composition
-     label: defect-manager FIX-NNNN task delegates to code-repair for implementation
-   - from: SKL-055
-     to: SKL-028
-     type: composition
-     label: defect-manager TEST-NNNN task delegates to test-generator for regression test authoring
-   - from: SKL-055
-     to: SKL-004
-     type: composition
-     label: defect-manager REVIEW-NNNN task delegates to clean-code-review for fix quality review
-   - from: SKL-055
-     to: SKL-057
-     type: composition
-     label: defect-manager BUG records and chain items are exported by work-item-exporter
-   - from: SKL-055
-     to: SKL-058
-     type: composition
-     label: defect-manager state transitions are validated by work-item-lifecycle-guard before write
-   - from: SKL-021
-     to: SKL-056
-     type: dependency
-     label: state-manager work_items scope is the read/write interface for change-request-manager
-   - from: SKL-056
-     to: SKL-024
-     type: dependency
-     label: change-request-manager delegates impact computation to change-impact-analyzer
-   - from: SKL-056
-     to: SKL-003
-     type: composition
-     label: change-request-manager approved task delta feeds back into feature-planning for re-planning
-   - from: SKL-056
-     to: SKL-057
-     type: composition
-     label: change-request-manager CR records are exported by work-item-exporter
-   - from: SKL-056
-     to: SKL-058
-     type: composition
-     label: change-request-manager state transitions are validated by work-item-lifecycle-guard before write
-   - from: SKL-021
-     to: SKL-057
-     type: dependency
-     label: work-item-exporter reads work_items scope from state-manager
-   - from: SKL-058
-     to: SKL-055
-     type: co_occurrence
-     label: work-item-lifecycle-guard co-occurs with defect-manager in all defect lifecycle pipelines
-   - from: SKL-058
-     to: SKL-056
-     type: co_occurrence
-     label: work-item-lifecycle-guard co-occurs with change-request-manager in all CR pipelines
+  - from: SKL-054
+    to: SKL-053
+    type: co_occurrence
+    label: creative-experience-architect and ux-research-synthesizer co-occur in premium design pipeline
+  - from: SKL-021
+    to: SKL-055
+    type: dependency
+    label: state-manager work_items scope is the read/write interface for defect-manager
+  - from: SKL-003
+    to: SKL-055
+    type: composition
+    label: feature-planning implementation gaps (missings) escalate to defect-manager for FIX+TEST+VALIDATION chain
+  - from: SKL-033
+    to: SKL-055
+    type: composition
+    label: implementation-completeness-auditor missings route to defect-manager to generate FIX tasks
+  - from: SKL-029
+    to: SKL-055
+    type: co_occurrence
+    label: code-repair escalation triggers defect-manager when all repair candidates fail
+  - from: SKL-055
+    to: SKL-029
+    type: composition
+    label: defect-manager FIX-NNNN task delegates to code-repair for implementation
+  - from: SKL-055
+    to: SKL-028
+    type: composition
+    label: defect-manager TEST-NNNN task delegates to test-generator for regression test authoring
+  - from: SKL-055
+    to: SKL-004
+    type: composition
+    label: defect-manager REVIEW-NNNN task delegates to clean-code-review for fix quality review
+  - from: SKL-055
+    to: SKL-057
+    type: composition
+    label: defect-manager BUG records and chain items are exported by work-item-exporter
+  - from: SKL-055
+    to: SKL-058
+    type: composition
+    label: defect-manager state transitions are validated by work-item-lifecycle-guard before write
+  - from: SKL-021
+    to: SKL-056
+    type: dependency
+    label: state-manager work_items scope is the read/write interface for change-request-manager
+  - from: SKL-056
+    to: SKL-024
+    type: dependency
+    label: change-request-manager delegates impact computation to change-impact-analyzer
+  - from: SKL-056
+    to: SKL-003
+    type: composition
+    label: change-request-manager approved task delta feeds back into feature-planning for re-planning
+  - from: SKL-056
+    to: SKL-057
+    type: composition
+    label: change-request-manager CR records are exported by work-item-exporter
+  - from: SKL-056
+    to: SKL-058
+    type: composition
+    label: change-request-manager state transitions are validated by work-item-lifecycle-guard before write
+  - from: SKL-021
+    to: SKL-057
+    type: dependency
+    label: work-item-exporter reads work_items scope from state-manager
+  - from: SKL-058
+    to: SKL-055
+    type: co_occurrence
+    label: work-item-lifecycle-guard co-occurs with defect-manager in all defect lifecycle pipelines
+  - from: SKL-058
+    to: SKL-056
+    type: co_occurrence
+    label: work-item-lifecycle-guard co-occurs with change-request-manager in all CR pipelines
