@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request"]
     },
 
     "created_at": {
@@ -359,6 +359,35 @@
       }
     },
 
+    "work_items": {
+      "type": "object",
+      "description": "Work Lifecycle Management Layer — in-state compressed index of all tracked work items. Full detail for each item is stored in work-items/{TYPE}-{NNNN}.md (file-based persistence per ADR-0001). Not in required[] — absent for all sessions that predate the Work Lifecycle Layer.",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "Compressed work item references. Each entry is ~120 bytes; full detail is in the linked .md file.",
+          "items": { "$ref": "#/$defs/work_item_ref" }
+        },
+        "sequences": {
+          "type": "object",
+          "description": "Last-assigned sequence number per work item type (used for ID assignment).",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "type_counts": {
+          "type": "object",
+          "description": "Count per work item type for quick summary without iterating items[].",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent work item write."
+        }
+      },
+      "required": ["items", "sequences", "type_counts", "last_updated"]
+    },
+
     "behavioral_telemetry": {
       "type": "object",
       "description": "Optional behavioral telemetry collected by behavioral-telemetry-collector (SKL-047). Only present when telemetry is enabled and opt_out is false. Not in required[] — absence is valid for all existing sessions.",
@@ -470,6 +499,64 @@
         "estimated_complexity": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] }
       },
       "required": ["id", "title", "status"]
+    },
+    "work_item_ref": {
+      "type": "object",
+      "description": "Compressed in-state work item reference (~120 bytes). Full detail is in file_path.",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "status", "lifecycle_state", "priority", "file_path", "created_at", "updated_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(TASK|REVIEW|TEST|VALIDATION|DOC|BUG|FIX|INVESTIGATION|CLOSURE|CR)-[0-9]{4,}$",
+          "description": "Unique work item identifier in TYPE-NNNN format."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["TASK", "REVIEW", "TEST", "VALIDATION", "DOC", "BUG", "FIX", "INVESTIGATION", "CLOSURE", "CR"],
+          "description": "Work item type."
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Short descriptive title (Jira summary field limit: 255 chars)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "in_progress", "review", "done", "closed", "cancelled", "blocked"],
+          "description": "Coarse lifecycle status for routing and filtering."
+        },
+        "lifecycle_state": {
+          "type": "string",
+          "description": "Fine-grained state within status (type-specific). E.g. 'reported', 'triaged', 'fixing' for BUG; 'draft', 'ready', 'in_progress' for TASK."
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"]
+        },
+        "severity": {
+          "type": ["string", "null"],
+          "enum": ["critical", "high", "medium", "low", "info", null],
+          "description": "Defect severity. Null for non-BUG types."
+        },
+        "parent_id": {
+          "type": ["string", "null"],
+          "description": "Parent work item ID. Null for top-level items."
+        },
+        "file_path": {
+          "type": "string",
+          "pattern": "^work-items/[A-Z]+-[0-9]+\\.md$",
+          "description": "Relative path to the full-detail .md file (per ADR-0001 file-based persistence model)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     },
     "snapshot": {
       "type": "object",

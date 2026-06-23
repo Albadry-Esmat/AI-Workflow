@@ -15,7 +15,7 @@ The state-manager is the sole interface to the ASE-OS system state. It provides 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `operation` | `string` | Yes | `read`, `write`, `diff`, `snapshot`, or `restore` |
-| `scope` | `string` | Yes | State section to operate on: `project_spec`, `architecture`, `dependency_graph`, `task_graph`, `code_map`, `skill_registry`, `decision_log`, `documentation_state`, `test_state`, `security_state`, `pipeline_state`, `dispatch_map`, `event_log`, `snapshots`, `rollback_log`, `adr_index`, or `all` |
+| `scope` | `string` | Yes | State section to operate on: `project_spec`, `architecture`, `dependency_graph`, `task_graph`, `code_map`, `skill_registry`, `decision_log`, `documentation_state`, `test_state`, `security_state`, `pipeline_state`, `dispatch_map`, `event_log`, `snapshots`, `rollback_log`, `adr_index`, `work_items`, or `all` |
 | `payload` | `object` | No | Data to write (required for `write` operation) |
 | `diff_entry` | `object` | No | Metadata for write audit: `{ skill_id, reason, timestamp }` |
 | `snapshot_id` | `string` | No | Snapshot ID to restore from (required for `restore` operation) |
@@ -29,7 +29,7 @@ The state-manager is the sole interface to the ASE-OS system state. It provides 
   "type": "object",
   "properties": {
     "operation": { "type": "string", "enum": ["read", "write", "diff", "snapshot", "restore"] },
-    "scope": { "type": "string", "enum": ["project_spec", "architecture", "dependency_graph", "task_graph", "code_map", "skill_registry", "decision_log", "documentation_state", "test_state", "security_state", "pipeline_state", "dispatch_map", "event_log", "snapshots", "rollback_log", "adr_index", "all"] },
+    "scope": { "type": "string", "enum": ["project_spec", "architecture", "dependency_graph", "task_graph", "code_map", "skill_registry", "decision_log", "documentation_state", "test_state", "security_state", "pipeline_state", "dispatch_map", "event_log", "snapshots", "rollback_log", "adr_index", "work_items", "all"] },
     "payload": { "type": "object" },
     "diff_entry": {
       "type": "object",

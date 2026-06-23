@@ -1,6 +1,6 @@
 # System Overview — AI Workflow
 
-**Version:** 3.0.0 | **Last updated:** 2026-06-21
+**Version:** 4.0.0 | **Last updated:** 2026-06-23
 
 ## What This System Is
 
@@ -69,6 +69,10 @@ A production-grade AI agent ecosystem that transforms raw ideas into deployed so
 - **Motion Design** — Complete motion token hierarchy, micro-interaction specs, page transitions, and 3D integration
 - **UX Research Synthesis** — User journey maps, heuristic evaluation, friction detection, and UX health scoring
 - **Creative Experience Architecture** — Innovative layout explorations, story-driven flows, immersive background systems
+- **Defect Management** — Full defect lifecycle: intake, triage HITL, companion chain generation (INVESTIGATION→FIX→TEST→REVIEW→VALIDATION→CLOSURE), traceability to requirements and tasks, file-based persistence
+- **Change Request Management** — CR intake, impact analysis via change-impact-analyzer, HITL approval gate, task delta generation, feature-planning re-invocation, backpropagation to requirement-analyzer for new requirements
+- **Work Item Export** — One-way outbound export to Jira Bulk Import JSON, JSON Lines, and Markdown; PII scrubbing; non-blocking async operation
+- **Work Item Lifecycle Enforcement** — Rule-based lifecycle guard validates all work item state transitions against the canonical state machine; initial deployment in warning mode; blocks terminal-state re-entry always
 
 ## Scope
 

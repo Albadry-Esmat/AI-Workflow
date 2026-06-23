@@ -31,8 +31,11 @@ path as `pipeline_config` to the orchestrator skill.
 | "security review", "find vulnerabilities", "threat modeling", "is this secure", "security audit" | `skills/pipelines/quick-review.json` | `reviewer` |
 | "deploy", "release", "pre-deploy check", "how do we deploy", "CI/CD", "rollback" | `skills/pipelines/pre-deploy.json` | `tester` |
 | "plan this feature", "break this down", "task breakdown", "roadmap", "sprint planning" | `skills/pipelines/full-pipeline.json` (resume from `feature-planning`) | `planner` |
+| "report a bug", "defect found", "this is broken", "bug report", "create defect", "log a defect" | `skills/pipelines/defect-lifecycle.json` | `analyzer` |
+| "change request", "modify this requirement", "scope change", "CR", "change the spec", "update the requirements" | `skills/pipelines/change-request.json` | `planner` |
+| "export tasks", "export work items", "sync to Jira", "export to GitHub Issues", "export work items to Jira" | Direct skill invocation (`work-item-exporter`) | `builder` |
 
-**Fallback:** If no trigger matches, ask the user: "Which stage of the pipeline do you need — requirements, architecture, review, testing, deployment, or the full pipeline?"
+**Fallback:** If no trigger matches, ask the user: "Which stage of the pipeline do you need — requirements, architecture, review, testing, deployment, defect tracking, change requests, work item export, or the full pipeline?"
 
 ## Before Acting on Any Request
 

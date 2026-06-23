@@ -7,7 +7,7 @@ const STEPS = [
     title: "Clone the Repository",
     description:
       "The full ASE-OS skill system lives in this repository. Clone it to get all 51 skills, registry files, pipeline templates, and agent configuration.",
-    code: "git clone <your-repo-url>\ncd AI-Workflow",
+    code: "git clone <https://github.com/Albadry-Esmat/AI-Workflow.git>\ncd AI-Workflow",
     color: "from-cyan-600 to-cyan-500",
   },
   {

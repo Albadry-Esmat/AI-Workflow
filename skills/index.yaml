@@ -1,7 +1,7 @@
 meta:
-  version: 3.0.0
+  version: 3.1.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: "2026-06-21"
+  last_updated: "2026-06-23"
   description: Central skills index for the AI Workflow system
 skills:
   - id: SKL-001
@@ -68,7 +68,7 @@ skills:
       - agile
       - milestones
       - dependencies
-    version: 1.2.0
+    version: 2.0.0
     depends_on:
       - SKL-001
       - SKL-002
@@ -1341,3 +1341,111 @@ skills:
     mastery_level: advanced
     use_when: Designing innovative, premium, or emotionally differentiated interfaces beyond standard enterprise patterns. Use when creativity_level is premium or world-class in the product brief.
     do_not_use_when: Standard CRUD screens or dashboards without a creative brief or differentiation requirement — use frontend-ux-architect (SKL-031) directly for those.
+
+# ── WORK LIFECYCLE MANAGEMENT LAYER (SKL-055 to SKL-058) ──────────────────
+  - id: SKL-055
+    name: Defect Manager
+    short_description: Manage the full defect lifecycle from intake to closure — creates BUG records and generates the companion task chain (INVESTIGATION, FIX, TEST, REVIEW, VALIDATION, CLOSURE) for all reported defects
+    reference_path: docs/work-item-foundation.md
+    reference_sections:
+      - "## 8. Defect Chain Pattern (Defect-Manager)"
+      - "## 4. Lifecycle State Machine"
+      - "## 2. Jira-Compatible Base Schema"
+    executable_skill: .opencode/skills/defect-manager/SKILL.md
+    tags:
+      - defect
+      - bug-tracking
+      - lifecycle
+      - task-chain
+      - work-items
+      - triage
+      - code-repair
+    version: 1.0.0
+    depends_on:
+      - SKL-021
+      - SKL-003
+      - SKL-029
+    related_skills:
+      - SKL-056
+      - SKL-057
+      - SKL-058
+    mastery_level: intermediate
+    use_when: A defect is reported from any source — test failure, security finding, code-review escalation, or manual report. Use to create a structured BUG record and generate the full repair task chain.
+    do_not_use_when: General task creation without an associated defect — use feature-planning (SKL-003) for implementation work. Do not use for change requests — use change-request-manager (SKL-056) instead.
+  - id: SKL-056
+    name: Change Request Manager
+    short_description: Manage change requests from intake through impact analysis, HITL approval, and task delta generation — feeds back into feature-planning for re-planning without modifying existing tasks directly
+    reference_path: docs/work-item-foundation.md
+    reference_sections:
+      - "## 4. Lifecycle State Machine"
+      - "## 6. Traceability Link Types"
+    executable_skill: .opencode/skills/change-request-manager/SKILL.md
+    tags:
+      - change-request
+      - lifecycle
+      - impact-analysis
+      - task-delta
+      - work-items
+      - hitl
+      - scope-change
+    version: 1.0.0
+    depends_on:
+      - SKL-021
+      - SKL-024
+      - SKL-003
+    related_skills:
+      - SKL-055
+      - SKL-057
+      - SKL-058
+    mastery_level: intermediate
+    use_when: A change request is raised, a requirement changes, or the project scope is modified. Use to run impact analysis, enforce human approval, and generate a task delta for re-planning.
+    do_not_use_when: Bug reports — use defect-manager (SKL-055) instead. Also skip for minor clarifications that do not affect scope or task graph.
+  - id: SKL-057
+    name: Work Item Exporter
+    short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — one-way outbound export, async, runs at pipeline completion or on demand
+    reference_path: docs/work-item-foundation.md
+    reference_sections:
+      - "## 2. Jira-Compatible Base Schema"
+      - "## 1. Work Item Type Taxonomy"
+    executable_skill: .opencode/skills/work-item-exporter/SKILL.md
+    tags:
+      - export
+      - jira
+      - integration
+      - work-items
+      - async
+      - outbound
+      - jsonl
+      - markdown
+    version: 1.0.0
+    depends_on:
+      - SKL-021
+      - SKL-055
+      - SKL-056
+    mastery_level: beginner
+    use_when: Work items need to be exported to Jira, a file, or a human-readable report. Runs async at pipeline completion. Can also be triggered on demand.
+    do_not_use_when: No work items have been created in this session. This is a one-way export — do not use for bidirectional sync or importing external issues.
+  - id: SKL-058
+    name: Work Item Lifecycle Guard
+    short_description: Validate work item lifecycle state transitions against the rules in docs/work-item-foundation.md — returns allow, warn, or block verdict before any state write
+    reference_path: docs/work-item-foundation.md
+    reference_sections:
+      - "## 4. Lifecycle State Machine"
+      - "## 4.5 Invalid Transition Rules"
+    executable_skill: .opencode/skills/work-item-lifecycle-guard/SKILL.md
+    tags:
+      - guard
+      - governance
+      - lifecycle
+      - work-items
+      - state-machine
+      - validation
+      - transition
+    version: 1.0.0
+    depends_on: []
+    related_skills:
+      - SKL-055
+      - SKL-056
+    mastery_level: beginner
+    use_when: Validating a work item state transition before writing it to the work_items scope. Acts as a governance gate in all work lifecycle pipelines. Initial deployment mode is warning.
+    do_not_use_when: Reading work items or querying state without a pending transition. This guard evaluates transitions only — not general work item queries.

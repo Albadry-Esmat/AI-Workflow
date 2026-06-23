@@ -1,6 +1,6 @@
 ---
 name: feature-planning
-version: 1.2.0
+version: 2.0.0
 domain: planning
 description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
@@ -19,6 +19,9 @@ Translate the architecture design into actionable development tasks. The skill p
 | `integration_points` | `array[object]` | No | Integration contracts from architecture-design |
 | `team_capacity` | `object` | No | Available developers, skill sets, velocity (story points per sprint) |
 | `milestones` | `array[string]` | No | Desired milestone names or dates |
+| `companion_generation` | `object` | No | Controls opt-in companion task generation. Default: `{ enabled: false }`. When disabled (default), output is identical to v1.2.0. |
+| `companion_generation.enabled` | `boolean` | No | Set `true` to generate REVIEW/TEST/VALIDATION/DOC companions for every TASK. Default: `false`. |
+| `companion_generation.types` | `array[string]` | No | Which companion types to generate. Default: `["REVIEW", "TEST", "VALIDATION"]`. Options: add `"DOC"` for documentation tasks. |
 
 **Input Schema:**
 
@@ -38,7 +41,20 @@ Translate the architecture design into actionable development tasks. The skill p
         "sprint_days": { "type": "integer", "minimum": 1 }
       }
     },
-    "milestones": { "type": "array", "items": { "type": "string" } }
+    "milestones": { "type": "array", "items": { "type": "string" } },
+    "companion_generation": {
+      "type": "object",
+      "description": "Opt-in companion task generation. Default: disabled. When disabled, output is identical to v1.2.0.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "types": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["REVIEW", "TEST", "VALIDATION", "DOC"] },
+          "default": ["REVIEW", "TEST", "VALIDATION"]
+        }
+      },
+      "default": { "enabled": false }
+    }
   },
   "required": ["requirements", "modules"]
 }
@@ -102,6 +118,33 @@ Step 7 — Build req_task_map and generate roadmap
   Every requirement must appear — any requirement with zero tasks is flagged as UNPLANNED risk.
   Combine phases, milestones, dependency graph, and req_task_map into final execution plan.
   Output: complete implementation roadmap with req_task_map
+
+Step 7b — Companion task generation (opt-in; only when companion_generation.enabled = true)
+  If companion_generation.enabled is false (default): skip this step entirely. Output unchanged from v1.2.0.
+  If companion_generation.enabled is true:
+    For each TASK-NNNN in tasks[]:
+      For each type in companion_generation.types (default: REVIEW, TEST, VALIDATION):
+        Generate companion item:
+          id:               "{TYPE}-{SAME_NUMBER_AS_TASK}"  (e.g. TASK-0042 → REVIEW-0042, TEST-0042, VALIDATION-0042)
+          type:             REVIEW | TEST | VALIDATION | DOC
+          title:            "{type} for: {task.description}" (abbreviated to 200 chars)
+          status:           open
+          lifecycle_state:  draft
+          priority:         same as parent task's complexity-derived priority
+          parent_id:        TASK-NNNN
+          req_ids:          same as parent task
+          module:           same as parent task
+          created_by_skill: feature-planning
+          linked_items:     [{ target_id: TASK-NNNN, link_type: "reviews"|"tests"|"validates", direction: outbound }]
+          file_path:        "work-items/{TYPE}-{NNNN}.md"
+        Write companion item to work-items/{TYPE}-{NNNN}.md (per ADR-0001 file-based persistence).
+        Write compressed index entry to state work_items.items[].
+    Note: companion tasks do NOT count toward the 200-task cap (implementation tasks only).
+    Update work_items.sequences for each companion type.
+    Update work_items.type_counts for each companion type.
+    Update work-items/index.md.
+  Assemble companion_tasks[] and work_item_summary output fields.
+  Output: companion_tasks[], work_item_summary
 ```
 
 ## Outputs
@@ -114,6 +157,8 @@ Step 7 — Build req_task_map and generate roadmap
 | `phases` | `array[object]` | Delivery phases (name, tasks, rationale) |
 | `milestones` | `array[object]` | Milestones (name, target, tasks_included, estimated_duration) |
 | `risks` | `array[object]` | Planning risks (description, impact, mitigation) |
+| `companion_tasks` | `array[object]` | Generated companion work items (REVIEW, TEST, VALIDATION, DOC) linked to implementation tasks. Empty array when `companion_generation.enabled = false`. |
+| `work_item_summary` | `object` | Summary counts: total_implementation_tasks, total_companion_tasks, total_work_items, type_breakdown. Null when companion generation disabled. |
 | `metrics` | `object` | Execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array[object]` | Feedback loop entries for cross-skill communication |
 
@@ -204,10 +249,28 @@ Step 7 — Build req_task_map and generate roadmap
         "required": ["description", "impact", "mitigation"]
       }
     },
+    "companion_tasks": {
+      "type": "array",
+      "description": "Generated companion work items. Empty array when companion_generation.enabled=false (default). All items are work_item_ref format — full detail in work-items/ files.",
+      "items": { "$ref": "../../schema/system-state-schema.json#/$defs/work_item_ref" }
+    },
+    "work_item_summary": {
+      "type": ["object", "null"],
+      "description": "Summary counts when companion_generation.enabled=true. Null when disabled.",
+      "properties": {
+        "total_implementation_tasks": { "type": "integer" },
+        "total_companion_tasks": { "type": "integer" },
+        "total_work_items": { "type": "integer" },
+        "type_breakdown": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" }
+        }
+      }
+    },
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
   },
-  "required": ["tasks", "req_task_map", "dependency_map", "phases", "milestones", "risks", "metrics", "feedback"],
+  "required": ["tasks", "req_task_map", "dependency_map", "phases", "milestones", "risks", "companion_tasks", "work_item_summary", "metrics", "feedback"],
   "$defs": {
     "metrics": {
       "type": "object",
@@ -245,6 +308,11 @@ Step 7 — Build req_task_map and generate roadmap
 - `blocked_by` field MUST only reference task IDs that exist in the same plan.
 - Phases MUST be ordered sequentially. No skipping phases.
 - Task `status` defaults to `pending`. Only the orchestrator may advance status to `in_review` or `complete`.
+- **v2.0.0 backward compatibility:** When `companion_generation.enabled = false` (default), the output of v2.0.0 is **identical** to v1.2.0. `companion_tasks` is an empty array `[]` and `work_item_summary` is `null`. No downstream consumer is broken.
+- **Companion ID contract:** Companion IDs MUST share the same numeric suffix as their parent TASK. `TASK-0042` → `REVIEW-0042`, `TEST-0042`, `VALIDATION-0042`, `DOC-0042`. This is a hard constraint — no exception.
+- **Companion task cap:** Companion tasks do NOT count toward the 200-task implementation cap. The cap applies only to `tasks[]` (TASK-NNNN items).
+- **Companion tasks are draft on creation.** They advance to `ready` when their parent TASK advances to `in_progress`. They advance to `in_progress` when parent TASK advances to `review`. The orchestrator manages these transitions.
+- **No duplicate companions:** If a companion file `work-items/{TYPE}-{NNNN}.md` already exists (e.g., from a previous run), skip creation and emit an `info` feedback entry.
 
 ## Security Considerations
 
@@ -271,6 +339,12 @@ Step 7 — Build req_task_map and generate roadmap
 - [ ] Phase 1 has zero external dependencies (foundation first)
 - [ ] No task has complexity 0 or negative
 - [ ] All requirements from input are covered by at least one task (via req_task_map)
+- [ ] `companion_tasks` is `[]` when `companion_generation.enabled = false` (backward compat)
+- [ ] `work_item_summary` is `null` when `companion_generation.enabled = false`
+- [ ] When companion generation is enabled: every TASK-NNNN has a companion for each requested type
+- [ ] Companion IDs share the same numeric suffix as parent TASK
+- [ ] Companion items have `parent_id` set to their TASK's id
+- [ ] Companion `.md` files written to `work-items/` when companion generation is enabled
 
 ## Failure Scenarios
 
@@ -295,9 +369,14 @@ Step 7 — Build req_task_map and generate roadmap
 `feature-planning` is a primitive skill. It may be included in a planning meta-skill:
 
 ```yaml
-composes:
+  composes:
   - skill: feature-planning
-    version: "^1.2.0"
-    input_map: { "modules": "architecture_modules", "requirements": "requirements" }
-    output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones" }
+    version: "^2.0.0"
+    input_map: { "modules": "architecture_modules", "requirements": "requirements", "companion_generation": "companion_generation" }
+    output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones", "companion_tasks": "companion_tasks", "work_item_summary": "work_item_summary" }
+  - skill: state-manager
+    version: "^1.1.0"
+    role: state_read_write
+    scopes: ["work_items"]
+    note: "Only accessed when companion_generation.enabled = true. Reads work_items.sequences for ID assignment; writes companion items to work_items.items[] and increments sequences/type_counts."
 ```

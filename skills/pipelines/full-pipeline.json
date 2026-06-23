@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "2.2.0",
-  "description": "Full idea-to-production pipeline (v2.2.0): requirements → architecture + UX/DB design → design system → dependency graph → impact analysis → code generation → guard layer (incl. security-guard) → quality + testing → completeness audit → deployment → docs",
+  "version": "3.0.0",
+  "description": "Full idea-to-production pipeline (v3.0.0): requirements → architecture + UX/DB design → design system → dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -47,7 +47,7 @@
       "id": "phase-4-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
       ]
     },
     {
@@ -80,10 +80,11 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard", "version": "^2.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "security-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        { "name": "database-guard",             "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard",          "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard",     "version": "^2.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "security-guard",             "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "work-item-lifecycle-guard",  "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
       ]
     },
     {
@@ -109,6 +110,14 @@
       ]
     },
     {
+      "id": "phase-8d-defect-management",
+      "label": "Defect Management (conditional)",
+      "condition": "defects_detected === true OR missings_count > 0",
+      "skills": [
+        { "name": "defect-manager", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
       "id": "phase-9-deploy",
       "label": "Deployment",
       "skills": [
@@ -123,12 +132,20 @@
         { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
         { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
       ]
+    },
+    {
+      "id": "phase-10b-export",
+      "label": "Work Item Export",
+      "async": true,
+      "skills": [
+        { "name": "work-item-exporter", "version": "^1.0.0", "max_retries": 1 }
+      ]
     }
   ],
   "parallel_groups": [
     ["frontend-ux-architect", "database-architect"],
     ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard", "security-guard"]
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard", "security-guard", "work-item-lifecycle-guard"]
   ],
   "gates": [
     {
@@ -186,6 +203,13 @@
       "condition": "release_guard.verdict === 'pass'"
     },
     {
+      "after_phase": "phase-8d-defect-management",
+      "type": "human_approval",
+      "condition": "defects_detected === true OR missings_count > 0",
+      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional — only when defects or missings detected)",
+      "timeout": 3600
+    },
+    {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
       "label": "Mandatory deployment approval — non-bypassable",
@@ -198,5 +222,5 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator", "work-item-exporter"]
 }

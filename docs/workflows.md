@@ -1,96 +1,10 @@
 # Workflows — End-to-End Lifecycle
 
-**Version:** 2.2.0 | **Last updated:** 2026-06-18
+**Version:** 2.3.0 | **Last updated:** 2026-06-23
 
 ## Full Pipeline Flow (Idea → Production)
 
 ```
-[Idea / Raw Input]
-        │
-        ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 1: REQUIREMENTS                              │
-│  skill: requirement-analyzer                       │
-└──────────────────────┬─────────────────────────────┘
-                       │
-        ◆ HITL [amber]: Validate requirements scope with stakeholder
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 2: ARCHITECTURE                              │
-│  skills: architecture-design                       │
-│          adr-generator (async)                     │
-└──────────────────────┬─────────────────────────────┘
-                       │
-        ◆ HITL [amber]: Sign off on architecture before design layer
-                       │
-                       ▼
-┌────────────────────────────────────────────────────────┐
-│ PHASE 2b: UI/UX + DATABASE DESIGN  [parallel]          │
-│  ┌───────────────────────┐  ┌───────────────────────┐  │
-│  │ frontend-ux-architect │  │  database-architect   │  │
-│  └───────────────────────┘  └───────────────────────┘  │
-└──────────────────────┬─────────────────────────────────┘
-                       │
-        ◆ HITL [amber]: Approve UX architecture and database schema
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 3: DEPENDENCY GRAPH                          │
-│  skill: dependency-analyzer                        │
-└──────────────────────┬─────────────────────────────┘
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 4: PLANNING                                  │
-│  skill: feature-planning                           │
-└──────────────────────┬─────────────────────────────┘
-                       │
-        ◆ HITL [amber]: Approve roadmap and impact surface before implementation
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 5: IMPACT ANALYSIS                           │
-│  skill: change-impact-analyzer                     │
-└──────────────────────┬─────────────────────────────┘
-                       │
-        ◇ COND [cyan]: Block if impact_severity = critical
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
-│ PHASE 6: CODE GENERATION                           │
-│  skill: code-generator                             │
-└──────────────────────┬─────────────────────────────┘
-                       │
-                       ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 7: QUALITY + TESTING  [parallel]                                       │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐   │
-│  │ clean-code-      │  │ testing-strategy  │  │     security-review      │   │
-│  │ review           │  │                   │  │                          │   │
-│  └──────────────────┘  └──────────────────┘  └──────────────────────────┘   │
-│  ┌──────────────────┐                                                        │
-│  │  test-generator  │                                                        │
-│  └──────────────────┘                                                        │
-└──────────────────────┬───────────────────────────────────────────────────────┘
-                       │
-        ◆ HITL [amber]: Approve security posture and coverage before audit
-                       │
-                       ▼
-┌──────────────────────────────────────────────────────────┐
-│ PHASE 7b: GUARD LAYER  [parallel]                        │
-│  ┌─────────────────┐  ┌──────────────────┐               │
-│  │ database-guard  │  │ performance-guard│               │
-│  └─────────────────┘  └──────────────────┘               │
-│  ┌─────────────────────────┐                             │
-│  │ ui-ux-compliance-guard  │                             │
-│  └─────────────────────────┘                             │
-└──────────────────────┬───────────────────────────────────┘
-                       │
-        ◇ COND [cyan]: Block if any guard verdict = 'block'
-                       │
-                       ▼
-┌────────────────────────────────────────────────────┐
 │ PHASE 8: REPAIR  [conditional]                     │
 │  skill: code-repair                                │
 │  condition: test.failed OR build.broken            │
@@ -112,6 +26,13 @@
                        │
                        ▼
 ┌────────────────────────────────────────────────────┐
+│ PHASE 8d: DEFECT MANAGEMENT  [conditional]         │
+│  skill: defect-manager                             │
+│  condition: defects_detected OR missings_count > 0 │
+└──────────────────────┬─────────────────────────────┘
+                       │
+                       ▼
+┌────────────────────────────────────────────────────┐
 │ PHASE 9: DEPLOYMENT                                │
 │  skill: deployment-strategy                        │
 └──────────────────────┬─────────────────────────────┘
@@ -123,6 +44,10 @@
 │ PHASE 10: DOCUMENTATION  [async]                   │
 │  skills: documentation-generator                  │
 │          doc-maintainer                            │
+└──────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────┐
+│ PHASE 10b: EXPORT  [async]                         │
+│  skill: work-item-exporter                         │
 └────────────────────────────────────────────────────┘
 ```
 
@@ -134,10 +59,12 @@ Skills marked as parallel-friendly can execute concurrently:
 Sequential:  phase-1 → phase-2 → phase-3 → phase-4 → phase-5 → phase-6
 Parallel:    phase-2b  [frontend-ux-architect + database-architect]
 Parallel:    phase-7   [clean-code-review + testing-strategy + security-review + test-generator]
-Parallel:    phase-7b  [database-guard + performance-guard + ui-ux-compliance-guard]
+Parallel:    phase-7b  [database-guard + performance-guard + ui-ux-compliance-guard + work-item-lifecycle-guard]
 Conditional: phase-8   [code-repair]  — only if test.failed OR build.broken
+Conditional: phase-8d  [defect-manager]  — only if defects_detected OR missings_count > 0
 Sequential:  phase-8b → phase-8c → phase-9
 Async:       phase-10  [documentation-generator + doc-maintainer]
+Async:       phase-10b [work-item-exporter]
 Also async:  adr-generator  — runs alongside phase-2 without blocking
 ```
 
@@ -179,7 +106,10 @@ Not all executions require the full pipeline:
 | Dependency check | Phase 3 only |
 | Impact assessment | Phase 5 only |
 | Pre-deployment check | Phase 7 → Phase 7b → Phase 8b → Phase 8c → Phase 9 |
-| Full feature launch | Full pipeline (Phase 1 → Phase 10) |
+| Full feature launch | Full pipeline (Phase 1 → Phase 10b) |
+| **Report a defect** | **`defect-lifecycle.json`** — defect intake → triage HITL → investigation → fix → test → review HITL → validate → export |
+| **Change request** | **`change-request.json`** — CR intake → impact analysis → HITL approval → re-plan → execute → validate → export |
+| **Export work items** | Direct invocation: `work-item-exporter` only |
 
 ## Pipeline Configuration
 
@@ -202,3 +132,130 @@ Configured via `pipeline_config` object passed to the orchestrator:
 - Any change to workflow sequence requires updating this file AND `changelog.md`.
 - Adding a new pipeline mode requires orchestrator updates in `skills/orchestrator/orchestrator.md`.
 - Feedback loop targets must be defined in the skill's `feedback` output schema.
+
+---
+
+## Defect Lifecycle Flow (`defect-lifecycle.json`)
+
+Triggered by: "report a bug", "defect found", "create defect", `defect.created` event from code-repair or test-generator.
+
+```
+[Defect Report]
+       │
+       ▼
+┌─────────────────────────────────────────┐
+│ PHASE 1: DEFECT INTAKE                  │
+│  skill: defect-manager                  │
+│  Creates BUG-NNNN + companion chain     │
+└────────────────────┬────────────────────┘
+                     │
+     ◆ HITL [amber]: Confirm triage — priority, severity, assignment
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 2: ROOT CAUSE INVESTIGATION       │
+│  skill: change-impact-analyzer          │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 3: FIX IMPLEMENTATION             │
+│  skill: code-repair                     │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 4: LIFECYCLE VALIDATION           │
+│  skill: work-item-lifecycle-guard       │
+└────────────────────┬────────────────────┘
+                     │
+     ◇ COND [cyan]: Block if guard verdict = 'block'
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 5: REGRESSION TEST GENERATION     │
+│  skill: test-generator                  │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 6: FIX REVIEW                     │
+│  skill: clean-code-review               │
+└────────────────────┬────────────────────┘
+                     │
+     ◆ HITL [amber]: Approve fix and confirm regression tests pass
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 7: COMPLETENESS VALIDATION        │
+│  skill: implementation-completeness-auditor │
+└────────────────────┬────────────────────┘
+                     │
+     ┌───────────────┼───────────────┐
+     ▼               ▼               ▼
+ [async]         [async]
+ work-item-    doc-maintainer
+ exporter
+```
+
+---
+
+## Change Request Flow (`change-request.json`)
+
+Triggered by: "change request", "modify this requirement", "scope change", `change_request.created` event.
+
+```
+[Change Request]
+       │
+       ▼
+┌─────────────────────────────────────────┐
+│ PHASE 1: CR INTAKE                      │
+│  skill: change-request-manager          │
+│  Creates CR-NNNN record                 │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 2: IMPACT ANALYSIS                │
+│  skill: change-impact-analyzer          │
+│  Computes modules/tasks/effort delta    │
+└────────────────────┬────────────────────┘
+                     │
+     ◆ HITL [amber]: Review impact (modules, tasks, effort delta, risk level)
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 3: RE-PLANNING  [conditional]     │
+│  skill: feature-planning v2.0.0         │
+│  condition: CR approved                 │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 4: LIFECYCLE VALIDATION           │
+│  skill: work-item-lifecycle-guard       │
+└────────────────────┬────────────────────┘
+                     │
+     ◇ COND [cyan]: Block if guard verdict = 'block'
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 5: CODE GENERATION  [conditional] │
+│  skill: code-generator                  │
+│  condition: new tasks in delta          │
+└────────────────────┬────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────┐
+│ PHASE 6: COMPLETENESS AUDIT             │
+│  skill: implementation-completeness-auditor │
+└────────────────────┬────────────────────┘
+                     │
+     ◆ HITL [amber]: Confirm scope of change is fully delivered
+                     │
+     ┌───────────────┼─────────────────────┐
+     ▼               ▼                     ▼
+ [async]         [async]               [async]
+ work-item-    doc-maintainer        adr-generator
+ exporter
+```

@@ -1,6 +1,6 @@
 # Governance — Approval Gates & Quality Enforcement
 
-**Version:** 2.3.0 | **Last updated:** 2026-06-21
+**Version:** 2.4.0 | **Last updated:** 2026-06-23
 
 ## Governance Model
 
@@ -66,6 +66,7 @@ Guard skills are enforcement agents that run as `validation_check` gates. A `blo
 | UI/UX Compliance Guard | `ui-ux-compliance-guard` (SKL-036) | Hardcoded colors, missing required component states, accessibility violations, prop contract violations | frontend-ux-architect (SKL-031) |
 | Implementation Completeness Guard | `implementation-completeness-guard` (SKL-037) | Readiness score < threshold (default: 85), critical requirements marked missing | implementation-completeness-auditor (SKL-033) |
 | Security Guard | `security-guard` (SKL-041) | CVSS score ≥ effective threshold, OWASP Top-10 critical findings present, compliance-scope blocking conditions (PCI/HIPAA/SOC2) | security-review (SKL-006) |
+| Work Item Lifecycle Guard | `work-item-lifecycle-guard` (SKL-058) | Invalid lifecycle state transition for any work item type (block mode only; initial deployment: warning mode) | docs/work-item-foundation.md (lifecycle state machine) |
 
 **Previously existing guards (covered by existing skills):**
 
@@ -112,6 +113,10 @@ The orchestrator reads `verdict` after each guard gate:
 | Approve security | `security-review` | Deployment | 3600s | No |
 | Completeness sign-off | `implementation-completeness-auditor` | Release pipeline | 3600s | No |
 | **Deploy approval** | **`deployment-strategy`** | **Production release** | **∞ (no timeout)** | **Never — hardcoded** |
+| Defect triage | `defect-manager` (defect-lifecycle pipeline, phase 1) | Chain generation | 3600s | No |
+| Fix approval | `clean-code-review` (defect-lifecycle pipeline, phase 6) | Defect closure | 3600s | No |
+| CR impact approval | `change-impact-analyzer` (change-request pipeline, phase 2) | CR planning | 7200s | No |
+| CR scope delivery | `implementation-completeness-auditor` (change-request pipeline, phase 6) | CR closure | 3600s | No |
 
 ### Deployment Gate (Special Rule)
 

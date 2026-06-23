@@ -1,6 +1,6 @@
 # Agents — Agent Definitions
 
-**Version:** 1.1.0 | **Last updated:** 2026-06-17
+**Version:** 1.2.0 | **Last updated:** 2026-06-23
 
 ## What Is an Agent
 
@@ -44,12 +44,12 @@ The primary agent receives user requests, delegates skill execution to subagents
 
 | Agent | Assigned Skills | Mode | Permission |
 |-------|---------------|------|------------|
-| `analyzer` | `requirement-analyzer` | `subagent` | read-only |
+| `analyzer` | `requirement-analyzer`, `defect-manager` | `subagent` | read-only |
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
-| `planner` | `feature-planning` | `subagent` | read-only |
-| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard` | `subagent` | edit: ask |
+| `planner` | `feature-planning`, `change-request-manager` | `subagent` | read-only |
+| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard`, `work-item-lifecycle-guard` | `subagent` | edit: ask |
 | `tester` | `testing-strategy` | `subagent` | read-only |
-| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
+| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer`, `work-item-exporter` | `subagent` | edit: ask |
 | `impact-analyzer` | `dependency-analyzer`, `change-impact-analyzer` | `subagent` | read-only |
 | `test-generator` | `test-generator` | `subagent` | edit: ask |
 | `recovery` | `rollback-manager` | `subagent` | edit: ask |

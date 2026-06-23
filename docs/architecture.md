@@ -1,6 +1,6 @@
 # Architecture — System Architecture
 
-**Version:** 2.1.0 | **Last updated:** 2026-06-20
+**Version:** 2.2.0 | **Last updated:** 2026-06-23
 
 ## Component Model
 
@@ -242,3 +242,61 @@ No skill in this pipeline feeds back into the orchestrator or modifies registry,
 - **No autonomous adaptation** — all pipeline configuration changes require explicit HITL approval.
 
 See [Governance — Layer 5](governance.md#adaptive-governance-layer-5) for full adaptive governance rules.
+
+---
+
+## Work Lifecycle Management Layer (v4.0.0)
+
+As of v4.0.0, the system includes a Work Lifecycle Management Layer that tracks, persists, and exports all work items produced during pipeline execution. This layer adds cross-session persistence for bugs, change requests, implementation tasks, and their companion items.
+
+### Component Topology
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                         Pipeline Execution                           │
+│   (feature-planning, code-repair, implementation-completeness-       │
+│    auditor, security-review → may trigger lifecycle skills)          │
+└─────────────────────────────┬────────────────────────────────────────┘
+                              │ emits events / produces work items
+           ┌──────────────────┼──────────────────┐
+           ▼                  ▼                  ▼
+┌──────────────────┐ ┌──────────────────┐  ┌──────────────────────────┐
+│ defect-manager   │ │ change-request-  │  │ feature-planning v2.0.0  │
+│ (SKL-055)        │ │ manager (SKL-056) │  │ companion generation     │
+│ BUG + chain      │ │ CR + task delta   │  │ REVIEW/TEST/VALIDATION   │
+└────────┬─────────┘ └────────┬─────────┘  └────────────┬─────────────┘
+         │                    │                          │
+         └──────────────┬─────┘                         │
+                        ▼                               ▼
+           ┌────────────────────────┐    ┌──────────────────────────────┐
+           │  work-items/ directory │    │  state work_items scope      │
+           │  (ADR-0001 — Markdown  │◄───│  (compressed index; 512KB    │
+           │   file-based store)    │    │   budget; ~104KB max)        │
+           └────────────┬───────────┘    └──────────────────────────────┘
+                        │                              ▲
+                        │ reads full items             │ guard validates
+                        ▼                              │ transitions
+           ┌────────────────────────┐    ┌─────────────┴────────────────┐
+           │ work-item-exporter     │    │ work-item-lifecycle-guard    │
+           │ (SKL-057)              │    │ (SKL-058)                    │
+           │ Jira / JSONL / Markdown│    │ enforcement: warning → block │
+           └────────────────────────┘    └──────────────────────────────┘
+```
+
+### Work Item Persistence (ADR-0001)
+
+- Each work item is a Markdown file at `work-items/{TYPE}-{NNNN}.md` with YAML front matter
+- The state `work_items` scope holds only the compressed index (ID + type + status + file_path)
+- Full detail is always in the `.md` file — state is a lookup index, not the source of truth
+- ID patterns: `BUG-NNNN`, `FIX-NNNN`, `INVESTIGATION-NNNN`, `TASK-NNNN`, `REVIEW-NNNN`, `TEST-NNNN`, `VALIDATION-NNNN`, `CR-NNNN`, `CLOSURE-NNNN`
+
+### Export Contract (ADR-0002)
+
+Export is **one-way (outbound only)**. No status read-back from external platforms. Supported formats:
+- **Primary**: Jira Bulk Import JSON (compatible with Jira's native bulk create endpoint)
+- JSON Lines (`.jsonl`) — universal machine-readable fallback
+- Markdown summary table — human-readable
+
+### Lifecycle State Machine
+
+All work item types have a defined state machine enforced by `work-item-lifecycle-guard` (SKL-058). Terminal states (`closed`, `cancelled`, `rejected`) are permanently blocked. HITL-gated transitions (e.g., `BUG: reported → triaged`) require orchestrator confirmation. See `docs/work-item-foundation.md §4` for the full state machine.

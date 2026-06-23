@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.1.0
+version: 1.2.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -70,6 +70,18 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 
 - `registry.json` MUST be loaded and resolvable — the orchestrator resolves skill paths from it.
 - Valid `session_context` if resuming a prior execution.
+
+**Supported Pipeline Templates:**
+
+| Pipeline File | Purpose | Entry Skills |
+|---------------|---------|--------------|
+| `skills/pipelines/full-pipeline.json` v3.0.0 | Full idea-to-production delivery | requirement-analyzer → … → deployment-strategy |
+| `skills/pipelines/requirements-only.json` | Requirements extraction only | requirement-analyzer |
+| `skills/pipelines/architecture-only.json` | Architecture design only | requirement-analyzer → architecture-design |
+| `skills/pipelines/quick-review.json` | Code/security review | clean-code-review / security-review |
+| `skills/pipelines/pre-deploy.json` | Pre-deployment checks | testing-strategy → deployment-strategy |
+| `skills/pipelines/defect-lifecycle.json` v1.1.0 | Defect intake → triage → fix → closure | defect-manager |
+| `skills/pipelines/change-request.json` v1.1.0 | CR intake → impact → re-plan → delivery | change-request-manager |
 
 ## Execution Logic
 

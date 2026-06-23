@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Central registry of all skills in the Skill System Standard",
   "parallel_groups": [
     {
@@ -17,7 +17,7 @@
         "behavioral-telemetry-collector",
         "session-insights"
       ],
-      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended \u2014 non-blocking"
+      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended — non-blocking"
     }
   ],
   "skills": [
@@ -46,7 +46,7 @@
       "produces_for": [
         "architecture-design@^1.1.0"
       ],
-      "orchestration": "MUST run first \u2014 entry point for all feature work",
+      "orchestration": "MUST run first — entry point for all feature work",
       "feedback_routes": []
     },
     {
@@ -78,7 +78,7 @@
       "produces_for": [
         "feature-planning@^1.1.0"
       ],
-      "orchestration": "MUST run second \u2014 depends on requirement-analyzer output",
+      "orchestration": "MUST run second — depends on requirement-analyzer output",
       "feedback_routes": [
         {
           "target_skill": "requirement-analyzer",
@@ -89,17 +89,18 @@
     },
     {
       "name": "feature-planning",
-      "version": "1.2.0",
+      "version": "2.0.0",
       "status": "active",
       "domain": "planning",
       "path": ".opencode/skills/feature-planning/SKILL.md",
-      "description": "Breaks architecture into tasks with dependencies and roadmap",
+      "description": "Breaks architecture into tasks with dependencies and roadmap. v2.0.0 adds opt-in companion task generation (REVIEW/TEST/VALIDATION/DOC per TASK). Backward compatible when companion_generation.enabled=false (default).",
       "inputs": [
         "requirements",
         "modules",
         "integration_points",
         "team_capacity",
-        "milestones"
+        "milestones",
+        "companion_generation"
       ],
       "outputs": [
         "tasks",
@@ -107,6 +108,8 @@
         "phases",
         "milestones",
         "risks",
+        "companion_tasks",
+        "work_item_summary",
         "metrics",
         "feedback"
       ],
@@ -117,7 +120,7 @@
         "clean-code-review@^1.1.0",
         "testing-strategy@^1.1.0"
       ],
-      "orchestration": "MUST run third \u2014 produces implementation plan",
+      "orchestration": "MUST run third — produces implementation plan",
       "feedback_routes": [
         {
           "target_skill": "architecture-design",
@@ -231,7 +234,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Utility skill \u2014 invoked by orchestrator between pipeline steps",
+      "orchestration": "Utility skill — invoked by orchestrator between pipeline steps",
       "feedback_routes": []
     },
     {
@@ -300,7 +303,7 @@
         "testing-strategy@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Runs after testing-strategy \u2014 final step before production",
+      "orchestration": "Runs after testing-strategy — final step before production",
       "feedback_routes": [
         {
           "target_skill": "testing-strategy",
@@ -333,12 +336,12 @@
         "clean-code-review@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Runs asynchronously after upstream skills complete \u2014 non-blocking",
+      "orchestration": "Runs asynchronously after upstream skills complete — non-blocking",
       "feedback_routes": []
     },
     {
       "name": "orchestrator",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/orchestrator/SKILL.md",
@@ -357,7 +360,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Meta-skill \u2014 invokes all other skills per pipeline definition",
+      "orchestration": "Meta-skill — invokes all other skills per pipeline definition",
       "feedback_routes": []
     },
     {
@@ -366,7 +369,7 @@
       "status": "active",
       "domain": "documentation",
       "path": ".opencode/skills/doc-maintainer/SKILL.md",
-      "description": "Autonomous documentation maintenance engine \u2014 detects changes, creates/updates .md files, ensures consistency",
+      "description": "Autonomous documentation maintenance engine — detects changes, creates/updates .md files, ensures consistency",
       "inputs": [
         "change_event",
         "change_type",
@@ -393,7 +396,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "System maintenance skill \u2014 runs on change detection, not pipeline execution",
+      "orchestration": "System maintenance skill — runs on change detection, not pipeline execution",
       "feedback_routes": []
     },
     {
@@ -402,7 +405,7 @@
       "status": "active",
       "domain": "meta",
       "path": ".opencode/skills/skill-authoring/SKILL.md",
-      "description": "Meta-skill \u2014 designs, generates, validates, and governs all other skills",
+      "description": "Meta-skill — designs, generates, validates, and governs all other skills",
       "inputs": [
         "intent",
         "domain",
@@ -431,7 +434,7 @@
         "doc-maintainer@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Meta-skill \u2014 invoked to create or govern any other skill in the system",
+      "orchestration": "Meta-skill — invoked to create or govern any other skill in the system",
       "feedback_routes": []
     },
     {
@@ -455,7 +458,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "Utility protocol \u2014 invoked by orchestrator to serialize, compress, and restore session state",
+      "orchestration": "Utility protocol — invoked by orchestrator to serialize, compress, and restore session state",
       "feedback_routes": []
     },
     {
@@ -464,7 +467,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/observability/SKILL.md",
-      "description": "Metrics collection, aggregation, threshold alerting, and health status reporting for the skill pipeline \u2014 defines the canonical per-skill metrics schema enforced by all skills",
+      "description": "Metrics collection, aggregation, threshold alerting, and health status reporting for the skill pipeline — defines the canonical per-skill metrics schema enforced by all skills",
       "inputs": [
         "skill_name",
         "execution_event",
@@ -483,7 +486,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Utility protocol \u2014 invoked by orchestrator at 4 defined collection points (skill.started, skill.completed, gate event, pipeline.ended); individual skills only need to produce a compliant metrics object",
+      "orchestration": "Utility protocol — invoked by orchestrator at 4 defined collection points (skill.started, skill.completed, gate event, pipeline.ended); individual skills only need to produce a compliant metrics object",
       "feedback_routes": []
     },
     {
@@ -508,7 +511,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Meta utility \u2014 invoked by skill-authoring (SKL-012) as part of the registration gate",
+      "orchestration": "Meta utility — invoked by skill-authoring (SKL-012) as part of the registration gate",
       "feedback_routes": []
     },
     {
@@ -530,7 +533,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Governance meta-skill \u2014 invoked to check or advance any skill's lifecycle stage",
+      "orchestration": "Governance meta-skill — invoked to check or advance any skill's lifecycle stage",
       "feedback_routes": []
     },
     {
@@ -554,7 +557,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Meta utility \u2014 invoked during skill design to produce activation trigger specs",
+      "orchestration": "Meta utility — invoked during skill design to produce activation trigger specs",
       "feedback_routes": []
     },
     {
@@ -579,7 +582,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Validation utility \u2014 invoked by skill-authoring during Step 8 (multi-layer validation)",
+      "orchestration": "Validation utility — invoked by skill-authoring during Step 8 (multi-layer validation)",
       "feedback_routes": []
     },
     {
@@ -604,7 +607,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Governance utility \u2014 invoked during skill evolution or release to determine correct version bump",
+      "orchestration": "Governance utility — invoked during skill evolution or release to determine correct version bump",
       "feedback_routes": []
     },
     {
@@ -645,7 +648,7 @@
         "schema-validator@^1.0.0"
       ],
       "produces_for": null,
-      "orchestration": "Meta-skill \u2014 invoked to scaffold a new sub-agent module from a capability specification",
+      "orchestration": "Meta-skill — invoked to scaffold a new sub-agent module from a capability specification",
       "feedback_routes": []
     },
     {
@@ -654,7 +657,7 @@
       "status": "active",
       "domain": "orchestration",
       "path": ".opencode/skills/state-manager/SKILL.md",
-      "description": "Reads, writes, diffs, snapshots, and restores shared system state \u2014 the sole write interface to cross-skill state",
+      "description": "Reads, writes, diffs, snapshots, and restores shared system state — the sole write interface to cross-skill state",
       "inputs": [
         "operation",
         "key",
@@ -675,7 +678,7 @@
         "orchestrator@^1.0.0",
         "context-memory@^1.0.0"
       ],
-      "orchestration": "Infrastructure primitive \u2014 invoked by every skill that reads or writes shared state",
+      "orchestration": "Infrastructure primitive — invoked by every skill that reads or writes shared state",
       "feedback_routes": []
     },
     {
@@ -785,7 +788,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "MUST run before any code modification \u2014 gates the execution of all downstream skills",
+      "orchestration": "MUST run before any code modification — gates the execution of all downstream skills",
       "feedback_routes": [
         {
           "target_skill": "architecture-design",
@@ -830,7 +833,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "Sits on the event bus \u2014 every system event passes through before reaching skill executors",
+      "orchestration": "Sits on the event bus — every system event passes through before reaching skill executors",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1039,7 +1042,7 @@
       "produces_for": [
         "state-manager@^1.0.0"
       ],
-      "orchestration": "Last-resort recovery \u2014 triggered on critical pipeline failures, deployment failures, and unrecoverable code errors",
+      "orchestration": "Last-resort recovery — triggered on critical pipeline failures, deployment failures, and unrecoverable code errors",
       "feedback_routes": [
         {
           "target_skill": "deployment-strategy",
@@ -1151,7 +1154,7 @@
       "status": "active",
       "domain": "quality",
       "path": ".opencode/skills/implementation-completeness-auditor/SKILL.md",
-      "description": "Cross-check all requirements against delivered code, tests, UI screens, DB entities, and documentation; produce a readiness score (0\u2013100) and traceability matrix",
+      "description": "Cross-check all requirements against delivered code, tests, UI screens, DB entities, and documentation; produce a readiness score (0–100) and traceability matrix",
       "inputs": [
         "requirements",
         "code_map",
@@ -1735,7 +1738,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/behavioral-telemetry-collector/SKILL.md",
-      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag \u2014 exits immediately if opted out. Ring-buffer storage of up to 500 events per session.",
+      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag — exits immediately if opted out. Ring-buffer storage of up to 500 events per session.",
       "inputs": [
         "event_type",
         "skill_name",
@@ -1760,7 +1763,7 @@
       "produces_for": [
         "session-insights@^1.0.0"
       ],
-      "orchestration": "Async fire-and-forget \u2014 invoked by orchestrator at skill.completed, skill.failed, gate.passed, and gate.blocked events; never blocks pipeline progression",
+      "orchestration": "Async fire-and-forget — invoked by orchestrator at skill.completed, skill.failed, gate.passed, and gate.blocked events; never blocks pipeline progression",
       "feedback_routes": []
     },
     {
@@ -1789,7 +1792,7 @@
       "produces_for": [
         "enhancement-dashboard@^1.0.0"
       ],
-      "orchestration": "Async \u2014 invoked once at pipeline.ended after behavioral-telemetry-collector events are complete; does not block pipeline",
+      "orchestration": "Async — invoked once at pipeline.ended after behavioral-telemetry-collector events are complete; does not block pipeline",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1831,7 +1834,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/adaptive-proposal-generator/SKILL.md",
-      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval \u2014 nothing is applied automatically.",
+      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval — nothing is applied automatically.",
       "inputs": [
         "session_summary",
         "historical_summaries",
@@ -1887,7 +1890,7 @@
       "produces_for": [
         "doc-maintainer@^1.0.0"
       ],
-      "orchestration": "Invoked by orchestrator only after HITL gate approves a proposal. Blocking \u2014 waits for validate-skills.sh and npm run build to complete before returning.",
+      "orchestration": "Invoked by orchestrator only after HITL gate approves a proposal. Blocking — waits for validate-skills.sh and npm run build to complete before returning.",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1984,7 +1987,7 @@
       "status": "active",
       "domain": "design",
       "path": ".opencode/skills/creative-experience-architect/SKILL.md",
-      "description": "Architect world-class interfaces \u2014 innovative layouts, story-driven flows, immersive backgrounds, premium component enhancements, creative briefs",
+      "description": "Architect world-class interfaces — innovative layouts, story-driven flows, immersive backgrounds, premium component enhancements, creative briefs",
       "inputs": [
         "product_brief",
         "screens",
@@ -2018,6 +2021,150 @@
           "description": "Feed approved creative patterns as creative_recommendations back to frontend-ux-architect"
         }
       ]
+    },
+    {
+      "name": "defect-manager",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "lifecycle",
+      "path": ".opencode/skills/defect-manager/SKILL.md",
+      "description": "Manages the full defect lifecycle from intake to closure. Creates BUG records and generates companion task chains (INVESTIGATION, FIX, TEST, REVIEW, VALIDATION, CLOSURE) for all reported defects. Integrates with code-repair for FIX execution.",
+      "inputs": [
+        "defect_report",
+        "defect_type"
+      ],
+      "outputs": [
+        "bug_id",
+        "bug_record",
+        "chain_items",
+        "chain_item_ids",
+        "traceability_map",
+        "triage_result",
+        "files_written",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "test-generator@^1.0.0",
+        "security-review@^1.0.0",
+        "code-repair@^1.0.0",
+        "implementation-completeness-auditor@^1.1.0"
+      ],
+      "produces_for": [
+        "code-repair@^1.0.0",
+        "test-generator@^1.0.0",
+        "clean-code-review@^1.1.0",
+        "work-item-exporter@^1.0.0"
+      ],
+      "orchestration": "sequential",
+      "feedback_routes": [
+        {
+          "target_skill": "code-repair",
+          "condition": "FIX-NNNN task generated",
+          "description": "FIX task routed to code-repair for implementation"
+        }
+      ]
+    },
+    {
+      "name": "change-request-manager",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "lifecycle",
+      "path": ".opencode/skills/change-request-manager/SKILL.md",
+      "description": "Manages the change request lifecycle from intake to execution. Runs impact analysis, enforces HITL approval, and generates task deltas for feature-planning re-invocation. Does not modify existing tasks directly.",
+      "inputs": [
+        "change_request"
+      ],
+      "outputs": [
+        "cr_id",
+        "cr_record",
+        "impact_analysis",
+        "approval_result",
+        "task_delta",
+        "files_written",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "change-impact-analyzer@^1.0.0"
+      ],
+      "produces_for": [
+        "feature-planning@^2.0.0",
+        "requirement-analyzer@^1.2.0",
+        "work-item-exporter@^1.0.0"
+      ],
+      "orchestration": "sequential",
+      "feedback_routes": [
+        {
+          "target_skill": "feature-planning",
+          "condition": "CR approved — task delta generated",
+          "description": "Backpropagate task delta to feature-planning for re-planning"
+        },
+        {
+          "target_skill": "requirement-analyzer",
+          "condition": "CR introduces new requirements",
+          "description": "Backpropagate new requirements for normalization before feature-planning re-plan"
+        }
+      ]
+    },
+    {
+      "name": "work-item-exporter",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "integration",
+      "path": ".opencode/skills/work-item-exporter/SKILL.md",
+      "description": "Exports work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats. One-way outbound export only. Runs async at pipeline completion. Includes PII scrubbing before any file write.",
+      "inputs": [
+        "export_formats",
+        "jira_project_key",
+        "filter",
+        "strip_internal_fields"
+      ],
+      "outputs": [
+        "export_id",
+        "files_produced",
+        "items_exported",
+        "type_breakdown",
+        "manifest",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "defect-manager@^1.0.0",
+        "feature-planning@^2.0.0",
+        "change-request-manager@^1.0.0"
+      ],
+      "produces_for": [],
+      "orchestration": "async",
+      "feedback_routes": []
+    },
+    {
+      "name": "work-item-lifecycle-guard",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "governance",
+      "path": ".opencode/skills/work-item-lifecycle-guard/SKILL.md",
+      "description": "Validates work item lifecycle state transitions against the rules in docs/work-item-foundation.md. Returns allow/warn/block verdict. Initial deployment mode: warning. Guard Layer 2 — runs as validation_check before every work item state write.",
+      "inputs": [
+        "item_id",
+        "item_type",
+        "from_state",
+        "to_state",
+        "actor_skill",
+        "guard_mode"
+      ],
+      "outputs": [
+        "item_id",
+        "verdict",
+        "reason",
+        "transition",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [],
+      "produces_for": [],
+      "orchestration": "validation_check",
+      "feedback_routes": []
     }
   ]
 }

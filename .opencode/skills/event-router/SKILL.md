@@ -126,6 +126,11 @@ The following event-to-skill bindings are registered at initialization:
 | `file.written` | doc-maintainer |
 | `state.snapshot_requested` | state-manager |
 | `context.pressure_high` | context-compressor |
+| `defect.created` | orchestrator |
+| `defect.resolved` | doc-maintainer |
+| `change_request.created` | change-impact-analyzer |
+| `change_request.approved` | feature-planning |
+| `work_item.state_changed` | doc-maintainer, behavioral-telemetry-collector |
 
 ## Outputs
 

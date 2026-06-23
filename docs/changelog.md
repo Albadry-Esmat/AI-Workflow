@@ -1,10 +1,166 @@
 # Changelog — System Update History
 
-**Version:** 3.0.0 | **Last updated:** 2026-06-21
+**Version:** 4.0.1 | **Last updated:** 2026-06-23
 
 All notable changes to this project are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+
+---
+
+## [4.0.1] — 2026-06-23
+
+### Fixed — Post-Implementation Review (8 bugs, 7 gaps resolved)
+
+**CRITICAL / HIGH bugs (blocked release):**
+- **BUG-1** — `skills/graph/skill-graph.yaml`: 6 wrong node IDs in edges for SKL-055/056 corrected: `SKL-020→SKL-021` (×2), `SKL-030→SKL-029` (×2), `SKL-017→SKL-028`, `SKL-023→SKL-024`. Dependency graph was structurally incorrect.
+- **BUG-2** — `skills/index.yaml`: Wrong `depends_on` IDs for all 4 new skills corrected (same root cause as BUG-1). SKL-058 `depends_on` cleared to `[]` (guard skills have no skill dependencies per Layer 2 rules).
+- **BUG-3** — `defect-manager/SKILL.md §13`: Stale `(SKL-030)` reference corrected to `(SKL-029)` for code-repair.
+- **BUG-5** — `skills/pipelines/defect-lifecycle.json`: Closure HITL gate was incorrectly positioned `after_phase: phase-6-review` (before validation ran). Moved to `after_phase: phase-7b-completeness-guard` so the gate confirms a completed, validated fix.
+- **BUG-6** — `skills/pipelines/change-request.json`: Removed redundant `phase-2-impact` (change-impact-analyzer was being invoked twice — once internally by change-request-manager, once as a pipeline phase). Impact approval gate moved to fire after `phase-1-intake`.
+
+**MEDIUM bugs:**
+- **BUG-4** — `orchestrator/SKILL.md`: Pipeline template table versions corrected from v1.0.0 to v1.1.0 for both `defect-lifecycle.json` and `change-request.json`.
+- **BUG-7** — `skills/graph/skill-graph.yaml`: Indentation inconsistency fixed — new edges for SKL-054–058 used 4-space list indent instead of the file-standard 3-space. Normalised.
+- **BUG-8** — `skills/registry.json`: Added missing `metrics` and `feedback` fields to `outputs` for all 4 new skills (SKL-055–058). `work-item-lifecycle-guard` also missing `item_id` output — added.
+
+**Gaps resolved:**
+- **GAP-1** — `skills/pipelines/change-request.json`: Added conditional scope-confirmation HITL gate (fires when `cr.new_requirements.length > 0`, timeout 3600s) after `phase-1-intake`.
+- **GAP-2** — Both pipelines: Added `implementation-completeness-guard` phase immediately after `implementation-completeness-auditor` in both `defect-lifecycle.json` (`phase-7b-completeness-guard`) and `change-request.json` (`phase-6b-completeness-guard`).
+- **GAP-4** — `defect-manager/SKILL.md` + `change-request-manager/SKILL.md`: Fixed `$ref` paths from non-existent `../../schema/system-state-schema.json` to correct `../../../skills/schema/system-state-schema.json`.
+- **GAP-5** — `docs/work-item-foundation.md §4.3`: Added `blocked` state to BUG lifecycle state machine (diagram + transition table). Transitions `investigating → blocked` and `blocked → investigating` added. Aligns with `work-item-lifecycle-guard` implementation.
+- **GAP-6** — `skills/pipelines/defect-lifecycle.json`: Added `phase-7c-closure-write` (state-manager) after the closure HITL gate to persist the `CLOSURE → closed` state transition in the audit trail.
+- **GAP-7** — `skills/index.yaml`: Pre-existing version inconsistency for SKL-003 (feature-planning) corrected from `v1.2.0` to `v2.0.0`, aligning with registry.json and skill-graph.yaml.
+- **GAP-8** — `skills/graph/skill-graph.yaml`: Added missing `SKL-021 → SKL-057` dependency edge (work-item-exporter reads from state-manager).
+
+### Changed
+- `skills/pipelines/defect-lifecycle.json`: v1.0.0 → v1.1.0 (added `phase-7b-completeness-guard`, `phase-7c-closure-write`; closure gate repositioned)
+- `skills/pipelines/change-request.json`: v1.0.1 → v1.1.0 (removed `phase-2-impact`; added `phase-6b-completeness-guard`; gates updated; scope-confirmation gate added)
+
+### Validation
+- `validate-skills.sh`: **95/95 passed, 0 failed** ✅
+- `graphify update .`: Graph rebuilt after all fixes ✅
+
+---
+
+
+
+### Added — Work Lifecycle Management Layer (Phases 5–6 Integration & Release)
+
+**Phase 5 completes integration wiring, governance compliance, and token/state validation. Phase 6 completes documentation, version bumps, and release.**
+
+**Routing (Phase 5.1):**
+- **`.opencode/agent/primary.md`**: 3 new routing table entries added:
+  - `"report a bug"`, `"defect found"`, `"this is broken"`, `"bug report"`, `"create defect"`, `"log a defect"` → `skills/pipelines/defect-lifecycle.json` / `analyzer`
+  - `"change request"`, `"modify this requirement"`, `"scope change"`, `"CR"`, `"change the spec"`, `"update the requirements"` → `skills/pipelines/change-request.json` / `planner`
+  - `"export tasks"`, `"export work items"`, `"sync to Jira"`, `"export to GitHub Issues"`, `"export work items to Jira"` → Direct skill invocation (`work-item-exporter`) / `builder`
+  - Fallback message updated to include: defect tracking, change requests, work item export
+- **`orchestrator/SKILL.md` v1.1.0 → v1.2.0**: Added "Supported Pipeline Templates" table with all 7 pipeline templates documented; `skills/registry.json` and `skills/graph/skill-graph.yaml` updated to match.
+
+**Integration contract verification (Phase 5.2):**
+- All 5 contracts verified: `feature-planning → defect-manager` (companion tasks via work_items scope), `defect-manager → code-repair` (FIX-NNNN task routing via orchestrator), `change-request-manager → change-impact-analyzer` (Step 3 direct invocation with input_map), `change-request-manager → feature-planning` (backpropagate feedback with task_delta), `all → work-item-exporter` (reads work_items scope + .md files).
+
+**Governance compliance (Phase 5.3):**
+- All new HITL gates verified: `type: human_approval`, no auto-continue, timeouts set (3600s or 7200s for CR impact gate).
+- `work-item-lifecycle-guard` condition gates: `type: condition`, evaluates `lifecycle_guard.verdict !== 'block'` — correct behavior confirmed.
+
+**Version bumps (Phase 6):**
+- **`skills/registry.json`**: v3.0.0 → v4.0.0 (MAJOR: Work Lifecycle Management Layer fully wired)
+- **`skills/graph/skill-graph.yaml`**: v2.7.0 → v2.7.1 (orchestrator node version update)
+- **`docs/governance.md`**: v2.3.0 → v2.4.0 (Guard Inventory + HITL gate table)
+- **`docs/workflows.md`**: v2.2.0 → v2.3.0 (defect lifecycle flow, CR flow, Phase 7b guard list, partial pipeline table)
+- **`docs/architecture.md`**: v2.1.0 → v2.2.0 (Work Lifecycle Management Layer section)
+- **`docs/system-overview.md`**: v3.0.0 → v4.0.0 (4 new capabilities: defect mgmt, CR mgmt, work item export, lifecycle enforcement)
+- **`docs/agents.md`**: v1.1.0 → v1.2.0 (skill assignments for SKL-055–058)
+- **`docs/skills-registry.md`**: v2.8.0 → v3.0.0 (4 new skill catalog entries, index count 51→58)
+
+**Release ADR:**
+- **`docs/adr/ADR-0003-work-lifecycle-layer-release.md`**: Records release scope, architectural decisions, integration contracts, bugs fixed, and validation gate status.
+
+### Fixed
+
+- **`skills/pipelines/change-request.json`** v1.0.0 → v1.0.1: `feature-planning` version constraint corrected from `"^1.2.0"` to `"^2.0.0"` — semver `^1.2.0` would not resolve to v2.0.0 (major version boundary). Now correctly targets the companion-generation-enabled v2.0.0.
+- **`defect-manager/SKILL.md` §12**: Closure gate timeout corrected from 7200s to 3600s to match `defect-lifecycle.json` pipeline definition.
+- **`change-request-manager/SKILL.md` §12**: Impact approval gate timeout corrected from 3600s to 7200s to match `change-request.json` pipeline definition (CR impact review justifies a longer window).
+
+### Phase 5 Gate Checklist
+
+| Check | Status |
+|---|---|
+| All end-to-end integration contracts verified | ✅ PASS |
+| Governance compliance: all HITL gates conform to governance.md | ✅ PASS |
+| State size validated (104KB < 512KB budget) | ✅ PASS |
+| Token budgets within tier limits (write agent: 100K) | ✅ PASS |
+| `validate-skills.sh` 95/95 | ✅ PASS |
+
+### Phase 6 Gate Checklist
+
+| Check | Status |
+|---|---|
+| All documentation updated per governance.md sync rules | ✅ PASS |
+| `validate-skills.sh` passes | ✅ PASS (95/95) |
+| Changelog entry complete and accurate | ✅ This entry |
+| ADR for the release written and in adr_index | ✅ ADR-0003 |
+| Registry version bumped (3.0.0 → 4.0.0) | ✅ PASS |
+| Stakeholder sign-off: Work Lifecycle capability | ⏳ Pending human review |
+
+---
+
+## [3.1.0] — 2026-06-23
+
+### Added — Work Lifecycle Management Layer (Phase 3 Infrastructure)
+
+**Phase 3 completes the infrastructure and registry wiring for the 4 Work Lifecycle skills authored in Phase 2.**
+
+**State infrastructure:**
+- **`state-manager/SKILL.md` v1.1.0 → v1.2.0**: Added `"work_items"` to `scope` enum (both Inputs table description and JSON Schema). Enables all 4 new lifecycle skills to read/write the `work_items` state scope via the standard state-manager interface.
+
+**Event routing:**
+- **`event-router/SKILL.md` v1.0.0 — Built-in Dispatch Map extended**: 5 new event type registrations:
+  - `defect.created` → `orchestrator` (triggers defect chain orchestration)
+  - `defect.resolved` → `doc-maintainer` (auto-syncs documentation on defect closure)
+  - `change_request.created` → `change-impact-analyzer` (auto-triggers impact analysis)
+  - `change_request.approved` → `feature-planning` (re-invokes planning with approved task delta)
+  - `work_item.state_changed` → `doc-maintainer`, `behavioral-telemetry-collector` (tracks lifecycle transitions in telemetry)
+
+**Skill registry:**
+- **`skills/index.yaml` → v3.1.0**: 4 new entries added (SKL-055, SKL-056, SKL-057, SKL-058); section header `# ── WORK LIFECYCLE MANAGEMENT LAYER (SKL-055 to SKL-058)` added; 58 total skills.
+
+**Pipeline templates (2 new):**
+- **`skills/pipelines/defect-lifecycle.json` v1.0.0**: 9-phase pipeline for the full defect lifecycle: defect intake → triage HITL → root cause investigation → fix implementation → lifecycle guard validation → regression test generation → fix review → completeness validation → async export + doc sync. Two HITL gates: triage confirmation (priority + severity), fix approval before closure.
+- **`skills/pipelines/change-request.json` v1.0.0**: 8-phase pipeline for change requests: CR intake → impact analysis → HITL approval → re-planning → lifecycle guard → code generation (conditional) → completeness audit → async export + doc + ADR sync. Two HITL gates: impact approval (modules/tasks/effort delta), scope delivery confirmation.
+
+**Skill graph:**
+- **`skills/graph/skill-graph.yaml` → v2.7.0**: 4 new nodes (SKL-055–058); 16 new edges covering defect-manager's code-repair/test-generator/clean-code-review/exporter/guard composition links, change-request-manager's change-impact-analyzer dependency and feature-planning backpropagation, state-manager dependencies for both lifecycle skills, and lifecycle guard co-occurrence edges; `total_nodes: 58`, `total_edges: 158`.
+
+### Changed — Existing Infrastructure
+
+- **`skills/pipelines/full-pipeline.json` → v3.0.0**:
+  - Added `work-item-lifecycle-guard` (SKL-058) to `phase-7b-guards` parallel guard group. Guard runs alongside database-guard, performance-guard, ui-ux-compliance-guard, and security-guard.
+  - Added `phase-8d-defect-management` (conditional on `defects_detected === true OR missings_count > 0`): invokes `defect-manager` when completeness audit or code-repair surfaces defects/missings.
+  - Added `phase-10b-export` (async): invokes `work-item-exporter` at pipeline completion alongside documentation phases.
+  - Updated `parallel_groups` to include `work-item-lifecycle-guard` in the guard parallel group.
+  - Updated `async_skills` to include `work-item-exporter`.
+
+- **`skills/graph/skill-graph.yaml`**: `feature-planning` node version corrected from `1.2.0` to `2.0.0` to match `skills/registry.json` (graph was stale from Phase 2 bump).
+
+### Validation
+
+- `validate-skills.sh`: **95/95 passed, 0 failed** — all 15 pipeline JSON schemas valid, all 58 SKILL.md section checks passed (8 skipped as meta-format), all skill IDs unique, skill counts match (58 index ↔ 58 on disk ↔ 58 graph nodes), all opencode.json paths exist, all registry↔graph versions consistent.
+
+### Phase 3 Gate Checklist (from implementation-plan-work-lifecycle.md)
+
+| Gate Check | Status |
+|---|---|
+| `system-state-schema.json` extended with `work_items` scope | ✅ Done (Phase 2 — pre-existing) |
+| All 15 existing pipelines validate against `pipeline-schema.json` | ✅ PASS |
+| `state-manager` accepts the new `work_items` scope | ✅ Done — added to scope enum |
+| Event-router dispatch map includes 5 new event types | ✅ Done |
+| `skills/registry.json` includes all new skill entries (SKL-055–058) | ✅ Done (Phase 2 — pre-existing) |
+| `validate-skills.sh` passes (58 skills) | ✅ 95/95 PASS |
+| No existing skill or agent configuration broken | ✅ Confirmed |
+
+**Phase 3 complete. Next: Phase 4 — Skill Implementation (feature-planning v2.0.0 companion generation, defect-manager, change-request-manager, work-item-exporter, work-item-lifecycle-guard full execution logic).**
 
 ---
 

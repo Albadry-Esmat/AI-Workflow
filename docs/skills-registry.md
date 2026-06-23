@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 2.8.0 | **Last updated:** 2026-06-20
+**Version:** 3.0.0 | **Last updated:** 2026-06-23
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 51 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 58 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `skills/<domain>/<skill>.md` | 13-section AI-executable specifications |
 
@@ -565,3 +565,89 @@ On success: triggers `doc-maintainer` (SKL-011) with a change event.
 On failure: auto-rollback from checkpoint, returns `rollback_executed: true`.
 
 **`dry_run: true`** simulates all changes and returns a diff — always safe to invoke.
+
+---
+
+## New Skills (v4.0.0) — Work Lifecycle Management Layer
+
+### SKL-055 — Defect Manager
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-055 |
+| **Domain** | lifecycle |
+| **Version** | 1.0.0 |
+| **Mastery** | advanced |
+| **Executable** | `.opencode/skills/defect-manager/SKILL.md` |
+| **Assigned to** | `analyzer` agent |
+
+Receives defect reports from any source (test failure, security finding, code-repair escalation, human report) and manages the full defect lifecycle from intake to closure. For every bug: creates `BUG-NNNN`, generates the full 6-item companion chain (INVESTIGATION + FIX + TEST + REVIEW + VALIDATION + CLOSURE), links all items to originating requirement and implementation task, persists each item as a Markdown file in `work-items/`. For "missings" from implementation-completeness-auditor: generates a shorter 3-item chain (FIX + TEST + VALIDATION). HITL triage gate is mandatory for all bugs.
+
+**Key outputs:** `bug_id`, `bug_record`, `chain_items`, `chain_item_ids`, `traceability_map`
+
+**Events emitted:** `defect.created`, `work_item.state_changed`
+
+**Pipeline:** `skills/pipelines/defect-lifecycle.json`
+
+---
+
+### SKL-056 — Change Request Manager
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-056 |
+| **Domain** | lifecycle |
+| **Version** | 1.0.0 |
+| **Mastery** | advanced |
+| **Executable** | `.opencode/skills/change-request-manager/SKILL.md` |
+| **Assigned to** | `planner` agent |
+
+Receives change requests (new requirement, modified requirement, scope change) and manages the full CR lifecycle from intake to planning. Runs impact analysis via `change-impact-analyzer`, presents HITL gate for approval, generates a task delta (new/modified/cancelled tasks), and backpropagates the approved delta to `feature-planning` for re-planning. Does NOT modify existing work items directly. HITL impact-approval gate is mandatory.
+
+**Key outputs:** `cr_id`, `cr_record`, `impact_analysis`, `approval_result`, `task_delta`
+
+**Events emitted:** `change_request.created`, `change_request.approved`, `work_item.state_changed`
+
+**Pipeline:** `skills/pipelines/change-request.json`
+
+---
+
+### SKL-057 — Work Item Exporter
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-057 |
+| **Domain** | integration |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.opencode/skills/work-item-exporter/SKILL.md` |
+| **Assigned to** | `builder` agent |
+
+Transforms internal work item records from `work-items/` into export-ready formats. Primary output is Jira Bulk Import JSON. Secondary outputs: JSON Lines and Markdown summary table. Export is one-way outbound only (no status read-back). Runs as an async non-blocking final step at pipeline completion. Includes mandatory PII scrubbing before any file write.
+
+**Key outputs:** `export_id`, `files_produced`, `items_exported`, `type_breakdown`, `manifest`
+
+**Supported formats:** Jira Bulk Import JSON, JSON Lines, Markdown
+
+**ADR:** [ADR-0002](adr/ADR-0002-work-item-export-contract.md)
+
+---
+
+### SKL-058 — Work Item Lifecycle Guard
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-058 |
+| **Domain** | governance |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.opencode/skills/work-item-lifecycle-guard/SKILL.md` |
+| **Assigned to** | `reviewer` agent |
+
+Enforces the work item lifecycle state machine from `docs/work-item-foundation.md §4`. Validates every proposed state transition before it is written. Returns `allow`, `warn`, or `block`. Terminal states (`closed`, `cancelled`, `rejected`) are always blocked. Initial deployment mode: `warning` (allows pipeline stabilization for first 2 weeks before switching to `block`). Pure rule evaluator — no file I/O or state reads required.
+
+**Key outputs:** `verdict` (`allow`/`warn`/`block`), `reason`, `transition`
+
+**Governance layer:** Layer 2 (Guard Skills)
+
+**ADR:** [ADR-0001](adr/ADR-0001-work-lifecycle-persistence-model.md)
