@@ -1,8 +1,8 @@
 meta:
-  version: 2.7.1
-  last_updated: '2026-06-23'
-  total_nodes: 58
-  total_edges: 158
+  version: 2.8.0
+  last_updated: '2026-06-24'
+  total_nodes: 59
+  total_edges: 162
   schema: skills/graph/graph-schema.yaml
 nodes:
   - id: SKL-001
@@ -86,7 +86,7 @@ nodes:
     name: skill-authoring
     domain: meta
     mastery_level: advanced
-    version: 1.0.0
+    version: 1.1.0
     status: active
     layer: meta
   - id: SKL-013
@@ -331,14 +331,14 @@ nodes:
     name: behavioral-telemetry-collector
     domain: system
     mastery_level: intermediate
-    version: 1.0.0
+    version: 1.1.0
     status: active
     layer: utility
   - id: SKL-048
     name: session-insights
     domain: system
     mastery_level: intermediate
-    version: 1.0.0
+    version: 1.1.0
     status: active
     layer: utility
   - id: SKL-049
@@ -411,6 +411,13 @@ nodes:
     version: 1.0.0
     status: active
     layer: governance
+  - id: SKL-065
+    name: gap-to-skill-pipeline
+    domain: meta
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: meta
 edges:
   - from: SKL-001
     to: SKL-002
@@ -1048,3 +1055,19 @@ edges:
     to: SKL-056
     type: co_occurrence
     label: work-item-lifecycle-guard co-occurs with change-request-manager in all CR pipelines
+  - from: SKL-047
+    to: SKL-065
+    type: dependency
+    label: behavioral-telemetry-collector emits capability_gap events consumed by gap-to-skill-pipeline as gap_context
+  - from: SKL-048
+    to: SKL-065
+    type: dependency
+    label: session-insights gap analysis populates the gap_context that gap-to-skill-pipeline restores
+  - from: SKL-065
+    to: SKL-012
+    type: composition
+    label: gap-to-skill-pipeline invokes skill-authoring in gap_seed operation mode to generate the draft skill
+  - from: SKL-065
+    to: SKL-015
+    type: composition
+    label: gap-to-skill-pipeline invokes quality-scoring as a pre-HITL quality gate (min score 70)

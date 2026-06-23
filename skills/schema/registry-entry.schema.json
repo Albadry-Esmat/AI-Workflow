@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/registry-entry.json",
+  "title": "RegistryEntry",
+  "description": "Schema for a single skill entry in skills/registry.json. The origin_metadata field is required for all skills registered at v5.1.0 or later; pre-v5.1.0 entries that lack it are exempted with a WARN in validate-skills.sh.",
+  "type": "object",
+  "required": ["name", "version", "status", "domain", "path"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Skill name (kebab-case, matches folder under .opencode/skills/)."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver string."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "draft", "deprecated", "retired"],
+      "description": "Lifecycle status."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain category (e.g. requirements, review, system, meta)."
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^\\.opencode/skills/.+/SKILL\\.md$",
+      "description": "Relative path to the SKILL.md file."
+    },
+    "origin_metadata": {
+      "type": "object",
+      "description": "Provenance and approval metadata. Required for all skills registered after v5.1.0 (FEATURE-003). Pre-v5.1.0 skills without this field receive a WARN in validate-skills.sh (not an error).",
+      "required": ["source", "approval_tier", "created_at"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["human", "gap-triggered", "migrated", "unknown"],
+          "description": "How the skill was created: 'human' for directly authored, 'gap-triggered' for gap-to-skill pipeline output, 'migrated' for pre-v5.1.0 back-fills, 'unknown' if not determinable."
+        },
+        "created_by_session": {
+          "type": ["string", "null"],
+          "description": "UUID v4 of the session in which the skill was registered. Null if not captured."
+        },
+        "approval_tier": {
+          "type": "string",
+          "enum": ["standard", "expedited", "legacy"],
+          "description": "Governance tier: 'standard' for human-authored (full quality-scoring + HITL), 'expedited' for gap-triggered (auto quality-scoring + non-bypassable HITL), 'legacy' for pre-v5.1.0 (no retroactive review)."
+        },
+        "dedup_override": {
+          "type": "boolean",
+          "default": false,
+          "description": "True if the FEATURE-002 dedup check returned DEDUP_HIT and the author chose to proceed anyway."
+        },
+        "dedup_override_reason": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Author's justification for proceeding despite a DEDUP_HIT. Null when dedup_override = false."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC ISO-8601 timestamp of skill registration."
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: session-insights
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: 'Use when generating per-skill performance insights from collected behavioral telemetry. Triggers on: "session insights", "skill performance report", "analyze telemetry", "pipeline performance", "HITL rejection ratio", "latency p95". Requires behavioral-telemetry-collector (SKL-047) to have run first. Read-only — does not modify behavioral_telemetry.events.'
 author: ASE-OS
@@ -8,7 +8,7 @@ author: ASE-OS
 
 # Session Insights
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-20
+**Version:** 1.1.0 | **Last updated:** 2026-06-24
 
 Analyzes the anonymized behavioral telemetry events collected by `behavioral-telemetry-collector` (SKL-047) and produces a structured performance report: per-skill invocation counts, success/failure rates, HITL approval/rejection ratios, and latency p95. Writes the aggregated `session_summary` back to system state for consumption by `enhancement-dashboard` (SKL-049).
 
@@ -18,7 +18,7 @@ Analyzes the anonymized behavioral telemetry events collected by `behavioral-tel
 
 ```yaml
 name: session-insights
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: >
   Aggregates behavioral telemetry events into per-skill performance metrics.
@@ -151,6 +151,12 @@ Step 4 — Compute session-level aggregates
   pipeline_success      = (pipeline_final_status == "success") if provided, else null
   feedback_loop_count   = count(feedback_events)
 
+  Gap metrics (from capability_gap events):
+  capability_gap_events = filtered_events where event_type == "capability_gap"
+  total_capability_gaps = count(capability_gap_events)
+  top_gap_domains       = top 3 gap_domain values by count ([] if none)
+  gap_ids               = [event.gap_id for event in capability_gap_events where gap_id present]
+
   Output: session_aggregates
 
 Step 5 — Build session_summary object
@@ -161,6 +167,9 @@ Step 5 — Build session_summary object
     hitl_approval_rate:    session_aggregates.hitl_approval_rate,
     pipeline_success:      session_aggregates.pipeline_success,
     feedback_loop_count:   session_aggregates.feedback_loop_count,
+    total_capability_gaps: session_aggregates.total_capability_gaps,
+    top_gap_domains:       session_aggregates.top_gap_domains,
+    gap_ids:               session_aggregates.gap_ids,
     skill_performance:     per_skill_metrics[],
     anomalies: [
       { skill_name, flag, value }
@@ -213,6 +222,9 @@ Step 7 — Return result
         "hitl_approval_rate":   { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
         "pipeline_success":     { "type": ["boolean", "null"] },
         "feedback_loop_count":  { "type": "integer" },
+        "total_capability_gaps": { "type": "integer", "minimum": 0, "description": "Count of capability_gap events in this session (FEATURE-001)." },
+        "top_gap_domains":      { "type": "array", "items": { "type": "string" }, "maxItems": 3, "description": "Top 3 detected_domain values by frequency (FEATURE-001)." },
+        "gap_ids":              { "type": "array", "items": { "type": "string" }, "description": "UUID list of all gap_id values from capability_gap events (FEATURE-001)." },
         "skill_performance": {
           "type": "array",
           "items": {
@@ -374,4 +386,5 @@ produces_for:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1.0 | 2026-06-24 | FEATURE-001: Added gap metrics — `total_capability_gaps`, `top_gap_domains`, `gap_ids` — to session_summary output |
 | 1.0.0 | 2026-06-20 | Initial version — per-skill invocation/success/failure/p95/HITL metrics, session aggregates, anomaly flags, state-manager integration |

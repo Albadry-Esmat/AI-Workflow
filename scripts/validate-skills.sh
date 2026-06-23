@@ -10,6 +10,7 @@
 #   5. All skill paths referenced in opencode.json exist on disk
 #   6. skill-graph.yaml total_nodes matches index.yaml entry count
 #   7. Version consistency: registry.json versions match skill-graph.yaml node versions
+#   8. origin_metadata shape validation for v5.1.0+ skills (FEATURE-003)
 #
 # Requires: ajv-cli (npm install -g ajv-cli ajv-formats), node, grep, awk
 
@@ -185,6 +186,55 @@ if command -v node &>/dev/null; then
     } else {
       process.exit(1);
     }
+  " && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+else
+  echo "  SKIP: node not found"
+fi
+
+# ─── 8. origin_metadata validation (FEATURE-003) ─────────────────────────────
+header "origin_metadata shape validation (skills/registry.json)"
+if command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const registry = JSON.parse(fs.readFileSync('skills/registry.json', 'utf8'));
+    const REQUIRED_FIELDS = ['source', 'approval_tier', 'created_at'];
+    const VALID_SOURCES = new Set(['human', 'gap-triggered', 'migrated', 'unknown']);
+    const VALID_TIERS   = new Set(['standard', 'expedited', 'legacy']);
+
+    let warnings = 0;
+    let errors   = 0;
+    const phase6Names = [];
+
+    for (const skill of registry.skills) {
+      if (!skill.origin_metadata) {
+        // Pre-v5.1.0 skills are exempt — emit a single summary at the end
+        warnings++;
+        continue;
+      }
+      const om = skill.origin_metadata;
+      const missing = REQUIRED_FIELDS.filter(f => !(f in om));
+      if (missing.length > 0) {
+        console.error('  ERROR: ' + skill.name + ' origin_metadata missing: ' + missing.join(', '));
+        errors++;
+        continue;
+      }
+      if (!VALID_SOURCES.has(om.source)) {
+        console.error('  ERROR: ' + skill.name + ' origin_metadata.source invalid: ' + om.source);
+        errors++;
+      }
+      if (!VALID_TIERS.has(om.approval_tier)) {
+        console.error('  ERROR: ' + skill.name + ' origin_metadata.approval_tier invalid: ' + om.approval_tier);
+        errors++;
+      }
+      if (errors === 0) phase6Names.push(skill.name);
+    }
+
+    if (errors > 0) { process.exit(1); }
+    if (phase6Names.length > 0) {
+      console.log('  PASS: origin_metadata valid for: ' + phase6Names.join(', '));
+    }
+    console.log('  WARN: ' + warnings + ' pre-v5.1.0 skill(s) lack origin_metadata — exempted');
+    process.exit(0);
   " && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 else
   echo "  SKIP: node not found"

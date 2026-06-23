@@ -22,14 +22,17 @@ All work items follow the `TYPE-NNNN` pattern (e.g., `BUG-0001`, `TASK-0042`).
 | `FIX` | `FIX-NNNN` | `defect-manager` (chain) | Defect | Implementation fix task for a BUG, executed by code-repair |
 | `CLOSURE` | `CLOSURE-NNNN` | `defect-manager` (chain) | Defect | Human closure approval task for a resolved BUG |
 | `CR` | `CR-NNNN` | `change-request-manager` | Change | A change request with impact analysis and task delta |
+| `FEATURE` | `FEATURE-NNN` | `gap-to-skill-pipeline` / human authoring | Enhancement | A multi-task feature item with folder structure (request, plan, tasks, status) |
 
 ### ID Sequence Rules
 
 - Each type has its own independent sequence (BUG-0001 and TASK-0001 can coexist)
 - Sequences are tracked in the in-state index: `work_items.sequences.{TYPE}` = last assigned number
 - IDs are zero-padded to 4 digits (0001–9999). If a type exceeds 9999, emit warning and continue with 5-digit IDs
+- `FEATURE` IDs use 3-digit zero-padding (`FEATURE-001`–`FEATURE-999`); sequence tracked at `work_items.sequences.FEATURE`
 - Companion IDs **share the same number as their parent** for traceability: TASK-0042 → REVIEW-0042, TEST-0042, VALIDATION-0042, DOC-0042
 - Defect chain IDs use the **BUG number as a namespace**: BUG-0001 → FIX-0001, INVESTIGATION-0001, CLOSURE-0001
+- `FEATURE` items use the **folder format** (`work-items/features/FEATURE-NNN-name/`) — not flat files; they are never stored as `FEATURE-NNN-*.md` at the root `work-items/` level
 
 ---
 

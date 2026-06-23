@@ -1,7 +1,7 @@
 meta:
-  version: 3.1.0
+  version: 3.2.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: "2026-06-23"
+  last_updated: "2026-06-24"
   description: Central skills index for the AI Workflow system
 skills:
   - id: SKL-001
@@ -1449,3 +1449,33 @@ skills:
     mastery_level: beginner
     use_when: Validating a work item state transition before writing it to the work_items scope. Acts as a governance gate in all work lifecycle pipelines. Initial deployment mode is warning.
     do_not_use_when: Reading work items or querying state without a pending transition. This guard evaluates transitions only — not general work item queries.
+  - id: SKL-065
+    name: Gap-to-Skill Pipeline
+    short_description: Reactive pipeline entry skill — converts a logged capability gap into a registered draft skill, enforcing dedup check, quality scoring, and non-bypassable HITL approval before registration
+    reference_path: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Human-in-the-Loop"
+    executable_skill: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+    tags:
+      - reactive
+      - gap-detection
+      - skill-generation
+      - hitl
+      - pipeline
+      - meta
+      - phase-6
+    version: 1.0.0
+    depends_on:
+      - SKL-047
+      - SKL-012
+      - SKL-015
+    related_skills:
+      - SKL-048
+      - SKL-010
+    mastery_level: advanced
+    use_when: |
+      A capability gap has been logged in session state (gap_context present). Run to convert the gap into a draft skill through dedup-checked, HITL-governed skill-authoring and quality-scoring.
+    do_not_use_when: |
+      No gap_context is present in session state. Do not invoke autonomously — requires a prior capability gap detection event (FEATURE-001) to populate gap_context. Never skip the HITL gate.

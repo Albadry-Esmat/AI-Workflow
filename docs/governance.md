@@ -309,3 +309,21 @@ The following actions require **explicit HITL approval before taking effect**:
 5. `adaptation-applicator` (SKL-051) **never proceeds without `hitl_status == "approved"`** — this check is Step 1 and unconditional.
 6. No skill in the adaptation pipeline can modify governance rules, guard skill configurations, or HITL gate thresholds.
 7. Adding or modifying any adaptation pipeline skill requires updating this file AND `changelog.md`.
+
+---
+
+### §5.1 — Skill Approval Tiers (FEATURE-003, v5.1.0+)
+
+All skills in the registry carry an `approval_tier` value in their `origin_metadata` that governs the minimum review process required at registration:
+
+| Tier | When assigned | Minimum review requirements |
+|------|---------------|------------------------------|
+| `standard` | Human-authored skill created in a design session | Full quality-scoring (≥ 70/100) + explicit HITL sign-off |
+| `expedited` | Gap-triggered skill produced by the gap-to-skill pipeline (SKL-065) | quality-scoring auto-run (any pass score) + HITL sign-off (non-bypassable) |
+| `legacy` | Any skill created before v5.1.0 (pre-FEATURE-003) | No retroactive review required; treated as approved |
+
+All tiers require `scripts/validate-skills.sh` to exit 0.
+
+HITL sign-off is **mandatory** for `standard` and `expedited` tiers — it cannot be bypassed by any automation, pipeline, or configuration flag.
+
+Skills lacking `origin_metadata` (pre-v5.1.0 registrations) are treated as `approval_tier: legacy`. `validate-skills.sh` emits `WARN: missing origin_metadata (pre-v5.1.0 skill, exempted)` for these entries — exit 0 (not an error).

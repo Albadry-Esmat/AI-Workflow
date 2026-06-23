@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "5.1.0",
   "description": "Central registry of all skills in the Skill System Standard",
   "parallel_groups": [
     {
@@ -341,7 +341,7 @@
     },
     {
       "name": "orchestrator",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/orchestrator/SKILL.md",
@@ -401,7 +401,7 @@
     },
     {
       "name": "skill-authoring",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "active",
       "domain": "meta",
       "path": ".opencode/skills/skill-authoring/SKILL.md",
@@ -1734,11 +1734,13 @@
     },
     {
       "name": "behavioral-telemetry-collector",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/behavioral-telemetry-collector/SKILL.md",
-      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag — exits immediately if opted out. Ring-buffer storage of up to 500 events per session.",
+      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag — exits immediately if opted out. Ring-buffer storage of up to 500 events per session. Supports capability_gap event type (FEATURE-001).",
+      "phase": 6,
+      "req_id": "N16",
       "inputs": [
         "event_type",
         "skill_name",
@@ -1747,6 +1749,8 @@
         "duration_ms",
         "outcome",
         "hitl_verdict",
+        "detected_domain",
+        "gap_id",
         "current_state"
       ],
       "outputs": [
@@ -1768,11 +1772,13 @@
     },
     {
       "name": "session-insights",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/session-insights/SKILL.md",
-      "description": "Aggregates behavioral telemetry events into per-skill performance metrics: invocation counts, success/failure rates, HITL rejection ratios, p95 latency. Writes session_summary to state. Read-only on events array.",
+      "description": "Aggregates behavioral telemetry events into per-skill performance metrics: invocation counts, success/failure rates, HITL rejection ratios, p95 latency. Writes session_summary to state. Includes gap metrics (total_capability_gaps, top_gap_domains, gap_ids) — FEATURE-001. Read-only on events array.",
+      "phase": 6,
+      "req_id": "N16",
       "inputs": [
         "telemetry_events",
         "session_id",
@@ -2165,6 +2171,50 @@
       "produces_for": [],
       "orchestration": "validation_check",
       "feedback_routes": []
+    },
+    {
+      "name": "gap-to-skill-pipeline",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "meta",
+      "path": ".opencode/skills/gap-to-skill-pipeline/SKILL.md",
+      "description": "Reactive pipeline converting a logged capability gap into a registered draft skill. Restores gap_context, pre-populates skill-authoring scaffold (gap_seed mode), runs quality scoring, and requires non-bypassable HITL approval before registration. Entry skill for the gap-to-skill pipeline template.",
+      "inputs": [
+        "session_state",
+        "session_id"
+      ],
+      "outputs": [
+        "registered_skill_id",
+        "pipeline_outcome",
+        "retry_context_written",
+        "gap_id",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "skill-authoring@^1.1.0",
+        "quality-scoring@^1.0.0",
+        "behavioral-telemetry-collector@^1.1.0"
+      ],
+      "produces_for": [],
+      "orchestration": "Entry skill of gap-to-skill pipeline; user-initiated or suggested by orchestrator after capability_gap detection",
+      "phase": 6,
+      "req_id": "N19",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "pipeline_outcome == 'error'",
+          "description": "Surface error details to orchestrator for user display"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
     }
   ]
 }

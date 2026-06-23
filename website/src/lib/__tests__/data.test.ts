@@ -91,7 +91,7 @@ describe("loadRegistry", () => {
     for (const entry of registry) {
       expect(Array.isArray(entry.inputs)).toBe(true);
       expect(Array.isArray(entry.outputs)).toBe(true);
-      expect(["active", "deprecated", "retired"]).toContain(entry.status);
+      expect(["active", "deprecated", "retired", "draft"]).toContain(entry.status);
     }
   });
 });
@@ -119,9 +119,9 @@ describe("loadSkillGraph", () => {
 // ─── loadPipeline ─────────────────────────────────────────────────────────────
 
 describe("loadPipeline", () => {
-  it("has 15 phases", () => {
+  it("has 17 phases", () => {
     const pipeline = loadPipeline();
-    expect(pipeline.phases.length).toBe(15);
+    expect(pipeline.phases.length).toBe(17);
   });
 
   it("has a recovery block with required fields", () => {

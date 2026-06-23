@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.2.0
+version: 1.3.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -82,6 +82,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `skills/pipelines/pre-deploy.json` | Pre-deployment checks | testing-strategy → deployment-strategy |
 | `skills/pipelines/defect-lifecycle.json` v1.1.0 | Defect intake → triage → fix → closure | defect-manager |
 | `skills/pipelines/change-request.json` v1.1.0 | CR intake → impact → re-plan → delivery | change-request-manager |
+| `skills/pipelines/gap-to-skill.json` v1.0.0 | Reactive gap → skill creation → HITL approval → registration | gap-to-skill-pipeline (SKL-065) |
 
 ## Execution Logic
 
@@ -93,9 +94,71 @@ Step 0 — Normalize prompt via prompt-normalizer (SKL-040)
   If action = "route_immediately": use normalized_prompt and detected pipeline for Step 1.
   Output: normalized_payload, selected_pipeline
 
+Step 0.5 — Retry check (FEATURE-005)
+  IF session_state["retry_context"] is present AND not expired:
+    Display:
+      "A retry is available for your previous request.
+       Original request:   '<raw_prompt>'
+       Skill registered:   <registered_skill_id>
+       Retry now?          [YES]  [NO]  [LATER]"
+
+    ── YES ──────────────────────────────────────────────────────────────────
+    SET session_state["retry_in_progress"] = true
+    Re-route raw_prompt through Step 1 routing table.
+    IF match found (confidence ≥ 0.5):
+      Execute matched skill pipeline normally.
+      Clear session_state["retry_context"]
+      Clear session_state["retry_in_progress"]
+    ELSE (no match):
+      Display:
+        "The new skill (<registered_skill_id>) did not match this request.
+         Consider refining its trigger patterns via skill-authoring (refactor mode)."
+      DO NOT emit a capability_gap event — retry_in_progress guard blocks gap emission.
+      Clear session_state["retry_context"]
+      Clear session_state["retry_in_progress"]
+
+    ── NO ───────────────────────────────────────────────────────────────────
+    Clear session_state["retry_context"]
+    Continue processing current user request normally.
+
+    ── LATER ────────────────────────────────────────────────────────────────
+    Do NOT modify retry_context (TTL continues unchanged).
+    Continue processing current user request normally.
+
+  Output: retry_handled (bool)
+
 Step 1 — Resolve pipeline from registry
   Look up each skill name in registry.json. Resolve file path, version, input/output schemas.
   Validate that all dependencies (consumes_from) are satisfied.
+
+  ─── ROUTING DEAD-END / GAP DETECTION (FEATURE-001) ────────────────────────
+  IF no skill matches above confidence threshold (< 0.5) AND normalized_payload.action != "request_pipeline_selection":
+
+    ── Recursion guards ──────────────────────────────────────────────────────
+    IF session_state["gap_to_skill_active"] == true:
+      Surface: "Cannot log a gap from within the gap-to-skill pipeline."
+      HALT — do not emit gap event.
+    IF session_state["retry_in_progress"] == true:
+      Surface: "No skill matched the retried request."
+      HALT — do not emit gap event (retry guard).
+
+    ── Classify and emit gap ─────────────────────────────────────────────────
+    1. Classify failure as `capability_gap` (not generic routing error)
+    2. Extract intent domain from raw prompt (one of: testing, security, deployment,
+       architecture, data, frontend, mobile, embedded, skill-management, unknown)
+    3. Generate gap_id (UUID v4)
+    4. Emit `capability_gap` event to behavioral-telemetry-collector (SKL-047):
+         { event_type: "capability_gap", session_id, skill_name: "orchestrator",
+           detected_domain, gap_id, timestamp: <now> }
+    5. Write gap_context to session state (TTL: 3600 s):
+         { gap_id, raw_prompt: <original>, detected_domain, timestamp }
+    6. Surface to user:
+         "No skill is available for this request. The capability gap has been logged
+          (domain: `<detected_domain>`). You can create a new skill to handle it using
+          the gap-to-skill workflow."
+    HALT — do not proceed to pipeline execution.
+  ─────────────────────────────────────────────────────────────────────────────
+
   Output: resolved skill sequence with dependency graph
 
 Step 2 — Load session context
@@ -249,6 +312,8 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - **Parallel write-back serialization (D3):** When `mode: "parallel"` or `parallel_groups` are used, concurrent skill execution is permitted, but writes to `session_context` MUST be serialized. Implement a write queue: each group's output is appended to `session_context` only after the previous group's write completes. Race conditions in session_context are a pipeline-integrity error.
 - **ADR canonical source:** All ADR writes go to `scope: "adr_index"` via state-manager. Do NOT write to `decision_log.adrs` (deprecated). The `adr_index` scope is the single source of truth for all architecture decisions.
 - **Prompt normalization gate:** Step 0 (prompt-normalizer SKL-040) MUST complete before any pipeline resolution begins. A `halt` or `ask_clarification` result from SKL-040 terminates the orchestrator immediately with a clarification request to the user.
+- **Gap detection recursion guard (FEATURE-001):** The orchestrator MUST check `session_state["gap_to_skill_active"]` before emitting any `capability_gap` event. If `gap_to_skill_active == true`, gap emission is suppressed and an error is surfaced.
+- **Retry recursion guard (FEATURE-005):** The orchestrator MUST check `session_state["retry_in_progress"]` before emitting any `capability_gap` event. If `retry_in_progress == true`, gap emission is suppressed. This breaks the retry → no-match → new-gap → new-retry infinite loop.
 
 ## 8. Security Considerations
 

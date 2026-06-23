@@ -1,10 +1,183 @@
 # Changelog — System Update History
 
-**Version:** 4.0.1 | **Last updated:** 2026-06-23
+**Version:** 4.1.0 | **Last updated:** 2026-06-24
 
 All notable changes to this project are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+
+---
+
+## [Unreleased] — Enhancement Roadmap v4.1.0 → v5.1.0
+
+### Implemented — Phase 6: Reactive Intelligence (5 Features, 24 Story Points)
+
+Phase 6 adds a reactive intelligence layer: capability gap detection, skill deduplication, skill origin trace metadata, and a gap-to-skill guided pipeline with HITL approval and automatic retry. See `docs/enhancements/phase-6-v5.1.0-reactive-intelligence.md` for the full feature list and dependency graph.
+
+**Phase 6 feature files — v5.1.0 Reactive Intelligence (5 features, 24 SP):**
+- FEATURE-001: Capability gap detection + telemetry — structured gap events, `gap_context` session state, SKL-047 extension, SKL-048 gap metrics
+- FEATURE-002: Skill deduplication check — Step 0 guard in `skill-authoring` (create/gap_seed modes), HITL options A/B/C
+- FEATURE-003: Skill origin trace + approval tier metadata — `origin_metadata` in registry, `docs/governance.md` §5.1
+- FEATURE-004: Gap-to-skill reactive pipeline — SKL-065 new skill, `gap_seed` mode in skill-authoring, non-bypassable HITL gate
+- FEATURE-005: Gap retry execution — orchestrator retry block, `retry_context` session state, recursion guard
+
+**Implementation summary (2026-06-24):**
+
+_FEATURE-001 — Capability Gap Detection + Telemetry:_
+- `behavioral-telemetry-collector` (SKL-047) bumped to v1.1.0: added `capability_gap` event type with `detected_domain` and `gap_id` fields
+- `session-insights` (SKL-048) bumped to v1.1.0: added gap metrics (`total_capability_gaps`, `top_gap_domains`, `gap_ids`) to output
+- `orchestrator` bumped to v1.3.0: Step 1 gap detection block (emit `capability_gap` event on no-match) + Step 0.5 retry check block + recursion guards
+- `skills/schema/system-state-schema.json`: added `gap_context`, `gap_to_skill_active`, `retry_context`, `retry_in_progress` properties; `"gap-to-skill"` appended to `pipeline_template` enum
+
+_FEATURE-002 — Skill Deduplication Check:_
+- `skill-authoring` (SKL-012) bumped to v1.1.0: Step 0 dedup guard added (DEDUP_CLEAR/DEDUP_HIT paths, Jaccard similarity, HITL options A/B/C)
+- `skills/schema/dedup-check-result.schema.json` created
+
+_FEATURE-003 — Skill Origin Trace + Approval Tier Metadata:_
+- `skills/schema/registry-entry.schema.json` created with `origin_metadata` object (triggered_by, gap_id, dedup_override, created_by, approved_by, approval_tier)
+- `skill-authoring` Step 9 now populates `origin_metadata` at registration time
+- `docs/governance.md` §5.1 Approval Tiers added (standard / expedited / legacy)
+
+_FEATURE-004 — Gap-to-Skill Reactive Pipeline:_
+- `.opencode/skills/gap-to-skill-pipeline/SKILL.md` created (SKL-065, v1.0.0, 13 sections, status: draft)
+- `skills/pipelines/gap-to-skill.json` created and schema-validated against `pipeline-schema.json`
+- `skill-authoring` operation enum extended with `gap_seed`
+- `skills/registry.json`: SKL-065 registered (draft); 59 total skills
+- `skills/index.yaml`: SKL-065 entry added (v3.2.0); 59 total entries
+- `skills/graph/skill-graph.yaml`: SKL-065 node added; 4 new edges (SKL-047→SKL-065, SKL-048→SKL-065, SKL-065→SKL-012, SKL-065→SKL-015); total_nodes 59, total_edges 162
+
+_FEATURE-005 — Gap Retry Execution:_
+- `orchestrator` Step 0.5 retry check block: YES/NO/LATER paths, `retry_in_progress` guard, no-match path suppresses duplicate gap emission
+- `skills/schema/system-state-schema.json`: `retry_context` + `retry_in_progress` properties added
+
+**Bugs closed as part of Phase 6:**
+- BUG-009: FEATURE-001/plan.md — "Create" corrected to "Extend" for SKL-047/SKL-048; §5 text corrected
+- BUG-010: FEATURE-004/plan.md + request.md — stale SKL-049 references corrected to SKL-065 throughout
+- BUG-011: FEATURE-004/plan.md — `mode = gap_seed` corrected to `operation = gap_seed`; table column renamed
+- BUG-012: `system-state-schema.json` — `"gap-to-skill"` appended to `pipeline_template` enum
+
+**Validation gate (2026-06-24):**
+- `validate-skills.sh` — 97 passed, 0 failed ✅
+
+**New work item format established (FEATURE-NNN folders):**
+- `work-items/features/FEATURE-001-capability-gap-detection/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-002-skill-deduplication-check/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-003-skill-origin-trace-metadata/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-004-gap-to-skill-pipeline/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-005-gap-retry-execution/` — request.md, plan.md, tasks.md, status.md
+
+---
+
+### Planned — Enhancement Roadmap (37 Tasks, 5 Phases, 211 Story Points)
+
+Full enhancement roadmap created and all 37 task files authored. Roadmap covers v4.1.0 through v5.0.0 across 5 delivery phases. See `docs/enhancements/README.md` for the master index, dependency graph, risk register, and milestone table.
+
+**Work Item Management System established:**
+- New directory structure under `work-items/`: `features/`, `bugs/`, `backlog/`, `indexes/`
+- `work-items/README.md` — documents both legacy `TASK-NNNN` flat format and new WIM folder format
+- `work-items/indexes/features.md` — central catalog of all 37 planned features
+- `work-items/indexes/bugs.md` — central bug catalog (8 historical bugs from v4.0.1 documented)
+- `work-items/backlog/backlog.md` — deferred post-v5.0.0 items + infrastructure backlog
+
+**Phase documentation (5 files):**
+- `docs/enhancements/README.md` — master roadmap with dependency graph, risk register, milestone table
+- `docs/enhancements/phase-1-v4.1.0-consistency-pass.md` — 9 tasks, 20 pts
+- `docs/enhancements/phase-2-v4.2.0-governance-runtime.md` — 8 tasks, 47 pts
+- `docs/enhancements/phase-3-v4.3.0-new-skills-testing.md` — 6 tasks, 48 pts
+- `docs/enhancements/phase-4-v4.4.0-pipeline-expansion.md` — 8 tasks, 49 pts
+- `docs/enhancements/phase-5-v5.0.0-intelligence-dx.md` — 6 tasks, 47 pts
+
+**Phase 1 task files — v4.1.0 Consistency Pass (9 tasks, 20 pts):**
+- TASK-0001: `dry_run` flag — adr-generator (SKL-025)
+- TASK-0002: `dry_run` flag — database-architect (SKL-032)
+- TASK-0003: `dry_run` flag — frontend-ux-architect (SKL-031)
+- TASK-0004: `dry_run` flag — design-system-generator (SKL-038)
+- TASK-0005: `consumes_from` version pinning across 15 skills
+- TASK-0006: `context_ttl` propagation across 8 skills
+- TASK-0007: HITL timeout model documentation — governance.md v2.4.0→v2.5.0
+- TASK-0008: Missing events — event-router (SKL-024) v1.0.0→v1.1.0
+- TASK-0009: Version bumps + registry v4.1.0 release
+
+**Phase 2 task files — v4.2.0 Governance + Runtime (8 tasks, 42 pts):**
+- TASK-0010: `api-contract-guard` new skill (SKL-059, 8 pts) — blocks TASK-0025
+- TASK-0011: `bundle-size-guard` new skill (SKL-060, 5 pts) — blocks TASK-0026
+- TASK-0012: Dark mode compliance — ui-ux-compliance-guard v2.0.0→v2.1.0
+- TASK-0013: Circuit-breaker pattern — orchestrator v1.2.0→v1.3.0
+- TASK-0014: GitHub Actions CI workflows (validate-skills + build-check)
+- TASK-0015: Session state persistence — `.opencode/state/sessions/` (foundational for Phase 5)
+- TASK-0016: Event bus wiring — event-router → live pipeline triggers
+- TASK-0017: Dependency vulnerability scan spec — security-review v1.0.0→v1.1.0
+
+**Phase 3 task files — v4.3.0 New Skills + Testing Depth (6 tasks, 48 pts):**
+- TASK-0018: `environment-config-manager` new skill (SKL-061, 8 pts) — blocks TASK-0026
+- TASK-0019: `release-notes-generator` new skill (SKL-062, 8 pts)
+- TASK-0020: `localization-architect` new skill (SKL-063, 13 pts) — blocks TASK-0021
+- TASK-0021: `i18n-compliance-guard` new skill (SKL-064, 8 pts)
+- TASK-0022: Snapshot + property-based testing — test-generator v1.0.0→v1.1.0
+- TASK-0023: `hreflang` support — seo-optimizer v1.0.0→v1.1.0
+
+**Phase 4 task files — v4.4.0 Pipeline Expansion + Meta-Skill Governance (8 tasks, 49 pts):**
+- TASK-0024: `data-ml-pipeline.json` template (13 pts)
+- TASK-0025: `microservices.json` pipeline template (8 pts, blocked by TASK-0010)
+- TASK-0026: `serverless-edge.json` pipeline template (5 pts, blocked by TASK-0011 + TASK-0018)
+- TASK-0027: Automated quality-scoring gate on skill registration
+- TASK-0028: `skill-lifecycle` stage enforcement — orchestrator v1.3.0→v1.4.0
+- TASK-0029: API versioning strategy — architecture-design v1.3.0→v1.4.0
+- TASK-0030: Effort estimation — change-impact-analyzer v1.1.0→v1.2.0
+- TASK-0031: Stakeholder conflict detection — requirement-analyzer v1.2.0→v1.3.0
+
+**Phase 5 task files — v5.0.0 Intelligence + Observability + DX (6 tasks, 47 pts):**
+- TASK-0032: Cross-session analytics — session-insights v1.0.0→v1.1.0 (blocked by TASK-0015)
+- TASK-0033: Smart routing — context-aware pipeline detection (prompt-normalizer v1.0.0→v1.1.0)
+- TASK-0034: Website Skills page complete — all 59 skills displayed
+- TASK-0035: Prometheus/OpenTelemetry spec — observability full rebuild v0.0.1→v2.0.0
+- TASK-0036: Work item bidirectional Jira sync — work-item-exporter v1.0.0→v2.0.0 (blocked by TASK-0015)
+- TASK-0037: Performance regression baseline — performance-guard v1.0.0→v1.1.0 (blocked by TASK-0015)
+
+**Ecosystem health targets:**
+- Current baseline: v5.1.0, 59 active skills, 16 pipeline templates, ecosystem health 8.2/10
+- After Phase 1 (v4.1.0): consistency stabilized, all 5 state-writing skills have `dry_run`
+- After Phase 2 (v4.2.0): 60 skills (+SKL-059/060), 2 new guards in phase-7b, session state live
+- After Phase 3 (v4.3.0): 64 skills (+SKL-061–064), multi-locale pipeline chain complete
+- After Phase 4 (v4.4.0): 64 skills, 18 pipeline templates (+3 new domains), meta-governance hardened
+- After Phase 5 (v5.0.0): self-improving, observable platform. Ecosystem health target: **9.5/10**
+
+**Critical path:** TASK-0001 → TASK-0009 → TASK-0010 → TASK-0025 → TASK-0026
+
+---
+
+## [5.1.0] — 2026-06-24
+
+### Added — Phase 6: Reactive Intelligence (5 FEATUREs, 24 SP)
+
+- `gap-to-skill-pipeline` (SKL-065 v1.0.0, draft) — new reactive pipeline entry skill: restores gap context, pre-populates skill-authoring scaffold in gap_seed mode, runs quality scoring, enforces non-bypassable HITL approval before registration
+- `skills/pipelines/gap-to-skill.json` — new pipeline template wiring gap-to-skill-pipeline → skill-authoring → quality-scoring with a human_approval gate
+- `skills/schema/dedup-check-result.schema.json` — new schema for structured deduplication check results (DEDUP_CLEAR / DEDUP_HIT)
+- `skills/schema/registry-entry.schema.json` — updated with `origin_metadata` object (source, approval_tier, dedup_override, created_by_session, created_at)
+- `docs/governance.md` §5.1 — Skill Approval Tiers table (standard / expedited / legacy)
+
+### Changed
+
+- `behavioral-telemetry-collector` (SKL-047) v1.0.0 → v1.1.0: added `capability_gap` event type with `detected_domain` and `gap_id` fields
+- `session-insights` (SKL-048) v1.0.0 → v1.1.0: added gap metrics output (total_capability_gaps, top_gap_domains, gap_ids)
+- `orchestrator` v1.2.0 → v1.3.0: Step 1 gap detection block (emit capability_gap on routing no-match) + Step 0.5 retry check block (YES/NO/LATER, retry_in_progress guard) + two recursion guards
+- `skill-authoring` (SKL-012) v1.0.0 → v1.1.0: Step 0 dedup guard (Jaccard similarity, HITL options A/B/C) + gap_seed operation enum + origin_metadata population at registration
+- `skills/schema/system-state-schema.json`: added gap_context, gap_to_skill_active, retry_context, retry_in_progress properties; "gap-to-skill" appended to pipeline_template enum
+- `skills/registry.json`: v4.0.0 → v5.1.0 (Phase 6 Reactive Intelligence layer)
+- `skills/index.yaml`: v3.1.0 → v3.2.0 (SKL-065 entry added; 58 → 59 total skills)
+- `skills/graph/skill-graph.yaml`: v2.7.1 → v2.8.0 (SKL-065 node + 4 edges; total_nodes 58 → 59, total_edges 158 → 162; SKL-012/047/048 versions bumped)
+
+### Fixed
+
+- BUG-009: FEATURE-001/plan.md — "Create" corrected to "Extend" for SKL-047/SKL-048
+- BUG-010: FEATURE-004/plan.md + request.md — stale SKL-049 references corrected to SKL-065
+- BUG-011: FEATURE-004/plan.md — `mode = gap_seed` corrected to `operation = gap_seed`
+- BUG-012: `system-state-schema.json` — `"gap-to-skill"` appended to pipeline_template enum
+
+### Validation
+
+- `validate-skills.sh` — 97 passed, 0 failed ✅
+- `website` test suite — 39 passed, 0 failed ✅
 
 ---
 

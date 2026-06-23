@@ -1,6 +1,6 @@
 ---
 name: behavioral-telemetry-collector
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: 'Use when collecting anonymized behavioral telemetry from pipeline sessions for later insight generation. Triggers on: "collect telemetry", "record session events", "behavioral telemetry", "pipeline behavior tracking". Always checks opt-out flag first — if set, exits immediately without collecting any data. Never collects PII, user inputs, code content, or credentials.'
 author: ASE-OS
@@ -8,7 +8,7 @@ author: ASE-OS
 
 # Behavioral Telemetry Collector
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-20
+**Version:** 1.1.0 | **Last updated:** 2026-06-24
 
 Collects anonymized, PII-scrubbed behavioral events from the skill pipeline to enable post-session insight generation. This skill is the entry point of the observability data pipeline: `Orchestrator → BehavioralTelemetryCollector → TelemetryEventQueue → SessionInsights → EnhancementDashboard`.
 
@@ -18,7 +18,7 @@ Collects anonymized, PII-scrubbed behavioral events from the skill pipeline to e
 
 ```yaml
 name: behavioral-telemetry-collector
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: >
   Anonymized behavioral telemetry sink for the skill pipeline. Checks opt-out
@@ -41,7 +41,7 @@ author: ASE-OS
 This skill does **not** produce alerts, health status, or aggregations — that is the responsibility of `session-insights` (SKL-048). It is a passive collector only.
 
 **What it collects (enum-bound, numeric, or date-time fields only):**
-- `event_type` — one of 6 defined enum values
+- `event_type` — one of 7 defined enum values
 - `skill_name` — registered skill identifier (string, no user content)
 - `timestamp` — ISO 8601 date-time
 - `session_id` — UUID
@@ -63,13 +63,15 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered` |
-| `skill_name` | `string` | Yes | Registered skill name (e.g. `architecture-design`) |
+| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `capability_gap` |
+| `skill_name` | `string` | Yes | Registered skill identifier (e.g. `architecture-design`). Use `"orchestrator"` for `capability_gap` events. |
 | `session_id` | `string` | Yes | UUID v4 session identifier |
 | `pipeline_phase` | `string` | No | Current pipeline phase ID |
 | `duration_ms` | `integer` | No | Wall-clock execution time in milliseconds (for `skill.completed` and `skill.failed`) |
 | `outcome` | `string` | No | One of: `success`, `failure`, `skipped`, `blocked` |
 | `hitl_verdict` | `string\|null` | No | One of: `approved`, `rejected`, `modified`, `timeout`, `null` (for gate events only) |
+| `detected_domain` | `string` | No | For `capability_gap` events only — the classified intent domain (enum-bound). One of: `testing`, `security`, `deployment`, `architecture`, `data`, `frontend`, `mobile`, `embedded`, `skill-management`, `unknown` |
+| `gap_id` | `string` | No | For `capability_gap` events only — UUID v4 of the logged gap (from `gap_context.gap_id`) |
 | `current_state` | `object` | Yes | Scoped read of `behavioral_telemetry` from state-manager (to check opt_out flag) |
 
 **Input Schema:**
@@ -84,12 +86,12 @@ This skill does **not** produce alerts, health status, or aggregations — that 
     "event_type": {
       "type": "string",
       "enum": ["skill.started", "skill.completed", "skill.failed",
-               "gate.passed", "gate.blocked", "feedback.triggered"]
+               "gate.passed", "gate.blocked", "feedback.triggered", "capability_gap"]
     },
-    "skill_name":     { "type": "string", "minLength": 1 },
-    "session_id":     { "type": "string", "format": "uuid" },
-    "pipeline_phase": { "type": "string" },
-    "duration_ms":    { "type": "integer", "minimum": 0 },
+    "skill_name":      { "type": "string", "minLength": 1 },
+    "session_id":      { "type": "string", "format": "uuid" },
+    "pipeline_phase":  { "type": "string" },
+    "duration_ms":     { "type": "integer", "minimum": 0 },
     "outcome": {
       "type": "string",
       "enum": ["success", "failure", "skipped", "blocked"]
@@ -97,6 +99,16 @@ This skill does **not** produce alerts, health status, or aggregations — that 
     "hitl_verdict": {
       "type": ["string", "null"],
       "enum": ["approved", "rejected", "modified", "timeout", null]
+    },
+    "detected_domain": {
+      "type": "string",
+      "enum": ["testing", "security", "deployment", "architecture", "data", "frontend", "mobile", "embedded", "skill-management", "unknown"],
+      "description": "For capability_gap events only."
+    },
+    "gap_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "For capability_gap events only."
     },
     "current_state": {
       "type": "object",
@@ -127,9 +139,10 @@ Step 1 — Opt-out gate (UNCONDITIONAL FIRST CHECK)
   Output: opt_out_cleared = true
 
 Step 2 — Validate event inputs
-  Verify event_type is one of 6 known event types.
+  Verify event_type is one of 7 known event types.
   Verify session_id is a valid UUID v4.
   Reject path traversal patterns in session_id (../  /etc/  etc.).
+  For capability_gap events: verify detected_domain is in the allowed enum; verify gap_id is a valid UUID v4.
   IF validation fails: return { collected: false, reason: "invalid_input", events_written: 0 }
   Output: validated_event
 
@@ -162,6 +175,12 @@ Step 4 — Construct anonymized event record
       hitl_verdict:   <enum/null or omitted>,
       pipeline_phase: <scrubbed or omitted>
     }
+  For capability_gap events, also include (never omit if present):
+    {
+      gap_domain:     <detected_domain enum value — not user text>,
+      gap_id:         <validated UUID>
+    }
+  Deduplication: capability_gap events with identical (session_id, gap_id) are silently dropped.
   Output: anonymized_event
 
 Step 5 — Initialize or load current behavioral_telemetry state
@@ -371,4 +390,5 @@ collection_points:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1.0 | 2026-06-24 | FEATURE-001: Added `capability_gap` event type; added `detected_domain` + `gap_id` input fields; dedup rule for (session_id, gap_id) pairs |
 | 1.0.0 | 2026-06-20 | Initial version — opt-out gate, PII scrubber, ring-buffer event collection, state-manager integration |

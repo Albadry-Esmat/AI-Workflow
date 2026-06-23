@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-version: 1.0.0
+version: 1.1.0
 domain: meta
 description: 'Use ONLY when creating, refactoring, splitting, validating, or evolving a skill in the skill system. Triggers on: "create a new skill", "add a skill", "refactor this skill", "split this skill", "validate this skill", "evolve the skill", "skill authoring". Do NOT use for general code tasks.'
 author: system
@@ -18,7 +18,7 @@ Every skill in the system was produced (or should be producible) by running this
 |-------|------|----------|-------------|
 | `intent` | `string` | Yes | Raw description of the needed capability — what should the skill do? |
 | `domain` | `string` | Yes | Domain category (e.g., `requirements`, `review`, `meta`) |
-| `operation` | `string` | Yes | `new`, `refactor`, `split`, `validate`, or `evolve` |
+| `operation` | `string` | Yes | `new`, `refactor`, `split`, `validate`, `evolve`, or `gap_seed` |
 | `source_material` | `string` | No | Raw knowledge: book chapters, documentation, domain rules |
 | `existing_skill_id` | `string` | No | `SKL-NNN` — required for `refactor`, `split`, `validate`, `evolve` |
 | `dependency_hints` | `array[string]` | No | Suspected related skill IDs from existing index |
@@ -34,7 +34,7 @@ Every skill in the system was produced (or should be producible) by running this
   "properties": {
     "intent": { "type": "string", "minLength": 10 },
     "domain": { "type": "string", "minLength": 1 },
-    "operation": { "type": "string", "enum": ["new", "refactor", "split", "validate", "evolve"] },
+    "operation": { "type": "string", "enum": ["new", "refactor", "split", "validate", "evolve", "gap_seed"] },
     "source_material": { "type": "string" },
     "existing_skill_id": { "type": "string", "pattern": "^SKL-\\d{3}$" },
     "dependency_hints": { "type": "array", "items": { "type": "string", "pattern": "^SKL-\\d{3}$" } },
@@ -56,6 +56,36 @@ Every skill in the system was produced (or should be producible) by running this
 ## Execution Logic
 
 ```
+Step 0 — Deduplication guard (FEATURE-002 — create and gap_seed operations only)
+  SKIP this step for: refactor, split, validate, evolve.
+
+  INPUT: proposed_triggers (from intent or gap_context seed), proposed_description, proposed_domain
+
+  1. Load skills/registry.json — all active + draft skills
+  2. Filter: keep skills whose domain matches proposed_domain
+     (if proposed_domain == "unknown", check all skills)
+  3. For each candidate skill C:
+       token_overlap = |proposed_triggers ∩ C.triggers| / |proposed_triggers ∪ C.triggers|
+       desc_overlap  = jaccard(tokenize(proposed_description), tokenize(C.description))
+       similarity    = (0.6 × token_overlap) + (0.4 × desc_overlap)
+  4. Sort candidates by similarity DESC; take top 3
+  5. IF max(similarity) ≥ 0.75 → DEDUP_HIT
+       Present to user:
+         "⚠️  Potential duplicate detected before scaffold generation:
+          • <skill_id> \"<name>\"  (similarity: <score>)
+            Overlapping triggers: [...]
+          Options:
+            [A] Extend <skill_id> instead (redirect to refactor mode)
+            [B] Proceed anyway (dedup override recorded in origin_metadata)
+            [C] Cancel"
+       Wait for explicit choice — no default, no timeout auto-selection.
+       Option A → Halt; redirect user to skill-authoring in `refactor` mode.
+       Option B → Set dedup_override = true; record override_reason; proceed to Step 1.
+       Option C → Halt; no state written.
+     ELSE (max similarity < 0.75) → DEDUP_CLEAR; proceed to Step 1.
+
+  Output: dedup_result { status: "DEDUP_CLEAR"|"DEDUP_HIT", override_approved, override_reason }
+
 Step 1 — Analyze requirement and determine operation
   Parse intent for: capability, domain, caller contexts, and expected output type.
   If existing_skill_id provided: load that skill's metadata from index.yaml.
@@ -65,6 +95,8 @@ Step 1 — Analyze requirement and determine operation
     split:    one skill covers multiple responsibilities → split into N atomic skills
     validate: check correctness of an existing skill without modification
     evolve:   capability exists but needs new functionality or version bump
+    gap_seed: inputs are pre-populated from gap_context seed; author confirms or overrides each field
+              (Step 0 still runs against pre-populated triggers; Steps 1–4 use seed values as defaults)
   Output: parsed capability spec + confirmed operation type
 
 Step 2 — Extract reusable patterns
@@ -169,8 +201,15 @@ Step 8 — Multi-layer validation
 
 Step 9 — Register in skill index
   If validation_report.passed is true:
-    Append skill_metadata_entry to skills/index.yaml (in dependency order)
-    Append skill entry to skills/registry.json
+    Construct origin_metadata (FEATURE-003):
+      source             = "gap-triggered" if gap_context present in session state, else "human"
+      created_by_session = current session_id (or null if not available)
+      approval_tier      = "expedited" if invoked from gap-to-skill pipeline, else "standard"
+      dedup_override     = true if Step 0 returned DEDUP_HIT and user chose Option B, else false
+      dedup_override_reason = user justification string if dedup_override == true, else null
+      created_at         = current UTC timestamp (ISO-8601)
+    Append skill_metadata_entry (with origin_metadata) to skills/index.yaml (in dependency order)
+    Append skill entry (with origin_metadata) to skills/registry.json
     Apply graph_delta to skills/graph/skill-graph.yaml
     Bump index meta.version (MINOR for new skill, PATCH for validate/evolve)
     Trigger doc-maintainer (SKL-011) to update docs/skills-registry.md
@@ -202,6 +241,7 @@ Step 10 — Generate activation tests
 | `version_assignment` | `string` | Semver string assigned to the skill |
 | `activation_tests` | `array[object]` | Positive, negative, and edge-case activation scenarios |
 | `quality_score` | `object` | 7-dimension score (clarity, completeness, reusability, etc.) |
+| `origin_metadata` | `object` | Provenance and approval metadata populated at Step 9 (FEATURE-003) |
 | `metrics` | `object` | Standard execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array[object]` | Backpropagation entries if upstream changes needed |
 
@@ -262,13 +302,26 @@ Step 10 — Generate activation tests
       },
       "required": ["dimensions", "total", "grade"]
     },
+    "origin_metadata": {
+      "type": "object",
+      "description": "Provenance and approval metadata written at Step 9 (FEATURE-003).",
+      "properties": {
+        "source":                { "type": "string", "enum": ["human", "gap-triggered", "migrated", "unknown"] },
+        "created_by_session":    { "type": ["string", "null"] },
+        "approval_tier":         { "type": "string", "enum": ["standard", "expedited", "legacy"] },
+        "dedup_override":        { "type": "boolean" },
+        "dedup_override_reason": { "type": ["string", "null"] },
+        "created_at":            { "type": "string", "format": "date-time" }
+      },
+      "required": ["source", "approval_tier", "created_at"]
+    },
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
   },
   "required": [
     "skill_metadata_entry", "skill_md_content", "knowledge_file_content",
     "graph_delta", "validation_report", "registration_status",
-    "version_assignment", "activation_tests", "quality_score", "metrics"
+    "version_assignment", "activation_tests", "quality_score", "origin_metadata", "metrics"
   ],
   "$defs": {
     "metrics": {

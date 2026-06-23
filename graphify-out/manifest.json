@@ -30,8 +30,8 @@
     "semantic_hash": "79bd0cd655cc4d7524f81ccf894ce933"
   },
   "scripts/validate-skills.sh": {
-    "mtime": 1781996676.5481198,
-    "ast_hash": "cd3a6c2fabf2ae3beeb4758f462cf900",
+    "mtime": 1782255384.0942452,
+    "ast_hash": "4719fef65e5e128228c94ca4200cd3ec",
     "semantic_hash": ""
   },
   "skills/pipelines/admin-panel.json": {
@@ -55,8 +55,8 @@
     "semantic_hash": "2bfa99c7d372b71258d4adaee44057c8"
   },
   "skills/pipelines/full-pipeline.json": {
-    "mtime": 1782226726.1989636,
-    "ast_hash": "a1844b06bf850c15637da6c6859e9c7b",
+    "mtime": 1782227629.896839,
+    "ast_hash": "319577b7008369ad987d8bc78eba28ec",
     "semantic_hash": ""
   },
   "skills/pipelines/pre-deploy.json": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "skills/registry.json": {
-    "mtime": 1782226069.8915558,
-    "ast_hash": "3b851d06f9fb74fed955364799848bb0",
+    "mtime": 1782255352.5252743,
+    "ast_hash": "65c7e79649eb4f5936b5e43c958656e7",
     "semantic_hash": ""
   },
   "skills/schema/pipeline-schema.json": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "skills/schema/system-state-schema.json": {
-    "mtime": 1782121504.4563935,
-    "ast_hash": "75598701d0ab38a7c01355cf7adcda92",
+    "mtime": 1782252380.3034735,
+    "ast_hash": "73c621d2221be054fa545e76e34548f3",
     "semantic_hash": ""
   },
   "vercel.json": {
@@ -255,8 +255,8 @@
     "semantic_hash": "4ebaa933468849b2baabc0a0dc05fa6d"
   },
   "website/src/lib/__tests__/data.test.ts": {
-    "mtime": 1781996500.311107,
-    "ast_hash": "7bace3131179950fd0ad94c42ae6d837",
+    "mtime": 1782255203.5061417,
+    "ast_hash": "b25bc4db4f080604e2f673a28a7c14cc",
     "semantic_hash": ""
   },
   "website/src/lib/colors.ts": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/feature-planning/SKILL.md": {
-    "mtime": 1782122086.6575425,
-    "ast_hash": "fc2472462929f9e58657c97612673f69",
+    "mtime": 1782228040.6725645,
+    "ast_hash": "f61346cb6f974efea1175c12b538ad8e",
     "semantic_hash": ""
   },
   ".opencode/skills/frontend-ux-architect/SKILL.md": {
@@ -460,8 +460,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/orchestrator/SKILL.md": {
-    "mtime": 1782226200.548452,
-    "ast_hash": "ad9a5c9ff9e2828b4c56f2e667d6daad",
+    "mtime": 1782252599.2789445,
+    "ast_hash": "5fd93927b57ab10f6dc550fd6051c0be",
     "semantic_hash": ""
   },
   ".opencode/skills/performance-guard/SKILL.md": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/skill-authoring/SKILL.md": {
-    "mtime": 1781745910.313309,
-    "ast_hash": "94723124668fb01a75f715af5821454c",
+    "mtime": 1782252694.462252,
+    "ast_hash": "b21963b0ed9dd509d3adb0ad8db893a5",
     "semantic_hash": ""
   },
   ".opencode/skills/skill-lifecycle/SKILL.md": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "docs/changelog.md": {
-    "mtime": 1782227111.2766013,
-    "ast_hash": "824a82638ac1e3557ef97bfe2bf19797",
+    "mtime": 1782255259.2450178,
+    "ast_hash": "f557735487111c11cdef89c657539f09",
     "semantic_hash": ""
   },
   "docs/context-engineering.md": {
@@ -605,8 +605,8 @@
     "semantic_hash": ""
   },
   "docs/governance.md": {
-    "mtime": 1782217666.9795506,
-    "ast_hash": "36cd1404b9acefdf5e1345bacdbbcb93",
+    "mtime": 1782252741.2719474,
+    "ast_hash": "862b18e2623659368ef0203ae205b37f",
     "semantic_hash": ""
   },
   "docs/how-to-use.md": {
@@ -675,13 +675,13 @@
     "semantic_hash": ""
   },
   "skills/graph/skill-graph.yaml": {
-    "mtime": 1782223731.1289947,
-    "ast_hash": "b4a89a18527c7032fe29053bc64e64e2",
+    "mtime": 1782254632.400668,
+    "ast_hash": "271c717b493521f6f4c29048b0882423",
     "semantic_hash": ""
   },
   "skills/index.yaml": {
-    "mtime": 1782224386.185796,
-    "ast_hash": "fb09e692378e2d48eda0f60574e56493",
+    "mtime": 1782254600.7047331,
+    "ast_hash": "53f254b35d7dd566bf36dc3124c10e37",
     "semantic_hash": ""
   },
   "skills/knowledge/adr-generator.md": {
@@ -1100,8 +1100,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/behavioral-telemetry-collector/SKILL.md": {
-    "mtime": 1781952621.672422,
-    "ast_hash": "cd863b63bc6e0d7c873794093c0c659b",
+    "mtime": 1782252471.6799111,
+    "ast_hash": "8584a6eb1965c998741f2eb967dbf8a5",
     "semantic_hash": ""
   },
   ".opencode/skills/ci-pipeline-generator/SKILL.md": {
@@ -1140,8 +1140,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/session-insights/SKILL.md": {
-    "mtime": 1781952698.5580792,
-    "ast_hash": "439a3dcad3b7f5f5683471dd6290e274",
+    "mtime": 1782252528.677697,
+    "ast_hash": "ee9826781e6879871ae09bfbcd44246d",
     "semantic_hash": ""
   },
   ".opencode/skills/systems-specialist/SKILL.md": {
@@ -1185,8 +1185,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/defect-manager/SKILL.md": {
-    "mtime": 1782227240.0557146,
-    "ast_hash": "eeb0615a05119a1daf898c0932b46f32",
+    "mtime": 1782228017.454964,
+    "ast_hash": "f6d4057243cbc50e19f37087a61b410c",
     "semantic_hash": ""
   },
   ".opencode/skills/work-item-exporter/SKILL.md": {
@@ -1220,8 +1220,63 @@
     "semantic_hash": ""
   },
   "docs/work-item-foundation.md": {
-    "mtime": 1782226466.399771,
-    "ast_hash": "3b0aebd36be833b9bf86adf17ac70077",
+    "mtime": 1782239465.8398569,
+    "ast_hash": "098d11f33c564d7aba55a2274d115c49",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/gap-to-skill.json": {
+    "mtime": 1782254567.2458577,
+    "ast_hash": "42bc16836cd792ff31ad31f4e2f78af7",
+    "semantic_hash": ""
+  },
+  "skills/schema/dedup-check-result.schema.json": {
+    "mtime": 1782252710.4506893,
+    "ast_hash": "f69e38746adcd650f8b75850581fd725",
+    "semantic_hash": ""
+  },
+  "skills/schema/registry-entry.schema.json": {
+    "mtime": 1782252721.840055,
+    "ast_hash": "1a39200f9c0013c3a2fea2cb2707695e",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/gap-to-skill-pipeline/SKILL.md": {
+    "mtime": 1782252827.8975182,
+    "ast_hash": "e0f50e27d2e98216fc7adc2c42c5e277",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/README.md": {
+    "mtime": 1782239429.4300919,
+    "ast_hash": "6ddbc57a05f01ed3006454d1e01ec869",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-1-v4.1.0-consistency-pass.md": {
+    "mtime": 1782235353.8883996,
+    "ast_hash": "6a219b7ddebb49df3261d82ae370eb46",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-2-v4.2.0-governance-runtime.md": {
+    "mtime": 1782235372.4333599,
+    "ast_hash": "3fbbf9a77e7542f17c8c7d2c7e913c5b",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-3-v4.3.0-new-skills-testing.md": {
+    "mtime": 1782235389.2901328,
+    "ast_hash": "65479f44e84cf8bb7448952dc65fd1bd",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-4-v4.4.0-pipeline-expansion.md": {
+    "mtime": 1782235414.3327544,
+    "ast_hash": "d8dcd476c931bfc4489031f7e7e43b5b",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-5-v5.0.0-intelligence-dx.md": {
+    "mtime": 1782235438.861895,
+    "ast_hash": "6c583fa1addee4d3374fceb0a356e24f",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-6-v5.1.0-reactive-intelligence.md": {
+    "mtime": 1782239345.2739167,
+    "ast_hash": "4d94e710b88a4423d80a0c2a592f1e41",
     "semantic_hash": ""
   }
 }

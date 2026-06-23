@@ -1,0 +1,43 @@
+{
+  "$schema": "skills/schema/pipeline-schema.json",
+  "name": "gap-to-skill",
+  "version": "1.0.0",
+  "description": "Reactive pipeline: converts a logged capability gap (from FEATURE-001 gap detection) into a registered draft skill, with mandatory non-bypassable HITL approval. Requires gap_context to be present in session state.",
+  "mode": "sequential",
+  "skills": [
+    {
+      "name": "gap-to-skill-pipeline",
+      "note": "Entry skill — restores gap context, generates scaffold seed, coordinates skill-authoring and quality-scoring. Guards: aborts if gap_to_skill_active flag is already set; aborts if gap_context is absent in session state.",
+      "max_retries": 0
+    },
+    {
+      "name": "skill-authoring",
+      "note": "Invoked in gap_seed operation mode — Steps 0 (dedup) through 9 (registration) with seed values pre-populated from gap_context.",
+      "max_retries": 1,
+      "config": {
+        "operation": "gap_seed"
+      }
+    },
+    {
+      "name": "quality-scoring",
+      "note": "Scores the draft SKILL.md output before the HITL gate. Minimum pass score 70; up to 2 revision cycles allowed.",
+      "max_retries": 2
+    }
+  ],
+  "gates": [
+    {
+      "after_skill": "quality-scoring",
+      "type": "human_approval",
+      "label": "Skill Registration Approval",
+      "note": "Non-bypassable human approval gate before skill registration. Presents: skill name, domain, triggers, quality score, approval tier. Options: APPROVE / REJECT / REVISE.",
+      "timeout": 0,
+      "bypass_on_timeout": false
+    }
+  ],
+  "on_failure": "halt",
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_run"
+  }
+}

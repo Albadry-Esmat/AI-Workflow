@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request", "gap-to-skill"]
     },
 
     "created_at": {
@@ -415,7 +415,7 @@
             "properties": {
               "event_type": {
                 "type": "string",
-                "enum": ["skill.started", "skill.completed", "skill.failed", "gate.passed", "gate.blocked", "feedback.triggered"]
+                "enum": ["skill.started", "skill.completed", "skill.failed", "gate.passed", "gate.blocked", "feedback.triggered", "capability_gap"]
               },
               "skill_name":   { "type": "string" },
               "timestamp":    { "type": "string", "format": "date-time" },
@@ -423,7 +423,9 @@
               "duration_ms":  { "type": "integer", "minimum": 0 },
               "outcome":      { "type": "string", "enum": ["success", "failure", "skipped", "blocked"] },
               "hitl_verdict": { "type": ["string", "null"], "enum": ["approved", "rejected", "modified", "timeout", null] },
-              "pipeline_phase": { "type": "string" }
+              "pipeline_phase": { "type": "string" },
+              "gap_domain":   { "type": "string", "description": "For capability_gap events only — the classified intent domain (enum-bound, not free text)." },
+              "gap_id":       { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "description": "For capability_gap events only — UUID of the logged gap." }
             }
           }
         },
@@ -461,6 +463,45 @@
           "description": "Timestamp of the most recent telemetry event recorded in this session."
         }
       }
+    },
+
+    "gap_context": {
+      "type": "object",
+      "description": "Active capability gap context written by orchestrator when a routing dead-end is classified as a gap (FEATURE-001). TTL: 3600 s. Cleared on successful gap-to-skill completion or cancellation. Not in required[] — absent for sessions with no routing dead-ends.",
+      "additionalProperties": false,
+      "required": ["gap_id", "raw_prompt", "detected_domain", "timestamp"],
+      "properties": {
+        "gap_id":          { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "raw_prompt":      { "type": "string", "maxLength": 1000 },
+        "detected_domain": { "type": "string" },
+        "timestamp":       { "type": "string", "format": "date-time" },
+        "expires_at":      { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "gap_to_skill_active": {
+      "type": "boolean",
+      "description": "Recursion guard flag set by gap-to-skill-pipeline (SKL-065) on entry, cleared on completion, rejection, or error. Prevents concurrent gap-to-skill executions within the same session (FEATURE-004)."
+    },
+
+    "retry_context": {
+      "type": "object",
+      "description": "Retry execution context written by gap-to-skill-pipeline (SKL-065) after successful skill registration (FEATURE-005). TTL: 3600 s. Cleared after retry is presented or declined.",
+      "additionalProperties": false,
+      "required": ["retry_id", "gap_id", "raw_prompt", "registered_skill_id", "timestamp"],
+      "properties": {
+        "retry_id":            { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "gap_id":              { "type": "string", "format": "uuid" },
+        "raw_prompt":          { "type": "string", "maxLength": 1000 },
+        "registered_skill_id": { "type": "string", "pattern": "^SKL-\\d{3}$" },
+        "timestamp":           { "type": "string", "format": "date-time" },
+        "expires_at":          { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "retry_in_progress": {
+      "type": "boolean",
+      "description": "Recursion guard flag set by orchestrator during a retry execution (FEATURE-005). Prevents a failed retry from emitting another capability_gap event."
     }
   },
 

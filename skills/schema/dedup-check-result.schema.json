@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/dedup-check-result.json",
+  "title": "DedupCheckResult",
+  "description": "Structured output of the skill deduplication guard (FEATURE-002). Produced by skill-authoring Step 0 for `create` and `gap_seed` operations. Consumed by Step 9 origin_metadata population.",
+  "type": "object",
+  "required": ["status", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["DEDUP_CLEAR", "DEDUP_HIT"],
+      "description": "DEDUP_CLEAR if no match above threshold; DEDUP_HIT if similarity >= 0.75 for at least one candidate."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the dedup check was performed."
+    },
+    "matches": {
+      "type": "array",
+      "description": "Top 3 matching skills (present only when status = DEDUP_HIT). Sorted by similarity_score DESC.",
+      "items": {
+        "type": "object",
+        "required": ["skill_id", "similarity_score", "overlapping_triggers"],
+        "additionalProperties": false,
+        "properties": {
+          "skill_id": {
+            "type": "string",
+            "pattern": "^SKL-\\d{3}$",
+            "description": "ID of the candidate skill."
+          },
+          "similarity_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Weighted similarity: (0.6 × trigger_overlap) + (0.4 × description_overlap)."
+          },
+          "overlapping_triggers": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Trigger phrases that appear in both the proposed and candidate skill."
+          }
+        }
+      },
+      "maxItems": 3
+    },
+    "override_approved": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when status = DEDUP_HIT and the author chose Option B (proceed despite duplicate)."
+    },
+    "override_reason": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Author's justification for proceeding despite a DEDUP_HIT. Null when override_approved = false."
+    }
+  }
+}
