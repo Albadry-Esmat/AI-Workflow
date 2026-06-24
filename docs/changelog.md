@@ -8,6 +8,76 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `C
 
 ---
 
+## [Unreleased] — Enhancement Roadmap v5.3.0 (Phase 8)
+
+### Planned — Phase 8: Data, API, Cloud & SRE Expansion (30 Skills, 180 Story Points)
+
+Phase 8 expands ASE-OS from 71 to 101 skills across 10 new capability domains: data engineering, ML platforms, API contract design, microservices & DDD, distributed resilience, cloud-native architecture, security depth, SRE & reliability, frontend depth, and product analytics. Six new specialist agents and five new pipeline templates are introduced.
+
+**New agents (6):** `data-engineer`, `api-designer`, `distributed-systems`, `cloud-platform`, `security-specialist`, `sre`
+
+**New pipeline templates (5):** `data-engineering.json`, `ml-platform.json`, `api-first.json`, `microservices-platform.json`, `cloud-migration.json`
+
+**Skill files created (2026-06-24):**
+
+*Data Domain (SKL-078–082):*
+- `.opencode/skills/data-pipeline-architect/SKILL.md` (SKL-078, v1.0.0, draft, req_id: N33)
+- `.opencode/skills/data-quality-validator/SKILL.md` (SKL-079, v1.0.0, draft, req_id: N34)
+- `.opencode/skills/ml-pipeline-architect/SKILL.md` (SKL-080, v1.0.0, draft, req_id: N35)
+- `.opencode/skills/analytics-schema-designer/SKILL.md` (SKL-081, v1.0.0, draft, req_id: N36)
+- `.opencode/skills/data-contract-enforcer/SKILL.md` (SKL-082, v1.0.0, draft, req_id: N37)
+
+*API Domain (SKL-083–085):*
+- `.opencode/skills/api-design-architect/SKILL.md` (SKL-083, v1.0.0, draft, req_id: N38)
+- `.opencode/skills/graphql-architect/SKILL.md` (SKL-084, v1.0.0, draft, req_id: N39)
+- `.opencode/skills/event-schema-designer/SKILL.md` (SKL-085, v1.0.0, draft, req_id: N40)
+
+*Architecture Domain (SKL-086–088, SKL-103, SKL-104, SKL-107):*
+- `.opencode/skills/microservices-architect/SKILL.md` (SKL-086, v1.0.0, draft, req_id: N41)
+- `.opencode/skills/event-sourcing-designer/SKILL.md` (SKL-087, v1.0.0, draft, req_id: N42)
+- `.opencode/skills/distributed-resilience-architect/SKILL.md` (SKL-088, v1.0.0, draft, req_id: N43)
+- `.opencode/skills/ddd-architect/SKILL.md` (SKL-103, v1.0.0, draft, req_id: N58)
+- `.opencode/skills/caching-strategy-designer/SKILL.md` (SKL-104, v1.0.0, draft, req_id: N59)
+- `.opencode/skills/realtime-system-architect/SKILL.md` (SKL-107, v1.0.0, draft, req_id: N62)
+
+*Cloud Domain (SKL-089–091):*
+- `.opencode/skills/cloud-architecture-reviewer/SKILL.md` (SKL-089, v1.0.0, draft, req_id: N44)
+- `.opencode/skills/serverless-architect/SKILL.md` (SKL-090, v1.0.0, draft, req_id: N45)
+- `.opencode/skills/container-orchestration-architect/SKILL.md` (SKL-091, v1.0.0, draft, req_id: N46)
+
+*Security Domain (SKL-092–094):*
+- `.opencode/skills/threat-model-designer/SKILL.md` (SKL-092, v1.0.0, draft, req_id: N47)
+- `.opencode/skills/secrets-management-architect/SKILL.md` (SKL-093, v1.0.0, draft, req_id: N48)
+- `.opencode/skills/devsecops-pipeline-designer/SKILL.md` (SKL-094, v1.0.0, draft, req_id: N49)
+
+*Testing/SRE Domain (SKL-095–099):*
+- `.opencode/skills/load-test-designer/SKILL.md` (SKL-095, v1.0.0, draft, req_id: N50)
+- `.opencode/skills/profiling-advisor/SKILL.md` (SKL-096, v1.0.0, draft, req_id: N51)
+- `.opencode/skills/slo-sla-designer/SKILL.md` (SKL-097, v1.0.0, draft, req_id: N52)
+- `.opencode/skills/runbook-generator/SKILL.md` (SKL-098, v1.0.0, draft, req_id: N53)
+- `.opencode/skills/chaos-engineering-designer/SKILL.md` (SKL-099, v1.0.0, draft, req_id: N54)
+
+*Design Domain (SKL-100–102, SKL-105):*
+- `.opencode/skills/state-management-architect/SKILL.md` (SKL-100, v1.0.0, draft, req_id: N55)
+- `.opencode/skills/micro-frontend-architect/SKILL.md` (SKL-101, v1.0.0, draft, req_id: N56)
+- `.opencode/skills/web-performance-optimizer/SKILL.md` (SKL-102, v1.0.0, draft, req_id: N57)
+- `.opencode/skills/localization-architect/SKILL.md` (SKL-105, v1.0.0, draft, req_id: N60)
+
+*Planning Domain (SKL-106):*
+- `.opencode/skills/product-analytics-designer/SKILL.md` (SKL-106, v1.0.0, draft, req_id: N61)
+
+**Registry and index updates (2026-06-24):**
+- `skills/registry.json`: v5.1.0 → v5.2.0 (71 → 101 skills)
+- `skills/index.yaml`: v3.3.0 → v4.0.0 (71 → 101 entries)
+- `skills/graph/skill-graph.yaml`: v2.9.0 → v3.0.0 (71 → 101 nodes, 198 → 328 edges)
+- `opencode.json`: 13 → 19 agents (+6 specialist agents)
+- `skills/pipelines/`: 16 → 21 templates (+5 Phase 8 pipelines)
+- `website/src/lib/colors.ts`: added `data`, `api`, `cloud`, `sre` domain colors
+- `website/src/components/home/FeaturesSection.tsx`: added 6 Phase 8 capability cards
+- `docs/enhancements/README.md`: v1.2.0 → v1.3.0 (54 → 84 items, 348 → 528 pts, 7 → 8 phases)
+
+---
+
 ## [Unreleased] — Enhancement Roadmap v5.2.0 (Phase 7)
 
 ### Planned — Phase 7: Intelligence Expansion (12 Features, 108 Story Points)

@@ -6,6 +6,7 @@ import {
   AlertTriangle, BarChart2, Route, Sparkles, Activity, Lightbulb,
   ClipboardList, Bot, Palette, Wand2,
   Scale, Diff, PlayCircle, GitFork, DollarSign, Layers2,
+  Database, Webhook, Boxes, Cloud, ShieldAlert, Gauge,
 } from "lucide-react";
 
 const FEATURES = [
@@ -177,6 +178,49 @@ const FEATURES = [
     description: "Forks the pipeline at architecture-design into two named branches, runs each through planning and quality skills in parallel, and produces a side-by-side scorecard with a recommendation. A mandatory HITL gate selects the winner before any artifacts are promoted.",
     color: "text-pink-400",
     bg: "bg-pink-500/10",
+  },
+  // ── Phase 8 — Data, API, Cloud, Microservices & SRE ───────────────────────
+  {
+    icon: Database,
+    title: "Data Platform Intelligence",
+    description: "Five data-engineering skills cover the full pipeline lifecycle: batch ETL/streaming design, dbt data quality rules, ML feature store and serving architecture, dimensional analytics schemas, and data contract enforcement between producers and consumers.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    icon: Webhook,
+    title: "API Contract First",
+    description: "Three API design skills produce binding contracts before code is written: OpenAPI 3.1 REST specs with versioning and rate-limiting plans, GraphQL schemas with Apollo Federation topology and authorization directives, and AsyncAPI event catalogs with schema registry enforcement.",
+    color: "text-blue-400",
+    bg: "bg-blue-500/10",
+  },
+  {
+    icon: Boxes,
+    title: "Microservices & DDD",
+    description: "Six distributed-systems skills cover DDD bounded context mapping, microservice decomposition with Conway's Law analysis, CQRS/event-sourcing aggregate design, resilience patterns (circuit breakers, sagas, FMEA), multi-tier caching topologies, and real-time WebSocket/CRDT architectures.",
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+  },
+  {
+    icon: Cloud,
+    title: "Cloud-Native Architecture",
+    description: "Three cloud-platform skills deliver: Well-Architected Framework reviews across AWS, GCP, and Azure with a prioritized remediation roadmap; serverless function topology design with cold-start mitigation; and Kubernetes cluster design with Helm charts, GitOps pipelines, and RBAC models.",
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
+  },
+  {
+    icon: ShieldAlert,
+    title: "Security Depth Layer",
+    description: "Three security-specialist skills go deeper than the base security review: STRIDE threat modeling with MITRE ATT&CK mappings, HashiCorp Vault architecture with secret rotation and PKI design, and DevSecOps pipeline stages with SAST/DAST/SCA/SBOM and SLSA compliance gates.",
+    color: "text-red-400",
+    bg: "bg-red-500/10",
+  },
+  {
+    icon: Gauge,
+    title: "SRE & Reliability Engineering",
+    description: "Five SRE skills operationalize reliability: SLI/SLO/error budget design, k6/Gatling load test scenarios with SLO-gated thresholds, CPU flamegraph and query plan profiling, alert-linked runbook generation with escalation trees, and chaos engineering experiments with GameDay plans and CI chaos gates.",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
   },
 ];
 

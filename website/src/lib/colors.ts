@@ -18,6 +18,10 @@ export const DOMAIN_COLORS: Record<string, { bg: string; text: string; border: s
   governance:     { bg: "bg-rose-500/10",    text: "text-rose-400",    border: "border-rose-500/30",    dot: "bg-rose-400"    },
   system:         { bg: "bg-yellow-500/10",  text: "text-yellow-400",  border: "border-yellow-500/30",  dot: "bg-yellow-400"  },
   "domain-specialist": { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/30", dot: "bg-purple-400" },
+  data:               { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/30", dot: "bg-emerald-400" },
+  api:                { bg: "bg-blue-500/10",    text: "text-blue-400",   border: "border-blue-500/30",    dot: "bg-blue-400"   },
+  cloud:              { bg: "bg-sky-500/10",     text: "text-sky-400",    border: "border-sky-500/30",     dot: "bg-sky-400"    },
+  sre:                { bg: "bg-orange-500/10",  text: "text-orange-400", border: "border-orange-500/30",  dot: "bg-orange-400" },
 };
 
 export const MASTERY_COLORS: Record<string, string> = {

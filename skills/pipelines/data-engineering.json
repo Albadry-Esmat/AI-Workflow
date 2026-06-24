@@ -1,0 +1,106 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "data-engineering",
+  "version": "1.0.0",
+  "description": "Data engineering pipeline (v1.0.0): requirements → architecture → data pipeline design → data quality → analytics schema → data contracts → deployment. Use for batch ETL, streaming, or lakehouse projects.",
+  "mode": "sequential",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture",
+      "skills": [
+        { "name": "architecture-design",      "version": "^1.1.0", "max_retries": 2 },
+        { "name": "database-architect",        "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-data-pipeline",
+      "label": "Data Pipeline Design",
+      "skills": [
+        { "name": "data-pipeline-architect", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-quality-and-schema",
+      "label": "Data Quality + Analytics Schema",
+      "parallel": true,
+      "skills": [
+        { "name": "data-quality-validator",    "version": "^1.0.0", "max_retries": 2 },
+        { "name": "analytics-schema-designer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-contracts",
+      "label": "Data Contracts",
+      "skills": [
+        { "name": "data-contract-enforcer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-slo",
+      "label": "SLO Design",
+      "skills": [
+        { "name": "slo-sla-designer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8-docs",
+      "label": "Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["data-quality-validator", "analytics-schema-designer"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Confirm data sources, volumes, and SLA requirements before architecture",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-3-data-pipeline",
+      "type": "human_approval",
+      "label": "Approve pipeline topology and technology stack before quality/schema design",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-contracts",
+      "type": "human_approval",
+      "label": "Approve data contracts before SLO definition — contracts are binding once SLOs are set",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-7-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer"]
+}

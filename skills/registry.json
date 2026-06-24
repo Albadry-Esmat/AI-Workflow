@@ -1,5 +1,5 @@
 {
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Central registry of all skills in the Skill System Standard",
   "parallel_groups": [
     {
@@ -17,7 +17,7 @@
         "behavioral-telemetry-collector",
         "session-insights"
       ],
-      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended — non-blocking"
+      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended \u2014 non-blocking"
     }
   ],
   "skills": [
@@ -46,7 +46,7 @@
       "produces_for": [
         "architecture-design@^1.1.0"
       ],
-      "orchestration": "MUST run first — entry point for all feature work",
+      "orchestration": "MUST run first \u2014 entry point for all feature work",
       "feedback_routes": []
     },
     {
@@ -78,7 +78,7 @@
       "produces_for": [
         "feature-planning@^1.1.0"
       ],
-      "orchestration": "MUST run second — depends on requirement-analyzer output",
+      "orchestration": "MUST run second \u2014 depends on requirement-analyzer output",
       "feedback_routes": [
         {
           "target_skill": "requirement-analyzer",
@@ -120,7 +120,7 @@
         "clean-code-review@^1.1.0",
         "testing-strategy@^1.1.0"
       ],
-      "orchestration": "MUST run third — produces implementation plan",
+      "orchestration": "MUST run third \u2014 produces implementation plan",
       "feedback_routes": [
         {
           "target_skill": "architecture-design",
@@ -234,7 +234,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Utility skill — invoked by orchestrator between pipeline steps",
+      "orchestration": "Utility skill \u2014 invoked by orchestrator between pipeline steps",
       "feedback_routes": []
     },
     {
@@ -303,7 +303,7 @@
         "testing-strategy@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Runs after testing-strategy — final step before production",
+      "orchestration": "Runs after testing-strategy \u2014 final step before production",
       "feedback_routes": [
         {
           "target_skill": "testing-strategy",
@@ -336,7 +336,7 @@
         "clean-code-review@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Runs asynchronously after upstream skills complete — non-blocking",
+      "orchestration": "Runs asynchronously after upstream skills complete \u2014 non-blocking",
       "feedback_routes": []
     },
     {
@@ -360,7 +360,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Meta-skill — invokes all other skills per pipeline definition",
+      "orchestration": "Meta-skill \u2014 invokes all other skills per pipeline definition",
       "feedback_routes": []
     },
     {
@@ -369,7 +369,7 @@
       "status": "active",
       "domain": "documentation",
       "path": ".opencode/skills/doc-maintainer/SKILL.md",
-      "description": "Autonomous documentation maintenance engine — detects changes, creates/updates .md files, ensures consistency",
+      "description": "Autonomous documentation maintenance engine \u2014 detects changes, creates/updates .md files, ensures consistency",
       "inputs": [
         "change_event",
         "change_type",
@@ -396,7 +396,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "System maintenance skill — runs on change detection, not pipeline execution",
+      "orchestration": "System maintenance skill \u2014 runs on change detection, not pipeline execution",
       "feedback_routes": []
     },
     {
@@ -405,7 +405,7 @@
       "status": "active",
       "domain": "meta",
       "path": ".opencode/skills/skill-authoring/SKILL.md",
-      "description": "Meta-skill — designs, generates, validates, and governs all other skills",
+      "description": "Meta-skill \u2014 designs, generates, validates, and governs all other skills",
       "inputs": [
         "intent",
         "domain",
@@ -434,7 +434,7 @@
         "doc-maintainer@^1.1.0"
       ],
       "produces_for": null,
-      "orchestration": "Meta-skill — invoked to create or govern any other skill in the system",
+      "orchestration": "Meta-skill \u2014 invoked to create or govern any other skill in the system",
       "feedback_routes": []
     },
     {
@@ -458,7 +458,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "Utility protocol — invoked by orchestrator to serialize, compress, and restore session state",
+      "orchestration": "Utility protocol \u2014 invoked by orchestrator to serialize, compress, and restore session state",
       "feedback_routes": []
     },
     {
@@ -467,7 +467,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/observability/SKILL.md",
-      "description": "Metrics collection, aggregation, threshold alerting, and health status reporting for the skill pipeline — defines the canonical per-skill metrics schema enforced by all skills",
+      "description": "Metrics collection, aggregation, threshold alerting, and health status reporting for the skill pipeline \u2014 defines the canonical per-skill metrics schema enforced by all skills",
       "inputs": [
         "skill_name",
         "execution_event",
@@ -486,7 +486,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Utility protocol — invoked by orchestrator at 4 defined collection points (skill.started, skill.completed, gate event, pipeline.ended); individual skills only need to produce a compliant metrics object",
+      "orchestration": "Utility protocol \u2014 invoked by orchestrator at 4 defined collection points (skill.started, skill.completed, gate event, pipeline.ended); individual skills only need to produce a compliant metrics object",
       "feedback_routes": []
     },
     {
@@ -511,7 +511,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Meta utility — invoked by skill-authoring (SKL-012) as part of the registration gate",
+      "orchestration": "Meta utility \u2014 invoked by skill-authoring (SKL-012) as part of the registration gate",
       "feedback_routes": []
     },
     {
@@ -533,7 +533,7 @@
       ],
       "consumes_from": null,
       "produces_for": null,
-      "orchestration": "Governance meta-skill — invoked to check or advance any skill's lifecycle stage",
+      "orchestration": "Governance meta-skill \u2014 invoked to check or advance any skill's lifecycle stage",
       "feedback_routes": []
     },
     {
@@ -557,7 +557,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Meta utility — invoked during skill design to produce activation trigger specs",
+      "orchestration": "Meta utility \u2014 invoked during skill design to produce activation trigger specs",
       "feedback_routes": []
     },
     {
@@ -582,7 +582,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Validation utility — invoked by skill-authoring during Step 8 (multi-layer validation)",
+      "orchestration": "Validation utility \u2014 invoked by skill-authoring during Step 8 (multi-layer validation)",
       "feedback_routes": []
     },
     {
@@ -607,7 +607,7 @@
       "produces_for": [
         "skill-authoring@^1.0.0"
       ],
-      "orchestration": "Governance utility — invoked during skill evolution or release to determine correct version bump",
+      "orchestration": "Governance utility \u2014 invoked during skill evolution or release to determine correct version bump",
       "feedback_routes": []
     },
     {
@@ -648,7 +648,7 @@
         "schema-validator@^1.0.0"
       ],
       "produces_for": null,
-      "orchestration": "Meta-skill — invoked to scaffold a new sub-agent module from a capability specification",
+      "orchestration": "Meta-skill \u2014 invoked to scaffold a new sub-agent module from a capability specification",
       "feedback_routes": []
     },
     {
@@ -657,7 +657,7 @@
       "status": "active",
       "domain": "orchestration",
       "path": ".opencode/skills/state-manager/SKILL.md",
-      "description": "Reads, writes, diffs, snapshots, and restores shared system state — the sole write interface to cross-skill state",
+      "description": "Reads, writes, diffs, snapshots, and restores shared system state \u2014 the sole write interface to cross-skill state",
       "inputs": [
         "operation",
         "key",
@@ -678,7 +678,7 @@
         "orchestrator@^1.0.0",
         "context-memory@^1.0.0"
       ],
-      "orchestration": "Infrastructure primitive — invoked by every skill that reads or writes shared state",
+      "orchestration": "Infrastructure primitive \u2014 invoked by every skill that reads or writes shared state",
       "feedback_routes": []
     },
     {
@@ -788,7 +788,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "MUST run before any code modification — gates the execution of all downstream skills",
+      "orchestration": "MUST run before any code modification \u2014 gates the execution of all downstream skills",
       "feedback_routes": [
         {
           "target_skill": "architecture-design",
@@ -833,7 +833,7 @@
       "produces_for": [
         "orchestrator@^1.0.0"
       ],
-      "orchestration": "Sits on the event bus — every system event passes through before reaching skill executors",
+      "orchestration": "Sits on the event bus \u2014 every system event passes through before reaching skill executors",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1042,7 +1042,7 @@
       "produces_for": [
         "state-manager@^1.0.0"
       ],
-      "orchestration": "Last-resort recovery — triggered on critical pipeline failures, deployment failures, and unrecoverable code errors",
+      "orchestration": "Last-resort recovery \u2014 triggered on critical pipeline failures, deployment failures, and unrecoverable code errors",
       "feedback_routes": [
         {
           "target_skill": "deployment-strategy",
@@ -1154,7 +1154,7 @@
       "status": "active",
       "domain": "quality",
       "path": ".opencode/skills/implementation-completeness-auditor/SKILL.md",
-      "description": "Cross-check all requirements against delivered code, tests, UI screens, DB entities, and documentation; produce a readiness score (0–100) and traceability matrix",
+      "description": "Cross-check all requirements against delivered code, tests, UI screens, DB entities, and documentation; produce a readiness score (0\u2013100) and traceability matrix",
       "inputs": [
         "requirements",
         "code_map",
@@ -1738,7 +1738,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/behavioral-telemetry-collector/SKILL.md",
-      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag — exits immediately if opted out. Ring-buffer storage of up to 500 events per session. Supports capability_gap event type (FEATURE-001).",
+      "description": "Collects anonymized, PII-scrubbed behavioral events from the skill pipeline. First check is always opt-out flag \u2014 exits immediately if opted out. Ring-buffer storage of up to 500 events per session. Supports capability_gap event type (FEATURE-001).",
       "phase": 6,
       "req_id": "N16",
       "inputs": [
@@ -1767,7 +1767,7 @@
       "produces_for": [
         "session-insights@^1.0.0"
       ],
-      "orchestration": "Async fire-and-forget — invoked by orchestrator at skill.completed, skill.failed, gate.passed, and gate.blocked events; never blocks pipeline progression",
+      "orchestration": "Async fire-and-forget \u2014 invoked by orchestrator at skill.completed, skill.failed, gate.passed, and gate.blocked events; never blocks pipeline progression",
       "feedback_routes": []
     },
     {
@@ -1776,7 +1776,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/session-insights/SKILL.md",
-      "description": "Aggregates behavioral telemetry events into per-skill performance metrics: invocation counts, success/failure rates, HITL rejection ratios, p95 latency. Writes session_summary to state. Includes gap metrics (total_capability_gaps, top_gap_domains, gap_ids) — FEATURE-001. Read-only on events array.",
+      "description": "Aggregates behavioral telemetry events into per-skill performance metrics: invocation counts, success/failure rates, HITL rejection ratios, p95 latency. Writes session_summary to state. Includes gap metrics (total_capability_gaps, top_gap_domains, gap_ids) \u2014 FEATURE-001. Read-only on events array.",
       "phase": 6,
       "req_id": "N16",
       "inputs": [
@@ -1798,7 +1798,7 @@
       "produces_for": [
         "enhancement-dashboard@^1.0.0"
       ],
-      "orchestration": "Async — invoked once at pipeline.ended after behavioral-telemetry-collector events are complete; does not block pipeline",
+      "orchestration": "Async \u2014 invoked once at pipeline.ended after behavioral-telemetry-collector events are complete; does not block pipeline",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1840,7 +1840,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/adaptive-proposal-generator/SKILL.md",
-      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval — nothing is applied automatically.",
+      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval \u2014 nothing is applied automatically.",
       "inputs": [
         "session_summary",
         "historical_summaries",
@@ -1896,7 +1896,7 @@
       "produces_for": [
         "doc-maintainer@^1.0.0"
       ],
-      "orchestration": "Invoked by orchestrator only after HITL gate approves a proposal. Blocking — waits for validate-skills.sh and npm run build to complete before returning.",
+      "orchestration": "Invoked by orchestrator only after HITL gate approves a proposal. Blocking \u2014 waits for validate-skills.sh and npm run build to complete before returning.",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
@@ -1911,7 +1911,7 @@
       "status": "active",
       "domain": "design",
       "path": ".opencode/skills/motion-design-architect/SKILL.md",
-      "description": "Design complete motion system — token hierarchy, micro-interactions, page transitions, scroll experiences, choreography, and 3D integration specs",
+      "description": "Design complete motion system \u2014 token hierarchy, micro-interactions, page transitions, scroll experiences, choreography, and 3D integration specs",
       "inputs": [
         "motion_spec",
         "component_contracts",
@@ -1993,7 +1993,7 @@
       "status": "active",
       "domain": "design",
       "path": ".opencode/skills/creative-experience-architect/SKILL.md",
-      "description": "Architect world-class interfaces — innovative layouts, story-driven flows, immersive backgrounds, premium component enhancements, creative briefs",
+      "description": "Architect world-class interfaces \u2014 innovative layouts, story-driven flows, immersive backgrounds, premium component enhancements, creative briefs",
       "inputs": [
         "product_brief",
         "screens",
@@ -2103,7 +2103,7 @@
       "feedback_routes": [
         {
           "target_skill": "feature-planning",
-          "condition": "CR approved — task delta generated",
+          "condition": "CR approved \u2014 task delta generated",
           "description": "Backpropagate task delta to feature-planning for re-planning"
         },
         {
@@ -2150,7 +2150,7 @@
       "status": "active",
       "domain": "governance",
       "path": ".opencode/skills/work-item-lifecycle-guard/SKILL.md",
-      "description": "Validates work item lifecycle state transitions against the rules in docs/work-item-foundation.md. Returns allow/warn/block verdict. Initial deployment mode: warning. Guard Layer 2 — runs as validation_check before every work item state write.",
+      "description": "Validates work item lifecycle state transitions against the rules in docs/work-item-foundation.md. Returns allow/warn/block verdict. Initial deployment mode: warning. Guard Layer 2 \u2014 runs as validation_check before every work item state write.",
       "inputs": [
         "item_id",
         "item_type",
@@ -2222,7 +2222,7 @@
       "status": "draft",
       "domain": "architecture",
       "path": ".opencode/skills/semantic-diff-analyzer/SKILL.md",
-      "description": "Compares before/after code to detect behavioral changes — logic shifts, contract changes, security boundary alterations — beyond line-level diffs. Feeds precise impact signals to security-review and test-generator.",
+      "description": "Compares before/after code to detect behavioral changes \u2014 logic shifts, contract changes, security boundary alterations \u2014 beyond line-level diffs. Feeds precise impact signals to security-review and test-generator.",
       "phase": 7,
       "req_id": "N21",
       "inputs": [
@@ -2330,7 +2330,7 @@
       "status": "draft",
       "domain": "quality",
       "path": ".opencode/skills/technical-debt-tracker/SKILL.md",
-      "description": "Maintains a persistent cross-session technical debt register. Calculates debt score (0–100), tracks debt trend across runs, projects maintenance cost with interest model, and surfaces prioritized remediation backlog.",
+      "description": "Maintains a persistent cross-session technical debt register. Calculates debt score (0\u2013100), tracks debt trend across runs, projects maintenance cost with interest model, and surfaces prioritized remediation backlog.",
       "phase": 7,
       "req_id": "N23",
       "inputs": [
@@ -2413,7 +2413,7 @@
         "feature-planning@^2.0.0",
         "adr-generator@^1.0.0"
       ],
-      "orchestration": "On-demand — triggered when user requests architecture migration or refactoring plan; HITL gate after output before implementation begins",
+      "orchestration": "On-demand \u2014 triggered when user requests architecture migration or refactoring plan; HITL gate after output before implementation begins",
       "feedback_routes": [
         {
           "target_skill": "architecture-design",
@@ -2497,7 +2497,7 @@
       "status": "draft",
       "domain": "architecture",
       "path": ".opencode/skills/api-deprecation-manager/SKILL.md",
-      "description": "Manages the full API version lifecycle (current → deprecated → sunset). Auto-generates migration guides from breaking changes, creates consumer migration work items, and enforces sunset timelines with violation detection.",
+      "description": "Manages the full API version lifecycle (current \u2192 deprecated \u2192 sunset). Auto-generates migration guides from breaking changes, creates consumer migration work items, and enforces sunset timelines with violation detection.",
       "phase": 7,
       "req_id": "N26",
       "inputs": [
@@ -2663,7 +2663,7 @@
       "status": "draft",
       "domain": "system",
       "path": ".opencode/skills/skill-simulator/SKILL.md",
-      "description": "Runs a complete pipeline in simulation mode — all skills execute, outputs generated in preview form, no disk writes — and produces a unified preview report: files that would change, HITL gates predicted, block risks, token estimate, and go/no-go summary.",
+      "description": "Runs a complete pipeline in simulation mode \u2014 all skills execute, outputs generated in preview form, no disk writes \u2014 and produces a unified preview report: files that would change, HITL gates predicted, block risks, token estimate, and go/no-go summary.",
       "phase": 7,
       "req_id": "N29",
       "inputs": [
@@ -2866,6 +2866,1531 @@
           "target_skill": "orchestrator",
           "condition": "branch_execution_failed",
           "description": "Report failed branch and fall back to single-branch execution"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "data-pipeline-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "data",
+      "path": ".opencode/skills/data-pipeline-architect/SKILL.md",
+      "description": "Use when designing production-grade data pipeline architectures for batch ETL, streaming, or lakehouse patterns. Triggers on: \"design a data pipeline\", \"ETL architecture\", \"streaming pipeline design\", \"data lakehouse\", \"Kafka pipeline\". Do NOT use for single-table queries or simple CRUD APIs \u2014 use database-architect for pure schema work instead.",
+      "phase": 8,
+      "req_id": "N33",
+      "inputs": [
+        "requirements",
+        "data_sources",
+        "processing_model",
+        "target_platform",
+        "context"
+      ],
+      "outputs": [
+        "pipeline_architecture",
+        "technology_recommendations",
+        "data_flow_diagram",
+        "sla_estimates",
+        "infrastructure_requirements",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "database-architect@^1.1.0"
+      ],
+      "produces_for": [
+        "data-quality-validator@^1.0.0",
+        "analytics-schema-designer@^1.0.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after architecture-design when domain == 'data' or requirements include ETL/streaming processing",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "conflicting_source_slas",
+          "description": "HITL when source SLAs conflict with pipeline latency requirements"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "data-quality-validator",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "data",
+      "path": ".opencode/skills/data-quality-validator/SKILL.md",
+      "description": "Use when defining or enforcing data quality rules at pipeline stages. Triggers on: \"data quality rules\", \"dbt tests\", \"Great Expectations\", \"data freshness\", \"data SLA enforcement\". Do NOT use for schema design \u2014 use database-architect. Do NOT use without a pipeline architecture output to validate against.",
+      "phase": 8,
+      "req_id": "N34",
+      "inputs": [
+        "schema",
+        "data_profile",
+        "quality_dimensions",
+        "critical_fields",
+        "context"
+      ],
+      "outputs": [
+        "quality_rules",
+        "dbt_tests",
+        "great_expectations_suite",
+        "freshness_monitors",
+        "quality_scorecard",
+        "alert_rules",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "data-pipeline-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "data-contract-enforcer@^1.0.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after data-pipeline-architect; runs at each pipeline stage boundary to validate schema conformance",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "critical_quality_rule_violated",
+          "description": "HITL when critical fields fail quality checks in production"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "ml-pipeline-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "data",
+      "path": ".opencode/skills/ml-pipeline-architect/SKILL.md",
+      "description": "Use when designing machine learning pipelines including feature stores, training orchestration, model serving, and monitoring. Triggers on: \"ML pipeline\", \"feature store design\", \"model training architecture\", \"MLflow\", \"model serving\". Do NOT use for pure data ETL without ML components \u2014 use data-pipeline-architect instead.",
+      "phase": 8,
+      "req_id": "N35",
+      "inputs": [
+        "ml_problem",
+        "feature_sources",
+        "model_complexity",
+        "serving_requirements",
+        "context"
+      ],
+      "outputs": [
+        "pipeline_design",
+        "feature_store_schema",
+        "training_config",
+        "serving_architecture",
+        "monitoring_config",
+        "estimated_infra_cost",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "data-pipeline-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "database-architect@^1.1.0"
+      ],
+      "orchestration": "Invoked when requirements include ML model training, feature engineering, or model serving endpoints",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "training_cost_exceeds_budget",
+          "description": "HITL when estimated training infrastructure cost exceeds configured budget threshold"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "analytics-schema-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "data",
+      "path": ".opencode/skills/analytics-schema-designer/SKILL.md",
+      "description": "Use when designing data warehouse schemas, dimensional models, or BI semantic layers for analytical workloads. Triggers on: \"dimensional model\", \"star schema\", \"data warehouse design\", \"dbt models\", \"BI semantic layer\". Do NOT use for transactional OLTP schemas \u2014 use database-architect instead.",
+      "phase": 8,
+      "req_id": "N36",
+      "inputs": [
+        "business_questions",
+        "source_entities",
+        "schema_pattern",
+        "time_grain",
+        "context"
+      ],
+      "outputs": [
+        "schema_design",
+        "dbt_models",
+        "scd_strategies",
+        "pre_aggregation_recommendations",
+        "bi_semantic_layer_hints",
+        "query_patterns",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "data-pipeline-architect@^1.0.0",
+        "database-architect@^1.1.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after data-pipeline-architect when output includes analytical/reporting requirements; runs before code-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "schema_ambiguity_detected",
+          "description": "HITL when business question definitions produce ambiguous fact table granularity"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "data-contract-enforcer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "data",
+      "path": ".opencode/skills/data-contract-enforcer/SKILL.md",
+      "description": "Use when establishing or enforcing contracts between data producers and consumers across pipeline boundaries. Triggers on: \"data contract\", \"schema contract\", \"breaking schema change\", \"producer-consumer agreement\", \"data SLA contract\". Do NOT use without defined producer schemas and consumer requirements.",
+      "phase": 8,
+      "req_id": "N37",
+      "inputs": [
+        "operation",
+        "producer_schema",
+        "consumer_requirements",
+        "contract_name",
+        "environment",
+        "context"
+      ],
+      "outputs": [
+        "contract_definition",
+        "violations",
+        "breaking_changes",
+        "migration_plan",
+        "contract_tests",
+        "consumer_notifications",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "data-quality-validator@^1.0.0",
+        "data-pipeline-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked at pipeline.schema_changed events or explicitly when defining cross-team data interfaces; blocks deployment on breaking changes",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "breaking_contract_violation",
+          "description": "Mandatory HITL when a breaking schema change affects registered consumers"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "api-design-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "api",
+      "path": ".opencode/skills/api-design-architect/SKILL.md",
+      "description": "Use when designing REST APIs, producing OpenAPI specifications, or defining API versioning and rate limiting strategies. Triggers on: \"design a REST API\", \"OpenAPI spec\", \"API versioning\", \"rate limiting design\", \"API contract\". Do NOT use for GraphQL APIs \u2014 use graphql-architect. Do NOT use for event-driven messaging \u2014 use event-schema-designer.",
+      "phase": 8,
+      "req_id": "N38",
+      "inputs": [
+        "requirements",
+        "domain_model",
+        "api_style",
+        "versioning_strategy",
+        "context"
+      ],
+      "outputs": [
+        "openapi_spec",
+        "endpoint_catalog",
+        "error_codes",
+        "versioning_plan",
+        "rate_limiting_design",
+        "sdk_hints",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "test-generator@^1.3.0",
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design when modules expose HTTP/REST interfaces; produces OpenAPI spec consumed by code-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "breaking_api_change_detected",
+          "description": "HITL when proposed changes break existing API contracts with registered consumers"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "graphql-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "api",
+      "path": ".opencode/skills/graphql-architect/SKILL.md",
+      "description": "Use when designing GraphQL APIs, federation topologies, or resolver architectures. Triggers on: \"GraphQL schema\", \"Apollo Federation\", \"resolver design\", \"GraphQL subscription\", \"schema stitching\". Do NOT use for REST APIs \u2014 use api-design-architect. Do NOT use for event-driven messaging \u2014 use event-schema-designer.",
+      "phase": 8,
+      "req_id": "N39",
+      "inputs": [
+        "requirements",
+        "domain_model",
+        "federation_enabled",
+        "security_model",
+        "context"
+      ],
+      "outputs": [
+        "schema_sdl",
+        "resolver_architecture",
+        "federation_config",
+        "subscription_design",
+        "complexity_rules",
+        "authorization_directives",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "test-generator@^1.3.0"
+      ],
+      "orchestration": "Invoked after architecture-design when modules expose GraphQL interfaces; federation_config required when multiple subgraphs present",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "circular_federation_dependency",
+          "description": "HITL when subgraph dependency cycle is detected in federation topology"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "event-schema-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "api",
+      "path": ".opencode/skills/event-schema-designer/SKILL.md",
+      "description": "Use when designing event schemas for message queues, event buses, or streaming platforms. Triggers on: \"event schema\", \"AsyncAPI\", \"Kafka topic design\", \"schema registry\", \"event catalog\". Do NOT use for REST/GraphQL APIs. Do NOT use without defined service boundaries from microservices-architect.",
+      "phase": 8,
+      "req_id": "N40",
+      "inputs": [
+        "services",
+        "event_catalog",
+        "schema_format",
+        "compatibility_strategy",
+        "context"
+      ],
+      "outputs": [
+        "asyncapi_spec",
+        "event_catalog",
+        "topic_design",
+        "schema_registry_config",
+        "dlq_design",
+        "compatibility_rules",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "microservices-architect@^1.0.0",
+        "architecture-design@^1.3.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after microservices-architect defines service boundaries; schema_registry_config blocks deployment until compatibility rules pass",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "incompatible_schema_evolution",
+          "description": "HITL when proposed event schema change breaks backward compatibility with registered consumers"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "microservices-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/microservices-architect/SKILL.md",
+      "description": "Use when decomposing monolithic systems into microservices or validating service boundaries using DDD. Triggers on: \"decompose into microservices\", \"service boundary design\", \"bounded context map\", \"DDD decomposition\", \"Conway's Law analysis\". Do NOT use for high-level architecture \u2014 run architecture-design first. Do NOT use for GraphQL federation topology \u2014 use graphql-architect.",
+      "phase": 8,
+      "req_id": "N41",
+      "inputs": [
+        "domain_description",
+        "existing_modules",
+        "team_topology",
+        "communication_preference",
+        "consistency_model",
+        "context"
+      ],
+      "outputs": [
+        "bounded_contexts",
+        "service_map",
+        "communication_design",
+        "api_gateway_design",
+        "migration_strategy",
+        "team_alignment",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "ddd-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "event-schema-designer@^1.0.0",
+        "api-design-architect@^1.0.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after architecture-design when system has 3+ bounded contexts or team asks about service decomposition",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "service_boundary_ambiguity",
+          "description": "HITL when two equally valid decompositions exist \u2014 requires domain expert input"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "event-sourcing-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/event-sourcing-designer/SKILL.md",
+      "description": "Use when designing CQRS/event-sourcing architectures including aggregates, event stores, and projections. Triggers on: \"event sourcing\", \"CQRS\", \"aggregate design\", \"event store\", \"projection design\". Do NOT use for simple CRUD systems. Do NOT use without service boundaries from microservices-architect.",
+      "phase": 8,
+      "req_id": "N42",
+      "inputs": [
+        "domain_description",
+        "aggregates",
+        "event_store_platform",
+        "projection_model",
+        "context"
+      ],
+      "outputs": [
+        "aggregate_designs",
+        "event_catalog",
+        "event_store_schema",
+        "command_handlers",
+        "projection_designs",
+        "snapshot_config",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "microservices-architect@^1.0.0",
+        "ddd-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "database-architect@^1.1.0",
+        "code-generator@^1.4.0",
+        "test-generator@^1.3.0"
+      ],
+      "orchestration": "Invoked after microservices-architect when aggregates require full audit trail or temporal queries; feeds database-architect for event store schema",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "aggregate_invariant_conflict",
+          "description": "HITL when aggregate boundary enforcement conflicts with query projection requirements"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "distributed-resilience-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/distributed-resilience-architect/SKILL.md",
+      "description": "Use when designing resilience patterns for distributed systems including circuit breakers, retries, bulkheads, and saga compensation. Triggers on: \"circuit breaker design\", \"resilience patterns\", \"timeout hierarchy\", \"retry policy\", \"bulkhead pattern\". Do NOT use for single-service applications. Do NOT use before microservices boundaries are defined.",
+      "phase": 8,
+      "req_id": "N43",
+      "inputs": [
+        "services",
+        "consistency_model",
+        "sla_targets",
+        "context"
+      ],
+      "outputs": [
+        "resilience_patterns",
+        "circuit_breaker_configs",
+        "timeout_hierarchy",
+        "retry_policies",
+        "saga_designs",
+        "fmea_report",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "microservices-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "chaos-engineering-designer@^1.0.0"
+      ],
+      "orchestration": "Invoked after microservices-architect; fmea_report is consumed by chaos-engineering-designer for experiment design",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "saga_compensation_ambiguity",
+          "description": "HITL when compensation transaction semantics conflict with business consistency requirements"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "cloud-architecture-reviewer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "cloud",
+      "path": ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
+      "description": "Use when reviewing cloud architectures against AWS/GCP/Azure Well-Architected Framework pillars. Triggers on: \"Well-Architected review\", \"cloud architecture review\", \"AWS WAR\", \"cloud cost optimization\", \"cloud security gaps\". Do NOT use for on-premises-only systems. Do NOT use as a substitute for architecture-design.",
+      "phase": 8,
+      "req_id": "N44",
+      "inputs": [
+        "architecture_description",
+        "cloud_provider",
+        "review_focus",
+        "current_costs",
+        "context"
+      ],
+      "outputs": [
+        "pillar_scores",
+        "critical_risks",
+        "cost_optimizations",
+        "security_gaps",
+        "reliability_improvements",
+        "remediation_roadmap",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "security-review@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design for any cloud-hosted system; can also run standalone for existing architecture reviews",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "critical_security_risk_detected",
+          "description": "Mandatory HITL when a critical security pillar gap is identified in the architecture"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "serverless-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "cloud",
+      "path": ".opencode/skills/serverless-architect/SKILL.md",
+      "description": "Use when designing serverless function architectures with Lambda/Cloud Functions/Azure Functions. Triggers on: \"serverless architecture\", \"Lambda design\", \"Cloud Functions\", \"event-driven serverless\", \"cold start mitigation\". Do NOT use when compute requirements need persistent connections or long-running processes.",
+      "phase": 8,
+      "req_id": "N45",
+      "inputs": [
+        "use_cases",
+        "cloud_provider",
+        "event_sources",
+        "cold_start_sensitivity",
+        "context"
+      ],
+      "outputs": [
+        "function_designs",
+        "cold_start_strategy",
+        "event_topology",
+        "state_management_design",
+        "cost_estimate",
+        "observability_config",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "cloud-architecture-reviewer@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked when architecture includes event-driven or workload-spiky compute requirements; cost_estimate feeds infrastructure-cost-estimator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "cold_start_latency_exceeds_sla",
+          "description": "HITL when provisioned concurrency cost required to meet cold-start SLA exceeds serverless cost benefit"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "container-orchestration-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "cloud",
+      "path": ".opencode/skills/container-orchestration-architect/SKILL.md",
+      "description": "Use when designing Kubernetes cluster topologies, Helm charts, autoscaling policies, or GitOps workflows. Triggers on: \"Kubernetes design\", \"Helm chart structure\", \"cluster topology\", \"GitOps pipeline\", \"pod autoscaling\". Do NOT use for serverless workloads \u2014 use serverless-architect. Do NOT use for VM-based deployments.",
+      "phase": 8,
+      "req_id": "N46",
+      "inputs": [
+        "workloads",
+        "cloud_provider",
+        "cluster_type",
+        "scaling_requirements",
+        "context"
+      ],
+      "outputs": [
+        "cluster_design",
+        "workload_specs",
+        "helm_chart_structure",
+        "autoscaling_config",
+        "gitops_config",
+        "rbac_design",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "secrets-management-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design when deployment target is Kubernetes; secrets-management-architect should run first for vault integration",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "resource_quota_conflict",
+          "description": "HITL when workload resource requirements exceed cluster capacity model"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "threat-model-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "security",
+      "path": ".opencode/skills/threat-model-designer/SKILL.md",
+      "description": "Use when producing structured threat models, STRIDE analyses, or MITRE ATT&CK mappings from architecture diagrams. Triggers on: \"threat model\", \"STRIDE analysis\", \"attack surface map\", \"trust boundary\", \"MITRE ATT&CK mapping\". Do NOT use as a substitute for security-review \u2014 threat modeling informs security review, not replaces it.",
+      "phase": 8,
+      "req_id": "N47",
+      "inputs": [
+        "architecture",
+        "data_classification",
+        "threat_actors",
+        "compliance_requirements",
+        "context"
+      ],
+      "outputs": [
+        "threat_catalog",
+        "security_user_stories",
+        "trust_boundary_analysis",
+        "attack_surface_map",
+        "mitre_mappings",
+        "risk_matrix",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "security-review@^1.0.0",
+        "security-guard@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design and before security-review; risk_matrix feeds security-guard severity thresholds",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "critical_threat_identified",
+          "description": "Mandatory HITL when a CRITICAL-rated threat with no existing mitigation is identified"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "secrets-management-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "security",
+      "path": ".opencode/skills/secrets-management-architect/SKILL.md",
+      "description": "Use when designing secrets management systems, Vault architectures, or credential rotation policies. Triggers on: \"secrets management\", \"Vault architecture\", \"secret rotation\", \"PKI design\", \"dynamic secrets\". Do NOT use for general security review \u2014 use security-review for that. Do NOT design secrets management without a known deployment target.",
+      "phase": 8,
+      "req_id": "N48",
+      "inputs": [
+        "secret_inventory",
+        "vault_platform",
+        "rotation_requirements",
+        "context"
+      ],
+      "outputs": [
+        "vault_architecture",
+        "rotation_policies",
+        "pki_design",
+        "dynamic_secrets_config",
+        "injection_patterns",
+        "audit_config",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "threat-model-designer@^1.0.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0",
+        "container-orchestration-architect@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design; injection_patterns consumed by container-orchestration-architect for Vault sidecar/CSI driver config",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "secret_sprawl_detected",
+          "description": "HITL when inventory reveals secrets stored in environment variables or config files in production"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "devsecops-pipeline-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "security",
+      "path": ".opencode/skills/devsecops-pipeline-designer/SKILL.md",
+      "description": "Use when embedding security scanning stages into CI/CD pipelines including SAST, DAST, SCA, and SBOM generation. Triggers on: \"DevSecOps pipeline\", \"SAST integration\", \"container scanning\", \"SBOM generation\", \"SLSA compliance\". Do NOT use before security-review has run \u2014 this skill implements findings, not discovers them.",
+      "phase": 8,
+      "req_id": "N49",
+      "inputs": [
+        "pipeline_type",
+        "languages",
+        "compliance_requirements",
+        "existing_tools",
+        "context"
+      ],
+      "outputs": [
+        "pipeline_stages",
+        "sast_config",
+        "dast_config",
+        "sca_config",
+        "sbom_config",
+        "slsa_compliance",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "security-review@^1.0.0",
+        "threat-model-designer@^1.0.0"
+      ],
+      "produces_for": [
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after security-review; pipeline_stages consumed by ci-pipeline-generator to produce executable YAML with security gates",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "critical_vulnerability_in_pipeline",
+          "description": "Mandatory HITL when CRITICAL CVE is detected in base image or direct dependency"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "load-test-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "testing",
+      "path": ".opencode/skills/load-test-designer/SKILL.md",
+      "description": "Use when designing load test scenarios, defining SLO-based thresholds, or integrating performance tests into CI pipelines. Triggers on: \"load test design\", \"performance test scenarios\", \"k6 scripts\", \"Gatling test\", \"soak test\". Do NOT use for unit or integration tests \u2014 use testing-strategy for that.",
+      "phase": 8,
+      "req_id": "N50",
+      "inputs": [
+        "target_system",
+        "test_scenarios",
+        "slo_targets",
+        "execution_environment",
+        "context"
+      ],
+      "outputs": [
+        "test_scenarios",
+        "slo_thresholds",
+        "data_parameterization",
+        "ci_integration",
+        "baseline_report_template",
+        "acceptance_criteria",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "testing-strategy@^1.2.0",
+        "slo-sla-designer@^1.0.0"
+      ],
+      "produces_for": [
+        "profiling-advisor@^1.0.0",
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after testing-strategy when performance/load requirements are present; slo_targets consumed from slo-sla-designer output",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "slo_violation_in_baseline",
+          "description": "HITL when baseline load test reveals existing SLO violation before new feature deployment"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "profiling-advisor",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "quality",
+      "path": ".opencode/skills/profiling-advisor/SKILL.md",
+      "description": "Use when analyzing profiling data \u2014 CPU flamegraphs, heap dumps, query execution plans \u2014 to identify performance bottlenecks. Triggers on: \"profile analysis\", \"CPU hotspot\", \"heap dump analysis\", \"query plan optimization\", \"GC pressure\". Do NOT use without actual profiling data \u2014 generate a load test with load-test-designer first.",
+      "phase": 8,
+      "req_id": "N51",
+      "inputs": [
+        "profile_data",
+        "service_name",
+        "language",
+        "service_type",
+        "context"
+      ],
+      "outputs": [
+        "bottlenecks",
+        "optimization_recommendations",
+        "hotspots",
+        "gc_analysis",
+        "query_plan_issues",
+        "optimization_backlog",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "load-test-designer@^1.0.0"
+      ],
+      "produces_for": [
+        "performance-guard@^1.0.0"
+      ],
+      "orchestration": "Invoked after load-test-designer generates profiling artifacts; optimization_backlog feeds performance-guard regression gate",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "memory_leak_detected",
+          "description": "Immediate HITL when heap profile shows unbounded memory growth pattern"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "slo-sla-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "deployment",
+      "path": ".opencode/skills/slo-sla-designer/SKILL.md",
+      "description": "Use when defining SLIs, SLOs, error budgets, SLA commitments, or reliability roadmaps for production services. Triggers on: \"SLO design\", \"SLI definition\", \"error budget\", \"SLA commitments\", \"reliability targets\". Do NOT use for infrastructure sizing \u2014 use cloud-architecture-reviewer. Do NOT define SLOs before user journeys are understood.",
+      "phase": 8,
+      "req_id": "N52",
+      "inputs": [
+        "services",
+        "user_personas",
+        "business_tier",
+        "context"
+      ],
+      "outputs": [
+        "sli_definitions",
+        "slo_targets",
+        "error_budget_rules",
+        "sla_definitions",
+        "toil_items",
+        "reliability_roadmap",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "observability@^1.0.0",
+        "load-test-designer@^1.0.0",
+        "runbook-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design; slo_targets consumed by load-test-designer, observability, and runbook-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "conflicting_slo_tiers",
+          "description": "HITL when SLO targets for dependent services have incompatible error budgets"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "runbook-generator",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "documentation",
+      "path": ".opencode/skills/runbook-generator/SKILL.md",
+      "description": "Use when generating operational runbooks linked to alert policies, SLOs, and service dependencies. Triggers on: \"generate runbooks\", \"operational runbook\", \"incident response procedures\", \"escalation tree\", \"on-call runbook\". Do NOT use without defined alerts and SLO targets.",
+      "phase": 8,
+      "req_id": "N53",
+      "inputs": [
+        "alerts",
+        "service_dependencies",
+        "runbook_style",
+        "severity_definitions",
+        "context"
+      ],
+      "outputs": [
+        "runbooks",
+        "incident_severity_matrix",
+        "communication_templates",
+        "postmortem_template",
+        "escalation_tree",
+        "runbook_validation_checklist",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "slo-sla-designer@^1.0.0",
+        "observability@^1.0.0"
+      ],
+      "produces_for": [
+        "documentation-generator@^1.1.0"
+      ],
+      "orchestration": "Invoked after slo-sla-designer and observability; runbook_url annotations fed back to alert definitions in observability",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "missing_escalation_contact",
+          "description": "HITL when escalation tree references teams or contacts not in the organizational directory"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "chaos-engineering-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "testing",
+      "path": ".opencode/skills/chaos-engineering-designer/SKILL.md",
+      "description": "Use when designing chaos engineering experiments to validate system resilience. Triggers on: \"chaos engineering\", \"fault injection\", \"resilience experiments\", \"chaos testing\", \"blast radius analysis\". Do NOT use when distributed-resilience-architect has not yet produced a resilience baseline \u2014 run that skill first.",
+      "phase": 8,
+      "req_id": "N54",
+      "inputs": [
+        "services",
+        "chaos_platform",
+        "experiment_scope",
+        "blast_radius_tolerance",
+        "continuous_chaos",
+        "context"
+      ],
+      "outputs": [
+        "experiments",
+        "steady_state_hypotheses",
+        "blast_radius_analysis",
+        "observability_requirements",
+        "rollback_procedures",
+        "scheduling_plan",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "distributed-resilience-architect@^1.0.0",
+        "slo-sla-designer@^1.0.0"
+      ],
+      "produces_for": [
+        "runbook-generator@^1.0.0",
+        "observability@^1.0.0"
+      ],
+      "orchestration": "Invoked after distributed-resilience-architect; requires fmea_report as input; scheduling_plan feeds CI/CD chaos gate when continuous_chaos=true",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "experiment_blast_radius_exceeded",
+          "description": "Mandatory HITL when a running experiment propagates beyond the configured blast_radius_tolerance"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "state-management-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "design",
+      "path": ".opencode/skills/state-management-architect/SKILL.md",
+      "description": "Use when designing frontend or mobile state management architecture including library selection and pattern recommendations. Triggers on: \"state management design\", \"Redux vs Zustand\", \"client state architecture\", \"server state caching\", \"offline state\". Do NOT use for backend state \u2014 use distributed-resilience-architect for distributed state.",
+      "phase": 8,
+      "req_id": "N55",
+      "inputs": [
+        "app_type",
+        "state_categories",
+        "framework",
+        "offline_required",
+        "context"
+      ],
+      "outputs": [
+        "state_architecture",
+        "library_recommendations",
+        "state_patterns",
+        "cache_strategy",
+        "optimistic_update_patterns",
+        "offline_strategy",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "feature-planning@^2.0.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0"
+      ],
+      "orchestration": "Invoked after architecture-design for frontend/mobile apps; library_recommendations consumed by code-generator for store scaffolding",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "conflicting_state_ownership",
+          "description": "HITL when server state and client state boundaries conflict in component design"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "micro-frontend-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "design",
+      "path": ".opencode/skills/micro-frontend-architect/SKILL.md",
+      "description": "Use when designing micro-frontend architectures, Module Federation configurations, or multi-team frontend composition strategies. Triggers on: \"micro-frontend architecture\", \"Module Federation\", \"single-spa\", \"shell app design\", \"frontend composition\". Do NOT use for monolithic SPAs \u2014 use architecture-design or frontend-ux-architect.",
+      "phase": 8,
+      "req_id": "N56",
+      "inputs": [
+        "current_architecture",
+        "team_count",
+        "mfe_boundaries",
+        "shared_dependencies",
+        "context"
+      ],
+      "outputs": [
+        "mfe_architecture",
+        "module_federation_config",
+        "shared_dependency_strategy",
+        "communication_patterns",
+        "routing_design",
+        "auth_propagation_design",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "feature-planning@^2.0.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "design-system-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked when team_count > 2 or explicit multi-team frontend ownership is required; module_federation_config feeds code-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "shared_singleton_conflict",
+          "description": "HITL when multiple MFEs declare conflicting singleton library versions (React, router)"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "web-performance-optimizer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "design",
+      "path": ".opencode/skills/web-performance-optimizer/SKILL.md",
+      "description": "Use when optimizing web application performance for Core Web Vitals, bundle size, or rendering strategy. Triggers on: \"Core Web Vitals\", \"bundle optimization\", \"LCP optimization\", \"rendering mode selection\", \"image optimization\". Do NOT use for backend API performance \u2014 use profiling-advisor for that.",
+      "phase": 8,
+      "req_id": "N57",
+      "inputs": [
+        "framework",
+        "performance_report",
+        "bundle_analysis",
+        "target_metrics",
+        "context"
+      ],
+      "outputs": [
+        "optimization_plan",
+        "bundle_optimization",
+        "rendering_mode_recommendation",
+        "image_optimization",
+        "font_strategy",
+        "caching_strategy",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "frontend-ux-architect@^1.2.0"
+      ],
+      "produces_for": [
+        "ci-pipeline-generator@^1.0.0"
+      ],
+      "orchestration": "Invoked after architecture-design for web apps; optimization_plan feeds CI lighthouse budget gates via ci-pipeline-generator",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "lcp_budget_exceeded",
+          "description": "HITL when LCP target cannot be achieved without architectural changes (SSR/ISR migration)"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "ddd-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/ddd-architect/SKILL.md",
+      "description": "Use when applying Domain-Driven Design to produce bounded context maps, ubiquitous language glossaries, or aggregate designs. Triggers on: \"domain-driven design\", \"bounded context map\", \"ubiquitous language\", \"aggregate design\", \"DDD strategic patterns\". Do NOT use as a substitute for architecture-design \u2014 DDD enriches domain understanding before architectural decomposition.",
+      "phase": 8,
+      "req_id": "N58",
+      "inputs": [
+        "domain_description",
+        "business_processes",
+        "team_structure",
+        "existing_codebase",
+        "context"
+      ],
+      "outputs": [
+        "bounded_context_map",
+        "ubiquitous_language",
+        "subdomain_classification",
+        "aggregate_designs",
+        "domain_events",
+        "domain_services",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "architecture-design@^1.3.0",
+        "microservices-architect@^1.0.0",
+        "database-architect@^1.1.0"
+      ],
+      "orchestration": "Invoked after requirement-analyzer when domain complexity warrants DDD; bounded_context_map consumed by microservices-architect",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "ambiguous_bounded_context",
+          "description": "HITL when two candidate bounded contexts have identical ubiquitous language \u2014 requires domain expert clarification"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "caching-strategy-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/caching-strategy-designer/SKILL.md",
+      "description": "Use when designing caching strategies for services including Redis configurations, HTTP cache headers, CDN rules, and invalidation patterns. Triggers on: \"caching strategy\", \"Redis design\", \"cache invalidation\", \"CDN caching rules\", \"cache stampede\". Do NOT use for database query optimization \u2014 use database-architect for indexes.",
+      "phase": 8,
+      "req_id": "N59",
+      "inputs": [
+        "service_description",
+        "data_access_patterns",
+        "consistency_requirement",
+        "cdn_available",
+        "context"
+      ],
+      "outputs": [
+        "cache_topology",
+        "cache_strategies",
+        "redis_config",
+        "http_cache_headers",
+        "stampede_prevention",
+        "invalidation_strategy",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "database-architect@^1.1.0"
+      ],
+      "produces_for": [
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after architecture-design when performance requirements include sub-millisecond reads or high traffic patterns",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "cache_consistency_conflict",
+          "description": "HITL when strong consistency requirements conflict with cache TTL settings for critical data"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "localization-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "design",
+      "path": ".opencode/skills/localization-architect/SKILL.md",
+      "description": "Use when designing internationalization or localization architectures for multi-locale applications. Triggers on: \"i18n architecture\", \"localization design\", \"RTL support\", \"ICU message format\", \"translation pipeline\". Do NOT use for single-locale applications. Do NOT configure translation tools without locale file structure in place.",
+      "phase": 8,
+      "req_id": "N60",
+      "inputs": [
+        "target_locales",
+        "framework",
+        "content_volume",
+        "translation_platform",
+        "context"
+      ],
+      "outputs": [
+        "i18n_architecture",
+        "locale_file_structure",
+        "icu_patterns",
+        "rtl_strategy",
+        "number_date_currency_strategy",
+        "translation_pipeline",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "feature-planning@^2.0.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0"
+      ],
+      "orchestration": "Invoked after architecture-design when target_locales.length > 1; translation_pipeline config consumed by ci-pipeline-generator for validation",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "rtl_layout_conflict",
+          "description": "HITL when RTL layout requirements conflict with existing design system component grid assumptions"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "product-analytics-designer",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "planning",
+      "path": ".opencode/skills/product-analytics-designer/SKILL.md",
+      "description": "Use when designing product analytics systems including event taxonomy, funnel definitions, or A/B testing frameworks. Triggers on: \"product analytics design\", \"event taxonomy\", \"funnel definition\", \"A/B experiment framework\", \"analytics data model\". Do NOT use for infrastructure metrics \u2014 use observability for that.",
+      "phase": 8,
+      "req_id": "N61",
+      "inputs": [
+        "product_goals",
+        "user_journeys",
+        "analytics_platform",
+        "experiment_framework",
+        "privacy_requirements",
+        "context"
+      ],
+      "outputs": [
+        "event_taxonomy",
+        "metrics_framework",
+        "funnel_definitions",
+        "experiment_framework_design",
+        "analytics_data_model",
+        "privacy_compliance",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "feature-planning@^2.0.0",
+        "requirement-analyzer@^1.2.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "data-pipeline-architect@^1.0.0"
+      ],
+      "orchestration": "Invoked after feature-planning when product_goals include growth, retention, or conversion metrics; analytics_data_model feeds data-pipeline-architect",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "privacy_conflict_detected",
+          "description": "HITL when proposed event tracking conflicts with GDPR/CCPA consent requirements"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-06-24T00:00:00Z"
+      }
+    },
+    {
+      "name": "realtime-system-architect",
+      "version": "1.0.0",
+      "status": "draft",
+      "domain": "architecture",
+      "path": ".opencode/skills/realtime-system-architect/SKILL.md",
+      "description": "Use when designing real-time systems with WebSockets, Server-Sent Events, or WebRTC. Triggers on: \"real-time architecture\", \"WebSocket design\", \"WebRTC\", \"collaborative editing\", \"CRDT\", \"presence system\". Do NOT use for batch or polling-based systems. Do NOT use for simple REST APIs.",
+      "phase": 8,
+      "req_id": "N62",
+      "inputs": [
+        "use_case",
+        "scale",
+        "persistence_required",
+        "p2p_capable",
+        "context"
+      ],
+      "outputs": [
+        "architecture_design",
+        "protocol_recommendation",
+        "server_design",
+        "scaling_strategy",
+        "conflict_resolution",
+        "presence_system",
+        "metrics",
+        "feedback"
+      ],
+      "consumes_from": [
+        "architecture-design@^1.3.0",
+        "distributed-resilience-architect@^1.0.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.4.0",
+        "deployment-strategy@^1.1.0"
+      ],
+      "orchestration": "Invoked after architecture-design when use cases include real-time collaboration, live feeds, or bidirectional streaming",
+      "feedback_routes": [
+        {
+          "target_skill": "orchestrator",
+          "condition": "scale_exceeds_single_region",
+          "description": "HITL when connection scale requires multi-region WebSocket routing with sticky sessions"
         }
       ],
       "origin_metadata": {

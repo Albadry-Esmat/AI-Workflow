@@ -112,6 +112,79 @@
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"
+    },
+    "data-engineer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Data platform specialist — designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
+      "skills": [
+        ".opencode/skills/data-pipeline-architect/SKILL.md",
+        ".opencode/skills/data-quality-validator/SKILL.md",
+        ".opencode/skills/ml-pipeline-architect/SKILL.md",
+        ".opencode/skills/analytics-schema-designer/SKILL.md",
+        ".opencode/skills/data-contract-enforcer/SKILL.md"
+      ]
+    },
+    "api-designer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "API contract specialist — produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
+      "skills": [
+        ".opencode/skills/api-design-architect/SKILL.md",
+        ".opencode/skills/graphql-architect/SKILL.md",
+        ".opencode/skills/event-schema-designer/SKILL.md"
+      ]
+    },
+    "distributed-systems": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Distributed systems architect — microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
+      "skills": [
+        ".opencode/skills/ddd-architect/SKILL.md",
+        ".opencode/skills/microservices-architect/SKILL.md",
+        ".opencode/skills/event-sourcing-designer/SKILL.md",
+        ".opencode/skills/distributed-resilience-architect/SKILL.md",
+        ".opencode/skills/caching-strategy-designer/SKILL.md",
+        ".opencode/skills/realtime-system-architect/SKILL.md"
+      ]
+    },
+    "cloud-platform": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Cloud infrastructure specialist — Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
+      "skills": [
+        ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
+        ".opencode/skills/serverless-architect/SKILL.md",
+        ".opencode/skills/container-orchestration-architect/SKILL.md"
+      ]
+    },
+    "security-specialist": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
+      "skills": [
+        ".opencode/skills/threat-model-designer/SKILL.md",
+        ".opencode/skills/secrets-management-architect/SKILL.md",
+        ".opencode/skills/devsecops-pipeline-designer/SKILL.md"
+      ]
+    },
+    "sre": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Site Reliability Engineering specialist — SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
+      "skills": [
+        ".opencode/skills/slo-sla-designer/SKILL.md",
+        ".opencode/skills/load-test-designer/SKILL.md",
+        ".opencode/skills/profiling-advisor/SKILL.md",
+        ".opencode/skills/runbook-generator/SKILL.md",
+        ".opencode/skills/chaos-engineering-designer/SKILL.md"
+      ]
     }
   }
 }

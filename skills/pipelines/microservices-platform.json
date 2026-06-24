@@ -1,0 +1,162 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "microservices-platform",
+  "version": "1.0.0",
+  "description": "Microservices platform pipeline (v1.0.0): requirements → DDD → microservices decomposition → event schema + API contracts → resilience design → container orchestration → SLO + security → chaos engineering → deployment. Use for complex multi-service architectures.",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-ddd",
+      "label": "Domain-Driven Design",
+      "skills": [
+        { "name": "ddd-architect", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-architecture",
+      "label": "System Architecture",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-decomposition",
+      "label": "Microservices Decomposition",
+      "skills": [
+        { "name": "microservices-architect", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-contracts",
+      "label": "API + Event Contracts",
+      "parallel": true,
+      "skills": [
+        { "name": "api-design-architect",  "version": "^1.0.0", "max_retries": 2 },
+        { "name": "event-schema-designer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-resilience",
+      "label": "Resilience Design",
+      "skills": [
+        { "name": "distributed-resilience-architect", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-infra",
+      "label": "Container Orchestration + Secrets",
+      "parallel": true,
+      "skills": [
+        { "name": "container-orchestration-architect", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "secrets-management-architect",      "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8-reliability",
+      "label": "SLO Design + Security Review",
+      "parallel": true,
+      "skills": [
+        { "name": "slo-sla-designer", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "security-review",  "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-9-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-10-chaos",
+      "label": "Chaos Engineering Design",
+      "skills": [
+        { "name": "chaos-engineering-designer", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
+      "id": "phase-11-runbooks",
+      "label": "Runbook Generation",
+      "skills": [
+        { "name": "runbook-generator", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
+      "id": "phase-12-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-13-docs",
+      "label": "Documentation + ADR",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "adr-generator",           "version": "^1.0.0", "max_retries": 1, "async": true },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["api-design-architect", "event-schema-designer"],
+    ["container-orchestration-architect", "secrets-management-architect"],
+    ["slo-sla-designer", "security-review"],
+    ["security-guard", "performance-guard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-2-ddd",
+      "type": "human_approval",
+      "label": "Approve bounded context map and ubiquitous language before architecture",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-decomposition",
+      "type": "human_approval",
+      "label": "Approve service map and team alignment before contract design",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-contracts",
+      "type": "human_approval",
+      "label": "Approve API and event contracts — binding interface boundaries",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-9-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-10-chaos",
+      "type": "human_approval",
+      "label": "Approve chaos experiment schedule and blast radius controls before production deployment",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-12-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 3,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "adr-generator", "doc-maintainer"]
+}

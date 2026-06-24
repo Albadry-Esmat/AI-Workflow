@@ -1,0 +1,118 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "ml-platform",
+  "version": "1.0.0",
+  "description": "ML platform pipeline (v1.0.0): requirements → architecture → data pipeline → ML pipeline design → SLO → security review → deployment. Use for machine learning systems with feature stores, training orchestration, and model serving.",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture + Database",
+      "parallel": true,
+      "skills": [
+        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "database-architect",  "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-data-foundation",
+      "label": "Data Pipeline Foundation",
+      "skills": [
+        { "name": "data-pipeline-architect",   "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3b-quality",
+      "label": "Data Quality",
+      "skills": [
+        { "name": "data-quality-validator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-ml-pipeline",
+      "label": "ML Pipeline Design",
+      "skills": [
+        { "name": "ml-pipeline-architect", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-reliability",
+      "label": "SLO + Security",
+      "parallel": true,
+      "skills": [
+        { "name": "slo-sla-designer",  "version": "^1.0.0", "max_retries": 2 },
+        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-7-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8-docs",
+      "label": "Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["architecture-design", "database-architect"],
+    ["slo-sla-designer", "security-review"],
+    ["security-guard", "performance-guard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Confirm ML problem type, feature sources, and serving latency requirements",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-ml-pipeline",
+      "type": "human_approval",
+      "label": "Approve ML architecture: feature store, training orchestration, and serving topology",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-6-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-7-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer"]
+}

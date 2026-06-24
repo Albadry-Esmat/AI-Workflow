@@ -1,1835 +1,3033 @@
 meta:
   version: 3.3.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: "2026-06-24"
+  last_updated: '2026-06-24'
   description: Central skills index for the AI Workflow system
 skills:
-  - id: SKL-001
-    name: Requirement Analysis
-    short_description: Extract, normalize, and validate requirements from unstructured raw input
-    reference_path: skills/knowledge/requirement-analysis.md
-    reference_sections:
-      - "## Principles"
-      - "## Anti-patterns"
-      - "## Source References"
-    executable_skill: .opencode/skills/requirement-analyzer/SKILL.md
-    tags:
-      - requirements
-      - analysis
-      - ambiguity
-      - clarification
-      - normalization
-      - invest
-    version: 1.2.0
-    depends_on: []
-    mastery_level: intermediate
-    use_when: |
-      Starting any new feature, epic, or system change where requirements are unclear, unstructured, or assumed.
-    do_not_use_when: |
-      Requirements are already fully specified, validated, and unambiguous with no open questions.
-  - id: SKL-002
-    name: Architecture Design
-    short_description: Define system modules, boundaries, data flow, and integration contracts from validated requirements
-    reference_path: skills/knowledge/architecture-design.md
-    reference_sections:
-      - "## Principles"
-      - "## Practices"
-      - "## Source References"
-    executable_skill: .opencode/skills/architecture-design/SKILL.md
-    tags:
-      - architecture
-      - ddd
-      - solid
-      - modules
-      - design
-      - boundaries
-      - clean-architecture
-    version: 1.3.0
-    depends_on:
-      - SKL-001
-    mastery_level: advanced
-    use_when: |
-      Translating validated requirements into a concrete system structure with explicit module boundaries and integration contracts.
-    do_not_use_when: |
-      Requirements are incomplete or contain open questions — resolve SKL-001 first.
-  - id: SKL-003
-    name: Feature Planning
-    short_description: Decompose architecture into tasks, dependencies, complexity estimates, and a phased delivery roadmap
-    reference_path: skills/knowledge/feature-planning.md
-    reference_sections:
-      - "## Practices"
-      - "## Anti-patterns"
-    executable_skill: .opencode/skills/feature-planning/SKILL.md
-    tags:
-      - planning
-      - tasks
-      - roadmap
-      - story-points
-      - agile
-      - milestones
-      - dependencies
-    version: 2.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: intermediate
-    use_when: |
-      Translating an approved architecture into an actionable, dependency-aware implementation plan with complexity estimates.
-    do_not_use_when: |
-      Architecture design is not approved or contains unresolved design decisions.
-  - id: SKL-004
-    name: Clean Code Review
-    short_description: Analyze code against SOLID principles, clean architecture, and detect anti-patterns
-    reference_path: skills/knowledge/clean-code.md
-    reference_sections:
-      - "## Principles"
-      - "## Anti-patterns"
-      - "## Examples"
-      - "## Source References"
-    executable_skill: .opencode/skills/clean-code-review/SKILL.md
-    tags:
-      - code-quality
-      - solid
-      - clean-code
-      - refactoring
-      - review
-      - readability
-      - smells
-    version: 1.1.0
-    depends_on:
-      - SKL-003
-    mastery_level: intermediate
-    use_when: |
-      Reviewing any implementation for quality, maintainability, readability, or before a code review gate in the pipeline.
-    do_not_use_when: |
-      Code is minified, auto-generated, compiled output, or is configuration/markup only.
-  - id: SKL-005
-    name: Testing Strategy
-    short_description: Define unit, integration, and e2e test plans with coverage targets and quality gates
-    reference_path: skills/knowledge/testing-strategy.md
-    reference_sections:
-      - "## Principles"
-      - "## Practices"
-      - "## Anti-patterns"
-      - "## Source References"
-    executable_skill: .opencode/skills/testing-strategy/SKILL.md
-    tags:
-      - testing
-      - tdd
-      - coverage
-      - quality-gates
-      - unit-tests
-      - integration
-      - pyramid
-    version: 1.2.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-003
-    mastery_level: intermediate
-    use_when: |
-      Defining how any feature or system change will be verified before it is promoted to the next environment.
-    do_not_use_when: |
-      Feature is a pure configuration or content change with no behavioral or logic impact.
-  - id: SKL-006
-    name: Security Review
-    short_description: Perform threat modeling, map vulnerabilities to OWASP Top 10, and produce remediation plans
-    reference_path: skills/knowledge/security-review.md
-    reference_sections:
-      - "## Principles"
-      - "## Practices"
-      - "## Source References"
-    executable_skill: .opencode/skills/security-review/SKILL.md
-    tags:
-      - security
-      - owasp
-      - stride
-      - threat-modeling
-      - vulnerabilities
-      - cwe
-      - authentication
-    version: 1.0.0
-    depends_on:
-      - SKL-002
-      - SKL-004
-    mastery_level: advanced
-    use_when: |
-      Reviewing any system that handles user data, authentication, external APIs, payments, or other sensitive operations.
-    do_not_use_when: |
-      Internal tooling with no external exposure, no user data, and no sensitive operations.
-  - id: SKL-007
-    name: Deployment Strategy
-    short_description: Define environment topology, promotion gates, rollback criteria, and feature flag governance
-    reference_path: skills/knowledge/deployment-strategy.md
-    reference_sections:
-      - "## Principles"
-      - "## Practices"
-      - "## Anti-patterns"
-      - "## Source References"
-    executable_skill: .opencode/skills/deployment-strategy/SKILL.md
-    tags:
-      - deployment
-      - ci-cd
-      - environments
-      - rollback
-      - feature-flags
-      - blue-green
-      - canary
-    version: 1.1.0
-    depends_on:
-      - SKL-002
-      - SKL-005
-    mastery_level: intermediate
-    use_when: |
-      Releasing any change to a staging, pre-production, or production environment.
-    do_not_use_when: |
-      Development-environment-only changes with no path to production.
-  - id: SKL-008
-    name: Documentation Generation
-    short_description: Auto-generate API docs, ADRs, and READMEs from structured pipeline artifacts
-    reference_path: skills/knowledge/documentation-generation.md
-    executable_skill: .opencode/skills/documentation-generator/SKILL.md
-    tags:
-      - documentation
-      - api-docs
-      - adr
-      - readme
-      - auto-generation
-      - openapi
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-004
-    mastery_level: beginner
-    use_when: |
-      After any feature is completed to generate or refresh system documentation from pipeline artifacts.
-    do_not_use_when: |
-      No pipeline artifacts are available as input — raw documentation should be written manually.
-  - id: SKL-009
-    name: Schema Validation
-    short_description: Validate any JSON data against a JSON Schema (draft-07) and report field-level issues
-    reference_path: skills/knowledge/schema-validation.md
-    executable_skill: .opencode/skills/schema-validator/SKILL.md
-    tags:
-      - validation
-      - json-schema
-      - contracts
-      - schema
-      - utility
-      - draft-07
-    version: 1.0.0
-    depends_on: []
-    mastery_level: beginner
-    use_when: |
-      Verifying that any skill output or pipeline artifact conforms to its declared schema before passing it downstream.
-    do_not_use_when: |
-      Input data is not JSON, or no schema is available for the data type.
-  - id: SKL-010
-    name: Orchestration
-    short_description: Execute the skill pipeline with routing, validation, retries, and HITL gate enforcement
-    reference_path: skills/knowledge/orchestration.md
-    executable_skill: .opencode/skills/orchestrator/SKILL.md
-    tags:
-      - orchestration
-      - pipeline
-      - routing
-      - hitl
-      - meta-skill
-      - retry
-      - feedback-loop
-    version: 1.1.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-003
-      - SKL-004
-      - SKL-005
-      - SKL-006
-      - SKL-007
-      - SKL-009
-    mastery_level: advanced
-    use_when: |
-      Running a multi-skill pipeline end-to-end with schema validation, HITL oversight, and feedback loop management.
-    do_not_use_when: |
-      Running a single skill in isolation — invoke the skill directly instead of using the orchestrator.
-  - id: SKL-011
-    name: Documentation Maintenance
-    short_description: Detect system changes and keep the /docs folder consistent, versioned, and up to date
-    reference_path: skills/knowledge/doc-maintenance.md
-    executable_skill: .opencode/skills/doc-maintainer/SKILL.md
-    tags:
-      - documentation
-      - maintenance
-      - consistency
-      - drift-detection
-      - auto-update
-    version: 1.1.0
-    depends_on:
-      - SKL-008
-      - SKL-009
-    mastery_level: intermediate
-    use_when: |
-      After any system change (skill, agent, workflow, architecture, config) to synchronize /docs with the current system state.
-    do_not_use_when: |
-      No system changes have occurred; use full_scan detection_mode to proactively check for documentation drift instead.
-  - id: SKL-012
-    name: Skill Authoring
-    short_description: Design, generate, validate, and register skills as structured artifacts with graph integrity and quality scoring
-    reference_path: skills/knowledge/skill-authoring.md
-    reference_sections:
-      - "## Principles"
-      - "## Anti-patterns"
-      - "## Examples"
-    executable_skill: .opencode/skills/skill-authoring/SKILL.md
-    tags:
-      - meta
-      - skill-design
-      - graph
-      - validation
-      - lifecycle
-      - compiler
-      - governance
-    version: 1.0.0
-    depends_on:
-      - SKL-009
-      - SKL-011
-    related_skills:
-      - SKL-010
-    mastery_level: advanced
-    use_when: |
-      Creating a new skill, refactoring an existing one, splitting an overloaded skill, validating a skill against quality standards, or evolving a skill to a new version.
-    do_not_use_when: |
-      Executing a domain task (use the appropriate domain skill instead). Replacing workflow pipelines or implementing business logic.
-  - id: SKL-013
-    name: Context Memory
-    short_description: Manage session state, compress artifacts, and enable multi-turn pipeline resumption
-    reference_path: skills/knowledge/context-memory.md
-    executable_skill: .opencode/skills/context-memory/SKILL.md
-    tags:
-      - session
-      - context
-      - state
-      - persistence
-      - multi-turn
-      - resumption
-      - compression
-    version: 1.0.0
-    depends_on: []
-    mastery_level: intermediate
-    use_when: |
-      Managing state across multiple pipeline turns, resuming a halted pipeline session, or preventing context bleed between sequential skill executions.
-    do_not_use_when: |
-      Running a single-skill invocation with no need for cross-turn state.
-  - id: SKL-014
-    name: Observability
-    short_description: Define and collect standardized metrics across all skills and the orchestrator pipeline
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/observability/SKILL.md
-    tags:
-      - metrics
-      - monitoring
-      - observability
-      - logging
-      - telemetry
-      - pipeline
-    version: 1.1.0
-    depends_on: []
-    mastery_level: intermediate
-    use_when: |
-      Adding metrics collection to a skill, monitoring pipeline health, or auditing execution performance across orchestrated skill runs.
-    do_not_use_when: |
-      Application-level monitoring of deployed software outside the skill pipeline.
-  - id: SKL-015
-    name: Quality Scoring
-    short_description: Score a skill against the 7-dimension rubric to determine if it meets the registration threshold
-    reference_path: skills/knowledge/quality-scoring.md
-    executable_skill: .opencode/skills/quality-scoring/SKILL.md
-    tags:
-      - quality
-      - scoring
-      - evaluation
-      - rubric
-      - governance
-      - registration
-    version: 1.0.0
-    depends_on: []
-    related_skills:
-      - SKL-012
-    mastery_level: intermediate
-    use_when: |
-      Evaluating whether a skill is ready for registration, or auditing an existing skill's quality score for improvement targeting.
-    do_not_use_when: |
-      Scoring non-skill artifacts (use schema-validator for JSON validation instead).
-  - id: SKL-016
-    name: Skill Lifecycle
-    short_description: Govern a skill through its 12-stage lifecycle from intent discovery to retirement
-    reference_path: skills/knowledge/skill-lifecycle.md
-    executable_skill: .opencode/skills/skill-lifecycle/SKILL.md
-    tags:
-      - lifecycle
-      - governance
-      - deprecation
-      - promotion
-      - stages
-      - meta
-    version: 1.0.0
-    depends_on: []
-    related_skills:
-      - SKL-012
-      - SKL-015
-    mastery_level: advanced
-    use_when: |
-      Checking what lifecycle stage a skill is in, advancing a skill to the next stage, deprecating a skill, or retiring a skill from the registry.
-    do_not_use_when: |
-      Executing a skill's functional capability — use the skill itself directly.
-  - id: SKL-017
-    name: Trigger Engineering
-    short_description: Define and refine activation trigger conditions with positive, negative, and edge-case routing scenarios
-    reference_path: skills/knowledge/trigger-engineering.md
-    executable_skill: .opencode/skills/trigger-engineering/SKILL.md
-    tags:
-      - triggers
-      - routing
-      - activation
-      - disambiguation
-      - meta
-      - skill-design
-    version: 1.0.0
-    depends_on: []
-    related_skills:
-      - SKL-012
-      - SKL-016
-    mastery_level: intermediate
-    use_when: |
-      Defining or improving trigger conditions for a skill, resolving activation conflicts between adjacent skills, or improving routing accuracy.
-    do_not_use_when: |
-      Defining business logic or execution steps — trigger engineering covers routing only.
-  - id: SKL-018
-    name: Validation Rules
-    short_description: Validate and enforce structural and content rules on skills/index.yaml entries
-    reference_path: skills/knowledge/validation-rules.md
-    executable_skill: .opencode/skills/validation-rules/SKILL.md
-    tags:
-      - validation
-      - index
-      - rules
-      - schema
-      - governance
-      - quality
-    version: 1.0.0
-    depends_on:
-      - SKL-009
-    related_skills:
-      - SKL-012
-    mastery_level: beginner
-    use_when: |
-      Checking whether a skills/index.yaml entry conforms to all structural and content rules before or after registration.
-    do_not_use_when: |
-      Validating general JSON payloads outside of index.yaml — use schema-validator (SKL-009) instead.
-  - id: SKL-019
-    name: Versioning
-    short_description: Assign, bump, and govern semver version numbers for skills and the registry
-    reference_path: skills/knowledge/versioning.md
-    executable_skill: .opencode/skills/versioning/SKILL.md
-    tags:
-      - versioning
-      - semver
-      - changelog
-      - governance
-      - compatibility
-      - breaking-changes
-    version: 1.0.0
-    depends_on: []
-    related_skills:
-      - SKL-012
-      - SKL-016
-    mastery_level: beginner
-    use_when: |
-      Deciding what version bump a skill change warrants, checking backward compatibility, or enforcing deprecation policy.
-    do_not_use_when: |
-      Versioning non-skill artifacts (application releases, API versions, etc.).
-  - id: SKL-020
-    name: Sub-Agent Creation
-    short_description: Compile a capability requirement into a fully-specified, orchestrator-controlled sub-agent spec
-    reference_path: skills/knowledge/create-sub-agent.md
-    executable_skill: .opencode/skills/create-sub-agent/SKILL.md
-    tags:
-      - sub-agent
-      - agent-design
-      - scaffolding
-      - meta
-      - automation
-      - spec-generation
-    version: 1.0.0
-    depends_on:
-      - SKL-009
-    related_skills:
-      - SKL-012
-      - SKL-016
-    mastery_level: advanced
-    use_when: |
-      Creating a new sub-agent module with a defined single responsibility, input/output contracts, and tool permissions for use in the orchestrated pipeline.
-    do_not_use_when: |
-      Creating general skill SKILL.md files — use skill-authoring (SKL-012) instead. This skill generates sub-agent specs only.
-  - id: SKL-021
-    name: State Manager
-    short_description: Read, write, diff, snapshot, and restore shared system state across all pipeline skills
-    reference_path: skills/knowledge/state-manager.md
-    executable_skill: .opencode/skills/state-manager/SKILL.md
-    tags:
-      - state
-      - persistence
-      - snapshot
-      - restore
-      - session
-      - shared-state
-    version: 1.1.0
-    depends_on: []
-    mastery_level: advanced
-    use_when: |
-      Any skill needs to read or write shared system state, take a pre-change snapshot, restore a prior snapshot, or diff state before and after a pipeline stage.
-    do_not_use_when: |
-      Accessing local skill-internal variables — state-manager manages only cross-skill shared state.
-  - id: SKL-022
-    name: Context Compressor
-    short_description: Semantically compress large context payloads to fit within token budget tiers without losing decision-critical information
-    reference_path: skills/knowledge/context-compressor.md
-    executable_skill: .opencode/skills/context-compressor/SKILL.md
-    tags:
-      - context
-      - compression
-      - token-budget
-      - summarization
-      - truncation
-      - memory
-    version: 1.0.0
-    depends_on: []
-    mastery_level: intermediate
-    use_when: |
-      Context payload exceeds the current token budget tier, long sessions accumulate large state, or a skill receives more input than its context window can accommodate.
-    do_not_use_when: |
-      Context is already within budget — unnecessary compression loses fidelity.
-  - id: SKL-023
-    name: Dependency Analyzer
-    short_description: Build and maintain a directed dependency graph; detect cycles; compute ripple effects of any change
-    reference_path: skills/knowledge/dependency-analyzer.md
-    executable_skill: .opencode/skills/dependency-analyzer/SKILL.md
-    tags:
-      - dependencies
-      - graph
-      - cycles
-      - ripple-effect
-      - impact
-      - modules
-    version: 1.1.0
-    depends_on:
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      Building the module dependency graph, detecting circular dependencies, or computing which modules are transitively affected by a change.
-    do_not_use_when: |
-      Analyzing impact across non-code artifacts (docs, ADRs) — use change-impact-analyzer instead.
-  - id: SKL-024
-    name: Change Impact Analyzer
-    short_description: Compute the full impact surface of a proposed change across modules, APIs, tests, docs, and security boundaries
-    reference_path: skills/knowledge/change-impact-analyzer.md
-    executable_skill: .opencode/skills/change-impact-analyzer/SKILL.md
-    tags:
-      - impact
-      - change
-      - blast-radius
-      - api
-      - tests
-      - security
-      - modules
-    version: 1.1.0
-    depends_on:
-      - SKL-023
-      - SKL-021
-    mastery_level: advanced
-    use_when: |
-      Before executing any modification — to know the full impact surface, required downstream skills, and overall severity before a single line of code is changed.
-    do_not_use_when: |
-      Post-change analysis — this skill runs pre-change only.
-  - id: SKL-025
-    name: Event Router
-    short_description: Route system events to their registered skill handlers; maintain the event-to-skill dispatch map; deduplicate events
-    reference_path: skills/knowledge/event-router.md
-    executable_skill: .opencode/skills/event-router/SKILL.md
-    tags:
-      - events
-      - routing
-      - dispatch
-      - event-driven
-      - bus
-      - deduplication
-    version: 1.0.0
-    depends_on:
-      - SKL-010
-      - SKL-021
-    mastery_level: advanced
-    use_when: |
-      Routing any system event to its downstream skill handlers, registering new event-to-skill bindings, querying what handles a given event type, or replaying a past event.
-    do_not_use_when: |
-      Direct skill invocation without an event — use the orchestrator directly for non-event-driven calls.
-  - id: SKL-026
-    name: Code Generator
-    short_description: Generate implementation files, scaffolding, and interface stubs from architecture modules, feature plans, or interface contracts
-    reference_path: skills/knowledge/code-generator.md
-    executable_skill: .opencode/skills/code-generator/SKILL.md
-    tags:
-      - code-generation
-      - scaffolding
-      - implementation
-      - boilerplate
-      - stubs
-      - modules
-    version: 1.1.0
-    depends_on:
-      - SKL-002
-      - SKL-003
-    mastery_level: advanced
-    use_when: |
-      Generating new code artifacts from an architecture spec or feature plan, scaffolding a new module, or producing interface stubs from a contract.
-    do_not_use_when: |
-      Modifying existing code — use code-repair (SKL-029) for fixes or clean-code-review (SKL-004) for refactoring.
-  - id: SKL-027
-    name: ADR Generator
-    short_description: Produce immutable Architecture Decision Records from architectural choices, tradeoffs, and alternatives
-    reference_path: skills/knowledge/adr-generator.md
-    executable_skill: .opencode/skills/adr-generator/SKILL.md
-    tags:
-      - adr
-      - architecture
-      - decisions
-      - tradeoffs
-      - documentation
-      - records
-    version: 1.0.0
-    depends_on:
-      - SKL-002
-    mastery_level: intermediate
-    use_when: |
-      Documenting a significant architectural or technical decision, capturing alternatives considered and their tradeoffs, or superseding a prior ADR.
-    do_not_use_when: |
-      General documentation — use documentation-generator (SKL-008) or doc-maintainer (SKL-011) instead.
-  - id: SKL-028
-    name: Test Generator
-    short_description: Generate unit, integration, and edge-case test suites from code artifacts, interface contracts, or testing strategies
-    reference_path: skills/knowledge/test-generator.md
-    executable_skill: .opencode/skills/test-generator/SKILL.md
-    tags:
-      - testing
-      - unit-tests
-      - integration-tests
-      - coverage
-      - edge-cases
-      - test-generation
-    version: 1.0.0
-    depends_on:
-      - SKL-005
-      - SKL-026
-    mastery_level: intermediate
-    use_when: |
-      Generating test files from code artifacts or specs, filling coverage gaps, or regenerating tests invalidated by a code change.
-    do_not_use_when: |
-      Defining what to test or setting coverage targets — use testing-strategy (SKL-005) for that.
-  - id: SKL-029
-    name: Code Repair
-    short_description: Diagnose and apply minimal, validated fixes to failing tests, compile errors, type errors, and lint violations
-    reference_path: skills/knowledge/code-repair.md
-    executable_skill: .opencode/skills/code-repair/SKILL.md
-    tags:
-      - repair
-      - debugging
-      - fix
-      - test-failure
-      - compile-error
-      - type-error
-      - lint
-    version: 1.0.0
-    depends_on:
-      - SKL-004
-      - SKL-026
-    mastery_level: advanced
-    use_when: |
-      A build is broken, tests are failing, or linter violations need automated fixing with minimal blast radius and regression protection.
-    do_not_use_when: |
-      Refactoring working code for quality — use clean-code-review (SKL-004) for that.
-  - id: SKL-030
-    name: Rollback Manager
-    short_description: Safely revert system state to a prior snapshot on deployment failure, critical pipeline error, or unrecoverable code change
-    reference_path: skills/knowledge/rollback-manager.md
-    executable_skill: .opencode/skills/rollback-manager/SKILL.md
-    tags:
-      - rollback
-      - recovery
-      - snapshot
-      - revert
-      - deployment
-      - pipeline-safety
-    version: 1.0.0
-    depends_on:
-      - SKL-021
-      - SKL-025
-    mastery_level: advanced
-    use_when: |
-      A deployment fails, a code change produces unrecoverable errors, or a critical pipeline stage failure requires restoring a known-good system state.
-    do_not_use_when: |
-      Minor code fixes — use code-repair (SKL-029) for recoverable failures. Rollback is for unrecoverable failures and deployment reversions only.
-  - id: SKL-031
-    name: Frontend UI/UX Architect
-    short_description: Design and validate screen structure, navigation, component contracts, accessibility, motion specs, visual excellence targets, and creative layout strategies for any UI feature
-    reference_path: skills/knowledge/frontend-ux-architect.md
-    reference_sections:
-      - "## Principles"
-      - "## Screen Architecture"
-      - "## Accessibility Standards"
-      - "## Anti-Patterns"
-    executable_skill: .opencode/skills/frontend-ux-architect/SKILL.md
-    tags:
-      - ui-ux
-      - design
-      - components
-      - accessibility
-      - wcag
-      - design-tokens
-      - navigation
-      - responsive
-      - motion
-      - visual-excellence
-      - creative-layouts
-    version: 2.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: Designing or validating any user interface layer — screen structure, component contracts, navigation architecture, interaction patterns, accessibility compliance, motion design specs, visual excellence targets, or creative layout exploration.
-    do_not_use_when: |
-      Features with no user interface (pure API, background jobs, CLI tools).
-  - id: SKL-032
-    name: Database Architect
-    short_description: Design normalized schemas, ERDs, indexing strategies, audit logging, soft-delete patterns, and migration plans for any data model
-    reference_path: skills/knowledge/database-architect.md
-    reference_sections:
-      - "## Principles"
-      - "## Normalization Reference"
-      - "## Indexing Strategy"
-      - "## Anti-Patterns"
-    executable_skill: .opencode/skills/database-architect/SKILL.md
-    tags:
-      - database
-      - schema
-      - erd
-      - normalization
-      - indexing
-      - migrations
-      - audit-logging
-      - soft-delete
-    version: 1.1.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      Designing or reviewing any data persistence layer — entity definitions, relationships, migration strategies, indexing, or audit logging.
-    do_not_use_when: |
-      Features with no persistent state. For in-memory or ephemeral data, use architecture-design (SKL-002).
-  - id: SKL-033
-    name: Implementation Completeness Auditor
-    short_description: Cross-check all requirements against delivered code, tests, UI, DB, and docs; produce a readiness score (0–100) and traceability matrix
-    reference_path: skills/knowledge/implementation-completeness-auditor.md
-    reference_sections:
-      - "## Principles"
-      - "## Coverage Dimensions"
-      - "## Gap Classifications"
-      - "## Readiness Score Calculation"
-    executable_skill: .opencode/skills/implementation-completeness-auditor/SKILL.md
-    tags:
-      - completeness
-      - audit
-      - traceability
-      - readiness-score
-      - gap-analysis
-      - requirements-coverage
-    version: 1.1.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-003
-      - SKL-026
-    mastery_level: intermediate
-    use_when: |
-      Verifying that all requirements have been fully implemented before release — detecting missing features, stubs, untested code, and undocumented functionality.
-    do_not_use_when: |
-      Early development stages where implementation is known to be incomplete. Use at the end of an implementation cycle, not during it.
-  - id: SKL-034
-    name: Database Guard
-    short_description: Enforce database schema safety by blocking destructive migrations, missing FK indexes, unannotated PII, and missing cascade rules
-    reference_path: skills/knowledge/database-architect.md
-    reference_sections:
-      - "## Anti-Patterns"
-      - "## Security Rules"
-    executable_skill: .opencode/skills/database-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - database
-      - migrations
-      - pii
-      - fk-index
-      - schema-safety
-    version: 1.0.0
-    depends_on:
-      - SKL-032
-    mastery_level: intermediate
-    use_when: |
-      Validating any proposed schema change or migration before it is applied. Runs as a validation_check gate in the pipeline after database-architect output.
-    do_not_use_when: |
-      No database changes in the current pipeline cycle.
-  - id: SKL-035
-    name: Performance Guard
-    short_description: Detect N+1 query patterns, missing query indexes, bulk operation anti-patterns, and blocking calls before they reach production
-    reference_path: skills/knowledge/architecture-design.md
-    reference_sections:
-      - "## Principles"
-    executable_skill: .opencode/skills/performance-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - performance
-      - n-plus-one
-      - indexes
-      - bulk-operations
-      - blocking
-    version: 1.0.0
-    depends_on:
-      - SKL-002
-      - SKL-004
-    mastery_level: intermediate
-    use_when: |
-      Validating implementation for performance regressions after code generation or before release. Runs as a validation_check gate in the pipeline.
-    do_not_use_when: |
-      No implementation artifacts exist yet (runs after code-generator, not before).
-  - id: SKL-036
-    name: UI/UX Compliance Guard
-    short_description: Block hardcoded design values, missing states, and contract violations; score visual quality, UX quality, and motion quality dimensions of UI implementations
-    reference_path: skills/knowledge/frontend-ux-architect.md
-    reference_sections:
-      - "## Anti-Patterns"
-      - "## Accessibility Standards"
-      - "## Theme System"
-    executable_skill: .opencode/skills/ui-ux-compliance-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - ui-ux
-      - design-system
-      - accessibility
-      - component-contracts
-      - visual-quality
-      - ux-quality
-      - motion-quality
-    version: 2.0.0
-    depends_on:
-      - SKL-031
-    mastery_level: intermediate
-    use_when: Validating UI component implementations against the contracts defined in frontend-ux-architect. Scores visual quality (consistency, modernity, brand alignment), UX quality (discoverability, learnability, efficiency, accessibility), and motion quality. Runs as a validation_check gate after UI code generation.
-    do_not_use_when: |
-      No UI components have been implemented yet, or the feature has no UI layer.
-  - id: SKL-037
-    name: Implementation Completeness Guard
-    short_description: Enforce the release readiness threshold by blocking pipeline advancement when the completeness audit score is below the configured minimum
-    reference_path: skills/knowledge/implementation-completeness-auditor.md
-    reference_sections:
-      - "## Readiness Score Calculation"
-      - "## Principles"
-    executable_skill: .opencode/skills/implementation-completeness-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - completeness
-      - readiness-score
-      - release-gate
-      - threshold
-    version: 1.0.0
-    depends_on:
-      - SKL-033
-    mastery_level: beginner
-    use_when: |
-      Enforcing the release readiness threshold before deployment approval. Always runs after implementation-completeness-auditor in a release pipeline.
-    do_not_use_when: |
-      implementation-completeness-auditor (SKL-033) has not been run in this pipeline cycle.
-  - id: SKL-038
-    name: Design System Generator
-    short_description: Generate design token files (including motion, elevation, glass tokens), multi-theme system, component stubs, and Storybook config from a UX architecture spec
-    reference_path: skills/knowledge/frontend-ux-architect.md
-    reference_sections:
-      - "## Principles"
-      - "## Theme System"
-    executable_skill: .opencode/skills/design-system-generator/SKILL.md
-    tags:
-      - design-system
-      - tokens
-      - components
-      - storybook
-      - tailwind
-      - css-variables
-      - scaffolding
-      - theming
-      - motion-tokens
-      - multi-theme
-      - glass-effects
-    version: 2.0.0
-    depends_on:
-      - SKL-031
-    mastery_level: intermediate
-    use_when: Generating the concrete design system file artifacts — multi-tier token files (including motion, elevation, blur/glass tokens), multi-theme system, component stubs, Storybook config — from the token requirements produced by frontend-ux-architect. Runs before code-generator.
-    do_not_use_when: |
-      frontend-ux-architect (SKL-031) has not run yet — this skill requires token_requirements and component_contracts as inputs. Also skip for projects with no UI layer.
-  - id: SKL-039
-    name: SEO Optimizer
-    short_description: Generate sitemap, robots.txt, JSON-LD structured data, Open Graph meta tags, and Core Web Vitals budget for any public-facing website
-    reference_path: skills/knowledge/frontend-ux-architect.md
-    reference_sections:
-      - "## Principles"
-    executable_skill: .opencode/skills/seo-optimizer/SKILL.md
-    tags:
-      - seo
-      - sitemap
-      - structured-data
-      - open-graph
-      - meta-tags
-      - core-web-vitals
-      - robots-txt
-      - json-ld
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-031
-    mastery_level: intermediate
-    use_when: |
-      Generating SEO artifacts and enforcing web performance standards for any public-facing website. Runs after code-generator and before deployment-strategy so that SEO compliance is verified before the site goes live.
-    do_not_use_when: |
-      Internal tools, admin panels, or developer portals without a public SEO requirement. API-only backends with no frontend. Private applications behind authentication walls.
-  - id: SKL-040
-    name: Prompt Normalizer
-    short_description: Extract structured intent and classify application domain from a raw user prompt; produce a routing-ready normalized prompt or a single targeted clarification question
-    reference_path: skills/knowledge/prompt-normalizer.md
-    reference_sections:
-      - "## Principles"
-      - "## Anti-patterns"
-      - "## Examples"
-    executable_skill: .opencode/skills/prompt-normalizer/SKILL.md
-    tags:
-      - prompt-normalization
-      - intent-extraction
-      - domain-classification
-      - routing
-      - meta
-      - pre-processing
-      - disambiguation
-    version: 1.1.0
-    depends_on: []
-    related_skills:
-      - SKL-001
-      - SKL-010
-      - SKL-025
-    mastery_level: intermediate
-    use_when: |
-      A raw user prompt is vague, missing routing keywords, or potentially ambiguous before pipeline entry. Invoke before the routing table is consulted, when no routing trigger keyword is matched with high confidence.
-    do_not_use_when: |
-      The prompt already contains unambiguous pipeline trigger keywords that map cleanly to a routing table entry. Also skip for internal system events — use event-router (SKL-025) instead.
-  - id: SKL-041
-    name: Security Guard
-    short_description: Convert security-review findings into a binary pass/block pipeline gate with CVSS threshold enforcement and compliance framework scaling
-    reference_path: skills/knowledge/security-review.md
-    reference_sections:
-      - "## Principles"
-      - "## OWASP Top 10"
-      - "## CVSS Scoring"
-    executable_skill: .opencode/skills/security-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - security
-      - cvss
-      - owasp
-      - compliance
-      - block
-      - findings
-      - pci-dss
-      - hipaa
-    version: 1.0.0
-    depends_on:
-      - SKL-006
-    mastery_level: advanced
-    use_when: |
-      After security-review (SKL-006) has run and its findings must be converted into a binary pipeline gate decision. Runs as a validation_check gate in phase-7b-guards, after architecture-design and clean-code-review complete.
-    do_not_use_when: |
-      security-review (SKL-006) has not been run in this pipeline cycle — this guard requires security_review output as mandatory input. Also skip for purely internal tooling with no external exposure and no sensitive data.
-  - id: SKL-042
-    name: CI Pipeline Generator
-    short_description: Generate executable CI/CD pipeline files (GitHub Actions / GitLab CI YAML, Dockerfile, docker-compose.yml, .env.example, Kubernetes manifests) from a deployment strategy
-    reference_path: skills/knowledge/deployment-strategy.md
-    reference_sections:
-      - "## Principles"
-      - "## CI/CD Practices"
-    executable_skill: .opencode/skills/ci-pipeline-generator/SKILL.md
-    tags:
-      - ci-cd
-      - github-actions
-      - gitlab-ci
-      - dockerfile
-      - kubernetes
-      - deployment
-      - pipeline
-      - scaffolding
-      - devops
-      - iac
-    version: 1.0.0
-    depends_on:
-      - SKL-007
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      After deployment-strategy (SKL-007) has produced a deployment plan and you need concrete, runnable CI/CD configuration files. Generates GitHub Actions, GitLab CI, Dockerfiles, docker-compose, and Kubernetes manifests.
-    do_not_use_when: |
-      deployment-strategy (SKL-007) has not run yet — this skill requires the deployment_strategy output. Also skip when existing CI/CD files are satisfactory and no scaffold is needed.
-  - id: SKL-043
-    name: AI Agent Specialist
-    short_description: Inject AI/agent-specific architecture patterns, prompt engineering standards, memory architecture, token budgets, evaluation frameworks, and safety controls when building LLM-powered or agentic systems
-    reference_path: skills/knowledge/ai-agent-specialist.md
-    reference_sections:
-      - "## Agent Architecture Patterns"
-      - "## Prompt Engineering"
-      - "## Safety Controls"
-      - "## Evaluation Frameworks"
-    executable_skill: .opencode/skills/ai-agent-specialist/SKILL.md
-    tags:
-      - ai
-      - llm
-      - rag
-      - multi-agent
-      - prompt-engineering
-      - vector-database
-      - safety
-      - evaluation
-      - langchain
-      - openai
-      - anthropic
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      The system being built has AI agent behavior as its core concern — LLM-powered applications, RAG pipelines, multi-agent orchestration, tool-use frameworks, or fine-tuned model pipelines. Activated automatically when domain_context.domain_primary == "ai_agent".
-    do_not_use_when: |
-      The system merely calls an AI API as a utility (e.g., a webhook that uses GPT for text formatting). Only use when the AI/agent reasoning, memory, or tool-use is the core system concern.
-  - id: SKL-044
-    name: Mobile Platform Specialist
-    short_description: Inject technology stack selection (iOS/Android/RN/Flutter/MAUI), offline-first architecture, push notification design, App Store compliance requirements, mobile security controls (certificate pinning, Keychain/Keystore, IAP server validation), device matrix, and platform-specific UX constraints when building native or cross-platform mobile apps
-    reference_path: skills/knowledge/mobile-platform-specialist.md
-    reference_sections:
-      - "## Technology Stack Patterns"
-      - "## App Store Compliance"
-      - "## Mobile Security Controls"
-      - "## Offline Architecture"
-    executable_skill: .opencode/skills/mobile-platform-specialist/SKILL.md
-    tags:
-      - mobile
-      - ios
-      - android
-      - react-native
-      - flutter
-      - maui
-      - app-store
-      - play-store
-      - push-notifications
-      - offline-first
-      - certificate-pinning
-      - in-app-purchases
-      - accessibility
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      The system being built is a native or cross-platform mobile application — iOS, Android, React Native, Flutter, or MAUI. Activated automatically when domain_context.domain_primary == "mobile". Use for any app distributed via the Apple App Store or Google Play Store.
-    do_not_use_when: |
-      The system is a mobile-responsive web app or PWA only (no native runtime). For PWA/responsive web, use frontend-ux-architect (SKL-009) with PWA mode instead. Only use this skill when a native or cross-platform mobile runtime is the core system concern.
-  - id: SKL-045
-    name: SaaS & Enterprise Architect
-    short_description: Inject multi-tenancy model selection (shared_db/schema_per_tenant/db_per_tenant), RBAC architecture, subscription billing design (Stripe/Chargebee, usage-based metering), enterprise SSO (SAML 2.0/OIDC/SCIM), compliance framework controls (SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS, FedRAMP), white-labeling capability, and audit logging architecture when building a SaaS platform or B2B enterprise product
-    reference_path: skills/knowledge/saas-enterprise-architect.md
-    reference_sections:
-      - "## Multi-Tenancy Models"
-      - "## Enterprise SSO"
-      - "## Compliance Frameworks"
-      - "## Subscription Billing"
-    executable_skill: .opencode/skills/saas-enterprise-architect/SKILL.md
-    tags:
-      - saas
-      - enterprise
-      - multi-tenant
-      - b2b
-      - rbac
-      - sso
-      - saml
-      - oidc
-      - scim
-      - billing
-      - stripe
-      - soc2
-      - iso27001
-      - hipaa
-      - gdpr
-      - pci-dss
-      - fedramp
-      - white-label
-      - audit-logging
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      The system being built is a multi-tenant SaaS platform or B2B enterprise product. Activated automatically when domain_context.domain_primary == "saas" or "enterprise". Use when tenant isolation, enterprise SSO, subscription billing, or compliance certification (SOC 2, HIPAA, etc.) is required.
-    do_not_use_when: |
-      The system is a single-tenant web app, an internal tool, or a consumer app with no multi-tenancy, enterprise SSO, or compliance certification requirements. Do not use for B2C consumer products — use the consumer-website pipeline instead.
-  - id: SKL-046
-    name: Systems Specialist
-    short_description: Inject embedded/IoT/real-time architecture patterns (bare-metal superloop, RTOS task model, IoT edge/cloud), memory budget, HAL design, communication protocol selection (MQTT/CoAP/BLE/LoRaWAN/CAN), OTA firmware update architecture (dual-bank flash, rollback, firmware signing), safety standard controls (IEC 62443, ISO 26262, IEC 61508), and game development architecture (ECS, game loop, multiplayer netcode, asset pipeline) when building embedded systems, IoT platforms, or games
-    reference_path: skills/knowledge/systems-specialist.md
-    reference_sections:
-      - "## Embedded Architecture Patterns"
-      - "## IoT Protocols"
-      - "## OTA Firmware Updates"
-      - "## Game Architecture"
-      - "## Safety Standards"
-    executable_skill: .opencode/skills/systems-specialist/SKILL.md
-    tags:
-      - embedded
-      - iot
-      - rtos
-      - freertos
-      - zephyr
-      - bare-metal
-      - real-time
-      - mqtt
-      - ble
-      - lorawan
-      - can-bus
-      - ota
-      - firmware
-      - misra-c
-      - iec-62443
-      - iso-26262
-      - game-dev
-      - ecs
-      - unity
-      - unreal
-      - godot
-      - netcode
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-    mastery_level: advanced
-    use_when: |
-      The system being built is an embedded system, IoT platform, real-time system, or game. Activated automatically when domain_context.domain_primary == "embedded_iot" or "game". Use when hardware constraints, real-time scheduling, RTOS task design, IoT protocols, OTA firmware updates, safety certification, game loop architecture, or ECS design is required.
-    do_not_use_when: |
-      The system is a standard cloud-native web backend, mobile app, or SaaS platform with no hardware constraints, real-time scheduling, or game-loop architecture. Do not use for systems that only use MQTT/WebSocket as a web protocol without embedded hardware constraints.
-  - id: SKL-047
-    name: Behavioral Telemetry Collector
-    short_description: Collect, scrub, and emit PII-free pipeline execution events into the behavioral_telemetry ring buffer for downstream analysis
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/behavioral-telemetry-collector/SKILL.md
-    tags:
-      - telemetry
-      - observability
-      - pii-scrubbing
-      - ring-buffer
-      - events
-      - pipeline
-      - monitoring
-    version: 1.0.0
-    depends_on:
-      - SKL-014
-      - SKL-021
-    mastery_level: intermediate
-    use_when: |
-      Collecting structured execution telemetry from any pipeline stage — skill latency, HITL outcomes, token usage, and gate decisions — for session-level analysis. Runs as an async hook after every orchestrator stage completion event.
-    do_not_use_when: |
-      opt_out_telemetry flag is set to true. Never use for application-level monitoring of deployed software outside the skill pipeline.
-  - id: SKL-048
-    name: Session Insights
-    short_description: Analyze behavioral_telemetry events to produce anomaly flags, HITL rejection ratios, and skill performance summaries for a completed session
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/session-insights/SKILL.md
-    tags:
-      - insights
-      - analysis
-      - anomaly-detection
-      - hitl
-      - performance
-      - session
-      - telemetry
-    version: 1.0.0
-    depends_on:
-      - SKL-047
-    mastery_level: intermediate
-    use_when: |
-      Analyzing a completed or in-progress session's telemetry events to surface skill failure patterns, HITL rejection trends, and latency anomalies. Produces session_summary consumed by enhancement-dashboard (SKL-049).
-    do_not_use_when: |
-      No telemetry events have been collected in this session (SKL-047 has not run). Never autonomously modifies registry or routing rules — suggestion-only.
-  - id: SKL-049
-    name: Enhancement Dashboard
-    short_description: Render a read-only session insights report (skill performance, HITL trends, anomaly flags, and improvement suggestions) for human review
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/enhancement-dashboard/SKILL.md
-    tags:
-      - dashboard
-      - reporting
-      - insights
-      - visualization
-      - human-review
-      - suggestions
-      - read-only
-    version: 1.0.0
-    depends_on:
-      - SKL-048
-    mastery_level: beginner
-    use_when: |
-      Presenting the session_summary produced by session-insights (SKL-048) as a human-readable report with improvement suggestions. Strictly read-only — never writes to system state or modifies pipeline configuration.
-    do_not_use_when: |
-      session-insights (SKL-048) has not produced a session_summary in this pipeline cycle. Do not invoke to trigger autonomous changes — it is a display-only skill.
-  - id: SKL-050
-    name: Adaptive Proposal Generator
-    short_description: Analyze session telemetry to generate ranked HITL-pending AdaptationProposals covering new skills, skill modifications, new pipelines, and agent changes
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/adaptive-proposal-generator/SKILL.md
-    tags:
-      - adaptive
-      - proposals
-      - self-improvement
-      - telemetry
-      - patterns
-      - hitl-gated
-      - suggestion-only
-    version: 1.0.0
-    depends_on:
-      - SKL-048
-      - SKL-015
-    mastery_level: advanced
-    use_when: |
-      Analyzing session_summary from session-insights (SKL-048) to surface failure patterns, HITL rejection hotspots, capability gaps, and routing improvements. Generates ranked proposals for human review. All proposals require explicit HITL approval before any change is applied.
-    do_not_use_when: |
-      session-insights (SKL-048) has not produced a session_summary. Never use to trigger autonomous changes — all output proposals have hitl_status: pending and must be approved by a human before adaptation-applicator (SKL-051) may run.
-  - id: SKL-051
-    name: Adaptation Applicator
-    short_description: Apply a single HITL-approved AdaptationProposal to the live skill system with rollback checkpoint, validate-skills.sh + build validation, and doc-maintainer sync
-    reference_path: skills/knowledge/observability.md
-    executable_skill: .opencode/skills/adaptation-applicator/SKILL.md
-    tags:
-      - adaptation
-      - apply
-      - hitl-approved
-      - rollback
-      - validation
-      - build
-      - self-improvement
-      - system-update
-    version: 1.0.0
-    depends_on:
-      - SKL-050
-      - SKL-012
-      - SKL-011
-    mastery_level: advanced
-    use_when: |
-      Applying a single AdaptationProposal that has been reviewed and approved (hitl_status == "approved") by the human operator. Creates a rollback checkpoint before any write, validates with validate-skills.sh and npm run build, and triggers doc-maintainer on success.
-    do_not_use_when: |
-      The proposal has not been approved (hitl_status != "approved"). Never invoke without a prior HITL gate. Use dry_run: true to preview changes safely without writing any file.
-  - id: SKL-052
-    name: Motion Design Architect
-    short_description: Design the complete motion system for a product — token hierarchy, micro-interactions, page transitions, scroll experiences, choreography, and 3D integration specs
-    reference_path: skills/knowledge/motion-design-architect.md
-    reference_sections:
-      - "## Principles"
-      - "## Motion Token Architecture"
-      - "## Micro-Interaction Patterns"
-      - "## Accessibility Motion Standards"
-      - "## Anti-Patterns"
-    executable_skill: .opencode/skills/motion-design-architect/SKILL.md
-    tags:
-      - motion
-      - animation
-      - design
-      - framer-motion
-      - spring-physics
-      - choreography
-      - transitions
-      - accessibility
-    version: 1.0.0
-    depends_on:
-      - SKL-031
-    related_skills:
-      - SKL-038
-      - SKL-036
-      - SKL-054
-    mastery_level: advanced
-    use_when: Designing a motion system, reviewing animations, planning page transitions, or choreographing multi-element interactions. Requires a motion_spec brief from frontend-ux-architect as input.
-    do_not_use_when: Static UI with no animation requirements. Also skip if frontend-ux-architect (SKL-031) has not yet produced a motion_spec.
-  - id: SKL-053
-    name: UX Research Synthesizer
-    short_description: Analyze user flows, map journeys, detect friction patterns, evaluate heuristics, audit accessibility experience, and score UX health for any UI design
-    reference_path: skills/knowledge/ux-research-synthesizer.md
-    reference_sections:
-      - "## Principles"
-      - "## Nielsen's 10 Usability Heuristics"
-      - "## Friction Pattern Library (F1–F15)"
-      - "## UX Health Score Formula"
-      - "## Anti-Patterns"
-    executable_skill: .opencode/skills/ux-research-synthesizer/SKILL.md
-    tags:
-      - ux-research
-      - journey-mapping
-      - heuristics
-      - friction-detection
-      - accessibility
-      - usability
-      - information-architecture
-    version: 1.0.0
-    depends_on:
-      - SKL-031
-    related_skills:
-      - SKL-036
-      - SKL-054
-    mastery_level: advanced
-    use_when: Analyzing user flows, mapping journeys, detecting friction points, or evaluating a UI against usability heuristics. Best run after frontend-ux-architect produces a screen inventory and navigation map.
-    do_not_use_when: Visual design reviews or code compliance checks — use ui-ux-compliance-guard (SKL-036) for those. Also skip when no screens or navigation map are available.
-  - id: SKL-054
-    name: Creative Experience Architect
-    short_description: Architect world-class, emotionally resonant interfaces — innovative layouts, story-driven flows, immersive backgrounds, premium component enhancements, and creative briefs with industry references
-    reference_path: skills/knowledge/creative-experience-architect.md
-    reference_sections:
-      - "## Principles"
-      - "## Creative Archetype Library"
-      - "## Layout Pattern Reference"
-      - "## Premium Component Patterns"
-      - "## Anti-Patterns"
-    executable_skill: .opencode/skills/creative-experience-architect/SKILL.md
-    tags:
-      - creative-design
-      - premium-ux
-      - bento-layout
-      - storytelling
-      - immersive
-      - motion-design
-      - typography
-      - visual-excellence
-    version: 1.0.0
-    depends_on:
-      - SKL-031
-    related_skills:
-      - SKL-052
-      - SKL-053
-      - SKL-036
-    mastery_level: advanced
-    use_when: Designing innovative, premium, or emotionally differentiated interfaces beyond standard enterprise patterns. Use when creativity_level is premium or world-class in the product brief.
-    do_not_use_when: Standard CRUD screens or dashboards without a creative brief or differentiation requirement — use frontend-ux-architect (SKL-031) directly for those.
+- id: SKL-001
+  name: Requirement Analysis
+  short_description: Extract, normalize, and validate requirements from unstructured raw input
+  reference_path: skills/knowledge/requirement-analysis.md
+  reference_sections:
+  - '## Principles'
+  - '## Anti-patterns'
+  - '## Source References'
+  executable_skill: .opencode/skills/requirement-analyzer/SKILL.md
+  tags:
+  - requirements
+  - analysis
+  - ambiguity
+  - clarification
+  - normalization
+  - invest
+  version: 1.2.0
+  depends_on: []
+  mastery_level: intermediate
+  use_when: 'Starting any new feature, epic, or system change where requirements are unclear, unstructured, or assumed.
 
-# ── WORK LIFECYCLE MANAGEMENT LAYER (SKL-055 to SKL-058) ──────────────────
-  - id: SKL-055
-    name: Defect Manager
-    short_description: Manage the full defect lifecycle from intake to closure — creates BUG records and generates the companion task chain (INVESTIGATION, FIX, TEST, REVIEW, VALIDATION, CLOSURE) for all reported defects
-    reference_path: docs/work-item-foundation.md
-    reference_sections:
-      - "## 8. Defect Chain Pattern (Defect-Manager)"
-      - "## 4. Lifecycle State Machine"
-      - "## 2. Jira-Compatible Base Schema"
-    executable_skill: .opencode/skills/defect-manager/SKILL.md
-    tags:
-      - defect
-      - bug-tracking
-      - lifecycle
-      - task-chain
-      - work-items
-      - triage
-      - code-repair
-    version: 1.0.0
-    depends_on:
-      - SKL-021
-      - SKL-003
-      - SKL-029
-    related_skills:
-      - SKL-056
-      - SKL-057
-      - SKL-058
-    mastery_level: intermediate
-    use_when: A defect is reported from any source — test failure, security finding, code-review escalation, or manual report. Use to create a structured BUG record and generate the full repair task chain.
-    do_not_use_when: General task creation without an associated defect — use feature-planning (SKL-003) for implementation work. Do not use for change requests — use change-request-manager (SKL-056) instead.
-  - id: SKL-056
-    name: Change Request Manager
-    short_description: Manage change requests from intake through impact analysis, HITL approval, and task delta generation — feeds back into feature-planning for re-planning without modifying existing tasks directly
-    reference_path: docs/work-item-foundation.md
-    reference_sections:
-      - "## 4. Lifecycle State Machine"
-      - "## 6. Traceability Link Types"
-    executable_skill: .opencode/skills/change-request-manager/SKILL.md
-    tags:
-      - change-request
-      - lifecycle
-      - impact-analysis
-      - task-delta
-      - work-items
-      - hitl
-      - scope-change
-    version: 1.0.0
-    depends_on:
-      - SKL-021
-      - SKL-024
-      - SKL-003
-    related_skills:
-      - SKL-055
-      - SKL-057
-      - SKL-058
-    mastery_level: intermediate
-    use_when: A change request is raised, a requirement changes, or the project scope is modified. Use to run impact analysis, enforce human approval, and generate a task delta for re-planning.
-    do_not_use_when: Bug reports — use defect-manager (SKL-055) instead. Also skip for minor clarifications that do not affect scope or task graph.
-  - id: SKL-057
-    name: Work Item Exporter
-    short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — one-way outbound export, async, runs at pipeline completion or on demand
-    reference_path: docs/work-item-foundation.md
-    reference_sections:
-      - "## 2. Jira-Compatible Base Schema"
-      - "## 1. Work Item Type Taxonomy"
-    executable_skill: .opencode/skills/work-item-exporter/SKILL.md
-    tags:
-      - export
-      - jira
-      - integration
-      - work-items
-      - async
-      - outbound
-      - jsonl
-      - markdown
-    version: 1.0.0
-    depends_on:
-      - SKL-021
-      - SKL-055
-      - SKL-056
-    mastery_level: beginner
-    use_when: Work items need to be exported to Jira, a file, or a human-readable report. Runs async at pipeline completion. Can also be triggered on demand.
-    do_not_use_when: No work items have been created in this session. This is a one-way export — do not use for bidirectional sync or importing external issues.
-  - id: SKL-058
-    name: Work Item Lifecycle Guard
-    short_description: Validate work item lifecycle state transitions against the rules in docs/work-item-foundation.md — returns allow, warn, or block verdict before any state write
-    reference_path: docs/work-item-foundation.md
-    reference_sections:
-      - "## 4. Lifecycle State Machine"
-      - "## 4.5 Invalid Transition Rules"
-    executable_skill: .opencode/skills/work-item-lifecycle-guard/SKILL.md
-    tags:
-      - guard
-      - governance
-      - lifecycle
-      - work-items
-      - state-machine
-      - validation
-      - transition
-    version: 1.0.0
-    depends_on: []
-    related_skills:
-      - SKL-055
-      - SKL-056
-    mastery_level: beginner
-    use_when: Validating a work item state transition before writing it to the work_items scope. Acts as a governance gate in all work lifecycle pipelines. Initial deployment mode is warning.
-    do_not_use_when: Reading work items or querying state without a pending transition. This guard evaluates transitions only — not general work item queries.
-  - id: SKL-065
-    name: Gap-to-Skill Pipeline
-    short_description: Reactive pipeline entry skill — converts a logged capability gap into a registered draft skill, enforcing dedup check, quality scoring, and non-bypassable HITL approval before registration
-    reference_path: .opencode/skills/gap-to-skill-pipeline/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Human-in-the-Loop"
-    executable_skill: .opencode/skills/gap-to-skill-pipeline/SKILL.md
-    tags:
-      - reactive
-      - gap-detection
-      - skill-generation
-      - hitl
-      - pipeline
-      - meta
-      - phase-6
-    version: 1.0.0
-    depends_on:
-      - SKL-047
-      - SKL-012
-      - SKL-015
-    related_skills:
-      - SKL-048
-      - SKL-010
-    mastery_level: advanced
-    use_when: |
-      A capability gap has been logged in session state (gap_context present). Run to convert the gap into a draft skill through dedup-checked, HITL-governed skill-authoring and quality-scoring.
-    do_not_use_when: |
-      No gap_context is present in session state. Do not invoke autonomously — requires a prior capability gap detection event (FEATURE-001) to populate gap_context. Never skip the HITL gate.
-  - id: SKL-066
-    name: Semantic Diff Analyzer
-    short_description: Compares before/after code to detect behavioral changes — logic shifts, contract changes, security boundary alterations — beyond line-level diffs
-    reference_path: .opencode/skills/semantic-diff-analyzer/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/semantic-diff-analyzer/SKILL.md
-    tags:
-      - diff
-      - behavioral-analysis
-      - security
-      - impact
-      - code-change
-      - architecture
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-024
-    related_skills:
-      - SKL-006
-      - SKL-028
-      - SKL-004
-    mastery_level: advanced
-    use_when: |
-      A code change has been detected and you need to understand what behavioral contracts changed, not just which lines. Use before security-review and test-generator for any non-trivial code modification.
-    do_not_use_when: |
-      The change is purely cosmetic (formatting, comments, variable renames with no logic change). Do not use for dependency version bumps or configuration-only changes.
-  - id: SKL-067
-    name: Acceptance Criteria Generator
-    short_description: Transforms structured requirements into formal BDD-style Given/When/Then acceptance criteria with AC IDs, negative scenarios, and testability ratings
-    reference_path: .opencode/skills/acceptance-criteria-generator/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/acceptance-criteria-generator/SKILL.md
-    tags:
-      - acceptance-criteria
-      - bdd
-      - gherkin
-      - requirements
-      - testing
-      - traceability
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-    related_skills:
-      - SKL-005
-      - SKL-028
-    mastery_level: intermediate
-    use_when: |
-      Structured requirements from requirement-analyzer are available and you need to generate executable acceptance criteria for test generation or sprint planning.
-    do_not_use_when: |
-      Requirements are not yet structured or validated. Run requirement-analyzer first. Do not use for purely technical tasks with no user-facing behavior.
-  - id: SKL-068
-    name: Technical Debt Tracker
-    short_description: Maintains a persistent cross-session technical debt register with debt score, trend analysis, maintenance cost projections, and prioritized remediation backlog
-    reference_path: .opencode/skills/technical-debt-tracker/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/technical-debt-tracker/SKILL.md
-    tags:
-      - technical-debt
-      - quality
-      - cross-session
-      - code-review
-      - remediation
-      - maintenance
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-004
-      - SKL-026
-    related_skills:
-      - SKL-003
-    mastery_level: intermediate
-    use_when: |
-      After clean-code-review produces issues and you want to track debt accumulation over time, get a debt score, or generate a prioritized remediation backlog for sprint planning.
-    do_not_use_when: |
-      First pipeline run with no prior clean-code-review output. Do not use for single-run analysis without state persistence configured.
-  - id: SKL-069
-    name: Architecture Evolution Planner
-    short_description: Produces a phased, sprint-sized migration plan from current to target architecture using strangler-fig, branch-by-abstraction, and expand-contract patterns
-    reference_path: .opencode/skills/architecture-evolution-planner/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Human-in-the-Loop Gates"
-    executable_skill: .opencode/skills/architecture-evolution-planner/SKILL.md
-    tags:
-      - architecture
-      - migration
-      - refactoring
-      - strangler-fig
-      - evolution
-      - planning
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-002
-      - SKL-029
-      - SKL-023
-    related_skills:
-      - SKL-003
-      - SKL-024
-    mastery_level: advanced
-    use_when: |
-      You have a current architecture and a target architecture and need a safe, incremental migration plan. Use for large refactors, monolith-to-microservices, or any multi-sprint architecture evolution.
-    do_not_use_when: |
-      You are designing an architecture from scratch. Use architecture-design (SKL-002) instead. Do not use when current and target architecture are identical.
-  - id: SKL-070
-    name: Compliance Mapper
-    short_description: Maps system features and architecture against GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 clauses to produce a compliance traceability matrix and audit evidence checklist
-    reference_path: .opencode/skills/compliance-mapper/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/compliance-mapper/SKILL.md
-    tags:
-      - compliance
-      - gdpr
-      - hipaa
-      - pci-dss
-      - soc2
-      - iso27001
-      - governance
-      - traceability
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-006
-    related_skills:
-      - SKL-041
-      - SKL-008
-    mastery_level: advanced
-    use_when: |
-      Building a regulated system (fintech, healthcare, govtech, SaaS with enterprise customers) and you need to verify which regulatory clauses are covered and which are missing.
-    do_not_use_when: |
-      Building a purely internal tool with no user data and no regulatory requirements. Do not use before security-review has run.
-  - id: SKL-071
-    name: API Deprecation Manager
-    short_description: Manages the full API version lifecycle — current, deprecated, sunset — auto-generates migration guides from breaking changes and creates consumer migration work items
-    reference_path: .opencode/skills/api-deprecation-manager/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/api-deprecation-manager/SKILL.md
-    tags:
-      - api
-      - deprecation
-      - versioning
-      - lifecycle
-      - migration
-      - breaking-changes
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-024
-      - SKL-026
-    related_skills:
-      - SKL-007
-      - SKL-008
-    mastery_level: intermediate
-    use_when: |
-      A breaking API change is detected, an API version needs to be deprecated, or you need to generate a migration guide for API consumers. Use for any public or internal API with known consumers.
-    do_not_use_when: |
-      The change is backward-compatible. Do not use for internal implementation changes that do not affect the public API contract.
-  - id: SKL-072
-    name: Infrastructure Cost Estimator
-    short_description: Projects monthly cloud infrastructure costs (AWS/GCP/Azure) from deployment-strategy output with per-provider breakdowns, alternatives, and cost optimization suggestions
-    reference_path: .opencode/skills/infrastructure-cost-estimator/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/infrastructure-cost-estimator/SKILL.md
-    tags:
-      - cost
-      - infrastructure
-      - aws
-      - gcp
-      - azure
-      - deployment
-      - estimation
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-007
-      - SKL-002
-    related_skills:
-      - SKL-042
-    mastery_level: intermediate
-    use_when: |
-      A deployment strategy has been defined and you need cost projections before committing to infrastructure. Use for any production deployment decision where budget matters.
-    do_not_use_when: |
-      No deployment strategy exists yet. Run deployment-strategy (SKL-007) first. Do not use for local development or test environments.
-  - id: SKL-073
-    name: Mutation Test Generator
-    short_description: Performs static mutation analysis on source code and test suite, infers kill status, produces mutation score and assertion gaps to eliminate surviving mutants
-    reference_path: .opencode/skills/mutation-test-generator/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/mutation-test-generator/SKILL.md
-    tags:
-      - mutation-testing
-      - test-quality
-      - coverage
-      - assertions
-      - static-analysis
-      - testing
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-028
-      - SKL-027
-    related_skills:
-      - SKL-005
-    mastery_level: advanced
-    use_when: |
-      Test coverage targets are met but you need to verify tests actually catch bugs. Use after test-generator to validate test suite effectiveness for critical modules.
-    do_not_use_when: |
-      No tests exist yet. Run test-generator (SKL-028) first. Do not use for integration or e2e tests — mutation analysis is for unit-level logic.
-  - id: SKL-074
-    name: Skill Simulator
-    short_description: Runs a complete pipeline in simulation mode with no disk writes, producing a preview report of files that would change, HITL gates predicted, block risks, and token estimates
-    reference_path: .opencode/skills/skill-simulator/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/skill-simulator/SKILL.md
-    tags:
-      - simulation
-      - dry-run
-      - preview
-      - pipeline
-      - safety
-      - orchestration
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-010
-      - SKL-026
-    related_skills:
-      - SKL-010
-    mastery_level: intermediate
-    use_when: |
-      Before running a full pipeline for the first time, testing a new pipeline configuration, or when you want to preview what changes a pipeline would make without committing any writes.
-    do_not_use_when: |
-      You need actual pipeline outputs or file changes. The simulator produces previews only — it does not generate code, update docs, or write any artifacts.
-  - id: SKL-075
-    name: Multi-Repo Coordinator
-    short_description: Coordinates changes across multiple repositories — maintains cross-repo dependency registry, detects cross-boundary breaking changes, and generates synchronized work items per affected repo
-    reference_path: .opencode/skills/multi-repo-coordinator/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Human-in-the-Loop Gates"
-    executable_skill: .opencode/skills/multi-repo-coordinator/SKILL.md
-    tags:
-      - multi-repo
-      - polyrepo
-      - microservices
-      - cross-repo
-      - dependency
-      - coordination
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-024
-      - SKL-023
-      - SKL-026
-    related_skills:
-      - SKL-025
-    mastery_level: advanced
-    use_when: |
-      Working in a polyrepo or microservices architecture where a change in one repo (especially a shared library) may break consumers in other repos. Use before committing breaking changes.
-    do_not_use_when: |
-      Working in a monorepo where all code is in one repository. Do not use for single-service changes with no downstream consumers.
-  - id: SKL-076
-    name: Domain Knowledge Extractor
-    short_description: Extracts reusable domain patterns from completed pipelines into a persistent knowledge base and injects relevant patterns into subsequent pipelines in the same domain
-    reference_path: .opencode/skills/domain-knowledge-extractor/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Outputs"
-    executable_skill: .opencode/skills/domain-knowledge-extractor/SKILL.md
-    tags:
-      - domain-knowledge
-      - learning
-      - cross-project
-      - context
-      - patterns
-      - system
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-001
-      - SKL-002
-      - SKL-006
-      - SKL-032
-      - SKL-026
-    related_skills:
-      - SKL-013
-      - SKL-022
-    mastery_level: advanced
-    use_when: |
-      At pipeline end (extract mode) to capture reusable patterns, or at pipeline start (inject mode) when working in a domain with prior knowledge. Enables cross-project learning.
-    do_not_use_when: |
-      First-ever pipeline with no prior history (no knowledge to inject). Do not use inject mode if no domain knowledge base exists for the detected domain.
-  - id: SKL-077
-    name: Pipeline Branching
-    short_description: Forks pipeline at architecture-design into two A/B branches, runs both through quality skills in parallel, produces a comparison scorecard and recommendation, enforces mandatory HITL branch selection
-    reference_path: .opencode/skills/pipeline-branching/SKILL.md
-    reference_sections:
-      - "## Purpose"
-      - "## Execution Logic"
-      - "## Human-in-the-Loop Gates"
-    executable_skill: .opencode/skills/pipeline-branching/SKILL.md
-    tags:
-      - branching
-      - a-b-testing
-      - architecture
-      - comparison
-      - orchestration
-      - decision-support
-      - phase-7
-    version: 1.0.0
-    depends_on:
-      - SKL-002
-      - SKL-003
-      - SKL-006
-      - SKL-005
-      - SKL-026
-    related_skills:
-      - SKL-029
-      - SKL-010
-    mastery_level: advanced
-    use_when: |
-      Two viable architecture approaches exist and you need an objective comparison before committing. Use when teams are divided on architectural decisions or when major design tradeoffs need evidence-based resolution.
-    do_not_use_when: |
-      Only one architecture approach is viable. Do not use as part of the default pipeline — only invoke explicitly when comparative evaluation is needed. Requires both architecture variants as input.
+    '
+  do_not_use_when: 'Requirements are already fully specified, validated, and unambiguous with no open questions.
+
+    '
+- id: SKL-002
+  name: Architecture Design
+  short_description: Define system modules, boundaries, data flow, and integration contracts from validated requirements
+  reference_path: skills/knowledge/architecture-design.md
+  reference_sections:
+  - '## Principles'
+  - '## Practices'
+  - '## Source References'
+  executable_skill: .opencode/skills/architecture-design/SKILL.md
+  tags:
+  - architecture
+  - ddd
+  - solid
+  - modules
+  - design
+  - boundaries
+  - clean-architecture
+  version: 1.3.0
+  depends_on:
+  - SKL-001
+  mastery_level: advanced
+  use_when: 'Translating validated requirements into a concrete system structure with explicit module boundaries and integration
+    contracts.
+
+    '
+  do_not_use_when: 'Requirements are incomplete or contain open questions — resolve SKL-001 first.
+
+    '
+- id: SKL-003
+  name: Feature Planning
+  short_description: Decompose architecture into tasks, dependencies, complexity estimates, and a phased delivery roadmap
+  reference_path: skills/knowledge/feature-planning.md
+  reference_sections:
+  - '## Practices'
+  - '## Anti-patterns'
+  executable_skill: .opencode/skills/feature-planning/SKILL.md
+  tags:
+  - planning
+  - tasks
+  - roadmap
+  - story-points
+  - agile
+  - milestones
+  - dependencies
+  version: 2.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: intermediate
+  use_when: 'Translating an approved architecture into an actionable, dependency-aware implementation plan with complexity
+    estimates.
+
+    '
+  do_not_use_when: 'Architecture design is not approved or contains unresolved design decisions.
+
+    '
+- id: SKL-004
+  name: Clean Code Review
+  short_description: Analyze code against SOLID principles, clean architecture, and detect anti-patterns
+  reference_path: skills/knowledge/clean-code.md
+  reference_sections:
+  - '## Principles'
+  - '## Anti-patterns'
+  - '## Examples'
+  - '## Source References'
+  executable_skill: .opencode/skills/clean-code-review/SKILL.md
+  tags:
+  - code-quality
+  - solid
+  - clean-code
+  - refactoring
+  - review
+  - readability
+  - smells
+  version: 1.1.0
+  depends_on:
+  - SKL-003
+  mastery_level: intermediate
+  use_when: 'Reviewing any implementation for quality, maintainability, readability, or before a code review gate in the pipeline.
+
+    '
+  do_not_use_when: 'Code is minified, auto-generated, compiled output, or is configuration/markup only.
+
+    '
+- id: SKL-005
+  name: Testing Strategy
+  short_description: Define unit, integration, and e2e test plans with coverage targets and quality gates
+  reference_path: skills/knowledge/testing-strategy.md
+  reference_sections:
+  - '## Principles'
+  - '## Practices'
+  - '## Anti-patterns'
+  - '## Source References'
+  executable_skill: .opencode/skills/testing-strategy/SKILL.md
+  tags:
+  - testing
+  - tdd
+  - coverage
+  - quality-gates
+  - unit-tests
+  - integration
+  - pyramid
+  version: 1.2.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  mastery_level: intermediate
+  use_when: 'Defining how any feature or system change will be verified before it is promoted to the next environment.
+
+    '
+  do_not_use_when: 'Feature is a pure configuration or content change with no behavioral or logic impact.
+
+    '
+- id: SKL-006
+  name: Security Review
+  short_description: Perform threat modeling, map vulnerabilities to OWASP Top 10, and produce remediation plans
+  reference_path: skills/knowledge/security-review.md
+  reference_sections:
+  - '## Principles'
+  - '## Practices'
+  - '## Source References'
+  executable_skill: .opencode/skills/security-review/SKILL.md
+  tags:
+  - security
+  - owasp
+  - stride
+  - threat-modeling
+  - vulnerabilities
+  - cwe
+  - authentication
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-004
+  mastery_level: advanced
+  use_when: 'Reviewing any system that handles user data, authentication, external APIs, payments, or other sensitive operations.
+
+    '
+  do_not_use_when: 'Internal tooling with no external exposure, no user data, and no sensitive operations.
+
+    '
+- id: SKL-007
+  name: Deployment Strategy
+  short_description: Define environment topology, promotion gates, rollback criteria, and feature flag governance
+  reference_path: skills/knowledge/deployment-strategy.md
+  reference_sections:
+  - '## Principles'
+  - '## Practices'
+  - '## Anti-patterns'
+  - '## Source References'
+  executable_skill: .opencode/skills/deployment-strategy/SKILL.md
+  tags:
+  - deployment
+  - ci-cd
+  - environments
+  - rollback
+  - feature-flags
+  - blue-green
+  - canary
+  version: 1.1.0
+  depends_on:
+  - SKL-002
+  - SKL-005
+  mastery_level: intermediate
+  use_when: 'Releasing any change to a staging, pre-production, or production environment.
+
+    '
+  do_not_use_when: 'Development-environment-only changes with no path to production.
+
+    '
+- id: SKL-008
+  name: Documentation Generation
+  short_description: Auto-generate API docs, ADRs, and READMEs from structured pipeline artifacts
+  reference_path: skills/knowledge/documentation-generation.md
+  executable_skill: .opencode/skills/documentation-generator/SKILL.md
+  tags:
+  - documentation
+  - api-docs
+  - adr
+  - readme
+  - auto-generation
+  - openapi
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-004
+  mastery_level: beginner
+  use_when: 'After any feature is completed to generate or refresh system documentation from pipeline artifacts.
+
+    '
+  do_not_use_when: 'No pipeline artifacts are available as input — raw documentation should be written manually.
+
+    '
+- id: SKL-009
+  name: Schema Validation
+  short_description: Validate any JSON data against a JSON Schema (draft-07) and report field-level issues
+  reference_path: skills/knowledge/schema-validation.md
+  executable_skill: .opencode/skills/schema-validator/SKILL.md
+  tags:
+  - validation
+  - json-schema
+  - contracts
+  - schema
+  - utility
+  - draft-07
+  version: 1.0.0
+  depends_on: []
+  mastery_level: beginner
+  use_when: 'Verifying that any skill output or pipeline artifact conforms to its declared schema before passing it downstream.
+
+    '
+  do_not_use_when: 'Input data is not JSON, or no schema is available for the data type.
+
+    '
+- id: SKL-010
+  name: Orchestration
+  short_description: Execute the skill pipeline with routing, validation, retries, and HITL gate enforcement
+  reference_path: skills/knowledge/orchestration.md
+  executable_skill: .opencode/skills/orchestrator/SKILL.md
+  tags:
+  - orchestration
+  - pipeline
+  - routing
+  - hitl
+  - meta-skill
+  - retry
+  - feedback-loop
+  version: 1.1.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-004
+  - SKL-005
+  - SKL-006
+  - SKL-007
+  - SKL-009
+  mastery_level: advanced
+  use_when: 'Running a multi-skill pipeline end-to-end with schema validation, HITL oversight, and feedback loop management.
+
+    '
+  do_not_use_when: 'Running a single skill in isolation — invoke the skill directly instead of using the orchestrator.
+
+    '
+- id: SKL-011
+  name: Documentation Maintenance
+  short_description: Detect system changes and keep the /docs folder consistent, versioned, and up to date
+  reference_path: skills/knowledge/doc-maintenance.md
+  executable_skill: .opencode/skills/doc-maintainer/SKILL.md
+  tags:
+  - documentation
+  - maintenance
+  - consistency
+  - drift-detection
+  - auto-update
+  version: 1.1.0
+  depends_on:
+  - SKL-008
+  - SKL-009
+  mastery_level: intermediate
+  use_when: 'After any system change (skill, agent, workflow, architecture, config) to synchronize /docs with the current
+    system state.
+
+    '
+  do_not_use_when: 'No system changes have occurred; use full_scan detection_mode to proactively check for documentation drift
+    instead.
+
+    '
+- id: SKL-012
+  name: Skill Authoring
+  short_description: Design, generate, validate, and register skills as structured artifacts with graph integrity and quality
+    scoring
+  reference_path: skills/knowledge/skill-authoring.md
+  reference_sections:
+  - '## Principles'
+  - '## Anti-patterns'
+  - '## Examples'
+  executable_skill: .opencode/skills/skill-authoring/SKILL.md
+  tags:
+  - meta
+  - skill-design
+  - graph
+  - validation
+  - lifecycle
+  - compiler
+  - governance
+  version: 1.0.0
+  depends_on:
+  - SKL-009
+  - SKL-011
+  related_skills:
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'Creating a new skill, refactoring an existing one, splitting an overloaded skill, validating a skill against
+    quality standards, or evolving a skill to a new version.
+
+    '
+  do_not_use_when: 'Executing a domain task (use the appropriate domain skill instead). Replacing workflow pipelines or implementing
+    business logic.
+
+    '
+- id: SKL-013
+  name: Context Memory
+  short_description: Manage session state, compress artifacts, and enable multi-turn pipeline resumption
+  reference_path: skills/knowledge/context-memory.md
+  executable_skill: .opencode/skills/context-memory/SKILL.md
+  tags:
+  - session
+  - context
+  - state
+  - persistence
+  - multi-turn
+  - resumption
+  - compression
+  version: 1.0.0
+  depends_on: []
+  mastery_level: intermediate
+  use_when: 'Managing state across multiple pipeline turns, resuming a halted pipeline session, or preventing context bleed
+    between sequential skill executions.
+
+    '
+  do_not_use_when: 'Running a single-skill invocation with no need for cross-turn state.
+
+    '
+- id: SKL-014
+  name: Observability
+  short_description: Define and collect standardized metrics across all skills and the orchestrator pipeline
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/observability/SKILL.md
+  tags:
+  - metrics
+  - monitoring
+  - observability
+  - logging
+  - telemetry
+  - pipeline
+  version: 1.1.0
+  depends_on: []
+  mastery_level: intermediate
+  use_when: 'Adding metrics collection to a skill, monitoring pipeline health, or auditing execution performance across orchestrated
+    skill runs.
+
+    '
+  do_not_use_when: 'Application-level monitoring of deployed software outside the skill pipeline.
+
+    '
+- id: SKL-015
+  name: Quality Scoring
+  short_description: Score a skill against the 7-dimension rubric to determine if it meets the registration threshold
+  reference_path: skills/knowledge/quality-scoring.md
+  executable_skill: .opencode/skills/quality-scoring/SKILL.md
+  tags:
+  - quality
+  - scoring
+  - evaluation
+  - rubric
+  - governance
+  - registration
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-012
+  mastery_level: intermediate
+  use_when: 'Evaluating whether a skill is ready for registration, or auditing an existing skill''s quality score for improvement
+    targeting.
+
+    '
+  do_not_use_when: 'Scoring non-skill artifacts (use schema-validator for JSON validation instead).
+
+    '
+- id: SKL-016
+  name: Skill Lifecycle
+  short_description: Govern a skill through its 12-stage lifecycle from intent discovery to retirement
+  reference_path: skills/knowledge/skill-lifecycle.md
+  executable_skill: .opencode/skills/skill-lifecycle/SKILL.md
+  tags:
+  - lifecycle
+  - governance
+  - deprecation
+  - promotion
+  - stages
+  - meta
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-012
+  - SKL-015
+  mastery_level: advanced
+  use_when: 'Checking what lifecycle stage a skill is in, advancing a skill to the next stage, deprecating a skill, or retiring
+    a skill from the registry.
+
+    '
+  do_not_use_when: 'Executing a skill''s functional capability — use the skill itself directly.
+
+    '
+- id: SKL-017
+  name: Trigger Engineering
+  short_description: Define and refine activation trigger conditions with positive, negative, and edge-case routing scenarios
+  reference_path: skills/knowledge/trigger-engineering.md
+  executable_skill: .opencode/skills/trigger-engineering/SKILL.md
+  tags:
+  - triggers
+  - routing
+  - activation
+  - disambiguation
+  - meta
+  - skill-design
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-012
+  - SKL-016
+  mastery_level: intermediate
+  use_when: 'Defining or improving trigger conditions for a skill, resolving activation conflicts between adjacent skills,
+    or improving routing accuracy.
+
+    '
+  do_not_use_when: 'Defining business logic or execution steps — trigger engineering covers routing only.
+
+    '
+- id: SKL-018
+  name: Validation Rules
+  short_description: Validate and enforce structural and content rules on skills/index.yaml entries
+  reference_path: skills/knowledge/validation-rules.md
+  executable_skill: .opencode/skills/validation-rules/SKILL.md
+  tags:
+  - validation
+  - index
+  - rules
+  - schema
+  - governance
+  - quality
+  version: 1.0.0
+  depends_on:
+  - SKL-009
+  related_skills:
+  - SKL-012
+  mastery_level: beginner
+  use_when: 'Checking whether a skills/index.yaml entry conforms to all structural and content rules before or after registration.
+
+    '
+  do_not_use_when: 'Validating general JSON payloads outside of index.yaml — use schema-validator (SKL-009) instead.
+
+    '
+- id: SKL-019
+  name: Versioning
+  short_description: Assign, bump, and govern semver version numbers for skills and the registry
+  reference_path: skills/knowledge/versioning.md
+  executable_skill: .opencode/skills/versioning/SKILL.md
+  tags:
+  - versioning
+  - semver
+  - changelog
+  - governance
+  - compatibility
+  - breaking-changes
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-012
+  - SKL-016
+  mastery_level: beginner
+  use_when: 'Deciding what version bump a skill change warrants, checking backward compatibility, or enforcing deprecation
+    policy.
+
+    '
+  do_not_use_when: 'Versioning non-skill artifacts (application releases, API versions, etc.).
+
+    '
+- id: SKL-020
+  name: Sub-Agent Creation
+  short_description: Compile a capability requirement into a fully-specified, orchestrator-controlled sub-agent spec
+  reference_path: skills/knowledge/create-sub-agent.md
+  executable_skill: .opencode/skills/create-sub-agent/SKILL.md
+  tags:
+  - sub-agent
+  - agent-design
+  - scaffolding
+  - meta
+  - automation
+  - spec-generation
+  version: 1.0.0
+  depends_on:
+  - SKL-009
+  related_skills:
+  - SKL-012
+  - SKL-016
+  mastery_level: advanced
+  use_when: 'Creating a new sub-agent module with a defined single responsibility, input/output contracts, and tool permissions
+    for use in the orchestrated pipeline.
+
+    '
+  do_not_use_when: 'Creating general skill SKILL.md files — use skill-authoring (SKL-012) instead. This skill generates sub-agent
+    specs only.
+
+    '
+- id: SKL-021
+  name: State Manager
+  short_description: Read, write, diff, snapshot, and restore shared system state across all pipeline skills
+  reference_path: skills/knowledge/state-manager.md
+  executable_skill: .opencode/skills/state-manager/SKILL.md
+  tags:
+  - state
+  - persistence
+  - snapshot
+  - restore
+  - session
+  - shared-state
+  version: 1.1.0
+  depends_on: []
+  mastery_level: advanced
+  use_when: 'Any skill needs to read or write shared system state, take a pre-change snapshot, restore a prior snapshot, or
+    diff state before and after a pipeline stage.
+
+    '
+  do_not_use_when: 'Accessing local skill-internal variables — state-manager manages only cross-skill shared state.
+
+    '
+- id: SKL-022
+  name: Context Compressor
+  short_description: Semantically compress large context payloads to fit within token budget tiers without losing decision-critical
+    information
+  reference_path: skills/knowledge/context-compressor.md
+  executable_skill: .opencode/skills/context-compressor/SKILL.md
+  tags:
+  - context
+  - compression
+  - token-budget
+  - summarization
+  - truncation
+  - memory
+  version: 1.0.0
+  depends_on: []
+  mastery_level: intermediate
+  use_when: 'Context payload exceeds the current token budget tier, long sessions accumulate large state, or a skill receives
+    more input than its context window can accommodate.
+
+    '
+  do_not_use_when: 'Context is already within budget — unnecessary compression loses fidelity.
+
+    '
+- id: SKL-023
+  name: Dependency Analyzer
+  short_description: Build and maintain a directed dependency graph; detect cycles; compute ripple effects of any change
+  reference_path: skills/knowledge/dependency-analyzer.md
+  executable_skill: .opencode/skills/dependency-analyzer/SKILL.md
+  tags:
+  - dependencies
+  - graph
+  - cycles
+  - ripple-effect
+  - impact
+  - modules
+  version: 1.1.0
+  depends_on:
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'Building the module dependency graph, detecting circular dependencies, or computing which modules are transitively
+    affected by a change.
+
+    '
+  do_not_use_when: 'Analyzing impact across non-code artifacts (docs, ADRs) — use change-impact-analyzer instead.
+
+    '
+- id: SKL-024
+  name: Change Impact Analyzer
+  short_description: Compute the full impact surface of a proposed change across modules, APIs, tests, docs, and security
+    boundaries
+  reference_path: skills/knowledge/change-impact-analyzer.md
+  executable_skill: .opencode/skills/change-impact-analyzer/SKILL.md
+  tags:
+  - impact
+  - change
+  - blast-radius
+  - api
+  - tests
+  - security
+  - modules
+  version: 1.1.0
+  depends_on:
+  - SKL-023
+  - SKL-021
+  mastery_level: advanced
+  use_when: 'Before executing any modification — to know the full impact surface, required downstream skills, and overall
+    severity before a single line of code is changed.
+
+    '
+  do_not_use_when: 'Post-change analysis — this skill runs pre-change only.
+
+    '
+- id: SKL-025
+  name: Event Router
+  short_description: Route system events to their registered skill handlers; maintain the event-to-skill dispatch map; deduplicate
+    events
+  reference_path: skills/knowledge/event-router.md
+  executable_skill: .opencode/skills/event-router/SKILL.md
+  tags:
+  - events
+  - routing
+  - dispatch
+  - event-driven
+  - bus
+  - deduplication
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  - SKL-021
+  mastery_level: advanced
+  use_when: 'Routing any system event to its downstream skill handlers, registering new event-to-skill bindings, querying
+    what handles a given event type, or replaying a past event.
+
+    '
+  do_not_use_when: 'Direct skill invocation without an event — use the orchestrator directly for non-event-driven calls.
+
+    '
+- id: SKL-026
+  name: Code Generator
+  short_description: Generate implementation files, scaffolding, and interface stubs from architecture modules, feature plans,
+    or interface contracts
+  reference_path: skills/knowledge/code-generator.md
+  executable_skill: .opencode/skills/code-generator/SKILL.md
+  tags:
+  - code-generation
+  - scaffolding
+  - implementation
+  - boilerplate
+  - stubs
+  - modules
+  version: 1.1.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  mastery_level: advanced
+  use_when: 'Generating new code artifacts from an architecture spec or feature plan, scaffolding a new module, or producing
+    interface stubs from a contract.
+
+    '
+  do_not_use_when: 'Modifying existing code — use code-repair (SKL-029) for fixes or clean-code-review (SKL-004) for refactoring.
+
+    '
+- id: SKL-027
+  name: ADR Generator
+  short_description: Produce immutable Architecture Decision Records from architectural choices, tradeoffs, and alternatives
+  reference_path: skills/knowledge/adr-generator.md
+  executable_skill: .opencode/skills/adr-generator/SKILL.md
+  tags:
+  - adr
+  - architecture
+  - decisions
+  - tradeoffs
+  - documentation
+  - records
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  mastery_level: intermediate
+  use_when: 'Documenting a significant architectural or technical decision, capturing alternatives considered and their tradeoffs,
+    or superseding a prior ADR.
+
+    '
+  do_not_use_when: 'General documentation — use documentation-generator (SKL-008) or doc-maintainer (SKL-011) instead.
+
+    '
+- id: SKL-028
+  name: Test Generator
+  short_description: Generate unit, integration, and edge-case test suites from code artifacts, interface contracts, or testing
+    strategies
+  reference_path: skills/knowledge/test-generator.md
+  executable_skill: .opencode/skills/test-generator/SKILL.md
+  tags:
+  - testing
+  - unit-tests
+  - integration-tests
+  - coverage
+  - edge-cases
+  - test-generation
+  version: 1.0.0
+  depends_on:
+  - SKL-005
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Generating test files from code artifacts or specs, filling coverage gaps, or regenerating tests invalidated
+    by a code change.
+
+    '
+  do_not_use_when: 'Defining what to test or setting coverage targets — use testing-strategy (SKL-005) for that.
+
+    '
+- id: SKL-029
+  name: Code Repair
+  short_description: Diagnose and apply minimal, validated fixes to failing tests, compile errors, type errors, and lint violations
+  reference_path: skills/knowledge/code-repair.md
+  executable_skill: .opencode/skills/code-repair/SKILL.md
+  tags:
+  - repair
+  - debugging
+  - fix
+  - test-failure
+  - compile-error
+  - type-error
+  - lint
+  version: 1.0.0
+  depends_on:
+  - SKL-004
+  - SKL-026
+  mastery_level: advanced
+  use_when: 'A build is broken, tests are failing, or linter violations need automated fixing with minimal blast radius and
+    regression protection.
+
+    '
+  do_not_use_when: 'Refactoring working code for quality — use clean-code-review (SKL-004) for that.
+
+    '
+- id: SKL-030
+  name: Rollback Manager
+  short_description: Safely revert system state to a prior snapshot on deployment failure, critical pipeline error, or unrecoverable
+    code change
+  reference_path: skills/knowledge/rollback-manager.md
+  executable_skill: .opencode/skills/rollback-manager/SKILL.md
+  tags:
+  - rollback
+  - recovery
+  - snapshot
+  - revert
+  - deployment
+  - pipeline-safety
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  - SKL-025
+  mastery_level: advanced
+  use_when: 'A deployment fails, a code change produces unrecoverable errors, or a critical pipeline stage failure requires
+    restoring a known-good system state.
+
+    '
+  do_not_use_when: 'Minor code fixes — use code-repair (SKL-029) for recoverable failures. Rollback is for unrecoverable failures
+    and deployment reversions only.
+
+    '
+- id: SKL-031
+  name: Frontend UI/UX Architect
+  short_description: Design and validate screen structure, navigation, component contracts, accessibility, motion specs, visual
+    excellence targets, and creative layout strategies for any UI feature
+  reference_path: skills/knowledge/frontend-ux-architect.md
+  reference_sections:
+  - '## Principles'
+  - '## Screen Architecture'
+  - '## Accessibility Standards'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/frontend-ux-architect/SKILL.md
+  tags:
+  - ui-ux
+  - design
+  - components
+  - accessibility
+  - wcag
+  - design-tokens
+  - navigation
+  - responsive
+  - motion
+  - visual-excellence
+  - creative-layouts
+  version: 2.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: Designing or validating any user interface layer — screen structure, component contracts, navigation architecture,
+    interaction patterns, accessibility compliance, motion design specs, visual excellence targets, or creative layout exploration.
+  do_not_use_when: 'Features with no user interface (pure API, background jobs, CLI tools).
+
+    '
+- id: SKL-032
+  name: Database Architect
+  short_description: Design normalized schemas, ERDs, indexing strategies, audit logging, soft-delete patterns, and migration
+    plans for any data model
+  reference_path: skills/knowledge/database-architect.md
+  reference_sections:
+  - '## Principles'
+  - '## Normalization Reference'
+  - '## Indexing Strategy'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/database-architect/SKILL.md
+  tags:
+  - database
+  - schema
+  - erd
+  - normalization
+  - indexing
+  - migrations
+  - audit-logging
+  - soft-delete
+  version: 1.1.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'Designing or reviewing any data persistence layer — entity definitions, relationships, migration strategies,
+    indexing, or audit logging.
+
+    '
+  do_not_use_when: 'Features with no persistent state. For in-memory or ephemeral data, use architecture-design (SKL-002).
+
+    '
+- id: SKL-033
+  name: Implementation Completeness Auditor
+  short_description: Cross-check all requirements against delivered code, tests, UI, DB, and docs; produce a readiness score
+    (0–100) and traceability matrix
+  reference_path: skills/knowledge/implementation-completeness-auditor.md
+  reference_sections:
+  - '## Principles'
+  - '## Coverage Dimensions'
+  - '## Gap Classifications'
+  - '## Readiness Score Calculation'
+  executable_skill: .opencode/skills/implementation-completeness-auditor/SKILL.md
+  tags:
+  - completeness
+  - audit
+  - traceability
+  - readiness-score
+  - gap-analysis
+  - requirements-coverage
+  version: 1.1.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Verifying that all requirements have been fully implemented before release — detecting missing features, stubs,
+    untested code, and undocumented functionality.
+
+    '
+  do_not_use_when: 'Early development stages where implementation is known to be incomplete. Use at the end of an implementation
+    cycle, not during it.
+
+    '
+- id: SKL-034
+  name: Database Guard
+  short_description: Enforce database schema safety by blocking destructive migrations, missing FK indexes, unannotated PII,
+    and missing cascade rules
+  reference_path: skills/knowledge/database-architect.md
+  reference_sections:
+  - '## Anti-Patterns'
+  - '## Security Rules'
+  executable_skill: .opencode/skills/database-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - database
+  - migrations
+  - pii
+  - fk-index
+  - schema-safety
+  version: 1.0.0
+  depends_on:
+  - SKL-032
+  mastery_level: intermediate
+  use_when: 'Validating any proposed schema change or migration before it is applied. Runs as a validation_check gate in the
+    pipeline after database-architect output.
+
+    '
+  do_not_use_when: 'No database changes in the current pipeline cycle.
+
+    '
+- id: SKL-035
+  name: Performance Guard
+  short_description: Detect N+1 query patterns, missing query indexes, bulk operation anti-patterns, and blocking calls before
+    they reach production
+  reference_path: skills/knowledge/architecture-design.md
+  reference_sections:
+  - '## Principles'
+  executable_skill: .opencode/skills/performance-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - performance
+  - n-plus-one
+  - indexes
+  - bulk-operations
+  - blocking
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-004
+  mastery_level: intermediate
+  use_when: 'Validating implementation for performance regressions after code generation or before release. Runs as a validation_check
+    gate in the pipeline.
+
+    '
+  do_not_use_when: 'No implementation artifacts exist yet (runs after code-generator, not before).
+
+    '
+- id: SKL-036
+  name: UI/UX Compliance Guard
+  short_description: Block hardcoded design values, missing states, and contract violations; score visual quality, UX quality,
+    and motion quality dimensions of UI implementations
+  reference_path: skills/knowledge/frontend-ux-architect.md
+  reference_sections:
+  - '## Anti-Patterns'
+  - '## Accessibility Standards'
+  - '## Theme System'
+  executable_skill: .opencode/skills/ui-ux-compliance-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - ui-ux
+  - design-system
+  - accessibility
+  - component-contracts
+  - visual-quality
+  - ux-quality
+  - motion-quality
+  version: 2.0.0
+  depends_on:
+  - SKL-031
+  mastery_level: intermediate
+  use_when: Validating UI component implementations against the contracts defined in frontend-ux-architect. Scores visual
+    quality (consistency, modernity, brand alignment), UX quality (discoverability, learnability, efficiency, accessibility),
+    and motion quality. Runs as a validation_check gate after UI code generation.
+  do_not_use_when: 'No UI components have been implemented yet, or the feature has no UI layer.
+
+    '
+- id: SKL-037
+  name: Implementation Completeness Guard
+  short_description: Enforce the release readiness threshold by blocking pipeline advancement when the completeness audit
+    score is below the configured minimum
+  reference_path: skills/knowledge/implementation-completeness-auditor.md
+  reference_sections:
+  - '## Readiness Score Calculation'
+  - '## Principles'
+  executable_skill: .opencode/skills/implementation-completeness-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - completeness
+  - readiness-score
+  - release-gate
+  - threshold
+  version: 1.0.0
+  depends_on:
+  - SKL-033
+  mastery_level: beginner
+  use_when: 'Enforcing the release readiness threshold before deployment approval. Always runs after implementation-completeness-auditor
+    in a release pipeline.
+
+    '
+  do_not_use_when: 'implementation-completeness-auditor (SKL-033) has not been run in this pipeline cycle.
+
+    '
+- id: SKL-038
+  name: Design System Generator
+  short_description: Generate design token files (including motion, elevation, glass tokens), multi-theme system, component
+    stubs, and Storybook config from a UX architecture spec
+  reference_path: skills/knowledge/frontend-ux-architect.md
+  reference_sections:
+  - '## Principles'
+  - '## Theme System'
+  executable_skill: .opencode/skills/design-system-generator/SKILL.md
+  tags:
+  - design-system
+  - tokens
+  - components
+  - storybook
+  - tailwind
+  - css-variables
+  - scaffolding
+  - theming
+  - motion-tokens
+  - multi-theme
+  - glass-effects
+  version: 2.0.0
+  depends_on:
+  - SKL-031
+  mastery_level: intermediate
+  use_when: Generating the concrete design system file artifacts — multi-tier token files (including motion, elevation, blur/glass
+    tokens), multi-theme system, component stubs, Storybook config — from the token requirements produced by frontend-ux-architect.
+    Runs before code-generator.
+  do_not_use_when: 'frontend-ux-architect (SKL-031) has not run yet — this skill requires token_requirements and component_contracts
+    as inputs. Also skip for projects with no UI layer.
+
+    '
+- id: SKL-039
+  name: SEO Optimizer
+  short_description: Generate sitemap, robots.txt, JSON-LD structured data, Open Graph meta tags, and Core Web Vitals budget
+    for any public-facing website
+  reference_path: skills/knowledge/frontend-ux-architect.md
+  reference_sections:
+  - '## Principles'
+  executable_skill: .opencode/skills/seo-optimizer/SKILL.md
+  tags:
+  - seo
+  - sitemap
+  - structured-data
+  - open-graph
+  - meta-tags
+  - core-web-vitals
+  - robots-txt
+  - json-ld
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-031
+  mastery_level: intermediate
+  use_when: 'Generating SEO artifacts and enforcing web performance standards for any public-facing website. Runs after code-generator
+    and before deployment-strategy so that SEO compliance is verified before the site goes live.
+
+    '
+  do_not_use_when: 'Internal tools, admin panels, or developer portals without a public SEO requirement. API-only backends
+    with no frontend. Private applications behind authentication walls.
+
+    '
+- id: SKL-040
+  name: Prompt Normalizer
+  short_description: Extract structured intent and classify application domain from a raw user prompt; produce a routing-ready
+    normalized prompt or a single targeted clarification question
+  reference_path: skills/knowledge/prompt-normalizer.md
+  reference_sections:
+  - '## Principles'
+  - '## Anti-patterns'
+  - '## Examples'
+  executable_skill: .opencode/skills/prompt-normalizer/SKILL.md
+  tags:
+  - prompt-normalization
+  - intent-extraction
+  - domain-classification
+  - routing
+  - meta
+  - pre-processing
+  - disambiguation
+  version: 1.1.0
+  depends_on: []
+  related_skills:
+  - SKL-001
+  - SKL-010
+  - SKL-025
+  mastery_level: intermediate
+  use_when: 'A raw user prompt is vague, missing routing keywords, or potentially ambiguous before pipeline entry. Invoke
+    before the routing table is consulted, when no routing trigger keyword is matched with high confidence.
+
+    '
+  do_not_use_when: 'The prompt already contains unambiguous pipeline trigger keywords that map cleanly to a routing table
+    entry. Also skip for internal system events — use event-router (SKL-025) instead.
+
+    '
+- id: SKL-041
+  name: Security Guard
+  short_description: Convert security-review findings into a binary pass/block pipeline gate with CVSS threshold enforcement
+    and compliance framework scaling
+  reference_path: skills/knowledge/security-review.md
+  reference_sections:
+  - '## Principles'
+  - '## OWASP Top 10'
+  - '## CVSS Scoring'
+  executable_skill: .opencode/skills/security-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - security
+  - cvss
+  - owasp
+  - compliance
+  - block
+  - findings
+  - pci-dss
+  - hipaa
+  version: 1.0.0
+  depends_on:
+  - SKL-006
+  mastery_level: advanced
+  use_when: 'After security-review (SKL-006) has run and its findings must be converted into a binary pipeline gate decision.
+    Runs as a validation_check gate in phase-7b-guards, after architecture-design and clean-code-review complete.
+
+    '
+  do_not_use_when: 'security-review (SKL-006) has not been run in this pipeline cycle — this guard requires security_review
+    output as mandatory input. Also skip for purely internal tooling with no external exposure and no sensitive data.
+
+    '
+- id: SKL-042
+  name: CI Pipeline Generator
+  short_description: Generate executable CI/CD pipeline files (GitHub Actions / GitLab CI YAML, Dockerfile, docker-compose.yml,
+    .env.example, Kubernetes manifests) from a deployment strategy
+  reference_path: skills/knowledge/deployment-strategy.md
+  reference_sections:
+  - '## Principles'
+  - '## CI/CD Practices'
+  executable_skill: .opencode/skills/ci-pipeline-generator/SKILL.md
+  tags:
+  - ci-cd
+  - github-actions
+  - gitlab-ci
+  - dockerfile
+  - kubernetes
+  - deployment
+  - pipeline
+  - scaffolding
+  - devops
+  - iac
+  version: 1.0.0
+  depends_on:
+  - SKL-007
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'After deployment-strategy (SKL-007) has produced a deployment plan and you need concrete, runnable CI/CD configuration
+    files. Generates GitHub Actions, GitLab CI, Dockerfiles, docker-compose, and Kubernetes manifests.
+
+    '
+  do_not_use_when: 'deployment-strategy (SKL-007) has not run yet — this skill requires the deployment_strategy output. Also
+    skip when existing CI/CD files are satisfactory and no scaffold is needed.
+
+    '
+- id: SKL-043
+  name: AI Agent Specialist
+  short_description: Inject AI/agent-specific architecture patterns, prompt engineering standards, memory architecture, token
+    budgets, evaluation frameworks, and safety controls when building LLM-powered or agentic systems
+  reference_path: skills/knowledge/ai-agent-specialist.md
+  reference_sections:
+  - '## Agent Architecture Patterns'
+  - '## Prompt Engineering'
+  - '## Safety Controls'
+  - '## Evaluation Frameworks'
+  executable_skill: .opencode/skills/ai-agent-specialist/SKILL.md
+  tags:
+  - ai
+  - llm
+  - rag
+  - multi-agent
+  - prompt-engineering
+  - vector-database
+  - safety
+  - evaluation
+  - langchain
+  - openai
+  - anthropic
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'The system being built has AI agent behavior as its core concern — LLM-powered applications, RAG pipelines, multi-agent
+    orchestration, tool-use frameworks, or fine-tuned model pipelines. Activated automatically when domain_context.domain_primary
+    == "ai_agent".
+
+    '
+  do_not_use_when: 'The system merely calls an AI API as a utility (e.g., a webhook that uses GPT for text formatting). Only
+    use when the AI/agent reasoning, memory, or tool-use is the core system concern.
+
+    '
+- id: SKL-044
+  name: Mobile Platform Specialist
+  short_description: Inject technology stack selection (iOS/Android/RN/Flutter/MAUI), offline-first architecture, push notification
+    design, App Store compliance requirements, mobile security controls (certificate pinning, Keychain/Keystore, IAP server
+    validation), device matrix, and platform-specific UX constraints when building native or cross-platform mobile apps
+  reference_path: skills/knowledge/mobile-platform-specialist.md
+  reference_sections:
+  - '## Technology Stack Patterns'
+  - '## App Store Compliance'
+  - '## Mobile Security Controls'
+  - '## Offline Architecture'
+  executable_skill: .opencode/skills/mobile-platform-specialist/SKILL.md
+  tags:
+  - mobile
+  - ios
+  - android
+  - react-native
+  - flutter
+  - maui
+  - app-store
+  - play-store
+  - push-notifications
+  - offline-first
+  - certificate-pinning
+  - in-app-purchases
+  - accessibility
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'The system being built is a native or cross-platform mobile application — iOS, Android, React Native, Flutter,
+    or MAUI. Activated automatically when domain_context.domain_primary == "mobile". Use for any app distributed via the Apple
+    App Store or Google Play Store.
+
+    '
+  do_not_use_when: 'The system is a mobile-responsive web app or PWA only (no native runtime). For PWA/responsive web, use
+    frontend-ux-architect (SKL-009) with PWA mode instead. Only use this skill when a native or cross-platform mobile runtime
+    is the core system concern.
+
+    '
+- id: SKL-045
+  name: SaaS & Enterprise Architect
+  short_description: Inject multi-tenancy model selection (shared_db/schema_per_tenant/db_per_tenant), RBAC architecture,
+    subscription billing design (Stripe/Chargebee, usage-based metering), enterprise SSO (SAML 2.0/OIDC/SCIM), compliance
+    framework controls (SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS, FedRAMP), white-labeling capability, and audit logging architecture
+    when building a SaaS platform or B2B enterprise product
+  reference_path: skills/knowledge/saas-enterprise-architect.md
+  reference_sections:
+  - '## Multi-Tenancy Models'
+  - '## Enterprise SSO'
+  - '## Compliance Frameworks'
+  - '## Subscription Billing'
+  executable_skill: .opencode/skills/saas-enterprise-architect/SKILL.md
+  tags:
+  - saas
+  - enterprise
+  - multi-tenant
+  - b2b
+  - rbac
+  - sso
+  - saml
+  - oidc
+  - scim
+  - billing
+  - stripe
+  - soc2
+  - iso27001
+  - hipaa
+  - gdpr
+  - pci-dss
+  - fedramp
+  - white-label
+  - audit-logging
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'The system being built is a multi-tenant SaaS platform or B2B enterprise product. Activated automatically when
+    domain_context.domain_primary == "saas" or "enterprise". Use when tenant isolation, enterprise SSO, subscription billing,
+    or compliance certification (SOC 2, HIPAA, etc.) is required.
+
+    '
+  do_not_use_when: 'The system is a single-tenant web app, an internal tool, or a consumer app with no multi-tenancy, enterprise
+    SSO, or compliance certification requirements. Do not use for B2C consumer products — use the consumer-website pipeline
+    instead.
+
+    '
+- id: SKL-046
+  name: Systems Specialist
+  short_description: Inject embedded/IoT/real-time architecture patterns (bare-metal superloop, RTOS task model, IoT edge/cloud),
+    memory budget, HAL design, communication protocol selection (MQTT/CoAP/BLE/LoRaWAN/CAN), OTA firmware update architecture
+    (dual-bank flash, rollback, firmware signing), safety standard controls (IEC 62443, ISO 26262, IEC 61508), and game development
+    architecture (ECS, game loop, multiplayer netcode, asset pipeline) when building embedded systems, IoT platforms, or games
+  reference_path: skills/knowledge/systems-specialist.md
+  reference_sections:
+  - '## Embedded Architecture Patterns'
+  - '## IoT Protocols'
+  - '## OTA Firmware Updates'
+  - '## Game Architecture'
+  - '## Safety Standards'
+  executable_skill: .opencode/skills/systems-specialist/SKILL.md
+  tags:
+  - embedded
+  - iot
+  - rtos
+  - freertos
+  - zephyr
+  - bare-metal
+  - real-time
+  - mqtt
+  - ble
+  - lorawan
+  - can-bus
+  - ota
+  - firmware
+  - misra-c
+  - iec-62443
+  - iso-26262
+  - game-dev
+  - ecs
+  - unity
+  - unreal
+  - godot
+  - netcode
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'The system being built is an embedded system, IoT platform, real-time system, or game. Activated automatically
+    when domain_context.domain_primary == "embedded_iot" or "game". Use when hardware constraints, real-time scheduling, RTOS
+    task design, IoT protocols, OTA firmware updates, safety certification, game loop architecture, or ECS design is required.
+
+    '
+  do_not_use_when: 'The system is a standard cloud-native web backend, mobile app, or SaaS platform with no hardware constraints,
+    real-time scheduling, or game-loop architecture. Do not use for systems that only use MQTT/WebSocket as a web protocol
+    without embedded hardware constraints.
+
+    '
+- id: SKL-047
+  name: Behavioral Telemetry Collector
+  short_description: Collect, scrub, and emit PII-free pipeline execution events into the behavioral_telemetry ring buffer
+    for downstream analysis
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/behavioral-telemetry-collector/SKILL.md
+  tags:
+  - telemetry
+  - observability
+  - pii-scrubbing
+  - ring-buffer
+  - events
+  - pipeline
+  - monitoring
+  version: 1.0.0
+  depends_on:
+  - SKL-014
+  - SKL-021
+  mastery_level: intermediate
+  use_when: 'Collecting structured execution telemetry from any pipeline stage — skill latency, HITL outcomes, token usage,
+    and gate decisions — for session-level analysis. Runs as an async hook after every orchestrator stage completion event.
+
+    '
+  do_not_use_when: 'opt_out_telemetry flag is set to true. Never use for application-level monitoring of deployed software
+    outside the skill pipeline.
+
+    '
+- id: SKL-048
+  name: Session Insights
+  short_description: Analyze behavioral_telemetry events to produce anomaly flags, HITL rejection ratios, and skill performance
+    summaries for a completed session
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/session-insights/SKILL.md
+  tags:
+  - insights
+  - analysis
+  - anomaly-detection
+  - hitl
+  - performance
+  - session
+  - telemetry
+  version: 1.0.0
+  depends_on:
+  - SKL-047
+  mastery_level: intermediate
+  use_when: 'Analyzing a completed or in-progress session''s telemetry events to surface skill failure patterns, HITL rejection
+    trends, and latency anomalies. Produces session_summary consumed by enhancement-dashboard (SKL-049).
+
+    '
+  do_not_use_when: 'No telemetry events have been collected in this session (SKL-047 has not run). Never autonomously modifies
+    registry or routing rules — suggestion-only.
+
+    '
+- id: SKL-049
+  name: Enhancement Dashboard
+  short_description: Render a read-only session insights report (skill performance, HITL trends, anomaly flags, and improvement
+    suggestions) for human review
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/enhancement-dashboard/SKILL.md
+  tags:
+  - dashboard
+  - reporting
+  - insights
+  - visualization
+  - human-review
+  - suggestions
+  - read-only
+  version: 1.0.0
+  depends_on:
+  - SKL-048
+  mastery_level: beginner
+  use_when: 'Presenting the session_summary produced by session-insights (SKL-048) as a human-readable report with improvement
+    suggestions. Strictly read-only — never writes to system state or modifies pipeline configuration.
+
+    '
+  do_not_use_when: 'session-insights (SKL-048) has not produced a session_summary in this pipeline cycle. Do not invoke to
+    trigger autonomous changes — it is a display-only skill.
+
+    '
+- id: SKL-050
+  name: Adaptive Proposal Generator
+  short_description: Analyze session telemetry to generate ranked HITL-pending AdaptationProposals covering new skills, skill
+    modifications, new pipelines, and agent changes
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/adaptive-proposal-generator/SKILL.md
+  tags:
+  - adaptive
+  - proposals
+  - self-improvement
+  - telemetry
+  - patterns
+  - hitl-gated
+  - suggestion-only
+  version: 1.0.0
+  depends_on:
+  - SKL-048
+  - SKL-015
+  mastery_level: advanced
+  use_when: 'Analyzing session_summary from session-insights (SKL-048) to surface failure patterns, HITL rejection hotspots,
+    capability gaps, and routing improvements. Generates ranked proposals for human review. All proposals require explicit
+    HITL approval before any change is applied.
+
+    '
+  do_not_use_when: 'session-insights (SKL-048) has not produced a session_summary. Never use to trigger autonomous changes
+    — all output proposals have hitl_status: pending and must be approved by a human before adaptation-applicator (SKL-051)
+    may run.
+
+    '
+- id: SKL-051
+  name: Adaptation Applicator
+  short_description: Apply a single HITL-approved AdaptationProposal to the live skill system with rollback checkpoint, validate-skills.sh
+    + build validation, and doc-maintainer sync
+  reference_path: skills/knowledge/observability.md
+  executable_skill: .opencode/skills/adaptation-applicator/SKILL.md
+  tags:
+  - adaptation
+  - apply
+  - hitl-approved
+  - rollback
+  - validation
+  - build
+  - self-improvement
+  - system-update
+  version: 1.0.0
+  depends_on:
+  - SKL-050
+  - SKL-012
+  - SKL-011
+  mastery_level: advanced
+  use_when: 'Applying a single AdaptationProposal that has been reviewed and approved (hitl_status == "approved") by the human
+    operator. Creates a rollback checkpoint before any write, validates with validate-skills.sh and npm run build, and triggers
+    doc-maintainer on success.
+
+    '
+  do_not_use_when: 'The proposal has not been approved (hitl_status != "approved"). Never invoke without a prior HITL gate.
+    Use dry_run: true to preview changes safely without writing any file.
+
+    '
+- id: SKL-052
+  name: Motion Design Architect
+  short_description: Design the complete motion system for a product — token hierarchy, micro-interactions, page transitions,
+    scroll experiences, choreography, and 3D integration specs
+  reference_path: skills/knowledge/motion-design-architect.md
+  reference_sections:
+  - '## Principles'
+  - '## Motion Token Architecture'
+  - '## Micro-Interaction Patterns'
+  - '## Accessibility Motion Standards'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/motion-design-architect/SKILL.md
+  tags:
+  - motion
+  - animation
+  - design
+  - framer-motion
+  - spring-physics
+  - choreography
+  - transitions
+  - accessibility
+  version: 1.0.0
+  depends_on:
+  - SKL-031
+  related_skills:
+  - SKL-038
+  - SKL-036
+  - SKL-054
+  mastery_level: advanced
+  use_when: Designing a motion system, reviewing animations, planning page transitions, or choreographing multi-element interactions.
+    Requires a motion_spec brief from frontend-ux-architect as input.
+  do_not_use_when: Static UI with no animation requirements. Also skip if frontend-ux-architect (SKL-031) has not yet produced
+    a motion_spec.
+- id: SKL-053
+  name: UX Research Synthesizer
+  short_description: Analyze user flows, map journeys, detect friction patterns, evaluate heuristics, audit accessibility
+    experience, and score UX health for any UI design
+  reference_path: skills/knowledge/ux-research-synthesizer.md
+  reference_sections:
+  - '## Principles'
+  - '## Nielsen''s 10 Usability Heuristics'
+  - '## Friction Pattern Library (F1–F15)'
+  - '## UX Health Score Formula'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/ux-research-synthesizer/SKILL.md
+  tags:
+  - ux-research
+  - journey-mapping
+  - heuristics
+  - friction-detection
+  - accessibility
+  - usability
+  - information-architecture
+  version: 1.0.0
+  depends_on:
+  - SKL-031
+  related_skills:
+  - SKL-036
+  - SKL-054
+  mastery_level: advanced
+  use_when: Analyzing user flows, mapping journeys, detecting friction points, or evaluating a UI against usability heuristics.
+    Best run after frontend-ux-architect produces a screen inventory and navigation map.
+  do_not_use_when: Visual design reviews or code compliance checks — use ui-ux-compliance-guard (SKL-036) for those. Also
+    skip when no screens or navigation map are available.
+- id: SKL-054
+  name: Creative Experience Architect
+  short_description: Architect world-class, emotionally resonant interfaces — innovative layouts, story-driven flows, immersive
+    backgrounds, premium component enhancements, and creative briefs with industry references
+  reference_path: skills/knowledge/creative-experience-architect.md
+  reference_sections:
+  - '## Principles'
+  - '## Creative Archetype Library'
+  - '## Layout Pattern Reference'
+  - '## Premium Component Patterns'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/creative-experience-architect/SKILL.md
+  tags:
+  - creative-design
+  - premium-ux
+  - bento-layout
+  - storytelling
+  - immersive
+  - motion-design
+  - typography
+  - visual-excellence
+  version: 1.0.0
+  depends_on:
+  - SKL-031
+  related_skills:
+  - SKL-052
+  - SKL-053
+  - SKL-036
+  mastery_level: advanced
+  use_when: Designing innovative, premium, or emotionally differentiated interfaces beyond standard enterprise patterns. Use
+    when creativity_level is premium or world-class in the product brief.
+  do_not_use_when: Standard CRUD screens or dashboards without a creative brief or differentiation requirement — use frontend-ux-architect
+    (SKL-031) directly for those.
+- id: SKL-055
+  name: Defect Manager
+  short_description: Manage the full defect lifecycle from intake to closure — creates BUG records and generates the companion
+    task chain (INVESTIGATION, FIX, TEST, REVIEW, VALIDATION, CLOSURE) for all reported defects
+  reference_path: docs/work-item-foundation.md
+  reference_sections:
+  - '## 8. Defect Chain Pattern (Defect-Manager)'
+  - '## 4. Lifecycle State Machine'
+  - '## 2. Jira-Compatible Base Schema'
+  executable_skill: .opencode/skills/defect-manager/SKILL.md
+  tags:
+  - defect
+  - bug-tracking
+  - lifecycle
+  - task-chain
+  - work-items
+  - triage
+  - code-repair
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  - SKL-003
+  - SKL-029
+  related_skills:
+  - SKL-056
+  - SKL-057
+  - SKL-058
+  mastery_level: intermediate
+  use_when: A defect is reported from any source — test failure, security finding, code-review escalation, or manual report.
+    Use to create a structured BUG record and generate the full repair task chain.
+  do_not_use_when: General task creation without an associated defect — use feature-planning (SKL-003) for implementation
+    work. Do not use for change requests — use change-request-manager (SKL-056) instead.
+- id: SKL-056
+  name: Change Request Manager
+  short_description: Manage change requests from intake through impact analysis, HITL approval, and task delta generation
+    — feeds back into feature-planning for re-planning without modifying existing tasks directly
+  reference_path: docs/work-item-foundation.md
+  reference_sections:
+  - '## 4. Lifecycle State Machine'
+  - '## 6. Traceability Link Types'
+  executable_skill: .opencode/skills/change-request-manager/SKILL.md
+  tags:
+  - change-request
+  - lifecycle
+  - impact-analysis
+  - task-delta
+  - work-items
+  - hitl
+  - scope-change
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  - SKL-024
+  - SKL-003
+  related_skills:
+  - SKL-055
+  - SKL-057
+  - SKL-058
+  mastery_level: intermediate
+  use_when: A change request is raised, a requirement changes, or the project scope is modified. Use to run impact analysis,
+    enforce human approval, and generate a task delta for re-planning.
+  do_not_use_when: Bug reports — use defect-manager (SKL-055) instead. Also skip for minor clarifications that do not affect
+    scope or task graph.
+- id: SKL-057
+  name: Work Item Exporter
+  short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — one-way outbound
+    export, async, runs at pipeline completion or on demand
+  reference_path: docs/work-item-foundation.md
+  reference_sections:
+  - '## 2. Jira-Compatible Base Schema'
+  - '## 1. Work Item Type Taxonomy'
+  executable_skill: .opencode/skills/work-item-exporter/SKILL.md
+  tags:
+  - export
+  - jira
+  - integration
+  - work-items
+  - async
+  - outbound
+  - jsonl
+  - markdown
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  - SKL-055
+  - SKL-056
+  mastery_level: beginner
+  use_when: Work items need to be exported to Jira, a file, or a human-readable report. Runs async at pipeline completion.
+    Can also be triggered on demand.
+  do_not_use_when: No work items have been created in this session. This is a one-way export — do not use for bidirectional
+    sync or importing external issues.
+- id: SKL-058
+  name: Work Item Lifecycle Guard
+  short_description: Validate work item lifecycle state transitions against the rules in docs/work-item-foundation.md — returns
+    allow, warn, or block verdict before any state write
+  reference_path: docs/work-item-foundation.md
+  reference_sections:
+  - '## 4. Lifecycle State Machine'
+  - '## 4.5 Invalid Transition Rules'
+  executable_skill: .opencode/skills/work-item-lifecycle-guard/SKILL.md
+  tags:
+  - guard
+  - governance
+  - lifecycle
+  - work-items
+  - state-machine
+  - validation
+  - transition
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-055
+  - SKL-056
+  mastery_level: beginner
+  use_when: Validating a work item state transition before writing it to the work_items scope. Acts as a governance gate in
+    all work lifecycle pipelines. Initial deployment mode is warning.
+  do_not_use_when: Reading work items or querying state without a pending transition. This guard evaluates transitions only
+    — not general work item queries.
+- id: SKL-065
+  name: Gap-to-Skill Pipeline
+  short_description: Reactive pipeline entry skill — converts a logged capability gap into a registered draft skill, enforcing
+    dedup check, quality scoring, and non-bypassable HITL approval before registration
+  reference_path: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Human-in-the-Loop'
+  executable_skill: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+  tags:
+  - reactive
+  - gap-detection
+  - skill-generation
+  - hitl
+  - pipeline
+  - meta
+  - phase-6
+  version: 1.0.0
+  depends_on:
+  - SKL-047
+  - SKL-012
+  - SKL-015
+  related_skills:
+  - SKL-048
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'A capability gap has been logged in session state (gap_context present). Run to convert the gap into a draft
+    skill through dedup-checked, HITL-governed skill-authoring and quality-scoring.
+
+    '
+  do_not_use_when: 'No gap_context is present in session state. Do not invoke autonomously — requires a prior capability gap
+    detection event (FEATURE-001) to populate gap_context. Never skip the HITL gate.
+
+    '
+- id: SKL-066
+  name: Semantic Diff Analyzer
+  short_description: Compares before/after code to detect behavioral changes — logic shifts, contract changes, security boundary
+    alterations — beyond line-level diffs
+  reference_path: .opencode/skills/semantic-diff-analyzer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/semantic-diff-analyzer/SKILL.md
+  tags:
+  - diff
+  - behavioral-analysis
+  - security
+  - impact
+  - code-change
+  - architecture
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-024
+  related_skills:
+  - SKL-006
+  - SKL-028
+  - SKL-004
+  mastery_level: advanced
+  use_when: 'A code change has been detected and you need to understand what behavioral contracts changed, not just which
+    lines. Use before security-review and test-generator for any non-trivial code modification.
+
+    '
+  do_not_use_when: 'The change is purely cosmetic (formatting, comments, variable renames with no logic change). Do not use
+    for dependency version bumps or configuration-only changes.
+
+    '
+- id: SKL-067
+  name: Acceptance Criteria Generator
+  short_description: Transforms structured requirements into formal BDD-style Given/When/Then acceptance criteria with AC
+    IDs, negative scenarios, and testability ratings
+  reference_path: .opencode/skills/acceptance-criteria-generator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/acceptance-criteria-generator/SKILL.md
+  tags:
+  - acceptance-criteria
+  - bdd
+  - gherkin
+  - requirements
+  - testing
+  - traceability
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  related_skills:
+  - SKL-005
+  - SKL-028
+  mastery_level: intermediate
+  use_when: 'Structured requirements from requirement-analyzer are available and you need to generate executable acceptance
+    criteria for test generation or sprint planning.
+
+    '
+  do_not_use_when: 'Requirements are not yet structured or validated. Run requirement-analyzer first. Do not use for purely
+    technical tasks with no user-facing behavior.
+
+    '
+- id: SKL-068
+  name: Technical Debt Tracker
+  short_description: Maintains a persistent cross-session technical debt register with debt score, trend analysis, maintenance
+    cost projections, and prioritized remediation backlog
+  reference_path: .opencode/skills/technical-debt-tracker/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/technical-debt-tracker/SKILL.md
+  tags:
+  - technical-debt
+  - quality
+  - cross-session
+  - code-review
+  - remediation
+  - maintenance
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-004
+  - SKL-026
+  related_skills:
+  - SKL-003
+  mastery_level: intermediate
+  use_when: 'After clean-code-review produces issues and you want to track debt accumulation over time, get a debt score,
+    or generate a prioritized remediation backlog for sprint planning.
+
+    '
+  do_not_use_when: 'First pipeline run with no prior clean-code-review output. Do not use for single-run analysis without
+    state persistence configured.
+
+    '
+- id: SKL-069
+  name: Architecture Evolution Planner
+  short_description: Produces a phased, sprint-sized migration plan from current to target architecture using strangler-fig,
+    branch-by-abstraction, and expand-contract patterns
+  reference_path: .opencode/skills/architecture-evolution-planner/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/architecture-evolution-planner/SKILL.md
+  tags:
+  - architecture
+  - migration
+  - refactoring
+  - strangler-fig
+  - evolution
+  - planning
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-029
+  - SKL-023
+  related_skills:
+  - SKL-003
+  - SKL-024
+  mastery_level: advanced
+  use_when: 'You have a current architecture and a target architecture and need a safe, incremental migration plan. Use for
+    large refactors, monolith-to-microservices, or any multi-sprint architecture evolution.
+
+    '
+  do_not_use_when: 'You are designing an architecture from scratch. Use architecture-design (SKL-002) instead. Do not use
+    when current and target architecture are identical.
+
+    '
+- id: SKL-070
+  name: Compliance Mapper
+  short_description: Maps system features and architecture against GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 clauses to produce
+    a compliance traceability matrix and audit evidence checklist
+  reference_path: .opencode/skills/compliance-mapper/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/compliance-mapper/SKILL.md
+  tags:
+  - compliance
+  - gdpr
+  - hipaa
+  - pci-dss
+  - soc2
+  - iso27001
+  - governance
+  - traceability
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-006
+  related_skills:
+  - SKL-041
+  - SKL-008
+  mastery_level: advanced
+  use_when: 'Building a regulated system (fintech, healthcare, govtech, SaaS with enterprise customers) and you need to verify
+    which regulatory clauses are covered and which are missing.
+
+    '
+  do_not_use_when: 'Building a purely internal tool with no user data and no regulatory requirements. Do not use before security-review
+    has run.
+
+    '
+- id: SKL-071
+  name: API Deprecation Manager
+  short_description: Manages the full API version lifecycle — current, deprecated, sunset — auto-generates migration guides
+    from breaking changes and creates consumer migration work items
+  reference_path: .opencode/skills/api-deprecation-manager/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/api-deprecation-manager/SKILL.md
+  tags:
+  - api
+  - deprecation
+  - versioning
+  - lifecycle
+  - migration
+  - breaking-changes
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-024
+  - SKL-026
+  related_skills:
+  - SKL-007
+  - SKL-008
+  mastery_level: intermediate
+  use_when: 'A breaking API change is detected, an API version needs to be deprecated, or you need to generate a migration
+    guide for API consumers. Use for any public or internal API with known consumers.
+
+    '
+  do_not_use_when: 'The change is backward-compatible. Do not use for internal implementation changes that do not affect the
+    public API contract.
+
+    '
+- id: SKL-072
+  name: Infrastructure Cost Estimator
+  short_description: Projects monthly cloud infrastructure costs (AWS/GCP/Azure) from deployment-strategy output with per-provider
+    breakdowns, alternatives, and cost optimization suggestions
+  reference_path: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+  tags:
+  - cost
+  - infrastructure
+  - aws
+  - gcp
+  - azure
+  - deployment
+  - estimation
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-007
+  - SKL-002
+  related_skills:
+  - SKL-042
+  mastery_level: intermediate
+  use_when: 'A deployment strategy has been defined and you need cost projections before committing to infrastructure. Use
+    for any production deployment decision where budget matters.
+
+    '
+  do_not_use_when: 'No deployment strategy exists yet. Run deployment-strategy (SKL-007) first. Do not use for local development
+    or test environments.
+
+    '
+- id: SKL-073
+  name: Mutation Test Generator
+  short_description: Performs static mutation analysis on source code and test suite, infers kill status, produces mutation
+    score and assertion gaps to eliminate surviving mutants
+  reference_path: .opencode/skills/mutation-test-generator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/mutation-test-generator/SKILL.md
+  tags:
+  - mutation-testing
+  - test-quality
+  - coverage
+  - assertions
+  - static-analysis
+  - testing
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-028
+  - SKL-027
+  related_skills:
+  - SKL-005
+  mastery_level: advanced
+  use_when: 'Test coverage targets are met but you need to verify tests actually catch bugs. Use after test-generator to validate
+    test suite effectiveness for critical modules.
+
+    '
+  do_not_use_when: 'No tests exist yet. Run test-generator (SKL-028) first. Do not use for integration or e2e tests — mutation
+    analysis is for unit-level logic.
+
+    '
+- id: SKL-074
+  name: Skill Simulator
+  short_description: Runs a complete pipeline in simulation mode with no disk writes, producing a preview report of files
+    that would change, HITL gates predicted, block risks, and token estimates
+  reference_path: .opencode/skills/skill-simulator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/skill-simulator/SKILL.md
+  tags:
+  - simulation
+  - dry-run
+  - preview
+  - pipeline
+  - safety
+  - orchestration
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  - SKL-026
+  related_skills:
+  - SKL-010
+  mastery_level: intermediate
+  use_when: 'Before running a full pipeline for the first time, testing a new pipeline configuration, or when you want to
+    preview what changes a pipeline would make without committing any writes.
+
+    '
+  do_not_use_when: 'You need actual pipeline outputs or file changes. The simulator produces previews only — it does not generate
+    code, update docs, or write any artifacts.
+
+    '
+- id: SKL-075
+  name: Multi-Repo Coordinator
+  short_description: Coordinates changes across multiple repositories — maintains cross-repo dependency registry, detects
+    cross-boundary breaking changes, and generates synchronized work items per affected repo
+  reference_path: .opencode/skills/multi-repo-coordinator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/multi-repo-coordinator/SKILL.md
+  tags:
+  - multi-repo
+  - polyrepo
+  - microservices
+  - cross-repo
+  - dependency
+  - coordination
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-024
+  - SKL-023
+  - SKL-026
+  related_skills:
+  - SKL-025
+  mastery_level: advanced
+  use_when: 'Working in a polyrepo or microservices architecture where a change in one repo (especially a shared library)
+    may break consumers in other repos. Use before committing breaking changes.
+
+    '
+  do_not_use_when: 'Working in a monorepo where all code is in one repository. Do not use for single-service changes with
+    no downstream consumers.
+
+    '
+- id: SKL-076
+  name: Domain Knowledge Extractor
+  short_description: Extracts reusable domain patterns from completed pipelines into a persistent knowledge base and injects
+    relevant patterns into subsequent pipelines in the same domain
+  reference_path: .opencode/skills/domain-knowledge-extractor/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/domain-knowledge-extractor/SKILL.md
+  tags:
+  - domain-knowledge
+  - learning
+  - cross-project
+  - context
+  - patterns
+  - system
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-006
+  - SKL-032
+  - SKL-026
+  related_skills:
+  - SKL-013
+  - SKL-022
+  mastery_level: advanced
+  use_when: 'At pipeline end (extract mode) to capture reusable patterns, or at pipeline start (inject mode) when working
+    in a domain with prior knowledge. Enables cross-project learning.
+
+    '
+  do_not_use_when: 'First-ever pipeline with no prior history (no knowledge to inject). Do not use inject mode if no domain
+    knowledge base exists for the detected domain.
+
+    '
+- id: SKL-077
+  name: Pipeline Branching
+  short_description: Forks pipeline at architecture-design into two A/B branches, runs both through quality skills in parallel,
+    produces a comparison scorecard and recommendation, enforces mandatory HITL branch selection
+  reference_path: .opencode/skills/pipeline-branching/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/pipeline-branching/SKILL.md
+  tags:
+  - branching
+  - a-b-testing
+  - architecture
+  - comparison
+  - orchestration
+  - decision-support
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  - SKL-006
+  - SKL-005
+  - SKL-026
+  related_skills:
+  - SKL-029
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'Two viable architecture approaches exist and you need an objective comparison before committing. Use when teams
+    are divided on architectural decisions or when major design tradeoffs need evidence-based resolution.
+
+    '
+  do_not_use_when: 'Only one architecture approach is viable. Do not use as part of the default pipeline — only invoke explicitly
+    when comparative evaluation is needed. Requires both architecture variants as input.
+
+    '
+- id: SKL-078
+  name: Data Pipeline Architect
+  short_description: Designs production-grade data pipeline architectures for batch ETL, streaming, and lakehouse patterns
+    with full topology specifications.
+  reference_path: .opencode/skills/data-pipeline-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/data-pipeline-architect/SKILL.md
+  tags:
+  - data-engineering
+  - etl
+  - streaming
+  - batch
+  - lakehouse
+  - data-mesh
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-032
+  related_skills:
+  - SKL-079
+  - SKL-081
+  - SKL-080
+  mastery_level: advanced
+  use_when: Designing any production data pipeline — batch ETL, streaming with Kafka/Flink, or lakehouse with Delta Lake/Iceberg/Hudi.
+  do_not_use_when: Single-table schema changes — use database-architect. Simple CRUD APIs without pipeline complexity.
+- id: SKL-079
+  name: Data Quality Validator
+  short_description: Generates dbt tests, Great Expectations suites, and freshness monitors to enforce data quality SLAs at
+    every pipeline stage.
+  reference_path: .opencode/skills/data-quality-validator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/data-quality-validator/SKILL.md
+  tags:
+  - data-quality
+  - dbt
+  - great-expectations
+  - freshness
+  - monitoring
+  - data-sla
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-078
+  related_skills:
+  - SKL-082
+  - SKL-032
+  mastery_level: intermediate
+  use_when: After pipeline architecture is defined and you need automated quality gates at each stage with dbt tests or Great
+    Expectations.
+  do_not_use_when: No pipeline architecture exists yet — run data-pipeline-architect first. Schema-only changes — use database-architect.
+- id: SKL-080
+  name: ML Pipeline Architect
+  short_description: Designs end-to-end ML pipelines covering feature engineering, training orchestration, model serving,
+    and drift monitoring.
+  reference_path: .opencode/skills/ml-pipeline-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/ml-pipeline-architect/SKILL.md
+  tags:
+  - machine-learning
+  - feature-store
+  - mlflow
+  - model-serving
+  - mlops
+  - drift-monitoring
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-078
+  related_skills:
+  - SKL-079
+  - SKL-082
+  mastery_level: advanced
+  use_when: 'Designing an ML system end-to-end: feature engineering, training pipelines, model registries, serving infrastructure,
+    and monitoring.'
+  do_not_use_when: Pure analytics/reporting without ML models. Simple batch ETL — use data-pipeline-architect instead.
+- id: SKL-081
+  name: Analytics Schema Designer
+  short_description: Designs dimensional models, star/snowflake schemas, and BI semantic layer configurations optimized for
+    analytical query patterns.
+  reference_path: .opencode/skills/analytics-schema-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/analytics-schema-designer/SKILL.md
+  tags:
+  - analytics
+  - dimensional-modeling
+  - star-schema
+  - dbt
+  - bi
+  - data-warehouse
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-078
+  - SKL-032
+  related_skills:
+  - SKL-079
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Designing analytical data models: star/snowflake schemas, slowly-changing dimensions, pre-aggregation layers,
+    BI tool integration.'
+  do_not_use_when: OLTP transactional schemas — use database-architect. No analytical queries required in the system.
+- id: SKL-082
+  name: Data Contract Enforcer
+  short_description: Defines, validates, and enforces schema contracts between data producers and consumers, detecting breaking
+    changes and generating migration plans.
+  reference_path: .opencode/skills/data-contract-enforcer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/data-contract-enforcer/SKILL.md
+  tags:
+  - data-contract
+  - schema-enforcement
+  - breaking-changes
+  - producer-consumer
+  - data-governance
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-079
+  - SKL-078
+  related_skills:
+  - SKL-066
+  - SKL-032
+  mastery_level: intermediate
+  use_when: 'Establishing governance between data producers and consumers: contract definitions, schema change validation,
+    consumer notification.'
+  do_not_use_when: Internal single-consumer pipelines with no cross-team data sharing. Application-level API contracts — use
+    api-design-architect.
+- id: SKL-083
+  name: API Design Architect
+  short_description: Produces complete OpenAPI 3.1 specifications with endpoint catalog, error codes, versioning strategy,
+    rate limiting, and SDK generation hints.
+  reference_path: .opencode/skills/api-design-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/api-design-architect/SKILL.md
+  tags:
+  - api-design
+  - openapi
+  - rest
+  - versioning
+  - rate-limiting
+  - sdk
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-001
+  related_skills:
+  - SKL-084
+  - SKL-085
+  - SKL-026
+  mastery_level: advanced
+  use_when: 'Designing any REST API surface: endpoint structure, request/response schemas, error catalog, versioning strategy,
+    rate limiting.'
+  do_not_use_when: GraphQL APIs — use graphql-architect. Event-driven messaging — use event-schema-designer. Internal-only
+    service calls without public contracts.
+- id: SKL-084
+  name: GraphQL Architect
+  short_description: Designs GraphQL schemas with federation topology, resolver architecture, DataLoader patterns, subscription
+    design, and authorization directives.
+  reference_path: .opencode/skills/graphql-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/graphql-architect/SKILL.md
+  tags:
+  - graphql
+  - apollo-federation
+  - resolver
+  - subscription
+  - schema-first
+  - dataloader
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-001
+  related_skills:
+  - SKL-083
+  - SKL-085
+  - SKL-026
+  mastery_level: advanced
+  use_when: 'Designing GraphQL APIs: schema-first modeling, Apollo Federation subgraphs, resolver patterns, DataLoader batching,
+    subscriptions.'
+  do_not_use_when: REST APIs — use api-design-architect. Event-driven messaging — use event-schema-designer. No GraphQL runtime
+    in the stack.
+- id: SKL-085
+  name: Event Schema Designer
+  short_description: Produces AsyncAPI specifications, event catalogs, topic designs, schema registry configurations, and
+    DLQ strategies for event-driven systems.
+  reference_path: .opencode/skills/event-schema-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/event-schema-designer/SKILL.md
+  tags:
+  - event-driven
+  - asyncapi
+  - kafka
+  - schema-registry
+  - dlq
+  - messaging
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-086
+  - SKL-002
+  related_skills:
+  - SKL-083
+  - SKL-087
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Designing event-driven message contracts: Kafka topics, AsyncAPI specs, schema registry enforcement, DLQ strategy.'
+  do_not_use_when: Synchronous REST/GraphQL APIs. No messaging platform in the architecture. Schema-only database changes.
+- id: SKL-086
+  name: Microservices Architect
+  short_description: Decomposes systems into bounded-context microservices using DDD, produces service maps, saga patterns,
+    and Conway's Law team alignment analysis.
+  reference_path: .opencode/skills/microservices-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/microservices-architect/SKILL.md
+  tags:
+  - microservices
+  - ddd
+  - bounded-context
+  - saga
+  - strangler-fig
+  - conways-law
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-103
+  related_skills:
+  - SKL-087
+  - SKL-088
+  - SKL-085
+  mastery_level: advanced
+  use_when: Decomposing monoliths or designing greenfield microservice topologies with DDD bounded contexts, saga patterns,
+    and team alignment.
+  do_not_use_when: Small single-team systems where microservices add operational overhead. No requirement for independent
+    deployment of services.
+- id: SKL-087
+  name: Event Sourcing Designer
+  short_description: Designs CQRS/event-sourcing systems with aggregate designs, event stores, projection patterns, snapshot
+    strategies, and upcasting plans.
+  reference_path: .opencode/skills/event-sourcing-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/event-sourcing-designer/SKILL.md
+  tags:
+  - event-sourcing
+  - cqrs
+  - aggregate
+  - event-store
+  - projection
+  - temporal-queries
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-086
+  - SKL-103
+  related_skills:
+  - SKL-085
+  - SKL-032
+  - SKL-026
+  mastery_level: advanced
+  use_when: Designing systems requiring full audit trails, temporal queries, or complex business process orchestration via
+    CQRS.
+  do_not_use_when: Simple CRUD applications. Systems where query performance is the primary concern — event sourcing adds
+    projection complexity.
+- id: SKL-088
+  name: Distributed Resilience Architect
+  short_description: Designs circuit breakers, timeout hierarchies, retry policies, bulkheads, and saga compensation patterns
+    with FMEA failure mode analysis.
+  reference_path: .opencode/skills/distributed-resilience-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/distributed-resilience-architect/SKILL.md
+  tags:
+  - resilience
+  - circuit-breaker
+  - retry
+  - bulkhead
+  - saga
+  - fmea
+  - distributed-systems
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-086
+  related_skills:
+  - SKL-099
+  - SKL-097
+  - SKL-107
+  mastery_level: advanced
+  use_when: 'Designing resilience for distributed services: circuit breakers, timeout hierarchies, retry budgets, bulkheads,
+    saga compensation.'
+  do_not_use_when: Monolithic applications with a single process boundary. Simple request/response systems with no distributed
+    transaction requirements.
+- id: SKL-089
+  name: Cloud Architecture Reviewer
+  short_description: Reviews cloud architectures against the Well-Architected Framework across all five pillars, scoring each
+    and producing a prioritized remediation roadmap.
+  reference_path: .opencode/skills/cloud-architecture-reviewer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/cloud-architecture-reviewer/SKILL.md
+  tags:
+  - cloud
+  - well-architected
+  - aws
+  - gcp
+  - azure
+  - cost-optimization
+  - cloud-review
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  related_skills:
+  - SKL-090
+  - SKL-091
+  - SKL-006
+  mastery_level: advanced
+  use_when: Reviewing existing or new cloud architectures against Well-Architected Framework pillars for any of AWS, GCP,
+    or Azure.
+  do_not_use_when: On-premises-only systems. General architecture design — run architecture-design first to produce the architecture
+    to review.
+- id: SKL-090
+  name: Serverless Architect
+  short_description: Designs serverless function topologies with cold-start mitigation, event source mapping, state management,
+    and cost modelling across AWS/GCP/Azure.
+  reference_path: .opencode/skills/serverless-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/serverless-architect/SKILL.md
+  tags:
+  - serverless
+  - lambda
+  - cloud-functions
+  - cold-start
+  - event-driven
+  - faas
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-089
+  related_skills:
+  - SKL-091
+  - SKL-007
+  mastery_level: advanced
+  use_when: 'Designing event-triggered, short-lived compute: Lambda/Cloud Functions, API Gateway backends, scheduled functions,
+    stream processors.'
+  do_not_use_when: Long-running processes needing persistent connections. Container workloads with steady traffic — use container-orchestration-architect.
+- id: SKL-091
+  name: Container Orchestration Architect
+  short_description: Designs Kubernetes cluster topologies, Helm chart structures, autoscaling policies, GitOps pipelines,
+    and RBAC models for container workloads.
+  reference_path: .opencode/skills/container-orchestration-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/container-orchestration-architect/SKILL.md
+  tags:
+  - kubernetes
+  - helm
+  - gitops
+  - autoscaling
+  - rbac
+  - container-orchestration
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-093
+  related_skills:
+  - SKL-090
+  - SKL-007
+  - SKL-042
+  mastery_level: advanced
+  use_when: 'Designing Kubernetes-based deployments: cluster topology, Helm charts, HPA/VPA policies, GitOps flows with ArgoCD/Flux,
+    RBAC.'
+  do_not_use_when: Serverless-first workloads — use serverless-architect. Simple docker-compose for local development only.
+- id: SKL-092
+  name: Threat Model Designer
+  short_description: Produces STRIDE threat catalogs, trust boundary analyses, MITRE ATT&CK mappings, and security user stories
+    from system architecture diagrams.
+  reference_path: .opencode/skills/threat-model-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/threat-model-designer/SKILL.md
+  tags:
+  - threat-modeling
+  - stride
+  - mitre
+  - attack-surface
+  - trust-boundary
+  - risk-matrix
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-001
+  related_skills:
+  - SKL-006
+  - SKL-041
+  - SKL-093
+  mastery_level: advanced
+  use_when: Before security review — run STRIDE threat modeling to systematically identify threats and produce security requirements
+    for the review.
+  do_not_use_when: After security-review has already been completed. For compliance mapping — use compliance-mapper instead.
+- id: SKL-093
+  name: Secrets Management Architect
+  short_description: Designs Vault architectures, secret rotation policies, PKI hierarchies, dynamic secrets configurations,
+    and injection patterns for Kubernetes and CI/CD.
+  reference_path: .opencode/skills/secrets-management-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/secrets-management-architect/SKILL.md
+  tags:
+  - secrets-management
+  - vault
+  - pki
+  - rotation
+  - dynamic-secrets
+  - kubernetes-secrets
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-092
+  related_skills:
+  - SKL-094
+  - SKL-091
+  - SKL-006
+  mastery_level: advanced
+  use_when: 'Designing secrets management infrastructure: HashiCorp Vault, AWS Secrets Manager, secret rotation, PKI, Kubernetes
+    secret injection.'
+  do_not_use_when: No secrets or credentials in the system. Development-only environments where shared secrets are acceptable.
+- id: SKL-094
+  name: DevSecOps Pipeline Designer
+  short_description: Designs SAST, DAST, SCA, SBOM, container scanning, and SLSA compliance stages integrated into CI/CD pipelines
+    with severity-gated quality gates.
+  reference_path: .opencode/skills/devsecops-pipeline-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/devsecops-pipeline-designer/SKILL.md
+  tags:
+  - devsecops
+  - sast
+  - dast
+  - sca
+  - sbom
+  - slsa
+  - supply-chain-security
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-006
+  - SKL-092
+  related_skills:
+  - SKL-042
+  - SKL-041
+  - SKL-093
+  mastery_level: advanced
+  use_when: 'Embedding security gates into CI/CD: SAST (Semgrep/SonarQube), DAST (OWASP ZAP), SCA (Snyk/Dependabot), SBOM,
+    container scanning.'
+  do_not_use_when: Security-review has not yet been completed. Environments with no CI/CD pipeline to embed stages into.
+- id: SKL-095
+  name: Load Test Designer
+  short_description: Designs load test scenarios, SLO acceptance thresholds, data parameterization, and CI integration for
+    k6, Gatling, and Locust.
+  reference_path: .opencode/skills/load-test-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/load-test-designer/SKILL.md
+  tags:
+  - load-testing
+  - performance
+  - k6
+  - gatling
+  - locust
+  - slo
+  - benchmarking
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-005
+  - SKL-097
+  related_skills:
+  - SKL-096
+  - SKL-035
+  mastery_level: intermediate
+  use_when: Designing load and performance tests with tool-specific scripts (k6/Gatling/Locust), SLO-gated thresholds, and
+    CI integration.
+  do_not_use_when: Unit/integration testing — use testing-strategy. No SLO targets defined — run slo-sla-designer first.
+- id: SKL-096
+  name: Profiling Advisor
+  short_description: Analyzes CPU profiles, heap dumps, and query execution plans to identify hotspots, GC pressure, and N+1
+    query patterns with prioritized optimization backlog.
+  reference_path: .opencode/skills/profiling-advisor/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/profiling-advisor/SKILL.md
+  tags:
+  - profiling
+  - flamegraph
+  - heap-dump
+  - query-plan
+  - gc-tuning
+  - n-plus-one
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-095
+  related_skills:
+  - SKL-035
+  - SKL-097
+  mastery_level: intermediate
+  use_when: 'Analyzing profiling artifacts from load tests: CPU flamegraphs, heap dumps, database query plans, GC logs.'
+  do_not_use_when: No profiling data available — run load-test-designer first. High-level architecture optimization — use
+    cloud-architecture-reviewer.
+- id: SKL-097
+  name: SLO/SLA Designer
+  short_description: Defines SLIs, SLOs, error budgets, SLA tiers, toil inventory, and reliability roadmaps grounded in user
+    journey criticality.
+  reference_path: .opencode/skills/slo-sla-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/slo-sla-designer/SKILL.md
+  tags:
+  - slo
+  - sli
+  - sla
+  - error-budget
+  - reliability
+  - toil
+  - site-reliability
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-001
+  related_skills:
+  - SKL-014
+  - SKL-095
+  - SKL-098
+  mastery_level: advanced
+  use_when: 'Defining reliability contracts: SLI metric selection, SLO target setting, error budget burn rate rules, SLA tier
+    commitments.'
+  do_not_use_when: Pre-production experiments with no users. Single-request CLI tools. No monitoring infrastructure to measure
+    SLIs.
+- id: SKL-098
+  name: Runbook Generator
+  short_description: Generates structured runbooks with step-by-step remediation, escalation trees, postmortem templates,
+    and communication templates linked to alert policies.
+  reference_path: .opencode/skills/runbook-generator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/runbook-generator/SKILL.md
+  tags:
+  - runbooks
+  - incident-response
+  - on-call
+  - escalation
+  - postmortem
+  - operational-docs
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-097
+  - SKL-014
+  related_skills:
+  - SKL-099
+  - SKL-008
+  mastery_level: intermediate
+  use_when: 'Generating operational runbooks for on-call engineers: alert-linked procedures, escalation trees, severity matrices,
+    postmortem templates.'
+  do_not_use_when: No alert definitions or SLO targets exist yet — run slo-sla-designer first. Feature documentation — use
+    documentation-generator.
+- id: SKL-099
+  name: Chaos Engineering Designer
+  short_description: Designs chaos experiments (LitmusChaos, Gremlin, AWS FIS) with steady-state hypotheses, blast radius
+    controls, GameDay plans, and CI chaos gates.
+  reference_path: .opencode/skills/chaos-engineering-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/chaos-engineering-designer/SKILL.md
+  tags:
+  - chaos-engineering
+  - fault-injection
+  - litmus
+  - gremlin
+  - aws-fis
+  - gameday
+  - resilience
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-088
+  - SKL-097
+  related_skills:
+  - SKL-098
+  - SKL-014
+  - SKL-035
+  mastery_level: advanced
+  use_when: 'Designing proactive resilience validation: fault injection experiments, steady-state hypothesis tests, GameDay
+    plans, CI chaos gates.'
+  do_not_use_when: No resilience baseline exists — run distributed-resilience-architect first. Production systems without
+    SLO monitoring in place.
+- id: SKL-100
+  name: State Management Architect
+  short_description: Selects state management libraries and patterns (Redux, Zustand, Jotai, TanStack Query) aligned with
+    app complexity, offline requirements, and colocation principles.
+  reference_path: .opencode/skills/state-management-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/state-management-architect/SKILL.md
+  tags:
+  - state-management
+  - redux
+  - zustand
+  - jotai
+  - tanstack-query
+  - offline
+  - frontend
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  related_skills:
+  - SKL-031
+  - SKL-101
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Designing client-side state: library selection, store slicing, server-state caching with TanStack Query, offline
+    persistence patterns.'
+  do_not_use_when: Backend/distributed state management. Simple single-component state with no cross-component sharing.
+- id: SKL-101
+  name: Micro-Frontend Architect
+  short_description: Designs micro-frontend architectures using Module Federation, single-spa, or iframes with shell-app routing,
+    shared dependency strategy, and auth propagation.
+  reference_path: .opencode/skills/micro-frontend-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/micro-frontend-architect/SKILL.md
+  tags:
+  - micro-frontend
+  - module-federation
+  - single-spa
+  - shell-app
+  - multi-team
+  - frontend-composition
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  related_skills:
+  - SKL-100
+  - SKL-031
+  - SKL-038
+  mastery_level: advanced
+  use_when: 'Designing multi-team frontend systems: Module Federation shell apps, MFE boundaries, shared dependency strategies,
+    cross-MFE communication.'
+  do_not_use_when: Single-team monolithic SPAs. Server-rendered multi-page apps without client-side composition requirements.
+- id: SKL-102
+  name: Web Performance Optimizer
+  short_description: Produces Core Web Vitals optimization plans covering bundle splitting, rendering modes, image optimization,
+    font strategies, and caching headers.
+  reference_path: .opencode/skills/web-performance-optimizer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/web-performance-optimizer/SKILL.md
+  tags:
+  - web-performance
+  - core-web-vitals
+  - bundle-optimization
+  - lcp
+  - fid
+  - cls
+  - rendering
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-031
+  related_skills:
+  - SKL-039
+  - SKL-042
+  mastery_level: intermediate
+  use_when: 'Optimizing web app performance: Core Web Vitals budgets, code splitting, SSR/ISR/CSR decisions, image optimization,
+    caching headers.'
+  do_not_use_when: Backend/API performance — use profiling-advisor. Non-web platforms (mobile, desktop).
+- id: SKL-103
+  name: DDD Architect
+  short_description: Produces bounded context maps, ubiquitous language glossaries, subdomain classifications, aggregate designs,
+    and domain event catalogs using DDD strategic and tactical patterns.
+  reference_path: .opencode/skills/ddd-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/ddd-architect/SKILL.md
+  tags:
+  - ddd
+  - bounded-context
+  - ubiquitous-language
+  - aggregate
+  - domain-events
+  - strategic-design
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  related_skills:
+  - SKL-086
+  - SKL-087
+  - SKL-002
+  mastery_level: advanced
+  use_when: 'Applying strategic and tactical DDD: bounded context identification, ubiquitous language, subdomain classification
+    (core/supporting/generic), aggregate design.'
+  do_not_use_when: Simple CRUD applications with no complex business rules. Domains already well-understood with stable bounded
+    contexts.
+- id: SKL-104
+  name: Caching Strategy Designer
+  short_description: Designs multi-tier caching topologies with Redis configurations, HTTP cache headers, CDN rules, cache
+    stampede prevention, and invalidation strategies.
+  reference_path: .opencode/skills/caching-strategy-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/caching-strategy-designer/SKILL.md
+  tags:
+  - caching
+  - redis
+  - cdn
+  - http-cache
+  - cache-invalidation
+  - stampede-prevention
+  - performance
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-032
+  related_skills:
+  - SKL-086
+  - SKL-091
+  mastery_level: intermediate
+  use_when: 'Designing caching for high-traffic services: Redis topology, cache-aside/write-through patterns, HTTP cache headers,
+    CDN rules, stampede prevention.'
+  do_not_use_when: Low-traffic systems where caching adds unnecessary complexity. Database query optimization — use database-architect
+    for proper indexing.
+- id: SKL-105
+  name: Localization Architect
+  short_description: Designs i18n/l10n architectures with ICU message format, RTL support, locale file structures, number/date/currency
+    strategies, and translation pipelines.
+  reference_path: .opencode/skills/localization-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/localization-architect/SKILL.md
+  tags:
+  - i18n
+  - l10n
+  - localization
+  - rtl
+  - icu-messages
+  - translation
+  - multi-locale
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  related_skills:
+  - SKL-031
+  - SKL-026
+  mastery_level: intermediate
+  use_when: 'Designing i18n/l10n for multi-locale apps: locale file structure, ICU message format, RTL layouts, date/number/currency
+    formatting, translation workflows.'
+  do_not_use_when: Single-locale applications. Backend-only services without user-facing text.
+- id: SKL-106
+  name: Product Analytics Designer
+  short_description: Designs event taxonomy, metrics frameworks, funnel definitions, A/B experiment frameworks, and privacy-compliant
+    analytics data models.
+  reference_path: .opencode/skills/product-analytics-designer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/product-analytics-designer/SKILL.md
+  tags:
+  - product-analytics
+  - event-taxonomy
+  - funnel
+  - a-b-testing
+  - metrics
+  - privacy
+  - amplitude
+  - mixpanel
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-003
+  - SKL-001
+  related_skills:
+  - SKL-078
+  - SKL-014
+  mastery_level: intermediate
+  use_when: 'Designing product analytics: event taxonomy, funnel definitions, A/B experiment framework, analytics data model,
+    privacy compliance.'
+  do_not_use_when: Infrastructure/operational metrics — use observability and slo-sla-designer. No growth/retention/conversion
+    goals.
+- id: SKL-107
+  name: Realtime System Architect
+  short_description: Designs WebSocket and WebRTC architectures with connection management, fan-out strategies, conflict resolution
+    (CRDTs/OT), presence systems, and horizontal scaling.
+  reference_path: .opencode/skills/realtime-system-architect/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/realtime-system-architect/SKILL.md
+  tags:
+  - realtime
+  - websocket
+  - webrtc
+  - crdt
+  - operational-transform
+  - presence
+  - fan-out
+  - phase-8
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-088
+  related_skills:
+  - SKL-086
+  - SKL-104
+  - SKL-097
+  mastery_level: advanced
+  use_when: 'Designing real-time features: WebSocket servers, WebRTC peer connections, collaborative editing with CRDTs/OT,
+    presence systems, live notification fan-out.'
+  do_not_use_when: Polling-based refresh is sufficient. Batch processing systems. REST-only APIs without bidirectional streaming
+    requirements.
+version: 4.0.0

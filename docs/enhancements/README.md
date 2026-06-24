@@ -1,13 +1,13 @@
 # ASE-OS Enhancement Roadmap — v4.1.0 → v5.2.0
 
-**Version:** 1.2.0 | **Created:** 2026-06-23 | **Updated:** 2026-06-24 | **Baseline:** v4.0.1 (58 skills, 15 pipelines)
-**Status:** Planning — Phase 7 (v5.2.0) Added
+**Version:** 1.3.0 | **Created:** 2026-06-23 | **Updated:** 2026-06-24 | **Baseline:** v4.0.1 (58 skills, 15 pipelines)
+**Status:** Planning — Phase 8 (v5.3.0) Added
 
 ---
 
 ## Overview
 
-This directory contains the structured enhancement plan for the ASE-OS AI Workflow system, covering **54 work items** across **7 delivery phases** targeting ecosystem maturity from **8.2/10 → 9.5/10+**.
+This directory contains the structured enhancement plan for the ASE-OS AI Workflow system, covering **84 work items** across **8 delivery phases** targeting ecosystem maturity from **8.2/10 → 9.5/10+**.
 
 Legacy tasks (TASK-0001–0037) are tracked as physical work-item files in `work-items/TASK-NNNN-*.md`. New-format features (FEATURE-001+) use the `work-items/features/FEATURE-NNN-name/` folder structure. Both formats follow the Jira-compatible schema defined in `docs/work-item-foundation.md`.
 
@@ -98,8 +98,9 @@ work-items/
 | [Phase 5 — Intelligence + DX](./phase-5-v5.0.0-intelligence-dx.md) | v5.0.0 | 4–6 weeks | 47 pts | TASK-0032–0037 | ⏳ Planned |
 | [Phase 6 — Reactive Intelligence](./phase-6-v5.1.0-reactive-intelligence.md) | v5.1.0 | 3–4 weeks | 24 pts | FEATURE-001–005 | ⏳ Planned |
 | [Phase 7 — Intelligence Expansion](./phase-7-v5.2.0-intelligence-expansion.md) | v5.2.0 | 5–6 weeks | 113 pts | FEATURE-006–017 | ⏳ Planned |
+| [Phase 8 — Data, API, Cloud & SRE Expansion](./phase-8-v5.3.0-platform-expansion.md) | v5.3.0 | 6–8 weeks | 180 pts | FEATURE-018–047 | ⏳ Planned |
 
-**Total: 54 work items · 348 story points · ~23–31 weeks**
+**Total: 84 work items · 528 story points · ~29–39 weeks**
 
 ---
 
@@ -118,6 +119,7 @@ work-items/
 | Website audit | N15 |
 | Autonomous Skill Discovery proposal (2026-06-23) | N16–N20 |
 | Intelligence Expansion proposal (2026-06-24) | N21–N32 |
+| Domain Expansion proposal (2026-06-24) | N33–N62 |
 
 ---
 
