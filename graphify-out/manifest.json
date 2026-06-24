@@ -15,8 +15,8 @@
     "semantic_hash": "083a394d93b90f5a42b78951a0317737"
   },
   "opencode.json": {
-    "mtime": 1782313954.12938,
-    "ast_hash": "006a6b451556718d1aacbf5d6c65f4c9",
+    "mtime": 1782342498.964743,
+    "ast_hash": "10e92bf71d7cc7ce051243a7c7239a86",
     "semantic_hash": ""
   },
   "package.json": {
@@ -570,8 +570,8 @@
     "semantic_hash": ""
   },
   "docs/agents.md": {
-    "mtime": 1782314290.457564,
-    "ast_hash": "ee0b49cf1efa931c090b63724eb884ae",
+    "mtime": 1782343398.731824,
+    "ast_hash": "534cb63e0c646a540f4ff668ad5d35fe",
     "semantic_hash": ""
   },
   "docs/architecture.md": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "docs/changelog.md": {
-    "mtime": 1782321574.7601256,
-    "ast_hash": "d7f5452c4e4e5d3c705b57c44a8127a0",
+    "mtime": 1782343602.1489718,
+    "ast_hash": "8aceb6a7c5f18dd7ae6e62d4fb7fecbc",
     "semantic_hash": ""
   },
   "docs/context-engineering.md": {
@@ -605,8 +605,8 @@
     "semantic_hash": ""
   },
   "docs/governance.md": {
-    "mtime": 1782323321.9500678,
-    "ast_hash": "aabdee258e0b8f5d760fd6ba1d5cfbb9",
+    "mtime": 1782343126.5007002,
+    "ast_hash": "93694aad29cb134e1700e94597438196",
     "semantic_hash": ""
   },
   "docs/how-to-use.md": {
@@ -1522,6 +1522,11 @@
   "docs/mcp.md": {
     "mtime": 1782310766.1438568,
     "ast_hash": "8c16cdd801a42318a75b2f6e9bf65085",
+    "semantic_hash": ""
+  },
+  "docs/models.md": {
+    "mtime": 1782342581.1659942,
+    "ast_hash": "5479af843606fd0f9194f3f1e4b56269",
     "semantic_hash": ""
   }
 }
