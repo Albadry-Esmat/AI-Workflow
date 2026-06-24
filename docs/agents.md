@@ -175,7 +175,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "test-generator": {
       "mode": "subagent",
-      "model": "github-copilot/gpt-4o-mini",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
       "skill": ".opencode/skills/test-generator/SKILL.md"
@@ -203,7 +203,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "doc-maintainer": {
       "mode": "subagent",
-      "model": "github-copilot/gpt-4o-mini",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"
@@ -293,7 +293,7 @@ Every agent has its own `"model"` field in `opencode.json`. Changing the model f
 
 ```json
 "architect": {
-  "model": "github-copilot/claude-opus-4-5",   ← change this one line
+  "model": "github-copilot/claude-opus-4.5",   ← change this one line
   ...
 }
 ```

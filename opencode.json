@@ -150,7 +150,7 @@
     },
     "test-generator": {
       "mode": "subagent",
-      "model": "github-copilot/gpt-4o-mini",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
       "skill": ".opencode/skills/test-generator/SKILL.md"
@@ -178,7 +178,7 @@
     },
     "doc-maintainer": {
       "mode": "subagent",
-      "model": "github-copilot/gpt-4o-mini",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"

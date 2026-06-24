@@ -1,10 +1,26 @@
 # Changelog — System Update History
 
-**Version:** 4.4.0 | **Last updated:** 2026-06-24
+**Version:** 5.5.0 | **Last updated:** 2026-06-25
 
 All notable changes to this project are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+
+---
+
+## [5.5.0] — 2026-06-25 — Model Configuration & ID Hygiene
+
+### Added
+- **`docs/models.md`**: new reference document listing all verified model IDs from `opencode models` output, current per-agent assignments, four tuning strategies (cost, quality, large-codebase, code-specialised), and governance rule for safety-critical agents (`reviewer`, `security-specialist`, `recovery`)
+
+### Fixed
+- **`opencode.json`**: `test-generator` and `doc-maintainer` agents were assigned `github-copilot/gpt-4o-mini` — a non-existent model ID. Corrected to `github-copilot/claude-haiku-4.5` (verified real ID)
+- **`docs/agents.md`**: same stale `gpt-4o-mini` references in the embedded JSON example, plus `claude-opus-4-5` (dash) corrected to `claude-opus-4.5` (dot) in the Model Configuration example
+- **`docs/governance.md`**: stale `gpt-4o-mini` reference in §8 model governance rule replaced with `claude-haiku-4.5`
+
+### Changed
+- **`docs/agents.md`** v1.4.0: Model Configuration section now cites `docs/models.md` as the canonical reference
+- **`docs/governance.md`** §8: model governance rule clarified — lightweight model example is now `claude-haiku-4.5`, consistent with actual assignments
 
 ---
 
