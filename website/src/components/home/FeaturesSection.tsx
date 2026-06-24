@@ -6,7 +6,7 @@ import {
   AlertTriangle, BarChart2, Route, Sparkles, Activity, Lightbulb,
   ClipboardList, Bot, Palette, Wand2,
   Scale, Diff, PlayCircle, GitFork, DollarSign, Layers2,
-  Database, Webhook, Boxes, Cloud, ShieldAlert, Gauge,
+  Database, Webhook, Boxes, Cloud, ShieldAlert, Gauge, Plug,
 } from "lucide-react";
 
 const FEATURES = [
@@ -221,6 +221,14 @@ const FEATURES = [
     description: "Five SRE skills operationalize reliability: SLI/SLO/error budget design, k6/Gatling load test scenarios with SLO-gated thresholds, CPU flamegraph and query plan profiling, alert-linked runbook generation with escalation trees, and chaos engineering experiments with GameDay plans and CI chaos gates.",
     color: "text-orange-400",
     bg: "bg-orange-500/10",
+  },
+  // ── MCP Integration ────────────────────────────────────────────────────────
+  {
+    icon: Plug,
+    title: "MCP Tool Integration",
+    description: "Six live MCP servers give every agent access to GitHub, real-time web search, persistent memory, URL fetching, up-to-date library docs (Context7), and headless browser automation — all without bash permissions.",
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
   },
 ];
 

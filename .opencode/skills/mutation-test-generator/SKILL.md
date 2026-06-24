@@ -79,7 +79,7 @@ Quantify the fault-detection strength of an existing test suite through static m
 
 ## Required Context
 
-- `test-generator@^1.0.0` or `code-generator@^1.1.0` must have produced the `existing_tests` being analysed — the skill assumes the test suite targets the same module as `source_code`.
+- `test-generator@^2.0.0` or `code-generator@^1.1.0` must have produced the `existing_tests` being analysed — the skill assumes the test suite targets the same module as `source_code`.
 - `language` must match the language of both `source_code` and `existing_tests`.
 - No test runner, compiler, or code execution environment is required — this is static analysis only.
 
@@ -452,5 +452,5 @@ composes:
       surviving_mutations: "state.surviving_mutations"
 ```
 
-Consumes from: `test-generator@^1.0.0`, `code-generator@^1.1.0`
-Produces for: `test-generator@^1.0.0` (backpropagate feedback with assertion_gaps for gap filling)
+Consumes from: `test-generator@^2.0.0`, `code-generator@^1.1.0`
+Produces for: `test-generator@^2.0.0` (backpropagate feedback with assertion_gaps for gap filling)

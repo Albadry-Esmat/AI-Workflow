@@ -15,8 +15,8 @@
     "semantic_hash": "083a394d93b90f5a42b78951a0317737"
   },
   "opencode.json": {
-    "mtime": 1782307102.4552734,
-    "ast_hash": "69ebc254077210c64c0e795b95279181",
+    "mtime": 1782310613.4520319,
+    "ast_hash": "32bcd96528c280a51fd008c89b580d77",
     "semantic_hash": ""
   },
   "package.json": {
@@ -1517,6 +1517,11 @@
   ".opencode/skills/web-performance-optimizer/SKILL.md": {
     "mtime": 1782303030.9237435,
     "ast_hash": "b1f0d91b1f154fc990f77f7b8710bf5c",
+    "semantic_hash": ""
+  },
+  "docs/mcp.md": {
+    "mtime": 1782310766.1438568,
+    "ast_hash": "8c16cdd801a42318a75b2f6e9bf65085",
     "semantic_hash": ""
   }
 }

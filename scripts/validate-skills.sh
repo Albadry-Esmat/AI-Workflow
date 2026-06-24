@@ -101,7 +101,7 @@ done
 
 # ─── 3. Unique skill IDs in index.yaml ───────────────────────────────────────
 header "Unique skill IDs in skills/index.yaml"
-DUPES=$(grep "^  - id:" skills/index.yaml | sort | uniq -d)
+DUPES=$(grep "^- id:" skills/index.yaml | sort | uniq -d || true)
 if [ -n "$DUPES" ]; then
   fail "Duplicate skill IDs: $DUPES"
 else
@@ -110,7 +110,7 @@ fi
 
 # ─── 4. Count consistency ─────────────────────────────────────────────────────
 header "Skill count: index.yaml vs .opencode/skills/"
-INDEX_COUNT=$(grep -c "^  - id:" skills/index.yaml)
+INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
 DIR_COUNT=$(ls -d .opencode/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
 echo "  index.yaml entries : $INDEX_COUNT"
 echo "  .opencode/skills/  : $DIR_COUNT"

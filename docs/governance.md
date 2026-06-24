@@ -1,6 +1,6 @@
 # Governance — Approval Gates & Quality Enforcement
 
-**Version:** 2.4.0 | **Last updated:** 2026-06-23
+**Version:** 2.5.0 | **Last updated:** 2026-06-24
 
 ## Governance Model
 
@@ -327,3 +327,46 @@ All tiers require `scripts/validate-skills.sh` to exit 0.
 HITL sign-off is **mandatory** for `standard` and `expedited` tiers — it cannot be bypassed by any automation, pipeline, or configuration flag.
 
 Skills lacking `origin_metadata` (pre-v5.1.0 registrations) are treated as `approval_tier: legacy`. `validate-skills.sh` emits `WARN: missing origin_metadata (pre-v5.1.0 skill, exempted)` for these entries — exit 0 (not an error).
+
+---
+
+## §6 — MCP Tool Governance (v5.3.0+)
+
+This section governs the use of Model Context Protocol (MCP) servers registered in `opencode.json`. MCP tools are available to all agents regardless of the agent's `bash: deny` permission — MCP is a separate tool layer, not a bash invocation.
+
+### MCP Access Rules
+
+| Rule | Enforcement | Consequence |
+|------|-------------|-------------|
+| MCP tools bypass `bash: deny` | MCP layer (separate from bash permission) | All agents with MCP access can use registered servers even if bash is denied |
+| Credentials must use `${ENV_VAR}` syntax | `opencode.json` convention | Credentials must not be hardcoded in the MCP command or env block |
+| Disabled servers (`"enabled": false`) must not be activated without credentials | Convention + PR review | Activating a pre-configured server without setting its credentials causes MCP startup failure |
+| MCP writes to external systems (GitHub, Slack, Vercel) require the same HITL approval as any state-writing operation | Governance rule | Agents must not use write-capable MCP tools autonomously without user confirmation |
+
+### MCP Server Registry
+
+| Server | Package | Default State | Credentials Required |
+|--------|---------|--------------|---------------------|
+| `github` | `@modelcontextprotocol/server-github` | Enabled | `GITHUB_TOKEN` |
+| `brave-search` | `@modelcontextprotocol/server-brave-search` | Enabled | `BRAVE_API_KEY` |
+| `memory` | `@modelcontextprotocol/server-memory` | Enabled | None |
+| `fetch` | `@modelcontextprotocol/server-fetch` | Enabled | None |
+| `context7` | `@upstash/context7-mcp@latest` | Enabled | `CONTEXT7_API_KEY` |
+| `playwright` | `@playwright/mcp@latest` | Enabled | None |
+| `slack` | `@modelcontextprotocol/server-slack` | Disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
+| `vercel` | `vercel-mcp` | Disabled | `VERCEL_TOKEN` |
+
+### MCP Credential Policy
+
+1. All API keys for MCP servers must be stored in `.env` (gitignored) — never in `opencode.json` or any tracked file.
+2. New MCP servers must be added to `.env` with a placeholder slot (`KEY=`) at the time of registration.
+3. Servers that fail to start due to missing credentials are silently skipped by the runtime — agents must not depend on an MCP server being available without confirming its enabled state.
+
+### Adding a New MCP Server
+
+Any addition of an MCP server to `opencode.json` requires:
+1. Adding the server definition under the `mcp` key with `"enabled": true/false`
+2. Adding the credential slot to `.env` (if credentials required)
+3. Adding an entry to the MCP Server Registry table above
+4. Adding a `docs/mcp.md` entry documenting the server's purpose and use cases
+5. Updating `changelog.md` with the MCP server addition

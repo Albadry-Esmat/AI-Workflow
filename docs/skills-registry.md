@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 3.0.0 | **Last updated:** 2026-06-23
+**Version:** 5.3.0 | **Last updated:** 2026-06-24
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 58 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 101 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `skills/<domain>/<skill>.md` | 13-section AI-executable specifications |
 

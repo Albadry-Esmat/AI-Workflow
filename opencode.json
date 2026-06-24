@@ -40,7 +40,7 @@
     "playwright": {
       "type": "local",
       "command": [
-        "npx", "@playwright/mcp@latest",
+        "npx", "-y", "@playwright/mcp@latest",
         "--headless",
         "--isolated",
         "--browser", "chromium"

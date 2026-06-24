@@ -1,6 +1,6 @@
 # Agents — Agent Definitions
 
-**Version:** 1.2.0 | **Last updated:** 2026-06-23
+**Version:** 1.3.0 | **Last updated:** 2026-06-24
 
 ## What Is an Agent
 
@@ -44,18 +44,24 @@ The primary agent receives user requests, delegates skill execution to subagents
 
 | Agent | Assigned Skills | Mode | Permission |
 |-------|---------------|------|------------|
-| `analyzer` | `requirement-analyzer`, `defect-manager` | `subagent` | read-only |
+| `analyzer` | `requirement-analyzer` | `subagent` | read-only |
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
-| `planner` | `feature-planning`, `change-request-manager` | `subagent` | read-only |
-| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard`, `work-item-lifecycle-guard` | `subagent` | edit: ask |
-| `tester` | `testing-strategy` | `subagent` | read-only |
-| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer`, `work-item-exporter` | `subagent` | edit: ask |
+| `planner` | `feature-planning` | `subagent` | read-only |
+| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `security-guard`, `implementation-completeness-guard` | `subagent` | edit: ask |
+| `tester` | `testing-strategy`, `test-generator`, `mutation-test-generator` | `subagent` | read-only |
+| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
 | `impact-analyzer` | `dependency-analyzer`, `change-impact-analyzer` | `subagent` | read-only |
 | `test-generator` | `test-generator` | `subagent` | edit: ask |
 | `recovery` | `rollback-manager` | `subagent` | edit: ask |
 | `deployer` | `deployment-strategy` | `subagent` | read-only |
 | `documenter` | `documentation-generator` | `subagent` | edit: ask |
 | `doc-maintainer` | `doc-maintainer` | `subagent` | edit: ask |
+| `data-engineer` | `data-pipeline-architect`, `data-quality-validator`, `ml-pipeline-architect`, `analytics-schema-designer`, `data-contract-enforcer` | `subagent` | read-only |
+| `api-designer` | `api-design-architect`, `graphql-architect`, `event-schema-designer` | `subagent` | read-only |
+| `distributed-systems` | `ddd-architect`, `microservices-architect`, `event-sourcing-designer`, `distributed-resilience-architect`, `caching-strategy-designer`, `realtime-system-architect` | `subagent` | read-only |
+| `cloud-platform` | `cloud-architecture-reviewer`, `serverless-architect`, `container-orchestration-architect` | `subagent` | read-only |
+| `security-specialist` | `threat-model-designer`, `secrets-management-architect`, `devsecops-pipeline-designer` | `subagent` | read-only |
+| `sre` | `slo-sla-designer`, `load-test-designer`, `profiling-advisor`, `runbook-generator`, `chaos-engineering-designer` | `subagent` | read-only |
 
 ### Subagent Capability Mapping
 
@@ -65,7 +71,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `architect` | requirements, constraints | modules, data_flow, integration_points | analyzer |
 | `planner` | requirements, modules | tasks, dependency_map, phases | architect |
 | `reviewer` | code, architecture context | issues, vulnerabilities, remediation | architect |
-| `tester` | requirements, modules, tasks | test_plan, test_cases, edge_cases | planner |
+| `tester` | requirements, modules, tasks | test_plan, test_cases, mutation_score, assertion_gaps | planner |
 | `builder` | architecture, feature plan | generated code files, repair diffs | planner, impact-analyzer |
 | `impact-analyzer` | architecture, proposed change | dependency_graph, impact_surface, required_skills | architect |
 | `test-generator` | code artifacts, testing strategy | test suite files, coverage report | builder, tester |
@@ -73,6 +79,12 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `deployer` | architecture, test_plan | environments, promotion_rules | architect, tester |
 | `documenter` | requirements, architecture, review | documents | analyzer, architect, reviewer |
 | `doc-maintainer` | system change events, current /docs | updated doc files, drift report | documenter |
+| `data-engineer` | requirements, architecture | ETL designs, data quality rules, ML pipeline specs, analytics schemas, data contracts | architect |
+| `api-designer` | architecture, module interfaces | OpenAPI specs, GraphQL schemas, AsyncAPI event catalogs | architect |
+| `distributed-systems` | architecture, requirements | bounded context maps, service decomposition, CQRS designs, resilience patterns, caching topologies | architect |
+| `cloud-platform` | architecture, deployment strategy | WAF reviews, serverless topologies, Kubernetes cluster designs | deployer, architect |
+| `security-specialist` | architecture, security review | STRIDE threat models, secrets management architecture, DevSecOps pipeline designs | reviewer |
+| `sre` | architecture, deployment strategy | SLO/SLA designs, load test scenarios, runbooks, chaos experiments | deployer, tester |
 
 ## Agent Configuration
 
@@ -85,79 +97,189 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "mode": "primary",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "ask" },
-      "description": "Main orchestrator — drives the full pipeline and approves HITL gates"
+      "description": "Main orchestrator — drives the full AI pipeline, approves HITL gates, and coordinates all subagents"
     },
     "analyzer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Specialist in requirement extraction, normalization, and ambiguity detection"
+      "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
+      "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
     },
     "architect": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "System architecture design — modules, data flow, integration points"
+      "description": "System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
+      "skills": [
+        ".opencode/skills/architecture-design/SKILL.md",
+        ".opencode/skills/frontend-ux-architect/SKILL.md",
+        ".opencode/skills/database-architect/SKILL.md"
+      ]
     },
     "planner": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Task decomposition, dependency mapping, complexity estimation, roadmap"
+      "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
+      "skill": ".opencode/skills/feature-planning/SKILL.md"
     },
     "reviewer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Code quality (SOLID, clean arch) and security review (STRIDE, OWASP)"
+      "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, security, and implementation completeness. Invoked during the implementation phase.",
+      "skills": [
+        ".opencode/skills/clean-code-review/SKILL.md",
+        ".opencode/skills/security-review/SKILL.md",
+        ".opencode/skills/implementation-completeness-auditor/SKILL.md",
+        ".opencode/skills/database-guard/SKILL.md",
+        ".opencode/skills/performance-guard/SKILL.md",
+        ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
+        ".opencode/skills/security-guard/SKILL.md",
+        ".opencode/skills/implementation-completeness-guard/SKILL.md"
+      ]
     },
     "tester": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Test strategy, coverage targets, edge cases, quality gates"
-    },
-    "deployer": {
-      "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Deployment strategy — environments, promotion, rollback, feature flags"
-    },
-    "documenter": {
-      "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Auto-generates API docs, ADRs, READMEs from pipeline artifacts"
-    },
-    "doc-maintainer": {
-      "mode": "subagent",
-      "model": "github-copilot/gpt-4o-mini",
-      "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Autonomous documentation engine — keeps /docs in sync after every change"
+      "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
+      "skills": [
+        ".opencode/skills/testing-strategy/SKILL.md",
+        ".opencode/skills/test-generator/SKILL.md",
+        ".opencode/skills/mutation-test-generator/SKILL.md"
+      ]
     },
     "builder": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Incremental code generation and targeted code repair"
+      "description": "Incremental code generation, targeted code repair, design system file generation, and SEO artifact generation. Invoked after feature planning and impact analysis are complete.",
+      "skills": [
+        ".opencode/skills/code-generator/SKILL.md",
+        ".opencode/skills/code-repair/SKILL.md",
+        ".opencode/skills/design-system-generator/SKILL.md",
+        ".opencode/skills/seo-optimizer/SKILL.md"
+      ]
     },
     "impact-analyzer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Dependency graph maintenance and change impact analysis — runs before every code modification"
+      "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
+      "skills": [
+        ".opencode/skills/dependency-analyzer/SKILL.md",
+        ".opencode/skills/change-impact-analyzer/SKILL.md"
+      ]
     },
     "test-generator": {
       "mode": "subagent",
       "model": "github-copilot/gpt-4o-mini",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Generates unit, integration, and edge-case test suites from code artifacts"
+      "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
+      "skill": ".opencode/skills/test-generator/SKILL.md"
     },
     "recovery": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Last-resort recovery — reverts system state to a prior snapshot on critical failure"
+      "description": "Last-resort recovery agent — reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
+      "skill": ".opencode/skills/rollback-manager/SKILL.md"
+    },
+    "deployer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
+      "skill": ".opencode/skills/deployment-strategy/SKILL.md"
+    },
+    "documenter": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
+      "skill": ".opencode/skills/documentation-generator/SKILL.md"
+    },
+    "doc-maintainer": {
+      "mode": "subagent",
+      "model": "github-copilot/gpt-4o-mini",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
+      "skill": ".opencode/skills/doc-maintainer/SKILL.md"
+    },
+    "data-engineer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Data platform specialist — designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
+      "skills": [
+        ".opencode/skills/data-pipeline-architect/SKILL.md",
+        ".opencode/skills/data-quality-validator/SKILL.md",
+        ".opencode/skills/ml-pipeline-architect/SKILL.md",
+        ".opencode/skills/analytics-schema-designer/SKILL.md",
+        ".opencode/skills/data-contract-enforcer/SKILL.md"
+      ]
+    },
+    "api-designer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "API contract specialist — produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
+      "skills": [
+        ".opencode/skills/api-design-architect/SKILL.md",
+        ".opencode/skills/graphql-architect/SKILL.md",
+        ".opencode/skills/event-schema-designer/SKILL.md"
+      ]
+    },
+    "distributed-systems": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Distributed systems architect — microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
+      "skills": [
+        ".opencode/skills/ddd-architect/SKILL.md",
+        ".opencode/skills/microservices-architect/SKILL.md",
+        ".opencode/skills/event-sourcing-designer/SKILL.md",
+        ".opencode/skills/distributed-resilience-architect/SKILL.md",
+        ".opencode/skills/caching-strategy-designer/SKILL.md",
+        ".opencode/skills/realtime-system-architect/SKILL.md"
+      ]
+    },
+    "cloud-platform": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Cloud infrastructure specialist — Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
+      "skills": [
+        ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
+        ".opencode/skills/serverless-architect/SKILL.md",
+        ".opencode/skills/container-orchestration-architect/SKILL.md"
+      ]
+    },
+    "security-specialist": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
+      "skills": [
+        ".opencode/skills/threat-model-designer/SKILL.md",
+        ".opencode/skills/secrets-management-architect/SKILL.md",
+        ".opencode/skills/devsecops-pipeline-designer/SKILL.md"
+      ]
+    },
+    "sre": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Site Reliability Engineering specialist — SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
+      "skills": [
+        ".opencode/skills/slo-sla-designer/SKILL.md",
+        ".opencode/skills/load-test-designer/SKILL.md",
+        ".opencode/skills/profiling-advisor/SKILL.md",
+        ".opencode/skills/runbook-generator/SKILL.md",
+        ".opencode/skills/chaos-engineering-designer/SKILL.md"
+      ]
     }
   }
 }

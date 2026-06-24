@@ -3044,4 +3044,3 @@ skills:
     presence systems, live notification fan-out.'
   do_not_use_when: Polling-based refresh is sufficient. Batch processing systems. REST-only APIs without bidirectional streaming
     requirements.
-version: 4.0.0

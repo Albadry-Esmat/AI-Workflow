@@ -3200,7 +3200,7 @@
       ],
       "produces_for": [
         "code-generator@^1.4.0",
-        "test-generator@^1.3.0",
+        "test-generator@^2.0.0",
         "ci-pipeline-generator@^1.0.0"
       ],
       "orchestration": "Invoked after architecture-design when modules expose HTTP/REST interfaces; produces OpenAPI spec consumed by code-generator",
@@ -3252,7 +3252,7 @@
       ],
       "produces_for": [
         "code-generator@^1.4.0",
-        "test-generator@^1.3.0"
+        "test-generator@^2.0.0"
       ],
       "orchestration": "Invoked after architecture-design when modules expose GraphQL interfaces; federation_config required when multiple subgraphs present",
       "feedback_routes": [
@@ -3408,7 +3408,7 @@
       "produces_for": [
         "database-architect@^1.1.0",
         "code-generator@^1.4.0",
-        "test-generator@^1.3.0"
+        "test-generator@^2.0.0"
       ],
       "orchestration": "Invoked after microservices-architect when aggregates require full audit trail or temporal queries; feeds database-architect for event store schema",
       "feedback_routes": [

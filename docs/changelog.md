@@ -1,6 +1,6 @@
 # Changelog — System Update History
 
-**Version:** 4.1.0 | **Last updated:** 2026-06-24
+**Version:** 4.3.0 | **Last updated:** 2026-06-24
 
 All notable changes to this project are documented here.
 
@@ -268,6 +268,85 @@ Full enhancement roadmap created and all 37 task files authored. Roadmap covers 
 - After Phase 5 (v5.0.0): self-improving, observable platform. Ecosystem health target: **9.5/10**
 
 **Critical path:** TASK-0001 → TASK-0009 → TASK-0010 → TASK-0025 → TASK-0026
+
+---
+
+## [5.3.0] — 2026-06-24
+
+### Added — MCP Integration (8 Servers)
+
+8 Model Context Protocol (MCP) servers added to `opencode.json` under the `mcp` key, giving all agents access to live GitHub, web search, persistent memory, URL fetching, library documentation, and browser automation.
+
+**MCP servers added:**
+
+| Server | Package | Enabled | Purpose |
+|--------|---------|---------|---------|
+| `github` | `@modelcontextprotocol/server-github` | ✅ | GitHub API — issues, PRs, commits, file read/write via `GITHUB_TOKEN` |
+| `brave-search` | `@modelcontextprotocol/server-brave-search` | ✅ | Real-time web search via Brave Search API (`BRAVE_API_KEY`) |
+| `memory` | `@modelcontextprotocol/server-memory` | ✅ | Persistent KV store for cross-turn context without session state writes |
+| `fetch` | `@modelcontextprotocol/server-fetch` | ✅ | Arbitrary URL fetch and HTML→Markdown conversion |
+| `context7` | `@upstash/context7-mcp@latest` | ✅ | Up-to-date library documentation and code examples (`CONTEXT7_API_KEY`) |
+| `playwright` | `@playwright/mcp@latest` | ✅ | Headless Chromium browser automation (isolated, `--headless`, `--browser chromium`) |
+| `slack` | `@modelcontextprotocol/server-slack` | ❌ (pre-configured) | Slack messaging — activate with `SLACK_BOT_TOKEN` + `SLACK_TEAM_ID` |
+| `vercel` | `vercel-mcp` | ❌ (pre-configured) | Vercel deployment actions — activate with `VERCEL_TOKEN` |
+
+**Environment variables added to `.env`:**
+- `CONTEXT7_API_KEY` — required for context7 MCP
+- `BRAVE_API_KEY` — required for brave-search MCP
+- `GITHUB_TOKEN`, `VERCEL_TOKEN`, `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` — pre-existing slots confirmed
+
+**New documentation:**
+- `docs/mcp.md` — full MCP server reference: purpose, credentials, use cases, configuration notes
+
+### Changed
+
+- `opencode.json`: added top-level `mcp` key with 8 server definitions (6 enabled, 2 disabled)
+- `opencode.json`: `playwright` command now includes `-y` flag for non-interactive npx execution
+- `docs/governance.md`: §6 MCP Governance section added (tool access rules, credential policy, bypass behavior)
+
+### Validation
+
+- `validate-skills.sh` — 0 failures ✅
+- `website` build — 117/117 pages ✅
+
+---
+
+## [5.2.0] — 2026-06-24
+
+### Changed — Testing Enhancement Phase (test-generator v2.0.0, testing-strategy v2.0.0)
+
+Major revision of the core testing pipeline — `test-generator` and `testing-strategy` both bumped to v2.0.0 with backward-incompatible output schema expansions. The `tester` agent now owns three skills.
+
+**`test-generator` v1.x → v2.0.0 (SKL-028, MAJOR):**
+- New `from_mutation_gaps` mode: reads `mutation-test-generator` assertion gaps as generation input
+- BDD naming enforcement: `describe / it('should <behavior>')` structure in all output test files
+- Property-based testing (PBT): generates `fast-check` (JS/TS), `hypothesis` (Python), `gopter` (Go), `proptest` (Rust), `jqwik` (Java) test cases from input constraint schemas
+- Pact contract test generation: consumer-driven contract tests from API design artifacts
+- Parameterized test generation: `jest.each`, `vitest.each`, `pytest.mark.parametrize`, table-driven Go, JUnit 5 `@ParameterizedTest`
+- Test data factory generation: builder-pattern factories with `faker` / `factory_boy` / `go-faker` variants
+- AAA structure enforcement: all generated tests include explicit Arrange / Act / Assert comment blocks
+- Vitest support: added alongside Jest as a first-class JS/TS test runner target
+- 8 flakiness rules: no random seeds without fixture, no `Date.now()` in assertions, no arbitrary `sleep()`, deterministic ordering, isolated state per test, no global mutation, bounded async timeouts, no network without mock
+- New output fields: `property_tests`, `contract_tests`, `parameterized_suites`, `factory_files`, `bdd_naming_report`, `flakiness_violations`
+
+**`testing-strategy` v1.x → v2.0.0 (SKL-005, MAJOR):**
+- New output fields: `property_tests`, `contract_tests`, `parameterized_tests`, `test_data_strategy`, `test_double_map`, `naming_convention`, `flakiness_rules`
+- Mutation score gate: domain logic ≥ 85%, infrastructure ≥ 70%, presentation ≥ 60%
+- Test data strategy section: distinguishes factories, fixtures, builders, and seeded randomization
+- Test double map: explicit spy/stub/mock/fake/dummy classification per dependency type
+
+**`tester` agent expanded (opencode.json):**
+- `skill` (single) → `skills` (array of 3): `testing-strategy`, `test-generator`, `mutation-test-generator`
+- Agent description updated to reflect mutation scoring and CI enforcement responsibilities
+
+**Registry and index updates:**
+- `skills/registry.json`: v5.2.0 → v5.3.0; SKL-005 and SKL-028 updated to v2.0.0; all `testing-strategy@^1.x` and `test-generator@^1.0.0` references updated to `@^2.0.0`
+- `skills/index.yaml`: v3.3.0 → v3.4.0; SKL-005 and SKL-028 entries updated with new tags and descriptions
+
+### Validation
+
+- `validate-skills.sh` — 0 failures ✅
+- `website` build — 117/117 pages ✅
 
 ---
 
