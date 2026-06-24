@@ -370,3 +370,66 @@ Any addition of an MCP server to `opencode.json` requires:
 3. Adding an entry to the MCP Server Registry table above
 4. Adding a `docs/mcp.md` entry documenting the server's purpose and use cases
 5. Updating `changelog.md` with the MCP server addition
+
+## §7 Token Budget & Context Management
+
+### Hard Token Ceilings
+
+Every pipeline phase and individual skill invocation operates under a **hard token ceiling**. The ceiling is declared in the pipeline template's `token_policy` block. Exceeding the ceiling is not a warning — it is a pipeline violation.
+
+| Budget Tier | Ceiling | Default Mode |
+|-------------|---------|--------------|
+| `standard` | 16 000 tokens | `single_pass` |
+| `large` | 32 000 tokens | `cascade` |
+| `xl` | 48 000 tokens | `cascade` |
+
+### Automatic Compression Trigger
+
+When context pressure reaches **85 % of the active ceiling**, the orchestrator automatically invokes `context-compressor@^2.0.0` with `auto_compress: true`. This is the only scenario where `context-compressor` may be called without an explicit skill invocation:
+
+```yaml
+token_policy:
+  auto_compress: true
+  trigger_at_percent: 85
+  budget_tiers:
+    - name: standard
+      ceiling: 16000
+      cascade_mode: single_pass
+    - name: large
+      ceiling: 32000
+      cascade_mode: cascade
+```
+
+Pipelines that declare `auto_compress: false` (or omit `token_policy`) will receive a `AUTO_COMPRESS_NOT_PERMITTED` rejection if the compressor is triggered automatically — the orchestrator must then pause and surface the context pressure to the user.
+
+### Cascade Compression Rules
+
+When `cascade_mode: cascade` is active, the compressor escalates through three levels:
+
+| Level | Target Reduction | Information Retained |
+|-------|-----------------|---------------------|
+| `light` | 20–40 % | ~90 % |
+| `medium` | 40–65 % | ~70 % |
+| `aggressive` | > 65 % | ~50 % |
+
+- Levels are tried in order. The cascade **stops as soon as the payload fits** within `max_tokens`.
+- If `aggressive` level still cannot meet the ceiling, the best result is returned with a `warning` feedback entry.
+- An `info` feedback is emitted whenever `aggressive` level is reached, so operators are notified that significant context was dropped.
+
+### token_efficiency_score
+
+Every `context-compressor` invocation returns a `token_efficiency_score` (0–100). Scores are recorded in the pipeline execution log. Scores below 40 on the `standard` tier are flagged as a quality issue and surfaced to the primary agent.
+
+### Sensitive Content
+
+`context-compressor` must **never** receive content containing API keys, passwords, JWTs, or other credentials. If credential patterns are detected, the invocation is rejected with `SENSITIVE_CONTENT_DETECTED` and the pipeline is halted until the calling skill removes the sensitive content from the payload.
+
+### Governance Rules for Token Budget
+
+| Rule | Enforcement | Rationale |
+|------|-------------|-----------|
+| Pipelines must declare a `token_policy` block | Convention + CI lint | Without a policy, auto-compression cannot fire and budget overruns are silent |
+| `auto_compress: true` requires explicit pipeline declaration | Enforced by `context-compressor` | Prevents accidental compression of pipelines not designed for it |
+| Credential-containing content must not be passed to `context-compressor` | Enforced by compressor | Prevents sensitive data leakage through compression artifacts |
+| `aggressive` cascade-level events must appear in the session observability log | Orchestrator responsibility | Ensures operators can review significant context drops |
+| `token_efficiency_score < 40` on `standard` tier triggers a feedback alert | Orchestrator responsibility | Low efficiency scores indicate content that should not have been passed to the compressor |

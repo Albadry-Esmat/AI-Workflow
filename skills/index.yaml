@@ -558,8 +558,8 @@ skills:
     '
 - id: SKL-022
   name: Context Compressor
-  short_description: Semantically compress large context payloads to fit within token budget tiers without losing decision-critical
-    information
+  short_description: Cascade-compress large context payloads (light → medium → aggressive) to fit within token budget tiers
+    without losing decision-critical information. Supports auto_compress, pipeline_state, and session_history types.
   reference_path: skills/knowledge/context-compressor.md
   executable_skill: .opencode/skills/context-compressor/SKILL.md
   tags:
@@ -569,11 +569,15 @@ skills:
   - summarization
   - truncation
   - memory
-  version: 1.0.0
+  - cascade
+  - auto-compress
+  - pipeline-state
+  - session-history
+  version: 2.0.0
   depends_on: []
   mastery_level: intermediate
-  use_when: 'Context payload exceeds the current token budget tier, long sessions accumulate large state, or a skill receives
-    more input than its context window can accommodate.
+  use_when: 'Context payload exceeds the current token budget tier, long sessions accumulate large state, pipeline state
+    objects grow beyond the window ceiling, or a skill receives more input than its context window can accommodate.
 
     '
   do_not_use_when: 'Context is already within budget — unnecessary compression loses fidelity.

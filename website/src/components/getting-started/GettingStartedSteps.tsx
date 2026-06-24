@@ -1,58 +1,63 @@
 "use client";
 import { motion } from "framer-motion";
 
-const STEPS = [
-  {
-    step: "01",
-    title: "Clone the Repository",
-    description:
-      "The full ASE-OS skill system lives in this repository. Clone it to get all 59 skills, registry files, pipeline templates, and agent configuration.",
-    code: "git clone https://github.com/Albadry-Esmat/AI-Workflow.git\ncd AI-Workflow",
-    color: "from-cyan-600 to-cyan-500",
-  },
-  {
-    step: "02",
-    title: "Open in an Agentic Environment",
-    description:
-      "ASE-OS is designed to run inside OpenCode, Claude Code, Codex, or any agentic dev environment that supports multi-agent workflows and skill binding.",
-    code: "# Open with OpenCode\nopencode .",
-    color: "from-violet-600 to-violet-500",
-  },
-  {
-    step: "03",
-    title: "The Orchestrator Takes Over",
-    description:
-      "The primary agent reads opencode.json and loads all skill bindings automatically. All 13 agents — including the analyzer, architect, builder, and more — are initialized and ready.",
-    code: "# opencode.json is the system entry point\n# All agents and skill bindings are declared there",
-    color: "from-blue-600 to-blue-500",
-  },
-  {
-    step: "04",
-    title: "Start with Requirements",
-    description:
-      "Describe what you want to build. The orchestrator routes your input through the full pipeline: requirements → architecture → planning → impact analysis → code generation → review → deployment.",
-    code: '# Example: describe your feature\n"Build a user authentication system\nwith JWT tokens and role-based access"',
-    color: "from-teal-600 to-teal-500",
-  },
-  {
-    step: "05",
-    title: "Approve Human Review Gates",
-    description:
-      "At critical points (after requirements, after architecture, before deployment), the pipeline pauses for your review and approval. You stay in control of every major decision.",
-    code: "# Pipeline pauses at:\n# - Requirements validated       (phase 1)\n# - Architecture approved        (phase 2)\n# - UX & database design approved (phase 2b)\n# - Design system approved       (phase 2c)\n# - Roadmap approved             (phase 4)\n# - Security posture approved    (phase 7)\n# - Defect triage (conditional)  (phase 8d)\n# - Final deploy approval        (phase 9)",
-    color: "from-amber-600 to-amber-500",
-  },
-  {
-    step: "06",
-    title: "Add New Skills",
-    description:
-      "To extend the system, add a new SKILL.md file, register it in the three registry files, and it becomes part of every future pipeline run. The website updates on next build.",
-    code: "# New skill path:\n.opencode/skills/<name>/SKILL.md\n\n# Register in:\nskills/index.yaml\nskills/registry.json\nskills/graph/skill-graph.yaml",
-    color: "from-pink-600 to-pink-500",
-  },
-];
+interface Props {
+  stats?: { totalSkills: number; totalAgents: number };
+}
 
-export function GettingStartedSteps() {
+export function GettingStartedSteps({ stats }: Props) {
+  const totalSkills = stats?.totalSkills ?? 100;
+  const totalAgents = stats?.totalAgents ?? 19;
+
+  const STEPS = [
+    {
+      step: "01",
+      title: "Clone the Repository",
+      description: `The full ASE-OS skill system lives in this repository. Clone it to get all ${totalSkills} skills, registry files, pipeline templates, and agent configuration.`,
+      code: "git clone https://github.com/Albadry-Esmat/AI-Workflow.git\ncd AI-Workflow",
+      color: "from-cyan-600 to-cyan-500",
+    },
+    {
+      step: "02",
+      title: "Open in an Agentic Environment",
+      description:
+        "ASE-OS is designed to run inside OpenCode, Claude Code, Codex, or any agentic dev environment that supports multi-agent workflows and skill binding.",
+      code: "# Open with OpenCode\nopencode .",
+      color: "from-violet-600 to-violet-500",
+    },
+    {
+      step: "03",
+      title: "The Orchestrator Takes Over",
+      description: `The primary agent reads opencode.json and loads all skill bindings automatically. All ${totalAgents} agents — including the analyzer, architect, builder, and domain specialists — are initialized and ready.`,
+      code: "# opencode.json is the system entry point\n# All agents and skill bindings are declared there",
+      color: "from-blue-600 to-blue-500",
+    },
+    {
+      step: "04",
+      title: "Start with Requirements",
+      description:
+        "Describe what you want to build. The orchestrator routes your input through the full pipeline: requirements → architecture → planning → impact analysis → code generation → review → deployment.",
+      code: '# Example: describe your feature\n"Build a user authentication system\nwith JWT tokens and role-based access"',
+      color: "from-teal-600 to-teal-500",
+    },
+    {
+      step: "05",
+      title: "Approve Human Review Gates",
+      description:
+        "At critical points (after requirements, after architecture, before deployment), the pipeline pauses for your review and approval. You stay in control of every major decision.",
+      code: "# Pipeline pauses at:\n# - Requirements validated       (phase 1)\n# - Architecture approved        (phase 2)\n# - UX & database design approved (phase 2b)\n# - Design system approved       (phase 2c)\n# - Roadmap approved             (phase 4)\n# - Security posture approved    (phase 7)\n# - Defect triage (conditional)  (phase 8d)\n# - Final deploy approval        (phase 9)",
+      color: "from-amber-600 to-amber-500",
+    },
+    {
+      step: "06",
+      title: "Add New Skills",
+      description:
+        "To extend the system, add a new SKILL.md file, register it in the three registry files, and it becomes part of every future pipeline run. The website updates on next build.",
+      code: "# New skill path:\n.opencode/skills/<name>/SKILL.md\n\n# Register in:\nskills/index.yaml\nskills/registry.json\nskills/graph/skill-graph.yaml",
+      color: "from-pink-600 to-pink-500",
+    },
+  ];
+
   return (
     <div className="space-y-8">
       {STEPS.map((s, i) => (

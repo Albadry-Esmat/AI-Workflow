@@ -25,7 +25,7 @@ export default function GettingStartedPage() {
         </p>
       </div>
 
-      <GettingStartedSteps />
+      <GettingStartedSteps stats={stats} />
 
       {/* Key files reference */}
       <div className="mt-16 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40 p-6">

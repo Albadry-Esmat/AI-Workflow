@@ -1,10 +1,42 @@
 # Changelog — System Update History
 
-**Version:** 4.3.0 | **Last updated:** 2026-06-24
+**Version:** 4.4.0 | **Last updated:** 2026-06-24
 
 All notable changes to this project are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+
+---
+
+## [5.4.0] — 2026-06-24 — Token-Saving Enhancement & Website Separation
+
+### Added — Token Saving
+
+- **`context-compressor` v2.0.0** (`SKL-022`): major upgrade with three new capabilities:
+  - **Cascade compression**: automatic 3-level fallback (light → medium → aggressive) until the payload fits the token ceiling; stops at the first level that succeeds
+  - **`auto_compress` mode**: orchestrator can trigger compression automatically when context pressure exceeds 85 % of the active budget tier — no explicit skill call required; controlled by `token_policy` in the pipeline template
+  - **Two new content types**: `pipeline_state` (retains active phase, pending gates, error count, last artifact ref) and `session_history` (retains last 5 user turns verbatim + concise summaries of prior turns)
+  - **`token_efficiency_score`** output (0–100): composite quality score = compression_ratio × information_retention_estimate; scores below 40 on the `standard` tier surface an alert to the primary agent
+  - **`cascade_level_used`** output: `none` | `light` | `medium` | `aggressive`
+- **`docs/governance.md` §7**: new Token Budget & Context Management section documenting: hard token ceiling tiers (`standard`/`large`/`xl`), auto-compression trigger rules, cascade escalation policy, `token_efficiency_score` thresholds, sensitive-content rejection rules, and five governance rules
+
+### Changed — Website
+
+- **`website/src/components/home/FeaturesSection.tsx`**: "Token Budget Guardrails" card updated — description now mentions cascade compression levels and `token_efficiency_score`
+- **`website/src/components/getting-started/GettingStartedSteps.tsx`**: removed hardcoded `"59 skills"` / `"13 agents"` — component now accepts `stats` prop (`{ totalSkills, totalAgents }`) and uses live counts from `loadSiteStats()`
+- **`website/src/app/getting-started/page.tsx`**: passes `stats` to `<GettingStartedSteps stats={stats} />` so counts are always current
+- **`website/src/components/home/HeroSection.tsx`**: added "Star on GitHub" button linking to `https://github.com/Albadry-Esmat/AI-Workflow`
+- **`website/src/components/home/CtaSection.tsx`**: added "View on GitHub" button linking to `https://github.com/Albadry-Esmat/AI-Workflow`
+- **`website/README.md`**: replaced generic Next.js boilerplate with proper ASE-OS Website README documenting: what the repo is, local dev instructions, build/deploy, tech stack, pages, contributing guide, and links
+
+### Added — Website Separation
+
+- New GitHub repo **`ase-os-website`** created and populated with `website/` contents (mirrored from the main monorepo). The `website/` directory in the AI-Workflow monorepo remains the canonical source for Vercel deployment. The new repo provides a standalone mirror for contributors and reference.
+
+### Registry / Index
+
+- `skills/registry.json`: `context-compressor` entry bumped `1.0.0` → `2.0.0`; inputs expanded to 8 fields; outputs expanded to 8 fields; description updated; second feedback route added (`aggressive_cascade_reached`)
+- `skills/index.yaml`: `SKL-022` version `1.0.0` → `2.0.0`; short_description updated; 4 new tags: `cascade`, `auto-compress`, `pipeline-state`, `session-history`
 
 ---
 

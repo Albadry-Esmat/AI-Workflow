@@ -15,8 +15,8 @@
     "semantic_hash": "083a394d93b90f5a42b78951a0317737"
   },
   "opencode.json": {
-    "mtime": 1782310613.4520319,
-    "ast_hash": "32bcd96528c280a51fd008c89b580d77",
+    "mtime": 1782313954.12938,
+    "ast_hash": "006a6b451556718d1aacbf5d6c65f4c9",
     "semantic_hash": ""
   },
   "package.json": {
@@ -30,8 +30,8 @@
     "semantic_hash": "79bd0cd655cc4d7524f81ccf894ce933"
   },
   "scripts/validate-skills.sh": {
-    "mtime": 1782255384.0942452,
-    "ast_hash": "4719fef65e5e128228c94ca4200cd3ec",
+    "mtime": 1782318042.7378306,
+    "ast_hash": "4ae72660b9170fa712149a4233389a22",
     "semantic_hash": ""
   },
   "skills/pipelines/admin-panel.json": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "skills/registry.json": {
-    "mtime": 1782307443.3730404,
-    "ast_hash": "6424d716910bc0d071039dd129a079f1",
+    "mtime": 1782314087.911039,
+    "ast_hash": "2a54c825ba26b55a0ce1bf2f10a6afe5",
     "semantic_hash": ""
   },
   "skills/schema/pipeline-schema.json": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "website/src/components/home/FeaturesSection.tsx": {
-    "mtime": 1782305021.101521,
-    "ast_hash": "5ebbff932974f5924ce991475e732b05",
+    "mtime": 1782314645.9211037,
+    "ast_hash": "7dd2d02cf5548392fa224a81ae842728",
     "semantic_hash": ""
   },
   "website/src/components/home/HeroSection.tsx": {
@@ -280,9 +280,9 @@
     "semantic_hash": "f482ac5e9839906af37a5f39364c2eff"
   },
   ".github/workflows/validate-skills.yml": {
-    "mtime": 1781741926.0732152,
-    "ast_hash": "eca07507a06218d5549f51ff66a9d9c9",
-    "semantic_hash": "eca07507a06218d5549f51ff66a9d9c9"
+    "mtime": 1782318311.9485111,
+    "ast_hash": "5e9524a97bbc8b7249e5fc0246d4d347",
+    "semantic_hash": ""
   },
   ".opencode/agent/analyzer.md": {
     "mtime": 1781642347.2212782,
@@ -570,8 +570,8 @@
     "semantic_hash": ""
   },
   "docs/agents.md": {
-    "mtime": 1782217832.7381477,
-    "ast_hash": "05fc49d343edc36e66f51eaebbd68c0a",
+    "mtime": 1782314290.457564,
+    "ast_hash": "ee0b49cf1efa931c090b63724eb884ae",
     "semantic_hash": ""
   },
   "docs/architecture.md": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "docs/changelog.md": {
-    "mtime": 1782305142.0684426,
-    "ast_hash": "bb266217937957b258c0467dcf3896f8",
+    "mtime": 1782314380.7143092,
+    "ast_hash": "6a3169bde28e6a6e4d44d824b8716d59",
     "semantic_hash": ""
   },
   "docs/context-engineering.md": {
@@ -605,8 +605,8 @@
     "semantic_hash": ""
   },
   "docs/governance.md": {
-    "mtime": 1782252741.2719474,
-    "ast_hash": "862b18e2623659368ef0203ae205b37f",
+    "mtime": 1782314512.967621,
+    "ast_hash": "a626f29d3d8668e0cece34f1ee9957f7",
     "semantic_hash": ""
   },
   "docs/how-to-use.md": {
@@ -635,8 +635,8 @@
     "semantic_hash": ""
   },
   "docs/skills-registry.md": {
-    "mtime": 1782217876.6001256,
-    "ast_hash": "fc185f6663b9b6a57a7c34e810673a2a",
+    "mtime": 1782314557.213606,
+    "ast_hash": "04ed3ac17932854416eee81045d53875",
     "semantic_hash": ""
   },
   "docs/system-overview.md": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "skills/index.yaml": {
-    "mtime": 1782307476.9175165,
-    "ast_hash": "364c5335e369132a4e098266b0f44f1a",
+    "mtime": 1782314176.0894506,
+    "ast_hash": "702a63e4a5fe91444bbbc6edfb02c9b2",
     "semantic_hash": ""
   },
   "skills/knowledge/adr-generator.md": {
@@ -1315,8 +1315,8 @@
     "semantic_hash": ""
   },
   ".opencode/skills/mutation-test-generator/SKILL.md": {
-    "mtime": 1782291429.6694262,
-    "ast_hash": "fbf89354db290b417a3eae1245af2973",
+    "mtime": 1782313909.9402332,
+    "ast_hash": "5ed26f09889435016e41c726108bc149",
     "semantic_hash": ""
   },
   ".opencode/skills/pipeline-branching/SKILL.md": {

@@ -1,16 +1,16 @@
 # Graph Report - AI-Workflow  (2026-06-24)
 
 ## Corpus Check
-- 292 files · ~385,670 words
+- 292 files · ~387,455 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4139 nodes · 4256 edges · 335 communities (325 shown, 10 thin omitted)
+- 4151 nodes · 4271 edges · 336 communities (326 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `02210feb`
+- Built from commit: `669fd6c3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -332,9 +332,10 @@
 - [[_COMMUNITY_Community 332|Community 332]]
 - [[_COMMUNITY_Community 333|Community 333]]
 - [[_COMMUNITY_Community 334|Community 334]]
+- [[_COMMUNITY_Community 335|Community 335]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Changelog — System Update History` - 26 edges
+1. `Changelog — System Update History` - 28 edges
 2. `agent` - 20 edges
 3. `edit` - 19 edges
 4. `bash` - 19 edges
@@ -360,7 +361,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (335 total, 10 thin omitted)
+## Communities (336 total, 10 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -383,8 +384,8 @@ Cohesion: 0.07
 Nodes (26): _comment, context_window, compressed, recent, current_phase, feedback_log, gate_decisions, metrics (+18 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.06
-Nodes (33): §5.1 — Skill Approval Tiers (FEATURE-003, v5.1.0+), Adaptation Execution Rules, Adaptation Scope Allowlist, Adaptive Governance (Layer 5), Agent Permissions (Layer 1), Agent Resource Limits, Automated Governance Rules, Change Approval Process (+25 more)
+Cohesion: 0.05
+Nodes (38): §5.1 — Skill Approval Tiers (FEATURE-003, v5.1.0+), §6 — MCP Tool Governance (v5.3.0+), Adaptation Execution Rules, Adaptation Scope Allowlist, Adaptive Governance (Layer 5), Adding a New MCP Server, Agent Permissions (Layer 1), Agent Resource Limits (+30 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.10
@@ -419,8 +420,8 @@ Cohesion: 0.10
 Nodes (20): Anti-patterns, AP1 — The Mega-Task, AP2 — Hidden Dependencies, AP3 — Estimates as Deadlines, AP4 — Gold-Plating in Phase 1, ✅ Correct — Atomic Task with Traceability, ✅ Correct — Phase 1 Foundation First, Examples (+12 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.05
-Nodes (39): minimum, type, maximum, minimum, type, maximum, minimum, type (+31 more)
+Cohesion: 0.10
+Nodes (21): maximum, minimum, type, maximum, minimum, type, items, type (+13 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.10
@@ -451,8 +452,8 @@ Cohesion: 0.12
 Nodes (16): properties, type, type, description, properties, type, description, format (+8 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.18
-Nodes (10): Overview, P1 — The Test Pyramid *(The Art of Software Testing, Myers; GOOS, Freeman & Pryce — Ch 1)*, P2 — TDD Red-Green-Refactor *(TDD by Example, Beck — Part I)*, P3 — Test Doubles *(GOOS, Freeman & Pryce — Ch 8)*, Practices, Principles, Purpose, Related Skills (+2 more)
+Cohesion: 0.12
+Nodes (15): Anti-patterns, AP1 — The Ice Cream Cone (Inverted Pyramid), AP2 — Testing Implementation Details, AP3 — The Megamock, AP4 — Flaky Tests, Overview, P1 — The Test Pyramid *(The Art of Software Testing, Myers; GOOS, Freeman & Pryce — Ch 1)*, P2 — TDD Red-Green-Refactor *(TDD by Example, Beck — Part I)* (+7 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.08
@@ -467,8 +468,8 @@ Cohesion: 0.08
 Nodes (24): 1. Registry (`skills/registry.json`), 2. Orchestrator (`skills/orchestrator/orchestrator.md`), 3. Skills, 4. Context Memory (`skills/memory/context-protocol.md`), 5. Schema Validator (`skills/validation/schema-validator.md`), Architecture — System Architecture, Component Model, Component Topology (+16 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.10
-Nodes (23): [1.1.0] — 2026-06-16, [1.2.0] — 2026-06-16, [1.3.0] — 2026-06-16, [1.4.0] — 2026-06-16, [2.2.0] — 2026-06-18, [2.4.1] — 2026-06-18, [2.4.2] — 2026-06-18, Added (+15 more)
+Cohesion: 0.15
+Nodes (13): [1.0.0] — 2026-06-16, [1.1.0] — 2026-06-16, [2.4.1] — 2026-06-18, [2.4.2] — 2026-06-18, Added, Added, Added, Added (+5 more)
 
 ### Community 27 - "Community 27"
 Cohesion: 0.12
@@ -791,8 +792,8 @@ Cohesion: 0.29
 Nodes (6): Anti-patterns, Built-in Event Types, Event Router — Knowledge Reference, Event Schema, Principles, Source References
 
 ### Community 107 - "Community 107"
-Cohesion: 0.33
-Nodes (6): analyzer, description, mode, model, permission, skill
+Cohesion: 0.29
+Nodes (7): analyzer, description, mode, model, permission, skill, edit
 
 ### Community 108 - "Community 108"
 Cohesion: 0.08
@@ -836,7 +837,7 @@ Nodes (6): planner, description, mode, model, permission, skill
 
 ### Community 118 - "Community 118"
 Cohesion: 0.33
-Nodes (6): primary, edit, description, mode, model, permission
+Nodes (6): primary, bash, description, mode, model, permission
 
 ### Community 119 - "Community 119"
 Cohesion: 0.33
@@ -899,8 +900,8 @@ Cohesion: 0.07
 Nodes (26): graphify, 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose (+18 more)
 
 ### Community 135 - "Community 135"
-Cohesion: 0.04
-Nodes (46): command, enabled, env, type, command, enabled, env, type (+38 more)
+Cohesion: 0.05
+Nodes (44): command, enabled, env, type, command, enabled, env, type (+36 more)
 
 ### Community 136 - "Community 136"
 Cohesion: 0.13
@@ -975,8 +976,8 @@ Cohesion: 0.15
 Nodes (13): enum, type, format, type, items, type, gate_status, last_audit (+5 more)
 
 ### Community 162 - "Community 162"
-Cohesion: 0.13
-Nodes (14): Anti-patterns, AP1 — Fire and Forget, AP2 — Unlimited Retries, AP3 — Bypass HITL Gate, Orchestration — Knowledge Reference, Overview, P1 — Orchestration vs Choreography *(Designing Distributed Systems, Burns — Ch 4)*, P2 — Idempotent Steps *(Enterprise Integration Patterns, Hohpe & Woolf — Ch 10)* (+6 more)
+Cohesion: 0.18
+Nodes (10): Anti-patterns, AP1 — Fire and Forget, AP2 — Unlimited Retries, AP3 — Bypass HITL Gate, Orchestration — Knowledge Reference, Overview, Practices, Purpose (+2 more)
 
 ### Community 163 - "Community 163"
 Cohesion: 0.18
@@ -1011,8 +1012,8 @@ Cohesion: 0.25
 Nodes (7): Anti-patterns, Mock Generation Rules, Principles, Source References, Test Case Categories (per testable unit), Test Generator — Knowledge Reference, Test Tiers
 
 ### Community 173 - "Community 173"
-Cohesion: 0.29
-Nodes (6): Anti-patterns, Principles, Quality Scoring — Knowledge Reference, Score Thresholds, Scoring Dimensions, Source References
+Cohesion: 0.14
+Nodes (12): Anti-patterns, Principles, Quality Scoring — Knowledge Reference, Score Thresholds, Scoring Dimensions, Source References, Anti-patterns, Lifecycle Stages (+4 more)
 
 ### Community 174 - "Community 174"
 Cohesion: 0.29
@@ -1187,12 +1188,12 @@ Cohesion: 0.29
 Nodes (7): loadAllPipelines(), PipelineTemplate, generateMetadata(), PipelinesPage(), PipelinesClient(), Props, TEMPLATE_META
 
 ### Community 229 - "Community 229"
-Cohesion: 0.12
-Nodes (16): [2.5.0] — 2026-06-18, [2.8.0] — 2026-06-20, Added — Assisted Adaptation Pipeline (Phase 3), Changed (EETF Selective Adoption — 6 skills updated), Changed — Registry & Governance, Changed (Registry & Graph), Changelog — System Update History, Context (EETF Adoption Decision) (+8 more)
+Cohesion: 0.11
+Nodes (18): [2.3.0] — 2026-06-18, [2.8.0] — 2026-06-20, [5.2.0] — 2026-06-24, Added, Added — Assisted Adaptation Pipeline (Phase 3), Changed, Changed — Registry & Governance, Changed — Testing Enhancement Phase (test-generator v2.0.0, testing-strategy v2.0.0) (+10 more)
 
 ### Community 230 - "Community 230"
-Cohesion: 0.67
-Nodes (3): [2.3.0] — 2026-06-18, Added, Changed
+Cohesion: 0.11
+Nodes (18): minimum, type, minimum, type, consumed_tokens, max_tokens, remaining_tokens, tier (+10 more)
 
 ### Community 231 - "Community 231"
 Cohesion: 0.22
@@ -1236,7 +1237,7 @@ Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic,
 
 ### Community 241 - "Community 241"
 Cohesion: 0.18
-Nodes (11): [1.0.0] — 2026-06-16, [2.1.1] — 2026-06-18, [2.4.0] — 2026-06-18, Added, Added, Changed, Changed, Fixed (+3 more)
+Nodes (11): [2.1.0] — 2026-06-17, [2.1.1] — 2026-06-18, [2.4.0] — 2026-06-18, Added, Added, Changed, Changed, Fixed (+3 more)
 
 ### Community 242 - "Community 242"
 Cohesion: 0.15
@@ -1295,8 +1296,8 @@ Cohesion: 0.25
 Nodes (8): [4.0.1] — 2026-06-23, Added — Work Lifecycle Management Layer (Phases 5–6 Integration & Release), Changed, Fixed, Fixed — Post-Implementation Review (8 bugs, 7 gaps resolved), Phase 5 Gate Checklist, Phase 6 Gate Checklist, Validation
 
 ### Community 261 - "Community 261"
-Cohesion: 0.25
-Nodes (8): [3.1.0] — 2026-06-23, [5.1.0] — 2026-06-24, Added — Phase 6: Reactive Intelligence (5 FEATUREs, 24 SP), Added — Work Lifecycle Management Layer (Phase 3 Infrastructure), Changed — Existing Infrastructure, Phase 3 Gate Checklist (from implementation-plan-work-lifecycle.md), Validation, Validation
+Cohesion: 0.20
+Nodes (10): [3.1.0] — 2026-06-23, [5.1.0] — 2026-06-24, Added — Phase 6: Reactive Intelligence (5 FEATUREs, 24 SP), Added — Work Lifecycle Management Layer (Phase 3 Infrastructure), Changed, Changed — Existing Infrastructure, Phase 3 Gate Checklist (from implementation-plan-work-lifecycle.md), Validation (+2 more)
 
 ### Community 262 - "Community 262"
 Cohesion: 0.40
@@ -1423,8 +1424,8 @@ Cohesion: 0.50
 Nodes (4): [3.0.0] — 2026-06-21, Added — Frontend UI/UX Enhancement (Phase 1), Changed — Evolved UI/UX Skills (MAJOR version bumps), Changed — Registry, Graph & Indices
 
 ### Community 293 - "Community 293"
-Cohesion: 0.29
-Nodes (6): Anti-patterns, Lifecycle Stages, Principles, Skill Lifecycle — Knowledge Reference, Source References, Transition Rules
+Cohesion: 0.15
+Nodes (13): [1.2.0] — 2026-06-16, [1.4.0] — 2026-06-16, [2.2.0] — 2026-06-18, [5.3.0] — 2026-06-24, Added, Added, Added, Added — MCP Integration (8 Servers) (+5 more)
 
 ### Community 294 - "Community 294"
 Cohesion: 0.14
@@ -1556,15 +1557,15 @@ Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic,
 
 ### Community 326 - "Community 326"
 Cohesion: 0.33
-Nodes (6): agent, api-designer, description, mode, model, skills
+Nodes (6): api-designer, description, mode, model, permission, skills
 
 ### Community 327 - "Community 327"
 Cohesion: 0.33
 Nodes (6): cloud-platform, description, mode, model, permission, skills
 
 ### Community 328 - "Community 328"
-Cohesion: 0.25
-Nodes (8): data-engineer, permission, description, mode, model, permission, skills, bash
+Cohesion: 0.33
+Nodes (6): data-engineer, description, mode, model, permission, skills
 
 ### Community 329 - "Community 329"
 Cohesion: 0.33
@@ -1579,36 +1580,40 @@ Cohesion: 0.33
 Nodes (6): sre, description, mode, model, permission, skills
 
 ### Community 332 - "Community 332"
-Cohesion: 0.50
-Nodes (4): [2.0.0] — 2026-06-17, Added, Changed, Fixed
+Cohesion: 0.29
+Nodes (7): [1.3.0] — 2026-06-16, [2.0.0] — 2026-06-17, Added, Added, Changed, Changed, Fixed
 
 ### Community 333 - "Community 333"
 Cohesion: 0.50
-Nodes (4): [2.1.0] — 2026-06-17, Added, Changed, Fixed
+Nodes (4): [2.5.0] — 2026-06-18, Changed (EETF Selective Adoption — 6 skills updated), Changed (Registry & Graph), Context (EETF Adoption Decision)
 
 ### Community 334 - "Community 334"
-Cohesion: 0.40
-Nodes (5): Anti-patterns, AP1 — The Ice Cream Cone (Inverted Pyramid), AP2 — Testing Implementation Details, AP3 — The Megamock, AP4 — Flaky Tests
+Cohesion: 0.50
+Nodes (4): P1 — Orchestration vs Choreography *(Designing Distributed Systems, Burns — Ch 4)*, P2 — Idempotent Steps *(Enterprise Integration Patterns, Hohpe & Woolf — Ch 10)*, P3 — Circuit Breaker for Failing Skills *(Release It!, Nygard — Ch 5)*, Principles
+
+### Community 335 - "Community 335"
+Cohesion: 0.50
+Nodes (3): agent, model, $schema
 
 ## Knowledge Gaps
-- **3141 isolated node(s):** `Overview`, `Enabled Servers`, ``github` — GitHub MCP`, ``brave-search` — Brave Search MCP`, ``memory` — Persistent Knowledge Graph` (+3136 more)
+- **3149 isolated node(s):** `Purpose`, `Inputs`, `Required Context`, `Execution Logic`, `Outputs` (+3144 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `properties` connect `Community 9` to `Community 64`, `Community 289`, `Community 161`, `Community 259`, `Community 66`, `Community 295`, `Community 14`, `Community 92`, `Community 60`, `Community 243`, `Community 21`, `Community 23`, `Community 123`, `Community 124`, `Community 61`, `Community 255`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `properties` connect `Community 9` to `Community 64`, `Community 289`, `Community 161`, `Community 259`, `Community 66`, `Community 230`, `Community 295`, `Community 14`, `Community 92`, `Community 60`, `Community 243`, `Community 21`, `Community 23`, `Community 123`, `Community 124`, `Community 61`, `Community 255`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Why does `properties` connect `Community 3` to `Community 289`, `Community 161`, `Community 259`, `Community 9`, `Community 21`, `Community 23`, `Community 123`, `Community 92`, `Community 255`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **What connects `Overview`, `Enabled Servers`, ``github` — GitHub MCP` to the rest of the system?**
-  _3141 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `documentation_state` connect `Community 295` to `Community 9`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **What connects `Purpose`, `Inputs`, `Required Context` to the rest of the system?**
+  _3149 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05555555555555555 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._

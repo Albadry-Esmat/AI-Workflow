@@ -62,7 +62,7 @@ const FEATURES = [
   {
     icon: Lock,
     title: "Token Budget Guardrails",
-    description: "Every operation has a token ceiling. When context grows too large, the system compresses it automatically — nothing silently goes over budget.",
+    description: "Every operation has a hard token ceiling. When context grows too large, the context-compressor fires automatically — cycling through three levels (light → medium → aggressive) until the payload fits. Nothing silently goes over budget, and you see an efficiency score for every compression.",
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
   },

@@ -696,21 +696,28 @@
     },
     {
       "name": "context-compressor",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "status": "active",
       "domain": "orchestration",
       "path": ".opencode/skills/context-compressor/SKILL.md",
-      "description": "Semantically compresses large context payloads to fit within token budget tiers without losing decision-critical information",
+      "description": "Semantically compresses large context payloads to fit within token budget tiers without losing decision-critical information. v2.0.0 adds cascade compression (light → medium → aggressive), auto_compress mode, pipeline_state and session_history content types, and token_efficiency_score.",
       "inputs": [
         "content",
-        "compression_target",
-        "budget_tier",
-        "preserve_keys"
+        "content_type",
+        "max_tokens",
+        "preserve_keys",
+        "compression_goal",
+        "downstream_skill",
+        "auto_compress",
+        "cascade_mode"
       ],
       "outputs": [
         "compressed_content",
         "compression_ratio",
-        "dropped_keys",
+        "token_efficiency_score",
+        "cascade_level_used",
+        "omitted_keys",
+        "preserved_keys",
         "metrics",
         "feedback"
       ],
@@ -719,12 +726,17 @@
         "orchestrator@^1.0.0",
         "context-memory@^1.0.0"
       ],
-      "orchestration": "Invoked automatically when context pressure exceeds the active token budget tier",
+      "orchestration": "Invoked automatically (auto_compress=true) when context pressure exceeds the active token budget tier; otherwise called explicitly by any skill needing context reduction",
       "feedback_routes": [
         {
           "target_skill": "orchestrator",
           "condition": "compression_ratio_too_low",
           "description": "Alert orchestrator when content cannot be compressed below budget without critical data loss"
+        },
+        {
+          "target_skill": "orchestrator",
+          "condition": "aggressive_cascade_reached",
+          "description": "Inform orchestrator when cascade escalated to aggressive level — significant context was dropped"
         }
       ]
     },
