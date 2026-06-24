@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "website/src/components/arch/StateDiagram.tsx": {
-    "mtime": 1781959772.3604298,
-    "ast_hash": "82c9adf09b944d48c3259366354f34b7",
+    "mtime": 1782286423.6071079,
+    "ast_hash": "9a29357ddc85ec753ec84f9b60fb7577",
     "semantic_hash": ""
   },
   "website/src/components/getting-started/GettingStartedSteps.tsx": {
-    "mtime": 1782088253.3708043,
-    "ast_hash": "62c551b1991ff7125695b5a79481f31b",
+    "mtime": 1782288577.7205458,
+    "ast_hash": "24a5df6892d066bccb7704c6c3b8cd8c",
     "semantic_hash": ""
   },
   "website/src/components/home/CtaSection.tsx": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "website/src/components/home/FeaturesSection.tsx": {
-    "mtime": 1781959800.9721022,
-    "ast_hash": "abad88c1ca14d683604756c07ea18cac",
+    "mtime": 1782286401.5866976,
+    "ast_hash": "a306383f766ce0fbe97ccd914d1e069e",
     "semantic_hash": ""
   },
   "website/src/components/home/HeroSection.tsx": {
@@ -220,13 +220,13 @@
     "semantic_hash": ""
   },
   "website/src/components/pipeline/EventFlowDiagram.tsx": {
-    "mtime": 1781799029.356077,
-    "ast_hash": "d9d513a9fd73db11772114ab44c0c045",
+    "mtime": 1782286416.495626,
+    "ast_hash": "1a8a1d520377eae8fdce3417aa364987",
     "semantic_hash": ""
   },
   "website/src/components/pipeline/LifecycleSteps.tsx": {
-    "mtime": 1781799005.877674,
-    "ast_hash": "c59bf65b1db94979d6c08d97ce17f964",
+    "mtime": 1782288444.3150437,
+    "ast_hash": "bac0df36d8c0be646a34e95418846971",
     "semantic_hash": ""
   },
   "website/src/components/pipeline/PipelineFlow.tsx": {
@@ -930,23 +930,23 @@
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/BackgroundProcessingSection.tsx": {
-    "mtime": 1781956423.8105261,
-    "ast_hash": "892ae9500b3a728b7b3fd81b0647f5f4",
+    "mtime": 1782285270.124815,
+    "ast_hash": "ef797c465b955a454c76448984c0df3e",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/InstallationSection.tsx": {
-    "mtime": 1781959936.7283032,
-    "ast_hash": "9600c1afda1595ef434d42b0b8e53420",
+    "mtime": 1782288511.0310702,
+    "ast_hash": "4a1114d6f4f68613d70bf55e86d21af3",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/OrchestrationSection.tsx": {
-    "mtime": 1781806734.6038065,
-    "ast_hash": "b163d8b1fb818595de81f4ebc23eb058",
+    "mtime": 1782288419.528161,
+    "ast_hash": "403b464ea78d049b746b27b5b7a72f2b",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/OutputDeliverySection.tsx": {
-    "mtime": 1781799713.8186266,
-    "ast_hash": "22219b1271cec29eb871442170dc8c47",
+    "mtime": 1782288502.18707,
+    "ast_hash": "b5e144a5e1264dc8b84530013da88884",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/PromptSubmissionSection.tsx": {
@@ -955,13 +955,13 @@
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/QualityAssuranceSection.tsx": {
-    "mtime": 1781799594.8285246,
-    "ast_hash": "dd509a71200f33fb17ef2e67c4475e04",
+    "mtime": 1782288455.1086311,
+    "ast_hash": "d44fb645de08d8f37fd4ce95e54432a2",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/UseCaseHero.tsx": {
-    "mtime": 1781959901.1985207,
-    "ast_hash": "0fdd709bff6b4b948c2caa84621bacd0",
+    "mtime": 1782285250.3453376,
+    "ast_hash": "b9b48023d9a15e06a195cee4094e80de",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/WorkflowDiagram.tsx": {
@@ -1080,8 +1080,8 @@
     "semantic_hash": ""
   },
   "website/src/components/pipelines/PipelinesClient.tsx": {
-    "mtime": 1781798325.2056472,
-    "ast_hash": "aca0a6d613d2403eaf5980e1b32df074",
+    "mtime": 1782286263.8279235,
+    "ast_hash": "56fecc36cf1a5c06564f7b6f1d7dcbd8",
     "semantic_hash": ""
   },
   ".opencode/skills/adaptation-applicator/SKILL.md": {

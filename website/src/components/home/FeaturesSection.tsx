@@ -5,6 +5,7 @@ import {
   BookOpen, RefreshCw, Zap, Lock,
   AlertTriangle, BarChart2, Route, Sparkles, Activity, Lightbulb,
   ClipboardList, Bot, Palette, Wand2,
+  Scale, Diff, PlayCircle, GitFork, DollarSign, Layers2,
 } from "lucide-react";
 
 const FEATURES = [
@@ -133,6 +134,49 @@ const FEATURES = [
     description: "When the orchestrator detects a capability the system can't handle, it fires a gap event. A reactive pipeline drafts a new skill, scores it for quality, and presents it for your approval — before anything is registered.",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
+  },
+  // ── Phase 7 — Intelligence Expansion ──────────────────────────────────────
+  {
+    icon: Diff,
+    title: "Behavioral Change Detection",
+    description: "Goes beyond line-level diffs to detect logic shifts, contract changes, and security boundary alterations. Feeds precise impact signals to security review and test generation — so tests are rewritten when the contract changes, not just when lines change.",
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+  },
+  {
+    icon: Scale,
+    title: "Built-In Compliance Mapping",
+    description: "Maps every feature and architecture decision against GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 clauses at design time — before a line of code is written. Produces a traceability matrix, gap report, and audit evidence checklist automatically.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    icon: DollarSign,
+    title: "Cloud Cost Intelligence",
+    description: "Projects monthly AWS, GCP, and Azure costs directly from the deployment strategy output — before you commit to an architecture. Produces per-provider breakdowns, three alternative configurations, and cost-per-feature attribution.",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10",
+  },
+  {
+    icon: PlayCircle,
+    title: "Pipeline Dry-Run",
+    description: "Runs the full pipeline in simulation mode before any real execution. Every skill fires, outputs are generated in preview form, no disk writes occur. You get a unified report: files that would change, HITL gates that would trigger, block risks, and a go/no-go summary.",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+  },
+  {
+    icon: Layers2,
+    title: "API Lifecycle Management",
+    description: "Manages the full API version lifecycle from current to deprecated to sunset. Auto-generates migration guides from breaking changes, creates consumer migration work items, and enforces sunset timelines with automatic violation detection.",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
+  },
+  {
+    icon: GitFork,
+    title: "A/B Architecture Comparison",
+    description: "Forks the pipeline at architecture-design into two named branches, runs each through planning and quality skills in parallel, and produces a side-by-side scorecard with a recommendation. A mandatory HITL gate selects the winner before any artifacts are promoted.",
+    color: "text-pink-400",
+    bg: "bg-pink-500/10",
   },
 ];
 

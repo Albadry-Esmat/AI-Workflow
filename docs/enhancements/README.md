@@ -1,13 +1,13 @@
-# ASE-OS Enhancement Roadmap — v4.1.0 → v5.1.0
+# ASE-OS Enhancement Roadmap — v4.1.0 → v5.2.0
 
-**Version:** 1.1.0 | **Created:** 2026-06-23 | **Baseline:** v4.0.1 (58 skills, 15 pipelines)
-**Status:** Planning — Awaiting Phase 1 Kickoff
+**Version:** 1.2.0 | **Created:** 2026-06-23 | **Updated:** 2026-06-24 | **Baseline:** v4.0.1 (58 skills, 15 pipelines)
+**Status:** Planning — Phase 7 (v5.2.0) Added
 
 ---
 
 ## Overview
 
-This directory contains the structured enhancement plan for the ASE-OS AI Workflow system, covering **42 work items** across **6 delivery phases** targeting ecosystem maturity from **8.2/10 → 9.5/10**.
+This directory contains the structured enhancement plan for the ASE-OS AI Workflow system, covering **54 work items** across **7 delivery phases** targeting ecosystem maturity from **8.2/10 → 9.5/10+**.
 
 Legacy tasks (TASK-0001–0037) are tracked as physical work-item files in `work-items/TASK-NNNN-*.md`. New-format features (FEATURE-001+) use the `work-items/features/FEATURE-NNN-name/` folder structure. Both formats follow the Jira-compatible schema defined in `docs/work-item-foundation.md`.
 
@@ -24,6 +24,7 @@ docs/enhancements/
   phase-4-v4.4.0-pipeline-expansion.md        ← Phase 4 task list + status
   phase-5-v5.0.0-intelligence-dx.md           ← Phase 5 task list + status
   phase-6-v5.1.0-reactive-intelligence.md     ← Phase 6 feature list + status
+  phase-7-v5.2.0-intelligence-expansion.md    ← Phase 7 feature list + status
 
 work-items/
   TASK-0001-dry-run-adr-generator.md
@@ -70,6 +71,18 @@ work-items/
     FEATURE-003-skill-origin-trace-metadata/ ← request.md, plan.md, tasks.md, status.md
     FEATURE-004-gap-to-skill-pipeline/       ← request.md, plan.md, tasks.md, status.md
     FEATURE-005-gap-retry-execution/         ← request.md, plan.md, tasks.md, status.md
+    FEATURE-006-semantic-diff-analyzer/      ← request.md, plan.md, tasks.md, status.md
+    FEATURE-007-acceptance-criteria-generator/ ← request.md, plan.md, tasks.md, status.md
+    FEATURE-008-technical-debt-tracker/      ← request.md, plan.md, tasks.md, status.md
+    FEATURE-009-architecture-evolution-planner/ ← request.md, plan.md, tasks.md, status.md
+    FEATURE-010-compliance-mapper/           ← request.md, plan.md, tasks.md, status.md
+    FEATURE-011-api-deprecation-manager/     ← request.md, plan.md, tasks.md, status.md
+    FEATURE-012-infrastructure-cost-estimator/ ← request.md, plan.md, tasks.md, status.md
+    FEATURE-013-mutation-test-generator/     ← request.md, plan.md, tasks.md, status.md
+    FEATURE-014-skill-simulator/             ← request.md, plan.md, tasks.md, status.md
+    FEATURE-015-multi-repo-coordinator/      ← request.md, plan.md, tasks.md, status.md
+    FEATURE-016-domain-knowledge-extractor/  ← request.md, plan.md, tasks.md, status.md
+    FEATURE-017-pipeline-branching/          ← request.md, plan.md, tasks.md, status.md
 ```
 
 ---
@@ -84,8 +97,9 @@ work-items/
 | [Phase 4 — Pipeline Expansion](./phase-4-v4.4.0-pipeline-expansion.md) | v4.4.0 | 3–4 weeks | 49 pts | TASK-0024–0031 | ⏳ Planned |
 | [Phase 5 — Intelligence + DX](./phase-5-v5.0.0-intelligence-dx.md) | v5.0.0 | 4–6 weeks | 47 pts | TASK-0032–0037 | ⏳ Planned |
 | [Phase 6 — Reactive Intelligence](./phase-6-v5.1.0-reactive-intelligence.md) | v5.1.0 | 3–4 weeks | 24 pts | FEATURE-001–005 | ⏳ Planned |
+| [Phase 7 — Intelligence Expansion](./phase-7-v5.2.0-intelligence-expansion.md) | v5.2.0 | 5–6 weeks | 113 pts | FEATURE-006–017 | ⏳ Planned |
 
-**Total: 42 work items · 235 story points · ~18–25 weeks**
+**Total: 54 work items · 348 story points · ~23–31 weeks**
 
 ---
 
@@ -103,6 +117,7 @@ work-items/
 | Work item export gaps | N14 |
 | Website audit | N15 |
 | Autonomous Skill Discovery proposal (2026-06-23) | N16–N20 |
+| Intelligence Expansion proposal (2026-06-24) | N21–N32 |
 
 ---
 

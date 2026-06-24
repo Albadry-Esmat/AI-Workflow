@@ -1,16 +1,16 @@
 # Graph Report - AI-Workflow  (2026-06-24)
 
 ## Corpus Check
-- 243 files · ~258,009 words
+- 243 files · ~258,663 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3406 nodes · 3560 edges · 285 communities (275 shown, 10 thin omitted)
+- 3406 nodes · 3560 edges · 284 communities (274 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6251de0c`
+- Built from commit: `dfd4bd7c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -273,7 +273,6 @@
 - [[_COMMUNITY_Community 273|Community 273]]
 - [[_COMMUNITY_Community 274|Community 274]]
 - [[_COMMUNITY_Community 275|Community 275]]
-- [[_COMMUNITY_Community 276|Community 276]]
 - [[_COMMUNITY_Community 277|Community 277]]
 - [[_COMMUNITY_Community 278|Community 278]]
 - [[_COMMUNITY_Community 279|Community 279]]
@@ -300,17 +299,17 @@
   website/src/app/layout.tsx → website/src/lib/data.ts
 - `Orchestration — Knowledge Reference` --calls--> `Requirement Analysis — Knowledge Reference`  [INFERRED]
   skills/knowledge/orchestration.md → skills/knowledge/requirement-analysis.md
+- `Props` --references--> `Pipeline`  [EXTRACTED]
+  website/src/components/pipeline/LifecycleSteps.tsx → website/src/lib/data.ts
 - `generateMetadata()` --calls--> `loadAgentConfig()`  [EXTRACTED]
   website/src/app/agents/page.tsx → website/src/lib/data.ts
 - `HowItWorksPage()` --calls--> `loadPipeline()`  [EXTRACTED]
   website/src/app/how-it-works/page.tsx → website/src/lib/data.ts
-- `SkillDetailPage()` --calls--> `NotFound()`  [INFERRED]
-  website/src/app/skills/[id]/page.tsx → website/src/app/not-found.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (285 total, 10 thin omitted)
+## Communities (284 total, 10 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -338,7 +337,7 @@ Nodes (33): §5.1 — Skill Approval Tiers (FEATURE-003, v5.1.0+), Adaptation Ex
 
 ### Community 6 - "Community 6"
 Cohesion: 0.12
-Nodes (17): CtaSection(), Props, container, FEATURES, FeaturesSection(), item, HeroSection(), Props (+9 more)
+Nodes (16): CtaSection(), Props, container, FEATURES, FeaturesSection(), item, HeroSection(), Props (+8 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.11
@@ -425,8 +424,8 @@ Cohesion: 0.12
 Nodes (15): For AI Agents, For Developers, How to Add a New Feature, How to Create a New Agent, How to Create a New Skill, How to Debug Issues, How to Deploy Changes, How to Execute a Pipeline (+7 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.21
-Nodes (12): MASTERY_COLORS, loadAllSkills(), SkillEntry, generateMetadata(), ReferencePage(), Props, ReferenceClient(), generateMetadata() (+4 more)
+Cohesion: 0.23
+Nodes (10): sitemap(), generateStaticParams(), loadAllSkills(), loadSkillIndex(), generateMetadata(), ReferencePage(), ReferenceClient(), generateMetadata() (+2 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.12
@@ -437,8 +436,8 @@ Cohesion: 0.12
 Nodes (15): AGENT_COLORS, AgentsGrid(), Props, AGENT_COLORS, AGENT_PLAIN, AgentDiagram(), Props, GraphOverview() (+7 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.16
-Nodes (10): NotFound(), sitemap(), generateStaticParams(), Props, SkillDetailPage(), FeedbackRoute, loadSkillIndex(), fadeUp (+2 more)
+Cohesion: 0.15
+Nodes (14): NotFound(), Props, SkillDetailPage(), DOMAIN_COLORS, LAYER_LABELS, MASTERY_COLORS, FeedbackRoute, SkillEntry (+6 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.10
@@ -497,8 +496,8 @@ Cohesion: 0.14
 Nodes (13): Recovery Agent, 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose (+5 more)
 
 ### Community 46 - "Community 46"
-Cohesion: 0.09
-Nodes (24): description, type, description, type, description, type, properties, description (+16 more)
+Cohesion: 0.11
+Nodes (18): default, description, type, description, type, description, type, properties (+10 more)
 
 ### Community 47 - "Community 47"
 Cohesion: 0.14
@@ -545,8 +544,8 @@ Cohesion: 0.17
 Nodes (11): CI/CD Pipeline, Deployment Change Rules, Deployment — CI/CD & Release Process, Deployment Patterns, Deployment Skill, Environment Model, Feature Flag Governance, Pattern Definitions (+3 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.40
-Nodes (5): type, default, description, enum, type
+Cohesion: 0.13
+Nodes (15): description, type, description, type, properties, description, type, after_phase (+7 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.12
@@ -589,8 +588,8 @@ Cohesion: 0.05
 Nodes (43): 1. Executive Summary, 2. Complete Skill Inventory, 3.10 Database Layer (1 skill), 3.11 Quality Layer (2 skills), 3.12 Governance Layer (4 skills), 3.13 Orchestration Layer (3 skills), 3.14 System Layer (3 skills), 3.15 Review Layer (1 skill) (+35 more)
 
 ### Community 69 - "Community 69"
-Cohesion: 0.09
-Nodes (23): description, type, description, type, description, type, default, description (+15 more)
+Cohesion: 0.08
+Nodes (24): description, type, description, type, description, type, default, description (+16 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.20
@@ -746,7 +745,7 @@ Nodes (7): analyzer, description, mode, model, permission, skill, bash
 
 ### Community 108 - "Community 108"
 Cohesion: 0.08
-Nodes (24): description, type, description, enum, type, default, description, type (+16 more)
+Nodes (24): description, type, description, enum, type, default, description, enum (+16 more)
 
 ### Community 109 - "Community 109"
 Cohesion: 0.29
@@ -821,8 +820,8 @@ Cohesion: 0.06
 Nodes (29): AIExecutionSection(), EXECUTION_PHASES, OUTPUT_TYPES, BackgroundProcessingSection(), CONTEXT_LAYERS, DISCOVERY_STEPS, InstallationSection(), STEPS (+21 more)
 
 ### Community 128 - "Community 128"
-Cohesion: 0.24
-Nodes (8): LAYER_LABELS, PHASE_COLORS, Pipeline, LifecycleSteps(), PHASE_DESCRIPTIONS, Props, PipelineFlow(), Props
+Cohesion: 0.28
+Nodes (7): PHASE_COLORS, Pipeline, LifecycleSteps(), PHASE_DESCRIPTIONS, Props, PipelineFlow(), Props
 
 ### Community 129 - "Community 129"
 Cohesion: 0.14
@@ -1297,16 +1296,12 @@ Cohesion: 0.29
 Nodes (6): Acceptance Gate, Context: Why This Pass Matters, Objective, Phase 1 — v4.1.0: Skill Consistency Pass, Recommended Execution Order, Task Checklist
 
 ### Community 274 - "Community 274"
-Cohesion: 0.40
-Nodes (5): default, description, enum, type, mode
+Cohesion: 0.50
+Nodes (4): default, description, type, full_trace
 
 ### Community 275 - "Community 275"
 Cohesion: 0.40
 Nodes (5): additionalProperties, description, required, type, origin_metadata
-
-### Community 276 - "Community 276"
-Cohesion: 0.50
-Nodes (4): default, description, type, async
 
 ### Community 277 - "Community 277"
 Cohesion: 0.50
@@ -1341,7 +1336,7 @@ Cohesion: 0.67
 Nodes (3): [2.2.0] — 2026-06-18, Added, Changed
 
 ## Knowledge Gaps
-- **2494 isolated node(s):** `$schema`, `plugin`, `@opencode-ai/plugin`, `$schema`, `_comment` (+2489 more)
+- **2494 isolated node(s):** `STATE_SCOPES`, `STEPS`, `FEATURES`, `container`, `item` (+2489 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1352,7 +1347,9 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Why does `properties` connect `Community 3` to `Community 161`, `Community 259`, `Community 9`, `Community 60`, `Community 21`, `Community 23`, `Community 123`, `Community 92`, `Community 255`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **What connects `$schema`, `plugin`, `@opencode-ai/plugin` to the rest of the system?**
+- **Why does `Reviewer Agent` connect `Community 145` to `Community 129`, `Community 38`, `Community 39`, `Community 49`, `Community 50`, `Community 52`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **What connects `STATE_SCOPES`, `STEPS`, `FEATURES` to the rest of the system?**
   _2494 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05555555555555555 - nodes in this community are weakly interconnected._
@@ -1360,5 +1357,3 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._

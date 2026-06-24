@@ -1,8 +1,8 @@
 meta:
-  version: 2.8.0
+  version: 2.9.0
   last_updated: '2026-06-24'
-  total_nodes: 59
-  total_edges: 162
+  total_nodes: 71
+  total_edges: 198
   schema: skills/graph/graph-schema.yaml
 nodes:
   - id: SKL-001
@@ -418,6 +418,90 @@ nodes:
     version: 1.0.0
     status: draft
     layer: meta
+  - id: SKL-066
+    name: semantic-diff-analyzer
+    domain: architecture
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: analysis
+  - id: SKL-067
+    name: acceptance-criteria-generator
+    domain: requirements
+    mastery_level: intermediate
+    version: 1.0.0
+    status: draft
+    layer: requirements
+  - id: SKL-068
+    name: technical-debt-tracker
+    domain: quality
+    mastery_level: intermediate
+    version: 1.0.0
+    status: draft
+    layer: quality
+  - id: SKL-069
+    name: architecture-evolution-planner
+    domain: architecture
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: architecture
+  - id: SKL-070
+    name: compliance-mapper
+    domain: governance
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: governance
+  - id: SKL-071
+    name: api-deprecation-manager
+    domain: architecture
+    mastery_level: intermediate
+    version: 1.0.0
+    status: draft
+    layer: lifecycle
+  - id: SKL-072
+    name: infrastructure-cost-estimator
+    domain: deployment
+    mastery_level: intermediate
+    version: 1.0.0
+    status: draft
+    layer: deployment
+  - id: SKL-073
+    name: mutation-test-generator
+    domain: testing
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: testing
+  - id: SKL-074
+    name: skill-simulator
+    domain: system
+    mastery_level: intermediate
+    version: 1.0.0
+    status: draft
+    layer: orchestration
+  - id: SKL-075
+    name: multi-repo-coordinator
+    domain: architecture
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: architecture
+  - id: SKL-076
+    name: domain-knowledge-extractor
+    domain: system
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: system
+  - id: SKL-077
+    name: pipeline-branching
+    domain: orchestration
+    mastery_level: advanced
+    version: 1.0.0
+    status: draft
+    layer: orchestration
 edges:
   - from: SKL-001
     to: SKL-002
@@ -1071,3 +1155,203 @@ edges:
     to: SKL-015
     type: composition
     label: gap-to-skill-pipeline invokes quality-scoring as a pre-HITL quality gate (min score 70)
+  - from: SKL-024
+    to: SKL-066
+    type: dependency
+    label: semantic-diff-analyzer consumes change-impact-analyzer output as triggering context
+  - from: SKL-066
+    to: SKL-006
+    type: dependency
+    label: semantic-diff-analyzer security_signals feed into security-review as behavioral evidence
+  - from: SKL-066
+    to: SKL-028
+    type: dependency
+    label: semantic-diff-analyzer test_invalidation_reasons feed into test-generator for targeted re-generation
+  - from: SKL-066
+    to: SKL-004
+    type: co_occurrence
+    label: semantic-diff-analyzer contract_diff surfaces to clean-code-review for review prioritization
+  - from: SKL-001
+    to: SKL-067
+    type: dependency
+    label: acceptance-criteria-generator consumes structured requirements from requirement-analyzer
+  - from: SKL-067
+    to: SKL-005
+    type: dependency
+    label: acceptance-criteria-generator outputs feed into testing-strategy as testability-rated criteria
+  - from: SKL-067
+    to: SKL-028
+    type: dependency
+    label: acceptance-criteria-generator outputs feed into test-generator for traceable test generation
+  - from: SKL-004
+    to: SKL-068
+    type: dependency
+    label: technical-debt-tracker consumes clean-code-review issues to build cross-session debt register
+  - from: SKL-021
+    to: SKL-068
+    type: dependency
+    label: technical-debt-tracker reads and writes debt register via state-manager
+  - from: SKL-068
+    to: SKL-003
+    type: dependency
+    label: technical-debt-tracker remediation backlog feeds into feature-planning for sprint prioritization
+  - from: SKL-002
+    to: SKL-069
+    type: dependency
+    label: architecture-evolution-planner consumes current and target architecture from architecture-design
+  - from: SKL-029
+    to: SKL-069
+    type: dependency
+    label: architecture-evolution-planner uses adr-generator to produce ADR stubs per evolution phase
+  - from: SKL-023
+    to: SKL-069
+    type: dependency
+    label: architecture-evolution-planner uses dependency-analyzer for safe refactoring order computation
+  - from: SKL-069
+    to: SKL-003
+    type: dependency
+    label: architecture-evolution-planner produces evolution phases fed into feature-planning as phased tasks
+  - from: SKL-069
+    to: SKL-029
+    type: composition
+    label: architecture-evolution-planner triggers adr-generator for each significant evolution decision
+  - from: SKL-001
+    to: SKL-070
+    type: dependency
+    label: compliance-mapper maps structured requirements to regulatory clauses
+  - from: SKL-002
+    to: SKL-070
+    type: dependency
+    label: compliance-mapper analyzes data flows in architecture for compliance scope
+  - from: SKL-006
+    to: SKL-070
+    type: dependency
+    label: compliance-mapper builds on security-review findings to enrich compliance evidence
+  - from: SKL-070
+    to: SKL-041
+    type: dependency
+    label: compliance-mapper compliance gaps feed into security-guard as additional blocking conditions
+  - from: SKL-070
+    to: SKL-008
+    type: dependency
+    label: compliance-mapper evidence checklist feeds into documentation-generator for audit docs
+  - from: SKL-024
+    to: SKL-071
+    type: dependency
+    label: api-deprecation-manager triggered when change-impact-analyzer detects breaking API changes
+  - from: SKL-021
+    to: SKL-071
+    type: dependency
+    label: api-deprecation-manager maintains API registry via state-manager
+  - from: SKL-071
+    to: SKL-008
+    type: dependency
+    label: api-deprecation-manager migration guides feed into documentation-generator
+  - from: SKL-071
+    to: SKL-007
+    type: co_occurrence
+    label: api-deprecation-manager deprecation timeline informs deployment-strategy release sequencing
+  - from: SKL-007
+    to: SKL-072
+    type: dependency
+    label: infrastructure-cost-estimator consumes deployment-strategy for resource specification
+  - from: SKL-002
+    to: SKL-072
+    type: dependency
+    label: infrastructure-cost-estimator uses architecture-design for workload profiling
+  - from: SKL-072
+    to: SKL-007
+    type: co_occurrence
+    label: infrastructure-cost-estimator cost estimates presented alongside deployment-strategy HITL gate
+  - from: SKL-028
+    to: SKL-073
+    type: dependency
+    label: mutation-test-generator analyzes test suites produced by test-generator
+  - from: SKL-027
+    to: SKL-073
+    type: dependency
+    label: mutation-test-generator analyzes code artifacts produced by code-generator
+  - from: SKL-073
+    to: SKL-028
+    type: dependency
+    label: mutation-test-generator assertion_gaps feed back into test-generator for targeted strengthening
+  - from: SKL-010
+    to: SKL-074
+    type: dependency
+    label: skill-simulator uses orchestrator execution model for pipeline graph resolution
+  - from: SKL-021
+    to: SKL-074
+    type: dependency
+    label: skill-simulator reads session context from state-manager for simulation baseline
+  - from: SKL-074
+    to: SKL-010
+    type: dependency
+    label: skill-simulator go/no-go report presented to orchestrator before real pipeline execution
+  - from: SKL-024
+    to: SKL-075
+    type: dependency
+    label: multi-repo-coordinator uses change-impact-analyzer findings for cross-boundary impact computation
+  - from: SKL-023
+    to: SKL-075
+    type: dependency
+    label: multi-repo-coordinator extends dependency-analyzer to cross-repo dependency graph
+  - from: SKL-021
+    to: SKL-075
+    type: dependency
+    label: multi-repo-coordinator maintains cross-repo registry via state-manager
+  - from: SKL-075
+    to: SKL-007
+    type: dependency
+    label: multi-repo-coordinator migration_coordination_plan informs deployment-strategy sequencing
+  - from: SKL-001
+    to: SKL-076
+    type: dependency
+    label: domain-knowledge-extractor receives requirements as primary domain signal for extraction
+  - from: SKL-002
+    to: SKL-076
+    type: dependency
+    label: domain-knowledge-extractor receives architecture artifacts for pattern extraction
+  - from: SKL-006
+    to: SKL-076
+    type: dependency
+    label: domain-knowledge-extractor captures security patterns from security-review findings
+  - from: SKL-021
+    to: SKL-076
+    type: dependency
+    label: domain-knowledge-extractor reads and writes domain knowledge base via state-manager
+  - from: SKL-076
+    to: SKL-001
+    type: co_occurrence
+    label: domain-knowledge-extractor injects domain context into requirement-analyzer at pipeline start
+  - from: SKL-076
+    to: SKL-002
+    type: co_occurrence
+    label: domain-knowledge-extractor injects architecture patterns into architecture-design at pipeline start
+  - from: SKL-002
+    to: SKL-077
+    type: dependency
+    label: pipeline-branching forks from architecture-design output — requires two architecture variants
+  - from: SKL-003
+    to: SKL-077
+    type: dependency
+    label: pipeline-branching runs feature-planning for both branches to generate comparative estimates
+  - from: SKL-006
+    to: SKL-077
+    type: dependency
+    label: pipeline-branching runs security-review for both branches as part of comparison scorecard
+  - from: SKL-005
+    to: SKL-077
+    type: dependency
+    label: pipeline-branching runs testing-strategy for both branches for testability comparison
+  - from: SKL-021
+    to: SKL-077
+    type: dependency
+    label: pipeline-branching manages isolated branch execution contexts via state-manager
+  - from: SKL-077
+    to: SKL-010
+    type: dependency
+    label: pipeline-branching selected_artifacts promoted to main pipeline by orchestrator after HITL selection
+  - from: SKL-077
+    to: SKL-029
+    type: composition
+    label: pipeline-branching produces ADR stub documenting the branch selection decision

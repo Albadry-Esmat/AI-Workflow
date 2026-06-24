@@ -1,5 +1,5 @@
 meta:
-  version: 3.2.0
+  version: 3.3.0
   schema: skills/schema/skill-schema.yaml
   last_updated: "2026-06-24"
   description: Central skills index for the AI Workflow system
@@ -1479,3 +1479,357 @@ skills:
       A capability gap has been logged in session state (gap_context present). Run to convert the gap into a draft skill through dedup-checked, HITL-governed skill-authoring and quality-scoring.
     do_not_use_when: |
       No gap_context is present in session state. Do not invoke autonomously — requires a prior capability gap detection event (FEATURE-001) to populate gap_context. Never skip the HITL gate.
+  - id: SKL-066
+    name: Semantic Diff Analyzer
+    short_description: Compares before/after code to detect behavioral changes — logic shifts, contract changes, security boundary alterations — beyond line-level diffs
+    reference_path: .opencode/skills/semantic-diff-analyzer/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/semantic-diff-analyzer/SKILL.md
+    tags:
+      - diff
+      - behavioral-analysis
+      - security
+      - impact
+      - code-change
+      - architecture
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-024
+    related_skills:
+      - SKL-006
+      - SKL-028
+      - SKL-004
+    mastery_level: advanced
+    use_when: |
+      A code change has been detected and you need to understand what behavioral contracts changed, not just which lines. Use before security-review and test-generator for any non-trivial code modification.
+    do_not_use_when: |
+      The change is purely cosmetic (formatting, comments, variable renames with no logic change). Do not use for dependency version bumps or configuration-only changes.
+  - id: SKL-067
+    name: Acceptance Criteria Generator
+    short_description: Transforms structured requirements into formal BDD-style Given/When/Then acceptance criteria with AC IDs, negative scenarios, and testability ratings
+    reference_path: .opencode/skills/acceptance-criteria-generator/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/acceptance-criteria-generator/SKILL.md
+    tags:
+      - acceptance-criteria
+      - bdd
+      - gherkin
+      - requirements
+      - testing
+      - traceability
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-001
+    related_skills:
+      - SKL-005
+      - SKL-028
+    mastery_level: intermediate
+    use_when: |
+      Structured requirements from requirement-analyzer are available and you need to generate executable acceptance criteria for test generation or sprint planning.
+    do_not_use_when: |
+      Requirements are not yet structured or validated. Run requirement-analyzer first. Do not use for purely technical tasks with no user-facing behavior.
+  - id: SKL-068
+    name: Technical Debt Tracker
+    short_description: Maintains a persistent cross-session technical debt register with debt score, trend analysis, maintenance cost projections, and prioritized remediation backlog
+    reference_path: .opencode/skills/technical-debt-tracker/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/technical-debt-tracker/SKILL.md
+    tags:
+      - technical-debt
+      - quality
+      - cross-session
+      - code-review
+      - remediation
+      - maintenance
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-004
+      - SKL-026
+    related_skills:
+      - SKL-003
+    mastery_level: intermediate
+    use_when: |
+      After clean-code-review produces issues and you want to track debt accumulation over time, get a debt score, or generate a prioritized remediation backlog for sprint planning.
+    do_not_use_when: |
+      First pipeline run with no prior clean-code-review output. Do not use for single-run analysis without state persistence configured.
+  - id: SKL-069
+    name: Architecture Evolution Planner
+    short_description: Produces a phased, sprint-sized migration plan from current to target architecture using strangler-fig, branch-by-abstraction, and expand-contract patterns
+    reference_path: .opencode/skills/architecture-evolution-planner/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Human-in-the-Loop Gates"
+    executable_skill: .opencode/skills/architecture-evolution-planner/SKILL.md
+    tags:
+      - architecture
+      - migration
+      - refactoring
+      - strangler-fig
+      - evolution
+      - planning
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-002
+      - SKL-029
+      - SKL-023
+    related_skills:
+      - SKL-003
+      - SKL-024
+    mastery_level: advanced
+    use_when: |
+      You have a current architecture and a target architecture and need a safe, incremental migration plan. Use for large refactors, monolith-to-microservices, or any multi-sprint architecture evolution.
+    do_not_use_when: |
+      You are designing an architecture from scratch. Use architecture-design (SKL-002) instead. Do not use when current and target architecture are identical.
+  - id: SKL-070
+    name: Compliance Mapper
+    short_description: Maps system features and architecture against GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 clauses to produce a compliance traceability matrix and audit evidence checklist
+    reference_path: .opencode/skills/compliance-mapper/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/compliance-mapper/SKILL.md
+    tags:
+      - compliance
+      - gdpr
+      - hipaa
+      - pci-dss
+      - soc2
+      - iso27001
+      - governance
+      - traceability
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-001
+      - SKL-002
+      - SKL-006
+    related_skills:
+      - SKL-041
+      - SKL-008
+    mastery_level: advanced
+    use_when: |
+      Building a regulated system (fintech, healthcare, govtech, SaaS with enterprise customers) and you need to verify which regulatory clauses are covered and which are missing.
+    do_not_use_when: |
+      Building a purely internal tool with no user data and no regulatory requirements. Do not use before security-review has run.
+  - id: SKL-071
+    name: API Deprecation Manager
+    short_description: Manages the full API version lifecycle — current, deprecated, sunset — auto-generates migration guides from breaking changes and creates consumer migration work items
+    reference_path: .opencode/skills/api-deprecation-manager/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/api-deprecation-manager/SKILL.md
+    tags:
+      - api
+      - deprecation
+      - versioning
+      - lifecycle
+      - migration
+      - breaking-changes
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-024
+      - SKL-026
+    related_skills:
+      - SKL-007
+      - SKL-008
+    mastery_level: intermediate
+    use_when: |
+      A breaking API change is detected, an API version needs to be deprecated, or you need to generate a migration guide for API consumers. Use for any public or internal API with known consumers.
+    do_not_use_when: |
+      The change is backward-compatible. Do not use for internal implementation changes that do not affect the public API contract.
+  - id: SKL-072
+    name: Infrastructure Cost Estimator
+    short_description: Projects monthly cloud infrastructure costs (AWS/GCP/Azure) from deployment-strategy output with per-provider breakdowns, alternatives, and cost optimization suggestions
+    reference_path: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+    tags:
+      - cost
+      - infrastructure
+      - aws
+      - gcp
+      - azure
+      - deployment
+      - estimation
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-007
+      - SKL-002
+    related_skills:
+      - SKL-042
+    mastery_level: intermediate
+    use_when: |
+      A deployment strategy has been defined and you need cost projections before committing to infrastructure. Use for any production deployment decision where budget matters.
+    do_not_use_when: |
+      No deployment strategy exists yet. Run deployment-strategy (SKL-007) first. Do not use for local development or test environments.
+  - id: SKL-073
+    name: Mutation Test Generator
+    short_description: Performs static mutation analysis on source code and test suite, infers kill status, produces mutation score and assertion gaps to eliminate surviving mutants
+    reference_path: .opencode/skills/mutation-test-generator/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/mutation-test-generator/SKILL.md
+    tags:
+      - mutation-testing
+      - test-quality
+      - coverage
+      - assertions
+      - static-analysis
+      - testing
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-028
+      - SKL-027
+    related_skills:
+      - SKL-005
+    mastery_level: advanced
+    use_when: |
+      Test coverage targets are met but you need to verify tests actually catch bugs. Use after test-generator to validate test suite effectiveness for critical modules.
+    do_not_use_when: |
+      No tests exist yet. Run test-generator (SKL-028) first. Do not use for integration or e2e tests — mutation analysis is for unit-level logic.
+  - id: SKL-074
+    name: Skill Simulator
+    short_description: Runs a complete pipeline in simulation mode with no disk writes, producing a preview report of files that would change, HITL gates predicted, block risks, and token estimates
+    reference_path: .opencode/skills/skill-simulator/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/skill-simulator/SKILL.md
+    tags:
+      - simulation
+      - dry-run
+      - preview
+      - pipeline
+      - safety
+      - orchestration
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-010
+      - SKL-026
+    related_skills:
+      - SKL-010
+    mastery_level: intermediate
+    use_when: |
+      Before running a full pipeline for the first time, testing a new pipeline configuration, or when you want to preview what changes a pipeline would make without committing any writes.
+    do_not_use_when: |
+      You need actual pipeline outputs or file changes. The simulator produces previews only — it does not generate code, update docs, or write any artifacts.
+  - id: SKL-075
+    name: Multi-Repo Coordinator
+    short_description: Coordinates changes across multiple repositories — maintains cross-repo dependency registry, detects cross-boundary breaking changes, and generates synchronized work items per affected repo
+    reference_path: .opencode/skills/multi-repo-coordinator/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Human-in-the-Loop Gates"
+    executable_skill: .opencode/skills/multi-repo-coordinator/SKILL.md
+    tags:
+      - multi-repo
+      - polyrepo
+      - microservices
+      - cross-repo
+      - dependency
+      - coordination
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-024
+      - SKL-023
+      - SKL-026
+    related_skills:
+      - SKL-025
+    mastery_level: advanced
+    use_when: |
+      Working in a polyrepo or microservices architecture where a change in one repo (especially a shared library) may break consumers in other repos. Use before committing breaking changes.
+    do_not_use_when: |
+      Working in a monorepo where all code is in one repository. Do not use for single-service changes with no downstream consumers.
+  - id: SKL-076
+    name: Domain Knowledge Extractor
+    short_description: Extracts reusable domain patterns from completed pipelines into a persistent knowledge base and injects relevant patterns into subsequent pipelines in the same domain
+    reference_path: .opencode/skills/domain-knowledge-extractor/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Outputs"
+    executable_skill: .opencode/skills/domain-knowledge-extractor/SKILL.md
+    tags:
+      - domain-knowledge
+      - learning
+      - cross-project
+      - context
+      - patterns
+      - system
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-001
+      - SKL-002
+      - SKL-006
+      - SKL-032
+      - SKL-026
+    related_skills:
+      - SKL-013
+      - SKL-022
+    mastery_level: advanced
+    use_when: |
+      At pipeline end (extract mode) to capture reusable patterns, or at pipeline start (inject mode) when working in a domain with prior knowledge. Enables cross-project learning.
+    do_not_use_when: |
+      First-ever pipeline with no prior history (no knowledge to inject). Do not use inject mode if no domain knowledge base exists for the detected domain.
+  - id: SKL-077
+    name: Pipeline Branching
+    short_description: Forks pipeline at architecture-design into two A/B branches, runs both through quality skills in parallel, produces a comparison scorecard and recommendation, enforces mandatory HITL branch selection
+    reference_path: .opencode/skills/pipeline-branching/SKILL.md
+    reference_sections:
+      - "## Purpose"
+      - "## Execution Logic"
+      - "## Human-in-the-Loop Gates"
+    executable_skill: .opencode/skills/pipeline-branching/SKILL.md
+    tags:
+      - branching
+      - a-b-testing
+      - architecture
+      - comparison
+      - orchestration
+      - decision-support
+      - phase-7
+    version: 1.0.0
+    depends_on:
+      - SKL-002
+      - SKL-003
+      - SKL-006
+      - SKL-005
+      - SKL-026
+    related_skills:
+      - SKL-029
+      - SKL-010
+    mastery_level: advanced
+    use_when: |
+      Two viable architecture approaches exist and you need an objective comparison before committing. Use when teams are divided on architectural decisions or when major design tradeoffs need evidence-based resolution.
+    do_not_use_when: |
+      Only one architecture approach is viable. Do not use as part of the default pipeline — only invoke explicitly when comparative evaluation is needed. Requires both architecture variants as input.

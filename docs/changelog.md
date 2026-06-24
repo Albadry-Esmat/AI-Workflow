@@ -8,6 +8,61 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — `Added`, `C
 
 ---
 
+## [Unreleased] — Enhancement Roadmap v5.2.0 (Phase 7)
+
+### Planned — Phase 7: Intelligence Expansion (12 Features, 108 Story Points)
+
+Phase 7 adds 12 new skills across six capability dimensions: behavioral intelligence, quality depth, governance expansion, infrastructure intelligence, architectural power, and operational safety. See `docs/enhancements/phase-7-v5.2.0-intelligence-expansion.md` for the full feature list, dependency graph, and delivery roadmap.
+
+**Phase 7 feature files — v5.2.0 Intelligence Expansion:**
+
+- FEATURE-006: `semantic-diff-analyzer` (SKL-066) — behavioral change detection beyond line-level diffs
+- FEATURE-007: `acceptance-criteria-generator` (SKL-067) — BDD Given/When/Then from structured requirements
+- FEATURE-008: `technical-debt-tracker` (SKL-068) — cross-session debt register with score, trend, and cost projection
+- FEATURE-009: `architecture-evolution-planner` (SKL-069) — phased migration plans with strangler-fig/expand-contract patterns
+- FEATURE-010: `compliance-mapper` (SKL-070) — GDPR/HIPAA/PCI-DSS/SOC2/ISO27001 traceability matrix + audit checklist
+- FEATURE-011: `api-deprecation-manager` (SKL-071) — full API version lifecycle with auto-generated migration guides
+- FEATURE-012: `infrastructure-cost-estimator` (SKL-072) — monthly cloud cost projections (AWS/GCP/Azure) from deployment strategy
+- FEATURE-013: `mutation-test-generator` (SKL-073) — static mutation analysis with mutation score and assertion gap reports
+- FEATURE-014: `skill-simulator` (SKL-074) — full pipeline dry-run with file preview, HITL gate prediction, and go/no-go summary
+- FEATURE-015: `multi-repo-coordinator` (SKL-075) — cross-repo dependency registry and synchronized impact analysis for polyrepo systems
+- FEATURE-016: `domain-knowledge-extractor` (SKL-076) — cross-project domain pattern learning and context injection
+- FEATURE-017: `pipeline-branching` (SKL-077) — A/B architecture exploration with comparison scorecard and mandatory HITL selection
+
+**Work item files created (2026-06-24):**
+- `work-items/features/FEATURE-006-semantic-diff-analyzer/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-007-acceptance-criteria-generator/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-008-technical-debt-tracker/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-009-architecture-evolution-planner/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-010-compliance-mapper/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-011-api-deprecation-manager/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-012-infrastructure-cost-estimator/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-013-mutation-test-generator/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-014-skill-simulator/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-015-multi-repo-coordinator/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-016-domain-knowledge-extractor/` — request.md, plan.md, tasks.md, status.md
+- `work-items/features/FEATURE-017-pipeline-branching/` — request.md, plan.md, tasks.md, status.md
+
+**Skill files created (2026-06-24):**
+- `.opencode/skills/semantic-diff-analyzer/SKILL.md` (SKL-066, v1.0.0, draft)
+- `.opencode/skills/acceptance-criteria-generator/SKILL.md` (SKL-067, v1.0.0, draft)
+- `.opencode/skills/technical-debt-tracker/SKILL.md` (SKL-068, v1.0.0, draft)
+- `.opencode/skills/architecture-evolution-planner/SKILL.md` (SKL-069, v1.0.0, draft)
+- `.opencode/skills/compliance-mapper/SKILL.md` (SKL-070, v1.0.0, draft)
+- `.opencode/skills/api-deprecation-manager/SKILL.md` (SKL-071, v1.0.0, draft)
+- `.opencode/skills/infrastructure-cost-estimator/SKILL.md` (SKL-072, v1.0.0, draft)
+- `.opencode/skills/mutation-test-generator/SKILL.md` (SKL-073, v1.0.0, draft)
+- `.opencode/skills/skill-simulator/SKILL.md` (SKL-074, v1.0.0, draft)
+- `.opencode/skills/multi-repo-coordinator/SKILL.md` (SKL-075, v1.0.0, draft)
+- `.opencode/skills/domain-knowledge-extractor/SKILL.md` (SKL-076, v1.0.0, draft)
+- `.opencode/skills/pipeline-branching/SKILL.md` (SKL-077, v1.0.0, draft)
+
+**Registry and index updates (2026-06-24):**
+- `skills/registry.json`: 12 new entries added (SKL-066–077); total skills: 71
+- `skills/index.yaml`: 12 new entries added; version bumped to 3.3.0
+
+---
+
 ## [Unreleased] — Enhancement Roadmap v4.1.0 → v5.1.0
 
 ### Implemented — Phase 6: Reactive Intelligence (5 Features, 24 Story Points)
