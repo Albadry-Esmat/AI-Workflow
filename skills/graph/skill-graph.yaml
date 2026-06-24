@@ -37,7 +37,7 @@ nodes:
   name: testing-strategy
   domain: testing
   mastery_level: intermediate
-  version: 1.2.0
+  version: 2.0.0
   status: active
   layer: pipeline-quality
 - id: SKL-006
@@ -156,7 +156,7 @@ nodes:
   name: context-compressor
   domain: orchestration
   mastery_level: intermediate
-  version: 1.0.0
+  version: 2.0.0
   status: active
   layer: infrastructure
 - id: SKL-023
@@ -198,7 +198,7 @@ nodes:
   name: test-generator
   domain: testing
   mastery_level: intermediate
-  version: 1.0.0
+  version: 2.0.0
   status: active
   layer: pipeline-execution
 - id: SKL-029

@@ -164,7 +164,7 @@ if command -v node &>/dev/null; then
     // Parse skill-graph.yaml node versions via simple regex (no yaml dep needed)
     const yaml = fs.readFileSync('skills/graph/skill-graph.yaml', 'utf8');
     const graphVersions = {};
-    const nodeBlocks = yaml.split(/\n  - id:/);
+    const nodeBlocks = yaml.split(/\n- id:/);
     for (const block of nodeBlocks.slice(1)) {
       const nameMatch = block.match(/name:\s+(\S+)/);
       const verMatch  = block.match(/version:\s+(\S+)/);
