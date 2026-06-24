@@ -196,6 +196,7 @@ The deployment gate is a system-level invariant:
 - HITL gate changes require updating the orchestrator AND this file.
 - Permission changes require updating agent configuration AND this file.
 - Adding a guard skill requires updating the Guard Inventory table AND `skills-registry.md`.
+- Model changes to `reviewer`, `security-specialist`, or `recovery` agents require a PR comment with justification. Downgrading these agents to a lightweight model (e.g. `gpt-4o-mini`) without documented rationale is not permitted. See [`docs/models.md`](models.md) for available model IDs and recommended assignments.
 
 ## Agent Resource Limits
 

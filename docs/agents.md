@@ -1,6 +1,6 @@
 # Agents — Agent Definitions
 
-**Version:** 1.3.0 | **Last updated:** 2026-06-24
+**Version:** 1.4.0 | **Last updated:** 2026-06-25
 
 ## What Is an Agent
 
@@ -286,6 +286,21 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 ```
 
 Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config.
+
+## Model Configuration
+
+Every agent has its own `"model"` field in `opencode.json`. Changing the model for any agent is a **single-line edit** — no restart required.
+
+```json
+"architect": {
+  "model": "github-copilot/claude-opus-4-5",   ← change this one line
+  ...
+}
+```
+
+The top-level `"model"` key is the global fallback for any agent that doesn't specify its own.
+
+**Full reference** → [`docs/models.md`](models.md) — lists all available model IDs, current assignments, cost-optimisation tips, and governance rules for safety-critical agents.
 
 ## Agent Rules
 
