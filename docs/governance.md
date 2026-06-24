@@ -371,7 +371,7 @@ Any addition of an MCP server to `opencode.json` requires:
 4. Adding a `docs/mcp.md` entry documenting the server's purpose and use cases
 5. Updating `changelog.md` with the MCP server addition
 
-## §7 Token Budget & Context Management
+## §7 — Token Budget & Context Management (v5.4.0+)
 
 ### Hard Token Ceilings
 
