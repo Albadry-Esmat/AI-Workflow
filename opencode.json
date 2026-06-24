@@ -1,6 +1,72 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/claude-sonnet-4.6",
+
+  "mcp": {
+
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" },
+      "enabled": true
+    },
+
+    "brave-search": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
+      "enabled": true
+    },
+
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "enabled": true
+    },
+
+    "fetch": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
+      "enabled": true
+    },
+
+    "context7": {
+      "type": "local",
+      "command": ["npx", "-y", "@upstash/context7-mcp@latest"],
+      "env": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" },
+      "enabled": true
+    },
+
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx", "@playwright/mcp@latest",
+        "--headless",
+        "--isolated",
+        "--browser", "chromium"
+      ],
+      "enabled": true
+    },
+
+    "slack": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
+        "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
+      },
+      "enabled": false
+    },
+
+    "vercel": {
+      "type": "local",
+      "command": ["npx", "-y", "vercel-mcp"],
+      "env": { "VERCEL_TOKEN": "${VERCEL_TOKEN}" },
+      "enabled": false
+    }
+
+  },
+
   "agent": {
     "primary": {
       "mode": "primary",

@@ -1,7 +1,7 @@
 # Graph Report - AI-Workflow  (2026-06-24)
 
 ## Corpus Check
-- 291 files · ~379,256 words
+- 291 files · ~383,948 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `449ac0b9`
+- Built from commit: `b39871eb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -851,7 +851,7 @@ Nodes (6): test-generator, description, mode, model, permission, skill
 
 ### Community 122 - "Community 122"
 Cohesion: 0.33
-Nodes (6): tester, description, mode, model, permission, skill
+Nodes (6): tester, description, mode, model, permission, skills
 
 ### Community 123 - "Community 123"
 Cohesion: 0.33
@@ -1594,11 +1594,11 @@ Nodes (4): [2.1.0] — 2026-06-17, Added, Changed, Fixed
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `properties` connect `Community 9` to `Community 64`, `Community 289`, `Community 161`, `Community 259`, `Community 66`, `Community 295`, `Community 8`, `Community 60`, `Community 92`, `Community 14`, `Community 243`, `Community 21`, `Community 23`, `Community 123`, `Community 124`, `Community 61`, `Community 255`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **Why does `type` connect `Community 23` to `Community 64`, `Community 259`, `Community 3`, `Community 295`, `Community 14`, `Community 243`, `Community 21`, `Community 60`, `Community 61`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `behavioral_telemetry` connect `Community 124` to `Community 9`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `properties` connect `Community 3` to `Community 289`, `Community 259`, `Community 9`, `Community 92`, `Community 21`, `Community 23`, `Community 123`, `Community 60`, `Community 255`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `session_id` connect `Community 9` to `Community 3`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `Purpose`, `Inputs`, `Required Context` to the rest of the system?**
   _3097 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
