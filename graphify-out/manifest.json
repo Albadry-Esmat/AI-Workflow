@@ -15,8 +15,8 @@
     "semantic_hash": "083a394d93b90f5a42b78951a0317737"
   },
   "opencode.json": {
-    "mtime": 1781996486.5767694,
-    "ast_hash": "df064f0ee70f5853fa9bd744b6b6b77c",
+    "mtime": 1782304840.3920627,
+    "ast_hash": "f7b11f35461c05fc3d8b3a045205661d",
     "semantic_hash": ""
   },
   "package.json": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "skills/registry.json": {
-    "mtime": 1782255352.5252743,
-    "ast_hash": "65c7e79649eb4f5936b5e43c958656e7",
+    "mtime": 1782304796.138369,
+    "ast_hash": "7f41e4059e3af19ef686eb639d13f21a",
     "semantic_hash": ""
   },
   "skills/schema/pipeline-schema.json": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "website/src/components/home/FeaturesSection.tsx": {
-    "mtime": 1782286401.5866976,
-    "ast_hash": "a306383f766ce0fbe97ccd914d1e069e",
+    "mtime": 1782305021.101521,
+    "ast_hash": "5ebbff932974f5924ce991475e732b05",
     "semantic_hash": ""
   },
   "website/src/components/home/HeroSection.tsx": {
@@ -260,8 +260,8 @@
     "semantic_hash": ""
   },
   "website/src/lib/colors.ts": {
-    "mtime": 1781953677.573777,
-    "ast_hash": "d49241b4369f99d283ce614eda34b796",
+    "mtime": 1782304965.9757483,
+    "ast_hash": "269c68638affcc3bf79bc4c6a9883309",
     "semantic_hash": ""
   },
   "website/src/lib/data.ts": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "docs/changelog.md": {
-    "mtime": 1782255259.2450178,
-    "ast_hash": "f557735487111c11cdef89c657539f09",
+    "mtime": 1782305142.0684426,
+    "ast_hash": "bb266217937957b258c0467dcf3896f8",
     "semantic_hash": ""
   },
   "docs/context-engineering.md": {
@@ -675,13 +675,13 @@
     "semantic_hash": ""
   },
   "skills/graph/skill-graph.yaml": {
-    "mtime": 1782254632.400668,
-    "ast_hash": "271c717b493521f6f4c29048b0882423",
+    "mtime": 1782304796.3727229,
+    "ast_hash": "01ed9cef9683f9b0c8cc3a13abeda2be",
     "semantic_hash": ""
   },
   "skills/index.yaml": {
-    "mtime": 1782254600.7047331,
-    "ast_hash": "53f254b35d7dd566bf36dc3124c10e37",
+    "mtime": 1782304796.2647057,
+    "ast_hash": "a7e4c0099cefe0e54ce64d34385ae387",
     "semantic_hash": ""
   },
   "skills/knowledge/adr-generator.md": {
@@ -1245,8 +1245,8 @@
     "semantic_hash": ""
   },
   "docs/enhancements/README.md": {
-    "mtime": 1782239429.4300919,
-    "ast_hash": "6ddbc57a05f01ed3006454d1e01ec869",
+    "mtime": 1782305094.7392433,
+    "ast_hash": "6e95c1edf3068cd1af4bd31598f69b3f",
     "semantic_hash": ""
   },
   "docs/enhancements/phase-1-v4.1.0-consistency-pass.md": {
@@ -1277,6 +1277,246 @@
   "docs/enhancements/phase-6-v5.1.0-reactive-intelligence.md": {
     "mtime": 1782239345.2739167,
     "ast_hash": "4d94e710b88a4423d80a0c2a592f1e41",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/acceptance-criteria-generator/SKILL.md": {
+    "mtime": 1782292241.4164126,
+    "ast_hash": "356b2cac80cb7fdcb74db3831e98e098",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/api-deprecation-manager/SKILL.md": {
+    "mtime": 1782291231.2776477,
+    "ast_hash": "c22a336dc66d55682b22eb228c7e81de",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/architecture-evolution-planner/SKILL.md": {
+    "mtime": 1782292442.4116087,
+    "ast_hash": "389ba9cf47bacd08a01910facfbb75b6",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/compliance-mapper/SKILL.md": {
+    "mtime": 1782291151.538491,
+    "ast_hash": "63a970703a8e5bd6169abdb801afcc04",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/domain-knowledge-extractor/SKILL.md": {
+    "mtime": 1782295193.143895,
+    "ast_hash": "d010714f0e7d717b755e262be802327f",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/infrastructure-cost-estimator/SKILL.md": {
+    "mtime": 1782291330.4447606,
+    "ast_hash": "b0ec05544f5ff3265c4499ae6c24e7a5",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/multi-repo-coordinator/SKILL.md": {
+    "mtime": 1782295193.1395478,
+    "ast_hash": "60c5abafcf2320afe6c12b73cc9b5c63",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/mutation-test-generator/SKILL.md": {
+    "mtime": 1782291429.6694262,
+    "ast_hash": "fbf89354db290b417a3eae1245af2973",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/pipeline-branching/SKILL.md": {
+    "mtime": 1782295193.1478152,
+    "ast_hash": "9e5052736841545caff8d1e8d7fb7a4e",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/semantic-diff-analyzer/SKILL.md": {
+    "mtime": 1782292163.4461677,
+    "ast_hash": "8ea64e149db4d9c5c1905f4ed312aed8",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/skill-simulator/SKILL.md": {
+    "mtime": 1782295193.135375,
+    "ast_hash": "f3e382dd446943a159c420c38bb0ad50",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/technical-debt-tracker/SKILL.md": {
+    "mtime": 1782292338.1450746,
+    "ast_hash": "ccb9a9b40eef78e0f282632a6b098048",
+    "semantic_hash": ""
+  },
+  "docs/enhancements/phase-7-v5.2.0-intelligence-expansion.md": {
+    "mtime": 1782292766.846429,
+    "ast_hash": "5e9b44fa7ea8a3414aa4c03d1fbecfbd",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/api-first.json": {
+    "mtime": 1782304898.723211,
+    "ast_hash": "e243d34d4ec11da209cab209b23b87c5",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/cloud-migration.json": {
+    "mtime": 1782304930.0367014,
+    "ast_hash": "492b79384d7a1700a068a720b876e445",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/data-engineering.json": {
+    "mtime": 1782304876.0122194,
+    "ast_hash": "a8bc7dbe9757669866451fd575cbfe8b",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/microservices-platform.json": {
+    "mtime": 1782304913.9333055,
+    "ast_hash": "27a1f7694ff53bc77dbdbb529aa3b4b0",
+    "semantic_hash": ""
+  },
+  "skills/pipelines/ml-platform.json": {
+    "mtime": 1782304886.6352944,
+    "ast_hash": "393f65e38dc6fb1d19e4e6c19ae7ea40",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/analytics-schema-designer/SKILL.md": {
+    "mtime": 1782302744.713565,
+    "ast_hash": "9309da5761c9f4447bd340ba6526b072",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/api-design-architect/SKILL.md": {
+    "mtime": 1782302563.5773783,
+    "ast_hash": "a2dbbb8b0e0551e8e406d3e43dba12bb",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/caching-strategy-designer/SKILL.md": {
+    "mtime": 1782303244.7682753,
+    "ast_hash": "62c57b0475ca64c478492c7149855c89",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/chaos-engineering-designer/SKILL.md": {
+    "mtime": 1782304283.701285,
+    "ast_hash": "dfe58818f163abc72b82ca0ec22c7a47",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/cloud-architecture-reviewer/SKILL.md": {
+    "mtime": 1782302749.292793,
+    "ast_hash": "fd7ff5ddc009e267ea8110e54d369607",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/container-orchestration-architect/SKILL.md": {
+    "mtime": 1782302992.4810512,
+    "ast_hash": "7983551a675dfc2adc2251efa47408ea",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/data-contract-enforcer/SKILL.md": {
+    "mtime": 1782302833.709801,
+    "ast_hash": "8d31de3b5871f9b1905e98772a5114d6",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/data-pipeline-architect/SKILL.md": {
+    "mtime": 1782302492.957059,
+    "ast_hash": "3cc16657ca2b1c18de87465b44cc853e",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/data-quality-validator/SKILL.md": {
+    "mtime": 1782302567.6493397,
+    "ast_hash": "3860a0eb06b513f0fe54c8a03df737d1",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/ddd-architect/SKILL.md": {
+    "mtime": 1782303126.3531125,
+    "ast_hash": "aac1224f3f107ac8edecfd790b4e75e5",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/devsecops-pipeline-designer/SKILL.md": {
+    "mtime": 1782302895.5411477,
+    "ast_hash": "8830089c15259f020100271318ca1486",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/distributed-resilience-architect/SKILL.md": {
+    "mtime": 1782302662.6149719,
+    "ast_hash": "27cf1b2673dd53d383ec8f150b831524",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/event-schema-designer/SKILL.md": {
+    "mtime": 1782302741.605385,
+    "ast_hash": "20f4b27aba5d0e934c3db3ce1b626c02",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/event-sourcing-designer/SKILL.md": {
+    "mtime": 1782302992.745257,
+    "ast_hash": "a5c72713a5d7b6de14a6e63f4c3d1572",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/graphql-architect/SKILL.md": {
+    "mtime": 1782302652.776049,
+    "ast_hash": "b9002df2fa082a265a4553536f0786e9",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/load-test-designer/SKILL.md": {
+    "mtime": 1782303009.751282,
+    "ast_hash": "d76baa9b991049355e24741edae198f1",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/localization-architect/SKILL.md": {
+    "mtime": 1782303367.192261,
+    "ast_hash": "3454bd4ec2ec318551cddbb2f54c7c2b",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/micro-frontend-architect/SKILL.md": {
+    "mtime": 1782302787.6119604,
+    "ast_hash": "88e2ce9256b2160b2dc177093f3849f4",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/microservices-architect/SKILL.md": {
+    "mtime": 1782302836.9599617,
+    "ast_hash": "a8f2abdd6178143e280eea2e71ced4a3",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/ml-pipeline-architect/SKILL.md": {
+    "mtime": 1782302650.6913044,
+    "ast_hash": "57019f2142881f4dfaf32db5aa6d34af",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/product-analytics-designer/SKILL.md": {
+    "mtime": 1782303510.104464,
+    "ast_hash": "e238a7d290d424fa487e9178d603da14",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/profiling-advisor/SKILL.md": {
+    "mtime": 1782303112.0349464,
+    "ast_hash": "12854ab0d4aaca777b0cd1aea7bd3301",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/realtime-system-architect/SKILL.md": {
+    "mtime": 1782303644.499257,
+    "ast_hash": "b11f023e53a5856598bd4a9af2a72031",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/runbook-generator/SKILL.md": {
+    "mtime": 1782303344.2968466,
+    "ast_hash": "93345d5bdcb6f7437429ff994eff0af9",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/secrets-management-architect/SKILL.md": {
+    "mtime": 1782303240.5753102,
+    "ast_hash": "bf78295d584d6c8c1b645526e5bfaaf5",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/serverless-architect/SKILL.md": {
+    "mtime": 1782302875.2287583,
+    "ast_hash": "dba4574f8fef0e3387a6d291aa307dc6",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/slo-sla-designer/SKILL.md": {
+    "mtime": 1782303222.0282745,
+    "ast_hash": "6aceb1bdc7a370a469f1d46254429fcd",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/state-management-architect/SKILL.md": {
+    "mtime": 1782302683.0805469,
+    "ast_hash": "984422a2ac9d46a98a142e3a225c93f0",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/threat-model-designer/SKILL.md": {
+    "mtime": 1782303105.132758,
+    "ast_hash": "19559ec352f0805781c0afac52b9880d",
+    "semantic_hash": ""
+  },
+  ".opencode/skills/web-performance-optimizer/SKILL.md": {
+    "mtime": 1782303030.9237435,
+    "ast_hash": "b1f0d91b1f154fc990f77f7b8710bf5c",
     "semantic_hash": ""
   }
 }

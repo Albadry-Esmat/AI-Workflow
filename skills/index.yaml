@@ -1,5 +1,5 @@
 meta:
-  version: 3.3.0
+  version: 3.4.0
   schema: skills/schema/skill-schema.yaml
   last_updated: '2026-06-24'
   description: Central skills index for the AI Workflow system
@@ -115,7 +115,7 @@ skills:
     '
 - id: SKL-005
   name: Testing Strategy
-  short_description: Define unit, integration, and e2e test plans with coverage targets and quality gates
+  short_description: Define layered test plans with pyramid targets, naming conventions, PBT candidates, contract tests, mutation score gates, and flakiness prevention rules
   reference_path: skills/knowledge/testing-strategy.md
   reference_sections:
   - '## Principles'
@@ -126,12 +126,19 @@ skills:
   tags:
   - testing
   - tdd
+  - bdd
   - coverage
   - quality-gates
   - unit-tests
   - integration
   - pyramid
-  version: 1.2.0
+  - property-based
+  - pbt
+  - contract-testing
+  - mutation
+  - flakiness
+  - naming-convention
+  version: 2.0.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -140,7 +147,7 @@ skills:
   use_when: 'Defining how any feature or system change will be verified before it is promoted to the next environment.
 
     '
-  do_not_use_when: 'Feature is a pure configuration or content change with no behavioral or logic impact.
+  do_not_use_when: 'Feature is a pure configuration or content change with no behavioral or logic impact. Do not use when generating test code — use test-generator (SKL-028) for that.
 
     '
 - id: SKL-006
@@ -696,8 +703,7 @@ skills:
     '
 - id: SKL-028
   name: Test Generator
-  short_description: Generate unit, integration, and edge-case test suites from code artifacts, interface contracts, or testing
-    strategies
+  short_description: Generate unit, integration, property-based, contract, and parameterized test suites with BDD naming, AAA structure, test data factories, and mutation gap filling
   reference_path: skills/knowledge/test-generator.md
   executable_skill: .opencode/skills/test-generator/SKILL.md
   tags:
@@ -707,13 +713,21 @@ skills:
   - coverage
   - edge-cases
   - test-generation
-  version: 1.0.0
+  - property-based
+  - pbt
+  - contract-testing
+  - parameterized
+  - bdd
+  - aaa
+  - vitest
+  - factory
+  - mutation-gaps
+  version: 2.0.0
   depends_on:
   - SKL-005
   - SKL-026
   mastery_level: intermediate
-  use_when: 'Generating test files from code artifacts or specs, filling coverage gaps, or regenerating tests invalidated
-    by a code change.
+  use_when: 'Generating test files from code artifacts or specs, filling coverage gaps, generating property-based or contract tests, or killing surviving mutants from mutation analysis.
 
     '
   do_not_use_when: 'Defining what to test or setting coverage targets — use testing-strategy (SKL-005) for that.

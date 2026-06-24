@@ -53,8 +53,12 @@
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Test strategy, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
-      "skill": ".opencode/skills/testing-strategy/SKILL.md"
+      "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
+      "skills": [
+        ".opencode/skills/testing-strategy/SKILL.md",
+        ".opencode/skills/test-generator/SKILL.md",
+        ".opencode/skills/mutation-test-generator/SKILL.md"
+      ]
     },
     "builder": {
       "mode": "subagent",

@@ -1,16 +1,16 @@
 # Graph Report - AI-Workflow  (2026-06-24)
 
 ## Corpus Check
-- 243 files · ~258,663 words
+- 291 files · ~379,256 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3406 nodes · 3560 edges · 284 communities (274 shown, 10 thin omitted)
+- 4078 nodes · 4196 edges · 334 communities (324 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dfd4bd7c`
+- Built from commit: `449ac0b9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -273,6 +273,7 @@
 - [[_COMMUNITY_Community 273|Community 273]]
 - [[_COMMUNITY_Community 274|Community 274]]
 - [[_COMMUNITY_Community 275|Community 275]]
+- [[_COMMUNITY_Community 276|Community 276]]
 - [[_COMMUNITY_Community 277|Community 277]]
 - [[_COMMUNITY_Community 278|Community 278]]
 - [[_COMMUNITY_Community 279|Community 279]]
@@ -281,18 +282,67 @@
 - [[_COMMUNITY_Community 282|Community 282]]
 - [[_COMMUNITY_Community 283|Community 283]]
 - [[_COMMUNITY_Community 284|Community 284]]
+- [[_COMMUNITY_Community 285|Community 285]]
+- [[_COMMUNITY_Community 286|Community 286]]
+- [[_COMMUNITY_Community 287|Community 287]]
+- [[_COMMUNITY_Community 288|Community 288]]
+- [[_COMMUNITY_Community 289|Community 289]]
+- [[_COMMUNITY_Community 290|Community 290]]
+- [[_COMMUNITY_Community 291|Community 291]]
+- [[_COMMUNITY_Community 292|Community 292]]
+- [[_COMMUNITY_Community 293|Community 293]]
+- [[_COMMUNITY_Community 294|Community 294]]
+- [[_COMMUNITY_Community 295|Community 295]]
+- [[_COMMUNITY_Community 296|Community 296]]
+- [[_COMMUNITY_Community 297|Community 297]]
+- [[_COMMUNITY_Community 298|Community 298]]
+- [[_COMMUNITY_Community 299|Community 299]]
+- [[_COMMUNITY_Community 300|Community 300]]
+- [[_COMMUNITY_Community 301|Community 301]]
+- [[_COMMUNITY_Community 302|Community 302]]
+- [[_COMMUNITY_Community 303|Community 303]]
+- [[_COMMUNITY_Community 304|Community 304]]
+- [[_COMMUNITY_Community 305|Community 305]]
+- [[_COMMUNITY_Community 306|Community 306]]
+- [[_COMMUNITY_Community 307|Community 307]]
+- [[_COMMUNITY_Community 308|Community 308]]
+- [[_COMMUNITY_Community 309|Community 309]]
+- [[_COMMUNITY_Community 310|Community 310]]
+- [[_COMMUNITY_Community 311|Community 311]]
+- [[_COMMUNITY_Community 312|Community 312]]
+- [[_COMMUNITY_Community 313|Community 313]]
+- [[_COMMUNITY_Community 314|Community 314]]
+- [[_COMMUNITY_Community 315|Community 315]]
+- [[_COMMUNITY_Community 316|Community 316]]
+- [[_COMMUNITY_Community 317|Community 317]]
+- [[_COMMUNITY_Community 318|Community 318]]
+- [[_COMMUNITY_Community 319|Community 319]]
+- [[_COMMUNITY_Community 320|Community 320]]
+- [[_COMMUNITY_Community 321|Community 321]]
+- [[_COMMUNITY_Community 322|Community 322]]
+- [[_COMMUNITY_Community 323|Community 323]]
+- [[_COMMUNITY_Community 324|Community 324]]
+- [[_COMMUNITY_Community 325|Community 325]]
+- [[_COMMUNITY_Community 326|Community 326]]
+- [[_COMMUNITY_Community 327|Community 327]]
+- [[_COMMUNITY_Community 328|Community 328]]
+- [[_COMMUNITY_Community 329|Community 329]]
+- [[_COMMUNITY_Community 330|Community 330]]
+- [[_COMMUNITY_Community 331|Community 331]]
+- [[_COMMUNITY_Community 332|Community 332]]
+- [[_COMMUNITY_Community 333|Community 333]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Changelog — System Update History` - 24 edges
-2. `Glossary — System Terminology` - 19 edges
-3. `loadSiteStats()` - 18 edges
-4. `Implementation Plan — Work Lifecycle Management Layer` - 17 edges
-5. `3. Domain Group Assessments` - 17 edges
-6. `compilerOptions` - 16 edges
-7. `loadAllSkills()` - 15 edges
-8. `Security Guard` - 15 edges
-9. `agent` - 14 edges
-10. `Adaptation Applicator` - 14 edges
+1. `Changelog — System Update History` - 26 edges
+2. `agent` - 20 edges
+3. `edit` - 19 edges
+4. `bash` - 19 edges
+5. `Glossary — System Terminology` - 19 edges
+6. `loadSiteStats()` - 18 edges
+7. `Implementation Plan — Work Lifecycle Management Layer` - 17 edges
+8. `3. Domain Group Assessments` - 17 edges
+9. `compilerOptions` - 16 edges
+10. `loadAllSkills()` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `RootLayout()` --calls--> `loadSiteStats()`  [EXTRACTED]
@@ -303,13 +353,13 @@
   website/src/components/pipeline/LifecycleSteps.tsx → website/src/lib/data.ts
 - `generateMetadata()` --calls--> `loadAgentConfig()`  [EXTRACTED]
   website/src/app/agents/page.tsx → website/src/lib/data.ts
-- `HowItWorksPage()` --calls--> `loadPipeline()`  [EXTRACTED]
-  website/src/app/how-it-works/page.tsx → website/src/lib/data.ts
+- `ArchitecturePage()` --calls--> `loadAgentConfig()`  [EXTRACTED]
+  website/src/app/architecture/page.tsx → website/src/lib/data.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (284 total, 10 thin omitted)
+## Communities (334 total, 10 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -336,20 +386,20 @@ Cohesion: 0.06
 Nodes (33): §5.1 — Skill Approval Tiers (FEATURE-003, v5.1.0+), Adaptation Execution Rules, Adaptation Scope Allowlist, Adaptive Governance (Layer 5), Agent Permissions (Layer 1), Agent Resource Limits, Automated Governance Rules, Change Approval Process (+25 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.12
-Nodes (16): CtaSection(), Props, container, FEATURES, FeaturesSection(), item, HeroSection(), Props (+8 more)
+Cohesion: 0.10
+Nodes (21): CtaSection(), Props, container, FEATURES, FeaturesSection(), item, HeroSection(), Props (+13 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.11
-Nodes (30): AgentsPage(), generateMetadata(), Image(), size, HomePage(), ArchitecturePage(), ChangelogPage(), metadata (+22 more)
+Cohesion: 0.10
+Nodes (29): AgentsPage(), generateMetadata(), Image(), size, HomePage(), ChangelogContent(), GROUP_STYLES, ChangelogPage() (+21 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.11
 Nodes (18): minimum, type, minimum, type, consumed_tokens, max_tokens, remaining_tokens, tier (+10 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.08
-Nodes (26): description, format, type, description, type, description, type, description (+18 more)
+Cohesion: 0.09
+Nodes (23): description, format, type, description, type, description, enum, type (+15 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.09
@@ -396,16 +446,16 @@ Cohesion: 0.04
 Nodes (46): 0.1 Tasks, 0.2 Unknowns Requiring Clarification, 0.3 Assumptions, 0.4 Dependencies on Existing System, 0.5 Validation Checkpoint, 1.1 Tasks, 1.2 Key Design Decisions, 1.3 Lifecycle State Model (Draft) (+38 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.17
-Nodes (12): properties, type, type, description, properties, type, cycle_report, cycles (+4 more)
+Cohesion: 0.13
+Nodes (15): properties, type, type, description, properties, type, items, type (+7 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.18
-Nodes (10): Overview, P1 — The Test Pyramid *(The Art of Software Testing, Myers; GOOS, Freeman & Pryce — Ch 1)*, P2 — TDD Red-Green-Refactor *(TDD by Example, Beck — Part I)*, P3 — Test Doubles *(GOOS, Freeman & Pryce — Ch 8)*, Practices, Principles, Purpose, Related Skills (+2 more)
+Cohesion: 0.12
+Nodes (15): Anti-patterns, AP1 — The Ice Cream Cone (Inverted Pyramid), AP2 — Testing Implementation Details, AP3 — The Megamock, AP4 — Flaky Tests, Overview, P1 — The Test Pyramid *(The Art of Software Testing, Myers; GOOS, Freeman & Pryce — Ch 1)*, P2 — TDD Red-Green-Refactor *(TDD by Example, Beck — Part I)* (+7 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.08
-Nodes (30): items, type, items, type, items, description, items, type (+22 more)
+Nodes (31): items, type, items, type, description, items, type, items (+23 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.05
@@ -416,28 +466,28 @@ Cohesion: 0.08
 Nodes (24): 1. Registry (`skills/registry.json`), 2. Orchestrator (`skills/orchestrator/orchestrator.md`), 3. Skills, 4. Context Memory (`skills/memory/context-protocol.md`), 5. Schema Validator (`skills/validation/schema-validator.md`), Architecture — System Architecture, Component Model, Component Topology (+16 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.15
-Nodes (13): [1.2.0] — 2026-06-16, [1.3.0] — 2026-06-16, [2.4.1] — 2026-06-18, [2.4.2] — 2026-06-18, Added, Added, Added, Added (+5 more)
+Cohesion: 0.10
+Nodes (23): [1.1.0] — 2026-06-16, [1.2.0] — 2026-06-16, [1.3.0] — 2026-06-16, [1.4.0] — 2026-06-16, [2.2.0] — 2026-06-18, [2.4.1] — 2026-06-18, [2.4.2] — 2026-06-18, Added (+15 more)
 
 ### Community 27 - "Community 27"
 Cohesion: 0.12
 Nodes (15): For AI Agents, For Developers, How to Add a New Feature, How to Create a New Agent, How to Create a New Skill, How to Debug Issues, How to Deploy Changes, How to Execute a Pipeline (+7 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.23
-Nodes (10): sitemap(), generateStaticParams(), loadAllSkills(), loadSkillIndex(), generateMetadata(), ReferencePage(), ReferenceClient(), generateMetadata() (+2 more)
+Cohesion: 0.17
+Nodes (14): NotFound(), sitemap(), generateMetadata(), generateStaticParams(), Props, SkillDetailPage(), loadAllSkills(), loadSkillDetail() (+6 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.12
 Nodes (15): Lifecycle Stages, Skill Lifecycle — End-to-End Governance, Stage 10 — Deployment, Stage 11 — Monitoring, Stage 12 — Iteration (Evolution Loop), Stage 1 — Intent Discovery, Stage 2 — Problem Decomposition, Stage 3 — Capability Extraction (+7 more)
 
 ### Community 30 - "Community 30"
-Cohesion: 0.12
-Nodes (15): AGENT_COLORS, AgentsGrid(), Props, AGENT_COLORS, AGENT_PLAIN, AgentDiagram(), Props, GraphOverview() (+7 more)
+Cohesion: 0.11
+Nodes (16): AGENT_COLORS, AgentsGrid(), Props, AGENT_COLORS, AGENT_PLAIN, AgentDiagram(), Props, GraphOverview() (+8 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.15
-Nodes (14): NotFound(), Props, SkillDetailPage(), DOMAIN_COLORS, LAYER_LABELS, MASTERY_COLORS, FeedbackRoute, SkillEntry (+6 more)
+Cohesion: 0.12
+Nodes (18): LAYER_LABELS, MASTERY_COLORS, PHASE_COLORS, FeedbackRoute, Pipeline, SkillEntry, LifecycleSteps(), PHASE_DESCRIPTIONS (+10 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.10
@@ -552,8 +602,8 @@ Cohesion: 0.12
 Nodes (17): description, maximum, minimum, type, description, type, max_repair_iterations, on_critical_failure (+9 more)
 
 ### Community 60 - "Community 60"
-Cohesion: 0.08
-Nodes (27): minimum, properties, required, type, additionalProperties, description, type, type (+19 more)
+Cohesion: 0.09
+Nodes (23): items, minimum, type, additionalProperties, description, type, description, dispatch_map (+15 more)
 
 ### Community 61 - "Community 61"
 Cohesion: 0.13
@@ -569,15 +619,15 @@ Nodes (14): ADR-0001: Work Lifecycle Persistence Model — File-Based Markdown, 
 
 ### Community 64 - "Community 64"
 Cohesion: 0.09
-Nodes (22): items, type, type, items, type, items, type, description (+14 more)
+Nodes (23): items, type, type, items, type, description, format, type (+15 more)
 
 ### Community 65 - "Community 65"
 Cohesion: 0.14
 Nodes (13): 12. Human-in-the-Loop Gates, 13. Skill Composition, Embedded Transition Tables, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose (+5 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.17
-Nodes (12): items, $ref, items, type, modules, requirements, snapshots, items (+4 more)
+Cohesion: 0.13
+Nodes (15): items, $ref, items, type, modules, requirements, snapshots, tasks (+7 more)
 
 ### Community 67 - "Community 67"
 Cohesion: 0.18
@@ -704,8 +754,8 @@ Cohesion: 0.11
 Nodes (18): 10. Quality Checklist, 11. Failure Scenarios, 12. Human-in-the-Loop Gates, 13. Skill Composition, 1. Skill Header, 2. Purpose, 3. Inputs, 4. Required Context (+10 more)
 
 ### Community 98 - "Community 98"
-Cohesion: 0.18
-Nodes (10): additionalProperties, $defs, requirement, description, $id, required, type, $schema (+2 more)
+Cohesion: 0.12
+Nodes (15): Acceptance Gate (v5.2.0 Release Gate — HITL Required), Capability Dimensions, Dependency Graph, Dimension 1 — Behavioral Intelligence, Dimension 2 — Quality Depth, Dimension 3 — Governance Expansion, Dimension 4 — Infrastructure Intelligence, Dimension 5 — Architectural Power (+7 more)
 
 ### Community 99 - "Community 99"
 Cohesion: 0.25
@@ -741,7 +791,7 @@ Nodes (6): Anti-patterns, Built-in Event Types, Event Router — Knowledge Refer
 
 ### Community 107 - "Community 107"
 Cohesion: 0.29
-Nodes (7): analyzer, description, mode, model, permission, skill, bash
+Nodes (7): analyzer, description, mode, model, permission, skill, edit
 
 ### Community 108 - "Community 108"
 Cohesion: 0.08
@@ -785,7 +835,7 @@ Nodes (6): planner, description, mode, model, permission, skill
 
 ### Community 118 - "Community 118"
 Cohesion: 0.33
-Nodes (6): primary, edit, description, mode, model, permission
+Nodes (6): primary, bash, description, mode, model, permission
 
 ### Community 119 - "Community 119"
 Cohesion: 0.33
@@ -804,8 +854,8 @@ Cohesion: 0.33
 Nodes (6): tester, description, mode, model, permission, skill
 
 ### Community 123 - "Community 123"
-Cohesion: 0.22
-Nodes (9): skill_registry, skills, version, description, properties, type, items, type (+1 more)
+Cohesion: 0.33
+Nodes (6): skill_registry, version, description, properties, type, type
 
 ### Community 124 - "Community 124"
 Cohesion: 0.05
@@ -820,8 +870,8 @@ Cohesion: 0.06
 Nodes (29): AIExecutionSection(), EXECUTION_PHASES, OUTPUT_TYPES, BackgroundProcessingSection(), CONTEXT_LAYERS, DISCOVERY_STEPS, InstallationSection(), STEPS (+21 more)
 
 ### Community 128 - "Community 128"
-Cohesion: 0.28
-Nodes (7): PHASE_COLORS, Pipeline, LifecycleSteps(), PHASE_DESCRIPTIONS, Props, PipelineFlow(), Props
+Cohesion: 0.14
+Nodes (13): async_skills, description, gates, mode, name, parallel_groups, phases, recovery (+5 more)
 
 ### Community 129 - "Community 129"
 Cohesion: 0.14
@@ -920,12 +970,12 @@ Cohesion: 0.15
 Nodes (12): Execution Logic, Failure Scenarios, Human-in-the-Loop Gates, Inputs, Outputs, Purpose, Quality Checklist, Required Context (+4 more)
 
 ### Community 161 - "Community 161"
-Cohesion: 0.15
-Nodes (13): enum, type, format, type, items, type, gate_status, last_audit (+5 more)
+Cohesion: 0.20
+Nodes (10): enum, type, format, type, gate_status, last_audit, security_state, description (+2 more)
 
 ### Community 162 - "Community 162"
-Cohesion: 0.13
-Nodes (14): Anti-patterns, AP1 — Fire and Forget, AP2 — Unlimited Retries, AP3 — Bypass HITL Gate, Orchestration — Knowledge Reference, Overview, P1 — Orchestration vs Choreography *(Designing Distributed Systems, Burns — Ch 4)*, P2 — Idempotent Steps *(Enterprise Integration Patterns, Hohpe & Woolf — Ch 10)* (+6 more)
+Cohesion: 0.18
+Nodes (10): Anti-patterns, AP1 — Fire and Forget, AP2 — Unlimited Retries, AP3 — Bypass HITL Gate, Orchestration — Knowledge Reference, Overview, Practices, Purpose (+2 more)
 
 ### Community 163 - "Community 163"
 Cohesion: 0.18
@@ -960,8 +1010,8 @@ Cohesion: 0.25
 Nodes (7): Anti-patterns, Mock Generation Rules, Principles, Source References, Test Case Categories (per testable unit), Test Generator — Knowledge Reference, Test Tiers
 
 ### Community 173 - "Community 173"
-Cohesion: 0.29
-Nodes (6): Anti-patterns, Principles, Quality Scoring — Knowledge Reference, Score Thresholds, Scoring Dimensions, Source References
+Cohesion: 0.14
+Nodes (12): Anti-patterns, Principles, Quality Scoring — Knowledge Reference, Score Thresholds, Scoring Dimensions, Source References, Anti-patterns, Lifecycle Stages (+4 more)
 
 ### Community 174 - "Community 174"
 Cohesion: 0.29
@@ -1128,8 +1178,8 @@ Cohesion: 0.12
 Nodes (15): 10. Quality Checklist, 11. Failure Scenarios, 12. Human-in-the-Loop Gates, 13. Skill Composition, 1. Skill Header, 2. Purpose, 3. Inputs, 4. Required Context (+7 more)
 
 ### Community 227 - "Community 227"
-Cohesion: 0.20
-Nodes (6): ChangelogContent(), GROUP_STYLES, CARD_STYLES, Props, WhatsNewBanner(), ChangelogSection
+Cohesion: 0.14
+Nodes (13): async_skills, description, gates, mode, name, parallel_groups, phases, recovery (+5 more)
 
 ### Community 228 - "Community 228"
 Cohesion: 0.29
@@ -1137,11 +1187,11 @@ Nodes (7): loadAllPipelines(), PipelineTemplate, generateMetadata(), PipelinesPa
 
 ### Community 229 - "Community 229"
 Cohesion: 0.12
-Nodes (15): [2.3.0] — 2026-06-18, [2.8.0] — 2026-06-20, [3.0.0] — 2026-06-21, Added, Added — Assisted Adaptation Pipeline (Phase 3), Added — Frontend UI/UX Enhancement (Phase 1), Changed, Changed — Evolved UI/UX Skills (MAJOR version bumps) (+7 more)
+Nodes (16): [2.5.0] — 2026-06-18, [2.8.0] — 2026-06-20, Added — Assisted Adaptation Pipeline (Phase 3), Changed (EETF Selective Adoption — 6 skills updated), Changed — Registry & Governance, Changed (Registry & Graph), Changelog — System Update History, Context (EETF Adoption Decision) (+8 more)
 
 ### Community 230 - "Community 230"
-Cohesion: 0.18
-Nodes (11): [1.1.0] — 2026-06-16, [1.4.0] — 2026-06-16, [2.4.0] — 2026-06-18, Added, Added, Added, Changed, Changed (+3 more)
+Cohesion: 0.67
+Nodes (3): [2.3.0] — 2026-06-18, Added, Changed
 
 ### Community 231 - "Community 231"
 Cohesion: 0.22
@@ -1152,8 +1202,8 @@ Cohesion: 0.25
 Nodes (7): Enhanced Skills (v2.7.0), pipeline-schema.json — Security Fixes, Skill Dependencies Graph, Skill Interaction Rules, Skills Registry — All Skills Catalog, system-state-schema.json — Backward-Compatible Extension, Two-Layer Architecture
 
 ### Community 233 - "Community 233"
-Cohesion: 0.14
-Nodes (14): maximum, minimum, type, description, properties, type, format, type (+6 more)
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 234 - "Community 234"
 Cohesion: 0.33
@@ -1185,11 +1235,11 @@ Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic,
 
 ### Community 241 - "Community 241"
 Cohesion: 0.18
-Nodes (11): [1.0.0] — 2026-06-16, [2.1.0] — 2026-06-17, [2.1.1] — 2026-06-18, Added, Added, Changed, Changed, Fixed (+3 more)
+Nodes (11): [1.0.0] — 2026-06-16, [2.1.1] — 2026-06-18, [2.4.0] — 2026-06-18, Added, Added, Changed, Changed, Fixed (+3 more)
 
 ### Community 242 - "Community 242"
-Cohesion: 0.50
-Nodes (4): [2.5.0] — 2026-06-18, Changed (EETF Selective Adoption — 6 skills updated), Changed (Registry & Graph), Context (EETF Adoption Decision)
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 243 - "Community 243"
 Cohesion: 0.15
@@ -1220,8 +1270,8 @@ Cohesion: 0.67
 Nodes (3): New Skills (v2.8.0) — Assisted Adaptation, SKL-050 — Adaptive Proposal Generator, SKL-051 — Adaptation Applicator
 
 ### Community 255 - "Community 255"
-Cohesion: 0.17
-Nodes (12): type, pattern, type, type, description, id, priority, status (+4 more)
+Cohesion: 0.09
+Nodes (22): additionalProperties, $defs, requirement, description, type, $id, pattern, type (+14 more)
 
 ### Community 256 - "Community 256"
 Cohesion: 0.18
@@ -1229,11 +1279,11 @@ Nodes (10): Artifacts Modified, Dependency Graph, DoD Gate (Phase 6 Completion),
 
 ### Community 257 - "Community 257"
 Cohesion: 0.20
-Nodes (9): ASE-OS Enhancement Roadmap — v4.1.0 → v5.1.0, Dependency Graph — Critical Path, Directory Structure, Discovery Sources, How to Use This Plan, Milestone Summary, Overview, Related Documents (+1 more)
+Nodes (9): ASE-OS Enhancement Roadmap — v4.1.0 → v5.2.0, Dependency Graph — Critical Path, Directory Structure, Discovery Sources, How to Use This Plan, Milestone Summary, Overview, Related Documents (+1 more)
 
 ### Community 258 - "Community 258"
-Cohesion: 0.29
-Nodes (6): Anti-patterns, Lifecycle Stages, Principles, Skill Lifecycle — Knowledge Reference, Source References, Transition Rules
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 259 - "Community 259"
 Cohesion: 0.29
@@ -1252,16 +1302,16 @@ Cohesion: 0.40
 Nodes (5): New Skills (v4.0.0) — Work Lifecycle Management Layer, SKL-055 — Defect Manager, SKL-056 — Change Request Manager, SKL-057 — Work Item Exporter, SKL-058 — Work Item Lifecycle Guard
 
 ### Community 263 - "Community 263"
-Cohesion: 0.40
-Nodes (5): Anti-patterns, AP1 — The Ice Cream Cone (Inverted Pyramid), AP2 — Testing Implementation Details, AP3 — The Megamock, AP4 — Flaky Tests
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 264 - "Community 264"
-Cohesion: 0.50
-Nodes (4): [2.0.0] — 2026-06-17, Added, Changed, Fixed
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 265 - "Community 265"
-Cohesion: 0.17
-Nodes (12): description, description, format, type, items, last_updated, work_items, additionalProperties (+4 more)
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
 
 ### Community 266 - "Community 266"
 Cohesion: 0.25
@@ -1303,6 +1353,10 @@ Nodes (4): default, description, type, full_trace
 Cohesion: 0.40
 Nodes (5): additionalProperties, description, required, type, origin_metadata
 
+### Community 276 - "Community 276"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
 ### Community 277 - "Community 277"
 Cohesion: 0.50
 Nodes (4): description, format, type, created_at
@@ -1332,25 +1386,221 @@ Cohesion: 0.50
 Nodes (4): version, description, pattern, type
 
 ### Community 284 - "Community 284"
-Cohesion: 0.67
-Nodes (3): [2.2.0] — 2026-06-18, Added, Changed
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 285 - "Community 285"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 286 - "Community 286"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 287 - "Community 287"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 288 - "Community 288"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 289 - "Community 289"
+Cohesion: 0.12
+Nodes (17): properties, required, additionalProperties, description, type, type, type, type (+9 more)
+
+### Community 290 - "Community 290"
+Cohesion: 0.14
+Nodes (13): async_skills, description, gates, mode, name, parallel_groups, phases, recovery (+5 more)
+
+### Community 291 - "Community 291"
+Cohesion: 0.14
+Nodes (13): async_skills, description, gates, mode, name, parallel_groups, phases, recovery (+5 more)
+
+### Community 292 - "Community 292"
+Cohesion: 0.50
+Nodes (4): [3.0.0] — 2026-06-21, Added — Frontend UI/UX Enhancement (Phase 1), Changed — Evolved UI/UX Skills (MAJOR version bumps), Changed — Registry, Graph & Indices
+
+### Community 293 - "Community 293"
+Cohesion: 0.50
+Nodes (4): P1 — Orchestration vs Choreography *(Designing Distributed Systems, Burns — Ch 4)*, P2 — Idempotent Steps *(Enterprise Integration Patterns, Hohpe & Woolf — Ch 10)*, P3 — Circuit Breaker for Failing Skills *(Release It!, Nygard — Ch 5)*, Principles
+
+### Community 294 - "Community 294"
+Cohesion: 0.14
+Nodes (13): async_skills, description, gates, mode, name, parallel_groups, phases, recovery (+5 more)
+
+### Community 295 - "Community 295"
+Cohesion: 0.14
+Nodes (14): maximum, minimum, type, description, properties, type, format, type (+6 more)
+
+### Community 296 - "Community 296"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 297 - "Community 297"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 298 - "Community 298"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 299 - "Community 299"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 300 - "Community 300"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 301 - "Community 301"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 302 - "Community 302"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 303 - "Community 303"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 304 - "Community 304"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 305 - "Community 305"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 306 - "Community 306"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 307 - "Community 307"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 308 - "Community 308"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 309 - "Community 309"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 310 - "Community 310"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 311 - "Community 311"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 312 - "Community 312"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 313 - "Community 313"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 314 - "Community 314"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 315 - "Community 315"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 316 - "Community 316"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 317 - "Community 317"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 318 - "Community 318"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 319 - "Community 319"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 320 - "Community 320"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 321 - "Community 321"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 322 - "Community 322"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 323 - "Community 323"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 324 - "Community 324"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 325 - "Community 325"
+Cohesion: 0.15
+Nodes (12): 12. Human-in-the-Loop Gates, 13. Skill Composition, Execution Logic, Failure Scenarios, Inputs, Outputs, Purpose, Quality Checklist (+4 more)
+
+### Community 326 - "Community 326"
+Cohesion: 0.33
+Nodes (6): api-designer, description, mode, model, permission, skills
+
+### Community 327 - "Community 327"
+Cohesion: 0.33
+Nodes (6): cloud-platform, description, mode, model, permission, skills
+
+### Community 328 - "Community 328"
+Cohesion: 0.33
+Nodes (6): data-engineer, description, mode, model, permission, skills
+
+### Community 329 - "Community 329"
+Cohesion: 0.33
+Nodes (6): distributed-systems, description, mode, model, permission, skills
+
+### Community 330 - "Community 330"
+Cohesion: 0.33
+Nodes (6): security-specialist, description, mode, model, permission, skills
+
+### Community 331 - "Community 331"
+Cohesion: 0.33
+Nodes (6): sre, description, mode, model, permission, skills
+
+### Community 332 - "Community 332"
+Cohesion: 0.50
+Nodes (4): [2.0.0] — 2026-06-17, Added, Changed, Fixed
+
+### Community 333 - "Community 333"
+Cohesion: 0.50
+Nodes (4): [2.1.0] — 2026-06-17, Added, Changed, Fixed
 
 ## Knowledge Gaps
-- **2494 isolated node(s):** `STATE_SCOPES`, `STEPS`, `FEATURES`, `container`, `item` (+2489 more)
+- **3097 isolated node(s):** `Purpose`, `Inputs`, `Required Context`, `Execution Logic`, `Outputs` (+3092 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `properties` connect `Community 9` to `Community 64`, `Community 161`, `Community 98`, `Community 259`, `Community 66`, `Community 8`, `Community 233`, `Community 265`, `Community 60`, `Community 92`, `Community 14`, `Community 243`, `Community 21`, `Community 23`, `Community 123`, `Community 124`, `Community 61`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `properties` connect `Community 3` to `Community 161`, `Community 259`, `Community 9`, `Community 60`, `Community 21`, `Community 23`, `Community 123`, `Community 92`, `Community 255`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **Why does `Reviewer Agent` connect `Community 145` to `Community 129`, `Community 38`, `Community 39`, `Community 49`, `Community 50`, `Community 52`?**
+- **Why does `properties` connect `Community 9` to `Community 64`, `Community 289`, `Community 161`, `Community 259`, `Community 66`, `Community 295`, `Community 8`, `Community 60`, `Community 92`, `Community 14`, `Community 243`, `Community 21`, `Community 23`, `Community 123`, `Community 124`, `Community 61`, `Community 255`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `type` connect `Community 23` to `Community 64`, `Community 259`, `Community 3`, `Community 295`, `Community 14`, `Community 243`, `Community 21`, `Community 60`, `Community 61`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **What connects `STATE_SCOPES`, `STEPS`, `FEATURES` to the rest of the system?**
-  _2494 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `behavioral_telemetry` connect `Community 124` to `Community 9`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **What connects `Purpose`, `Inputs`, `Required Context` to the rest of the system?**
+  _3097 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05555555555555555 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
