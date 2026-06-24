@@ -4,6 +4,7 @@ import {
   GitBranch, ShieldCheck, FileCode2, TestTube2,
   BookOpen, RefreshCw, Zap, Lock,
   AlertTriangle, BarChart2, Route, Sparkles, Activity, Lightbulb,
+  ClipboardList, Bot, Palette, Wand2,
 } from "lucide-react";
 
 const FEATURES = [
@@ -104,6 +105,34 @@ const FEATURES = [
     description: "The system analyzes its own usage patterns and proposes ranked improvements — new skills, modified pipelines, or retired dead weight. Every proposal requires your approval before anything changes.",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
+  },
+  {
+    icon: ClipboardList,
+    title: "Structured Work Items",
+    description: "Every task, bug, review, and change request is a typed work item with a lifecycle state machine. Defect chains link root cause to fix to closure. Export to Jira-compatible format with one command.",
+    color: "text-fuchsia-400",
+    bg: "bg-fuchsia-500/10",
+  },
+  {
+    icon: Bot,
+    title: "Domain Specialist Agents",
+    description: "Four specialist agents — AI/LLM systems, Mobile (iOS/Android/RN/Flutter), SaaS & Enterprise (multi-tenant, SOC 2), and Embedded/IoT — auto-route into the pipeline when your project requires them.",
+    color: "text-purple-400",
+    bg: "bg-purple-500/10",
+  },
+  {
+    icon: Palette,
+    title: "Motion & Creative Design",
+    description: "Three creative-layer skills cover motion design, UX research synthesis, and creative experience architecture. They run in Phase 2 alongside the core UX architect so visual and functional design stay in sync.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    icon: Wand2,
+    title: "Gap-to-Skill Pipeline",
+    description: "When the orchestrator detects a capability the system can't handle, it fires a gap event. A reactive pipeline drafts a new skill, scores it for quality, and presents it for your approval — before anything is registered.",
+    color: "text-blue-400",
+    bg: "bg-blue-500/10",
   },
 ];
 

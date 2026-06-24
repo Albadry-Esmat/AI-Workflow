@@ -7,8 +7,8 @@ const STEPS = [
     num: "01",
     icon: GitBranch,
     title: "Clone the Repository",
-    desc: "The entire ASE-OS skill system is self-contained in one repo — 51 skills, registry files, pipeline templates, and agent config are all included.",
-    code: `git clone https://github.com/your-org/AI-Workflow.git
+    desc: "The entire ASE-OS skill system is self-contained in one repo — 59 skills, registry files, pipeline templates, and agent config are all included.",
+    code: `git clone https://github.com/Albadry-Esmat/AI-Workflow.git
 cd AI-Workflow`,
     color: "from-cyan-600 to-cyan-500",
     accent: "border-cyan-500/30 bg-cyan-500/10",
@@ -31,13 +31,13 @@ opencode .
     num: "03",
     icon: Settings,
     title: "Agents Auto-Initialize",
-    desc: "The primary orchestrator reads opencode.json and auto-binds all 13 specialized subagents. No manual wiring — each agent's skill scope is declared in the config.",
+    desc: "The primary orchestrator reads opencode.json and auto-binds all 12 specialized subagents. No manual wiring — each agent's skill scope is declared in the config.",
     code: `// opencode.json — snippet
 {
   "agent": {
-    "orchestrator":  { "skill": "orchestrator/SKILL.md" },
-    "analyzer":      { "skill": "requirement-analyzer/SKILL.md" },
-    "architect":     { "skill": "architecture-design/SKILL.md" },
+    "primary":   { "skill": "orchestrator/SKILL.md" },
+    "analyzer":  { "skill": "requirement-analyzer/SKILL.md" },
+    "architect": { "skills": ["architecture-design/SKILL.md", ...] },
     // ... 10 more agents
   }
 }`,
@@ -49,7 +49,7 @@ opencode .
     num: "04",
     icon: Terminal,
     title: "Graph Index Built Automatically",
-    desc: "Graphify scans the project AST and builds a 2,234-node knowledge graph. This becomes the project's long-term memory — no embeddings, no vector DB required.",
+    desc: "Graphify scans the project AST and builds a 3,406-node knowledge graph. This becomes the project's long-term memory — no embeddings, no vector DB required.",
     code: `# Runs automatically on first open via plugin hook
 # graphify-out/ is populated with:
 #   graph.json         — full AST graph
@@ -91,7 +91,7 @@ export function InstallationSection() {
           transition={{ delay: 0.1 }}
           className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed"
         >
-          Four commands. The orchestrator, all 51 skills, the knowledge graph, and 13 agents
+          Four commands. The orchestrator, all 59 skills, the knowledge graph, and 13 agents
           are ready in under a minute.
         </motion.p>
       </div>

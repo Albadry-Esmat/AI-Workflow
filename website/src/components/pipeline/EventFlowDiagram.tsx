@@ -2,12 +2,15 @@
 import { motion } from "framer-motion";
 
 const EVENTS = [
-  { type: "code.changed",         source: "Builder",        handlers: ["clean-code-review", "dependency-analyzer", "change-impact-analyzer"], color: "text-teal-400",   bg: "bg-teal-500/10",   border: "border-teal-500/20"   },
-  { type: "architecture.changed", source: "Architect",      handlers: ["architecture-design", "dependency-analyzer", "change-impact-analyzer"], color: "text-cyan-400",   bg: "bg-cyan-500/10",   border: "border-cyan-500/20"   },
-  { type: "test.failed",          source: "Test Runner",    handlers: ["code-repair"],                                                          color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/20"    },
-  { type: "security.finding",     source: "Security Review",handlers: ["security-review"],                                                      color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-  { type: "file.written",         source: "Any skill",      handlers: ["doc-maintainer"],                                                       color: "text-pink-400",   bg: "bg-pink-500/10",   border: "border-pink-500/20"   },
-  { type: "context.pressure_high",source: "Orchestrator",   handlers: ["context-compressor"],                                                   color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
+  { type: "code.changed",              source: "Builder",        handlers: ["clean-code-review", "dependency-analyzer", "change-impact-analyzer"],  color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/20"    },
+  { type: "architecture.changed",      source: "Architect",      handlers: ["architecture-design", "dependency-analyzer", "change-impact-analyzer"],  color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/20"    },
+  { type: "test.failed",               source: "Test Runner",    handlers: ["code-repair"],                                                            color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/20"     },
+  { type: "security.finding",          source: "Security Review",handlers: ["security-review"],                                                        color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20"  },
+  { type: "file.written",              source: "Any skill",      handlers: ["doc-maintainer"],                                                         color: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/20"    },
+  { type: "context.pressure_high",     source: "Orchestrator",   handlers: ["context-compressor"],                                                     color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/20"  },
+  { type: "defect.created",            source: "Reviewer",       handlers: ["defect-manager", "work-item-lifecycle-guard"],                            color: "text-rose-400",    bg: "bg-rose-500/10",    border: "border-rose-500/20"    },
+  { type: "change_request.created",    source: "User / Planner", handlers: ["change-request-manager", "feature-planning"],                            color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20"   },
+  { type: "capability.gap.detected",   source: "Orchestrator",   handlers: ["gap-to-skill"],                                                           color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20"  },
 ];
 
 export function EventFlowDiagram() {

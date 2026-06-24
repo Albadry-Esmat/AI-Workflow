@@ -7,7 +7,7 @@ const AGENTS = [
   { id: "analyzer",        label: "Analyzer",        color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/30",  skill: "requirement-analyzer",    extra: 0 },
   { id: "architect",       label: "Architect",       color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/30",    skill: "architecture-design",     extra: 2 },
   { id: "planner",         label: "Planner",         color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/30",    skill: "feature-planning",        extra: 0 },
-  { id: "reviewer",        label: "Reviewer",        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   skill: "clean-code-review",       extra: 6 },
+  { id: "reviewer",        label: "Reviewer",        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   skill: "clean-code-review",       extra: 7 },
   { id: "tester",          label: "Tester",          color: "text-green-400",   bg: "bg-green-500/10",   border: "border-green-500/30",   skill: "testing-strategy",        extra: 0 },
   { id: "builder",         label: "Builder",         color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/30",    skill: "code-generator",          extra: 3 },
   { id: "impact-analyzer", label: "Impact Analyzer", color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/30",  skill: "change-impact-analyzer",  extra: 1 },

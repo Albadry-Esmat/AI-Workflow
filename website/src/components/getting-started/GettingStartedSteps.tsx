@@ -6,8 +6,8 @@ const STEPS = [
     step: "01",
     title: "Clone the Repository",
     description:
-      "The full ASE-OS skill system lives in this repository. Clone it to get all 51 skills, registry files, pipeline templates, and agent configuration.",
-    code: "git clone <https://github.com/Albadry-Esmat/AI-Workflow.git>\ncd AI-Workflow",
+      "The full ASE-OS skill system lives in this repository. Clone it to get all 59 skills, registry files, pipeline templates, and agent configuration.",
+    code: "git clone https://github.com/Albadry-Esmat/AI-Workflow.git\ncd AI-Workflow",
     color: "from-cyan-600 to-cyan-500",
   },
   {
@@ -22,7 +22,7 @@ const STEPS = [
     step: "03",
     title: "The Orchestrator Takes Over",
     description:
-      "The primary agent reads opencode.json and loads all skill bindings automatically. The 12 subagents (analyzer, architect, builder, and more) are initialized and ready.",
+      "The primary agent reads opencode.json and loads all skill bindings automatically. All 13 agents — including the analyzer, architect, builder, and more — are initialized and ready.",
     code: "# opencode.json is the system entry point\n# All agents and skill bindings are declared there",
     color: "from-blue-600 to-blue-500",
   },
@@ -39,7 +39,7 @@ const STEPS = [
     title: "Approve Human Review Gates",
     description:
       "At critical points (after requirements, after architecture, before deployment), the pipeline pauses for your review and approval. You stay in control of every major decision.",
-    code: "# Pipeline pauses at:\n# - Requirements validated\n# - Architecture approved\n# - Roadmap approved\n# - Security posture approved\n# - Final deploy approval",
+    code: "# Pipeline pauses at:\n# - Requirements validated       (phase 1)\n# - Architecture approved        (phase 2)\n# - UX & database design approved (phase 2b)\n# - Design system approved       (phase 2c)\n# - Roadmap approved             (phase 4)\n# - Security posture approved    (phase 7)\n# - Defect triage (conditional)  (phase 8d)\n# - Final deploy approval        (phase 9)",
     color: "from-amber-600 to-amber-500",
   },
   {

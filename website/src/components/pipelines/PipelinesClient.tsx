@@ -1,21 +1,29 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Users, Zap, Layers, GitBranch } from "lucide-react";
+import { ChevronDown, Users, Zap, Layers, GitBranch, Brain, Smartphone, Building2, Cpu, Bug, GitMerge, BarChart2, Sparkles } from "lucide-react";
 import type { PipelineTemplate } from "@/lib/data";
 import { PHASE_COLORS } from "@/lib/colors";
 
 interface Props { pipelines: PipelineTemplate[] }
 
 const TEMPLATE_META: Record<string, { icon: typeof Layers; color: string; bg: string; border: string; badge: string }> = {
-  "full-pipeline":     { icon: Layers,    color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/30", badge: "Complete"       },
-  "consumer-website":  { icon: GitBranch, color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/30",   badge: "Website"        },
-  "developer-portal":  { icon: GitBranch, color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/30",   badge: "Portal"         },
-  "admin-panel":       { icon: GitBranch, color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/30", badge: "Admin"          },
-  "pre-deploy":        { icon: Zap,       color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30", badge: "Pre-Deploy"     },
-  "quick-review":      { icon: Zap,       color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",  badge: "Review"         },
-  "requirements-only": { icon: Zap,       color: "text-green-400",   bg: "bg-green-500/10",   border: "border-green-500/30",  badge: "Requirements"   },
-  "architecture-only": { icon: Zap,       color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/30",   badge: "Architecture"   },
+  "full-pipeline":                  { icon: Layers,     color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/30",  badge: "Complete"        },
+  "consumer-website":               { icon: GitBranch,  color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/30",    badge: "Website"         },
+  "developer-portal":               { icon: GitBranch,  color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/30",    badge: "Portal"          },
+  "admin-panel":                    { icon: GitBranch,  color: "text-indigo-400",  bg: "bg-indigo-500/10",  border: "border-indigo-500/30",  badge: "Admin"           },
+  "ai-agent-system":                { icon: Brain,      color: "text-fuchsia-400", bg: "bg-fuchsia-500/10", border: "border-fuchsia-500/30", badge: "AI System"       },
+  "mobile-app":                     { icon: Smartphone, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", badge: "Mobile"          },
+  "saas-platform":                  { icon: Building2,  color: "text-sky-400",     bg: "bg-sky-500/10",     border: "border-sky-500/30",     badge: "SaaS"            },
+  "iot-embedded":                   { icon: Cpu,        color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30",  badge: "IoT / Embedded"  },
+  "defect-lifecycle":               { icon: Bug,        color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     badge: "Defect"          },
+  "change-request":                 { icon: GitMerge,   color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   badge: "Change Req"      },
+  "insights-adaptation-pipeline":   { icon: BarChart2,  color: "text-lime-400",    bg: "bg-lime-500/10",    border: "border-lime-500/30",    badge: "Adaptation"      },
+  "gap-to-skill":                   { icon: Sparkles,   color: "text-rose-400",    bg: "bg-rose-500/10",    border: "border-rose-500/30",    badge: "Gap → Skill"     },
+  "pre-deploy":                     { icon: Zap,        color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30",  badge: "Pre-Deploy"      },
+  "quick-review":                   { icon: Zap,        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   badge: "Review"          },
+  "requirements-only":              { icon: Zap,        color: "text-green-400",   bg: "bg-green-500/10",   border: "border-green-500/30",   badge: "Requirements"    },
+  "architecture-only":              { icon: Zap,        color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/30",    badge: "Architecture"    },
 };
 
 function PipelineCard({ pipeline }: { pipeline: PipelineTemplate }) {

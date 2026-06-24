@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { PackageCheck, Book, Rocket, RotateCcw, Users } from "lucide-react";
+import { PackageCheck, Book, Rocket, RotateCcw, Users, ListChecks } from "lucide-react";
 
 const DELIVERABLES = [
   {
@@ -35,15 +35,26 @@ const DELIVERABLES = [
     border: "border-amber-500/30",
     bg: "bg-amber-500/10",
   },
+  {
+    icon: ListChecks,
+    title: "Work Item Export",
+    desc: "The complete task graph exported as Jira-compatible work items — tasks, bugs, reviews, change requests, and closures — ready for import into any external project management tool. Runs async, never blocks delivery.",
+    accent: "text-fuchsia-400",
+    border: "border-fuchsia-500/30",
+    bg: "bg-fuchsia-500/10",
+  },
 ];
 
 const APPROVAL_GATES = [
-  { label: "Requirements validated",    phase: "After Phase 1",  type: "human" },
-  { label: "Architecture approved",     phase: "After Phase 2",  type: "human" },
-  { label: "Roadmap approved",          phase: "After Phase 4",  type: "human" },
-  { label: "Security posture approved", phase: "After Phase 7",  type: "human" },
-  { label: "Release guard passed",      phase: "After Phase 8c", type: "auto"  },
-  { label: "Final deploy approval",     phase: "After Phase 9",  type: "human" },
+  { label: "Requirements validated",          phase: "After Phase 1",    type: "human" },
+  { label: "Architecture approved",           phase: "After Phase 2",    type: "human" },
+  { label: "UX & database design approved",   phase: "After Phase 2b",   type: "human" },
+  { label: "Design system approved",          phase: "After Phase 2c",   type: "human" },
+  { label: "Roadmap approved",               phase: "After Phase 4",    type: "human" },
+  { label: "Security posture approved",       phase: "After Phase 7",    type: "human" },
+  { label: "Release guard passed",            phase: "After Phase 8c",   type: "auto"  },
+  { label: "Defect triage (conditional)",     phase: "After Phase 8d",   type: "human" },
+  { label: "Final deploy approval",           phase: "After Phase 9",    type: "human" },
 ];
 
 export function OutputDeliverySection() {
@@ -75,14 +86,14 @@ export function OutputDeliverySection() {
           transition={{ delay: 0.1 }}
           className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed"
         >
-          When all gates pass, the pipeline produces four categories of deliverable — and a full
+          When all gates pass, the pipeline produces five categories of deliverable — and a full
           human approval trail shows every decision point that was reviewed before deployment.
         </motion.p>
       </div>
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Deliverables grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {DELIVERABLES.map((d, i) => (
             <motion.div
               key={d.title}

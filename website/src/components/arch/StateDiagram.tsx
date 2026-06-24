@@ -86,6 +86,13 @@ const STATE_SCOPES = [
     color: "text-lime-400 border-lime-500/20 bg-lime-500/10",
     owner: "adaptive-proposal-generator",
   },
+  {
+    key: "work_items",
+    label: "Work Items",
+    subtitle: "Live task, bug, and CR item states",
+    color: "text-emerald-400 border-emerald-500/20 bg-emerald-500/10",
+    owner: "work-item-lifecycle-guard",
+  },
 ];
 
 export function StateDiagram() {
