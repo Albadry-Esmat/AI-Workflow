@@ -6,7 +6,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Requirements",
     agent: "analyzer",
-    model: "claude-sonnet-4.6",
+    modelTier: "Standard",
     input: "Raw feature description",
     output: "Structured requirement objects with acceptance criteria",
     color: "from-violet-600 to-violet-500",
@@ -15,7 +15,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Architecture",
     agent: "architect",
-    model: "claude-sonnet-4.6",
+    modelTier: "Standard",
     input: "Validated requirements",
     output: "Module boundaries, data flow contracts, ADR records",
     color: "from-cyan-600 to-cyan-500",
@@ -24,7 +24,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Planning",
     agent: "planner",
-    model: "claude-sonnet-4.6",
+    modelTier: "Standard",
     input: "Architecture + dependency graph",
     output: "Task graph with effort estimates and milestones",
     color: "from-blue-600 to-blue-500",
@@ -33,7 +33,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Code Generation",
     agent: "builder",
-    model: "claude-sonnet-4.6",
+    modelTier: "Standard",
     input: "Architecture modules + feature plan",
     output: "Implementation files, interface stubs, scaffolding",
     color: "from-teal-600 to-teal-500",
@@ -42,7 +42,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Test Generation",
     agent: "test-generator",
-    model: "gpt-4o-mini",
+    modelTier: "Lightweight",
     input: "Code artifacts + testing strategy",
     output: "Unit tests, integration tests, edge-case suites",
     color: "from-green-600 to-green-500",
@@ -51,7 +51,7 @@ const EXECUTION_PHASES = [
   {
     phase: "Documentation",
     agent: "doc-maintainer",
-    model: "gpt-4o-mini",
+    modelTier: "Lightweight",
     input: "All pipeline outputs",
     output: "Updated docs — async, never blocks pipeline",
     color: "from-pink-600 to-pink-500",
@@ -60,10 +60,10 @@ const EXECUTION_PHASES = [
 ];
 
 const OUTPUT_TYPES = [
-  { label: "Requirement Objects",    icon: FileText,      color: "text-violet-400" },
-  { label: "Architecture ADRs",      icon: Brain,         color: "text-cyan-400"   },
-  { label: "Implementation Code",    icon: FileText,      color: "text-teal-400"   },
-  { label: "Test Suites",            icon: RefreshCw,     color: "text-green-400"  },
+  { label: "Requirement Objects",    icon: FileText,   color: "text-violet-400" },
+  { label: "Architecture ADRs",      icon: Brain,      color: "text-cyan-400"   },
+  { label: "Implementation Code",    icon: FileText,   color: "text-teal-400"   },
+  { label: "Test Suites",            icon: RefreshCw,  color: "text-green-400"  },
   { label: "Session State Snapshot", icon: HardDrive,  color: "text-zinc-400"   },
 ];
 
@@ -97,7 +97,8 @@ export function AIExecutionSection() {
           className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed"
         >
           Each phase produces structured artifacts that become the inputs for the next.
-          Complex reasoning agents use Claude Sonnet; utility tasks use GPT-4o-mini to minimize cost.
+          Complex reasoning agents use the standard model tier; high-volume utility tasks
+          use a lightweight model to minimise cost. Every assignment is a single-line config change.
         </motion.p>
       </div>
 
@@ -126,7 +127,7 @@ export function AIExecutionSection() {
                     <span className="text-xs text-zinc-500">agent: <span className="text-zinc-700 dark:text-zinc-300">{p.agent}</span></span>
                   </div>
                   <span className={`font-mono text-xs ${p.accent} rounded-full border border-current/20 bg-current/5 px-2 py-0.5`}>
-                    {p.model}
+                    {p.modelTier}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
