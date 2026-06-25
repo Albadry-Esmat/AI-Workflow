@@ -925,8 +925,8 @@
     "semantic_hash": "62c05a2bf20bf036a0b2633478663e64"
   },
   "website/src/components/how-it-works/AIExecutionSection.tsx": {
-    "mtime": 1781799848.7401998,
-    "ast_hash": "838b7719c29a6dfd59cab189c4afb544",
+    "mtime": 1782425338.7943347,
+    "ast_hash": "44d61d560ce6d9c5fad290ee9bd1dc28",
     "semantic_hash": ""
   },
   "website/src/components/how-it-works/BackgroundProcessingSection.tsx": {
