@@ -17,21 +17,23 @@ export const runtime = "nodejs";
 
 export default function Image() {
   // Graceful fallback so a data read error never blocks the build
-  let totalSkills = 51;
-  let totalPipelinePhases = 8;
+  let totalSkills = 0;
+  let totalPipelinePhases = 0;
+  let totalPipelines = 0;
   try {
     const stats = loadSiteStats();
     totalSkills = stats.totalSkills;
     totalPipelinePhases = stats.totalPipelinePhases;
+    totalPipelines = stats.totalPipelines;
   } catch {
-    // Use hardcoded fallbacks above
+    // Use fallback zeroes above
   }
 
   const statItems: [string, string][] = [
-    [`${totalSkills}`, "Skills"],
+    [`${totalSkills}`,         "Skills"],
     [`${totalPipelinePhases}`, "Pipeline\u00a0Phases"],
-    ["13", "Pipelines"],
-    ["Zero", "Doc\u00a0Drift"],
+    [`${totalPipelines}`,      "Pipelines"],
+    ["Zero",                   "Doc\u00a0Drift"],
   ];
 
   return new ImageResponse(

@@ -1,73 +1,121 @@
 # ASE-OS Website
 
-This is the official marketing and documentation website for [ASE-OS — AI Software Engineering OS](https://github.com/Albadry-Esmat/AI-Workflow), built with [Next.js 15](https://nextjs.org) and [Tailwind CSS v4](https://tailwindcss.com).
+Official documentation and marketing website for [ASE-OS — AI Software Engineering Operating System](https://github.com/Albadry-Esmat/AI-Workflow).
 
-## What This Repo Is
+Built with [Next.js 15](https://nextjs.org) (App Router, static generation) and [Tailwind CSS v4](https://tailwindcss.com).
 
-This repo contains only the **website source** (`website/` from the main monorepo, mirrored here). It documents and showcases the ASE-OS skill system but **does not contain the skill files themselves**.
+**Live site:** https://ase-os.vercel.app
 
-To use ASE-OS, clone the main system repo:
+---
 
-```bash
-git clone https://github.com/Albadry-Esmat/AI-Workflow.git
-```
+## Quick Start (Standalone)
 
-## Local Development
-
-> **Prerequisite:** Node.js 20+
+This repository is **self-contained** — all skill data, registry files, pipeline templates, and agent config are bundled in `data/`. Clone it and you're ready to build:
 
 ```bash
-# From this directory
+git clone https://github.com/Albadry-Esmat/ase-os-website.git
+cd ase-os-website
 npm install
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-> **Note for local dev:** The website reads skill data from the parent `AI-Workflow` directory at build time. If you run the website standalone (outside the monorepo), data pages will fall back to empty values. Run from inside the monorepo for full data:
->
-> ```bash
-> # From the AI-Workflow root:
-> cd website && npm run dev
-> ```
+> **Node.js 20+** required.
+
+---
+
+## How Data Works
+
+The website reads skill and pipeline data from the file system at build time. It auto-detects the data source:
+
+| Mode | When | Data path |
+|------|------|-----------|
+| **Standalone** | `data/skills/index.yaml` exists in this repo | `./data/` |
+| **Monorepo** | Running inside the `AI-Workflow` parent repo | `../` (parent directory) |
+| **Override** | `DATA_ROOT` env var is set | `$DATA_ROOT` |
+
+This means you can clone this repo and `npm run build` works immediately — no parent repo required.
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local` to override defaults:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_SITE_URL` | `https://ase-os.vercel.app` | Canonical site URL (used in metadata, sitemap, robots.txt) |
+| `NEXT_PUBLIC_REPO_URL` | `https://github.com/Albadry-Esmat/AI-Workflow` | GitHub repo URL (used in GitHub buttons) |
+| `DATA_ROOT` | *(auto-detect)* | Override the data directory path |
+
+---
 
 ## Build & Deploy
 
 ```bash
-npm run build   # production build
-npm start       # serve production build locally
+npm run build   # production build — static site generation
+npm start       # serve the production build locally
 ```
 
-The site is deployed automatically to [Vercel](https://vercel.com) on every push to `main` of the main monorepo. The Vercel project is configured with `website/` as the root directory.
+The site deploys automatically to [Vercel](https://vercel.com) on every push to `main` of the main [AI-Workflow](https://github.com/Albadry-Esmat/AI-Workflow) monorepo (configured with `website/` as root directory).
+
+---
+
+## Keeping Data Current
+
+This repo bundles a snapshot of the skill registry. To sync with the latest data from the main repo:
+
+```bash
+# 1 — clone (or pull) the main system repo
+git clone https://github.com/Albadry-Esmat/AI-Workflow.git
+
+# 2 — copy the data snapshot into this repo
+rsync -av --delete \
+  --exclude='.git' --exclude='node_modules' --exclude='.next' \
+  AI-Workflow/website/ ase-os-website/
+
+# 3 — commit the updated data
+cd ase-os-website && git add . && git commit -m "sync: update data snapshot"
+```
+
+---
 
 ## Tech Stack
 
 | Layer | Choice |
 |-------|--------|
-| Framework | Next.js 15 (App Router, static export) |
+| Framework | Next.js 15 (App Router, static generation) |
 | Styling | Tailwind CSS v4 |
 | Animation | Framer Motion |
 | Icons | Lucide React |
-| Data | Static generation from YAML/JSON files in the main repo |
+| Data | Static generation from bundled YAML/JSON in `data/` |
 | Deployment | Vercel |
+
+---
 
 ## Pages
 
 | Route | Description |
 |-------|-------------|
-| `/` | Home — hero, features, stats |
-| `/getting-started` | Setup guide with live skill/agent counts |
-| `/skills` | Browsable skill catalog (all 100+ skills) |
-| `/how-it-works` | Full pipeline walkthrough |
+| `/` | Home — hero, features, live stats |
+| `/how-it-works` | Full pipeline walkthrough with diagrams |
+| `/skills` | Browsable skill catalog |
+| `/skills/[id]` | Individual skill specification page |
+| `/pipelines` | All pipeline templates |
 | `/agents` | Agent roster and responsibilities |
-| `/changelog` | Auto-generated from `docs/changelog.md` |
+| `/architecture` | System architecture overview |
+| `/reference` | Quick-reference index |
+| `/changelog` | Auto-generated from `data/docs/changelog.md` |
+| `/getting-started` | Setup guide with live skill/agent counts |
+| `/about` | About the project |
+
+---
 
 ## Contributing
 
-UI/website changes → open a PR against the main repo at [AI-Workflow](https://github.com/Albadry-Esmat/AI-Workflow). Changes to skill files, registry, and pipeline templates live there, not here.
-
-## Links
-
-- **Main System Repo:** https://github.com/Albadry-Esmat/AI-Workflow
-- **Live Website:** https://ase-os.vercel.app *(or your Vercel domain)*
-- **Getting Started:** https://ase-os.vercel.app/getting-started
+UI and website changes → open a PR against the main repo at [AI-Workflow](https://github.com/Albadry-Esmat/AI-Workflow). Skill files, registry, and pipeline templates live there.

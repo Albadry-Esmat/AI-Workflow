@@ -1,68 +1,75 @@
 "use client";
 import { motion } from "framer-motion";
 import { Terminal, FolderOpen, Settings, GitBranch } from "lucide-react";
+import { REPO_URL, REPO_NAME } from "@/lib/site.config";
 
-const STEPS = [
-  {
-    num: "01",
-    icon: GitBranch,
-    title: "Clone the Repository",
-    desc: "The entire ASE-OS skill system is self-contained in one repo — 59 skills, registry files, pipeline templates, and agent config are all included.",
-    code: `git clone https://github.com/Albadry-Esmat/AI-Workflow.git
-cd AI-Workflow`,
-    color: "from-cyan-600 to-cyan-500",
-    accent: "border-cyan-500/30 bg-cyan-500/10",
-    text: "text-cyan-400",
-  },
-  {
-    num: "02",
-    icon: FolderOpen,
-    title: "Open in an Agentic Environment",
-    desc: "ASE-OS runs inside OpenCode, Claude Code, or any agentic dev environment that supports multi-agent workflows and SKILL.md skill binding.",
-    code: `# Open with OpenCode
+interface Props {
+  stats?: { totalSkills: number; totalAgents: number };
+}
+
+export function InstallationSection({ stats }: Props) {
+  const totalSkills = stats?.totalSkills ?? 0;
+  const totalAgents = stats?.totalAgents ?? 0;
+
+  const STEPS = [
+    {
+      num: "01",
+      icon: GitBranch,
+      title: "Clone the Repository",
+      desc: `The entire ASE-OS skill system is self-contained in one repo — ${totalSkills} skills, registry files, pipeline templates, and agent config are all included.`,
+      code: `git clone ${REPO_URL}\ncd ${REPO_NAME}`,
+      color: "from-cyan-600 to-cyan-500",
+      accent: "border-cyan-500/30 bg-cyan-500/10",
+      text: "text-cyan-400",
+    },
+    {
+      num: "02",
+      icon: FolderOpen,
+      title: "Open in an Agentic Environment",
+      desc: "ASE-OS runs inside OpenCode, Claude Code, or any agentic dev environment that supports multi-agent workflows and SKILL.md skill binding.",
+      code: `# Open with OpenCode
 opencode .
 
 # Or use any compatible agentic IDE`,
-    color: "from-violet-600 to-violet-500",
-    accent: "border-violet-500/30 bg-violet-500/10",
-    text: "text-violet-400",
-  },
-  {
-    num: "03",
-    icon: Settings,
-    title: "Agents Auto-Initialize",
-    desc: "The primary orchestrator reads opencode.json and auto-binds all 12 specialized subagents. No manual wiring — each agent's skill scope is declared in the config.",
-    code: `// opencode.json — snippet
+      color: "from-violet-600 to-violet-500",
+      accent: "border-violet-500/30 bg-violet-500/10",
+      text: "text-violet-400",
+    },
+    {
+      num: "03",
+      icon: Settings,
+      title: "Agents Auto-Initialize",
+      desc: `The primary orchestrator reads opencode.json and auto-binds all ${totalAgents} specialized subagents. No manual wiring — each agent's skill scope is declared in the config.`,
+      code: `// opencode.json — snippet
 {
   "agent": {
     "primary":   { "skill": "orchestrator/SKILL.md" },
     "analyzer":  { "skill": "requirement-analyzer/SKILL.md" },
     "architect": { "skills": ["architecture-design/SKILL.md", ...] },
-    // ... 10 more agents
+    // ... more agents
   }
 }`,
-    color: "from-blue-600 to-blue-500",
-    accent: "border-blue-500/30 bg-blue-500/10",
-    text: "text-blue-400",
-  },
-  {
-    num: "04",
-    icon: Terminal,
-    title: "Graph Index Built Automatically",
-    desc: "Graphify scans the project AST and builds a 3,406-node knowledge graph. This becomes the project's long-term memory — no embeddings, no vector DB required.",
-    code: `# Runs automatically on first open via plugin hook
+      color: "from-blue-600 to-blue-500",
+      accent: "border-blue-500/30 bg-blue-500/10",
+      text: "text-blue-400",
+    },
+    {
+      num: "04",
+      icon: Terminal,
+      title: "Graph Index Built Automatically",
+      desc: "Graphify scans the project AST and builds a knowledge graph used as long-term memory — no embeddings, no vector DB required.",
+      code: `# Runs automatically on first open via plugin hook
 # graphify-out/ is populated with:
 #   graph.json         — full AST graph
 #   GRAPH_REPORT.md    — architecture summary
 #   wiki/index.md      — navigable docs
 graphify update .`,
-    color: "from-teal-600 to-teal-500",
-    accent: "border-teal-500/30 bg-teal-500/10",
-    text: "text-teal-400",
-  },
-];
+      color: "from-teal-600 to-teal-500",
+      accent: "border-teal-500/30 bg-teal-500/10",
+      text: "text-teal-400",
+    },
+  ];
 
-export function InstallationSection() {
   return (
     <section className="mb-24">
       {/* Section header */}
@@ -91,8 +98,8 @@ export function InstallationSection() {
           transition={{ delay: 0.1 }}
           className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed"
         >
-          Four commands. The orchestrator, all 59 skills, the knowledge graph, and 13 agents
-          are ready in under a minute.
+          Four commands. The orchestrator, all {totalSkills} skills, the knowledge graph, and{" "}
+          {totalAgents} agents are ready in under a minute.
         </motion.p>
       </div>
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadPipeline } from "@/lib/data";
+import { loadPipeline, loadSiteStats } from "@/lib/data";
 import { PipelineFlow } from "@/components/pipeline/PipelineFlow";
 import { EventFlowDiagram } from "@/components/pipeline/EventFlowDiagram";
 import { LifecycleSteps } from "@/components/pipeline/LifecycleSteps";
@@ -23,15 +23,33 @@ export const metadata: Metadata = {
   },
 };
 
+const FALLBACK_STATS = {
+  totalSkills: 0,
+  totalNodes: 0,
+  totalEdges: 0,
+  totalPipelinePhases: 0,
+  totalPipelines: 0,
+  totalAgents: 0,
+  domainCounts: {} as Record<string, number>,
+  registryVersion: "0.0.0",
+};
+
 export default function HowItWorksPage() {
   const pipeline = loadPipeline();
+  let stats = FALLBACK_STATS;
+  try {
+    stats = loadSiteStats();
+  } catch {
+    // data unavailable — fall back to zeroes, components degrade gracefully
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-6">
       {/* ── Use-case walkthrough ─────────────────────────────────────────── */}
-      <UseCaseHero />
+      <UseCaseHero stats={stats} />
 
       <div className="py-4">
-        <InstallationSection />
+        <InstallationSection stats={stats} />
         <PromptSubmissionSection />
         <BackgroundProcessingSection />
         <OrchestrationSection />

@@ -18,8 +18,16 @@ import matter from "gray-matter";
 import yaml from "js-yaml";
 
 // ─── Root path resolution ────────────────────────────────────────────────────
-// website/ is a subdirectory of the project root
-const PROJECT_ROOT = path.resolve(process.cwd(), "..");
+// Priority order:
+//   1. DATA_ROOT env var (explicit override)
+//   2. ./data/  inside the website directory (standalone / ase-os-website clone)
+//   3. ../      parent directory (monorepo / AI-Workflow development mode)
+const _localDataDir = path.resolve(process.cwd(), "data");
+const PROJECT_ROOT = process.env.DATA_ROOT
+  ? path.resolve(process.env.DATA_ROOT)
+  : fs.existsSync(path.join(_localDataDir, "skills", "index.yaml"))
+    ? _localDataDir
+    : path.resolve(process.cwd(), "..");
 
 export function projectPath(...segments: string[]) {
   return path.join(PROJECT_ROOT, ...segments);
@@ -356,6 +364,7 @@ export function loadSiteStats() {
   const graph = loadSkillGraph();
   const pipeline = loadPipeline();
   const agents = loadAgentConfig();
+  const pipelines = loadAllPipelines();
   const { version: registryVersion, skills: registryEntries } = parseRegistry();
 
   const domainCounts: Record<string, number> = {};
@@ -365,8 +374,10 @@ export function loadSiteStats() {
 
   return {
     totalSkills: skills.length,
+    totalNodes: graph.meta.total_nodes,
     totalEdges: graph.meta.total_edges,
     totalPipelinePhases: pipeline.phases.length,
+    totalPipelines: pipelines.length,
     totalAgents: Object.keys(agents).length,
     domainCounts,
     registryVersion,

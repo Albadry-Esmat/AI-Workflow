@@ -2,13 +2,20 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Layers, Zap, ShieldCheck } from "lucide-react";
 
-const HIGHLIGHTS = [
-  { icon: Layers, label: "59 Skills",         desc: "Modular, composable AI skills" },
-  { icon: Zap,        label: "17 Pipeline Phases", desc: "Fully automated lifecycle"  },
-  { icon: ShieldCheck,label: "Non-bypassable Gates", desc: "Human approval at every key decision" },
-];
+interface Props {
+  stats?: { totalSkills: number; totalPipelinePhases: number };
+}
 
-export function UseCaseHero() {
+export function UseCaseHero({ stats }: Props) {
+  const totalSkills = stats?.totalSkills ?? 0;
+  const totalPipelinePhases = stats?.totalPipelinePhases ?? 0;
+
+  const HIGHLIGHTS = [
+    { icon: Layers,      label: `${totalSkills} Skills`,              desc: "Modular, composable AI skills" },
+    { icon: Zap,         label: `${totalPipelinePhases} Pipeline Phases`, desc: "Fully automated lifecycle" },
+    { icon: ShieldCheck, label: "Non-bypassable Gates",              desc: "Human approval at every key decision" },
+  ];
+
   return (
     <section className="relative overflow-hidden py-24 text-center">
       {/* Ambient glow */}

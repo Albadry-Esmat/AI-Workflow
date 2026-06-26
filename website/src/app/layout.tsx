@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
 import { loadSiteStats } from "@/lib/data";
+import { SITE_URL, REPO_URL } from "@/lib/site.config";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -16,27 +17,29 @@ export const metadata: Metadata = {
   },
   description:
     "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously.",
-  metadataBase: new URL("https://ase-os.vercel.app"),
-    openGraph: {
-      title: "ASE-OS — AI Software Engineering Operating System",
-      description:
-        "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift.",
-      type: "website",
-      url: "https://ase-os.vercel.app",
-      siteName: "ASE-OS",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "ASE-OS — AI Software Engineering Operating System",
-      description:
-        "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically.",
-    },
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    title: "ASE-OS — AI Software Engineering Operating System",
+    description:
+      "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift.",
+    type: "website",
+    url: SITE_URL,
+    siteName: "ASE-OS",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ASE-OS — AI Software Engineering Operating System",
+    description:
+      "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically.",
+  },
 };
 
 const FALLBACK_STATS = {
   totalSkills: 0,
+  totalNodes: 0,
   totalEdges: 0,
   totalPipelinePhases: 0,
+  totalPipelines: 0,
   totalAgents: 0,
   domainCounts: {} as Record<string, number>,
   registryVersion: "0.0.0",
@@ -69,6 +72,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     Albadry Esmat
                   </Link>
                 </span>
+                <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">·</span>
+                <a
+                  href={REPO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                >
+                  GitHub
+                </a>
               </div>
               <span className="font-mono text-xs">
                 Skill System v{stats.registryVersion} · {stats.totalSkills} Skills · {stats.totalEdges} Edges

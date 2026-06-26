@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+import { REPO_URL } from "@/lib/site.config";
 interface Props {
   stats: { totalSkills: number; totalPipelinePhases: number; totalAgents: number; registryVersion: string };
 }
@@ -78,7 +79,7 @@ export function HeroSection({ stats }: Props) {
             See How It Works →
           </Link>
           <a
-            href="https://github.com/Albadry-Esmat/AI-Workflow"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 px-6 py-3 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"

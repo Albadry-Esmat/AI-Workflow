@@ -1,20 +1,21 @@
 "use client";
 import { motion } from "framer-motion";
+import { REPO_URL, REPO_NAME } from "@/lib/site.config";
 
 interface Props {
   stats?: { totalSkills: number; totalAgents: number };
 }
 
 export function GettingStartedSteps({ stats }: Props) {
-  const totalSkills = stats?.totalSkills ?? 100;
-  const totalAgents = stats?.totalAgents ?? 19;
+  const totalSkills = stats?.totalSkills ?? 0;
+  const totalAgents = stats?.totalAgents ?? 0;
 
   const STEPS = [
     {
       step: "01",
       title: "Clone the Repository",
       description: `The full ASE-OS skill system lives in this repository. Clone it to get all ${totalSkills} skills, registry files, pipeline templates, and agent configuration.`,
-      code: "git clone https://github.com/Albadry-Esmat/AI-Workflow.git\ncd AI-Workflow",
+      code: `git clone ${REPO_URL}\ncd ${REPO_NAME}`,
       color: "from-cyan-600 to-cyan-500",
     },
     {

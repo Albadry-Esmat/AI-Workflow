@@ -30,8 +30,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (local overrides are never committed; .env.example is committed as a template)
 .env*
+!.env.example
+
+# Bundled data directory — populated by scripts/bundle-website-data.sh for
+# the standalone ase-os-website repo. Not committed to the AI-Workflow monorepo
+# because the live source files in skills/, docs/, etc. are used directly.
+/data
 
 # vercel
 .vercel

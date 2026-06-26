@@ -23,7 +23,7 @@ const CONTEXT_LAYERS = [
   },
   {
     layer: "L3 — Knowledge Graph (Graphify)",
-    desc: "AST-level code graph with 3,406 nodes and 3,560 links. Cross-file relationships, community clusters, and semantic navigation — no vector DB required.",
+    desc: "AST-level code graph spanning your entire codebase. Cross-file relationships, community clusters, and semantic navigation — no vector DB required.",
     capacity: "Full codebase",
     icon: Network,
     color: "text-teal-400",
@@ -142,7 +142,7 @@ export function BackgroundProcessingSection() {
           <div className="mt-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/40 p-3">
             <pre className="text-xs font-mono text-zinc-600 dark:text-zinc-400 whitespace-pre overflow-x-auto">{`# Graphify retrieval — targeted, not full-scan
 graphify query "payment gateway"
-# → returns ~15 nodes instead of loading 3,406
+# → returns a scoped subgraph, not the entire codebase
 
 graphify path "UserService" "PaymentGateway"
 # → shows the exact dependency chain between modules`}</pre>
