@@ -7,8 +7,11 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { CtaSection } from "@/components/home/CtaSection";
 
 export default function HomePage() {
-  const stats = loadSiteStats();
-  const changelog = loadChangelog();
+  const stats = (() => {
+    try { return loadSiteStats(); }
+    catch { return { totalSkills: 0, totalNodes: 0, totalEdges: 0, totalPipelinePhases: 0, totalPipelines: 0, totalAgents: 0, domainCounts: {} as Record<string, number>, registryVersion: "0.0.0" }; }
+  })();
+  const changelog = (() => { try { return loadChangelog(); } catch { return []; } })();
 
   // count domains
   const domains = Object.entries(stats.domainCounts).sort((a, b) => b[1] - a[1]);

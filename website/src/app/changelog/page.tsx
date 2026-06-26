@@ -13,8 +13,11 @@ export const metadata = {
 };
 
 export default function ChangelogPage() {
-  const sections = loadChangelog();
-  const stats = loadSiteStats();
+  const sections = (() => { try { return loadChangelog(); } catch { return []; } })();
+  const stats = (() => {
+    try { return loadSiteStats(); }
+    catch { return { totalSkills: 0, registryVersion: "0.0.0", totalNodes: 0, totalEdges: 0, totalPipelinePhases: 0, totalPipelines: 0, totalAgents: 0, domainCounts: {} as Record<string, number> }; }
+  })();
   const latest = sections[0];
 
   return (

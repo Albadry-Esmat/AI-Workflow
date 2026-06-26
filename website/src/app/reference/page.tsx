@@ -3,7 +3,7 @@ import { ReferenceClient } from "@/components/reference/ReferenceClient";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const skills = loadAllSkills();
+  const skills = (() => { try { return loadAllSkills(); } catch { return []; } })();
   return {
     title: "Full Skills Reference",
     description: `Complete specification for all ${skills.length} ASE-OS skills — inputs, outputs, orchestration rules, and usage guidelines.`,
@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function ReferencePage() {
-  const skills = loadAllSkills();
+  const skills = (() => { try { return loadAllSkills(); } catch { return []; } })();
   return (
     <div className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-12 text-center">

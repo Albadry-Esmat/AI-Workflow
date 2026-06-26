@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadPipeline, loadSiteStats } from "@/lib/data";
+import { loadPipeline, loadSiteStats, type Pipeline } from "@/lib/data";
 import { PipelineFlow } from "@/components/pipeline/PipelineFlow";
 import { EventFlowDiagram } from "@/components/pipeline/EventFlowDiagram";
 import { LifecycleSteps } from "@/components/pipeline/LifecycleSteps";
@@ -34,8 +34,22 @@ const FALLBACK_STATS = {
   registryVersion: "0.0.0",
 };
 
+const FALLBACK_PIPELINE: Pipeline = {
+  name: "full-pipeline",
+  version: "1.0.0",
+  description: "",
+  phases: [],
+  gates: [],
+  recovery: { on_critical_failure: "", max_repair_iterations: 0 },
+};
+
 export default function HowItWorksPage() {
-  const pipeline = loadPipeline();
+  let pipeline: Pipeline = FALLBACK_PIPELINE;
+  try {
+    pipeline = loadPipeline();
+  } catch {
+    // data unavailable — fall back to empty pipeline
+  }
   let stats = FALLBACK_STATS;
   try {
     stats = loadSiteStats();

@@ -45,7 +45,7 @@ function InstagramIcon({ size = 18, className = "" }: { size?: number; className
 }
 
 /* ─────────────────────────────────────────────────────────────
-   UPDATE THESE LINKS with your real social media profiles
+   Social media links
 ───────────────────────────────────────────────────────────── */
 const SOCIAL_LINKS = [
   {

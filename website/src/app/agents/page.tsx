@@ -1,9 +1,9 @@
-import { loadAgentConfig, loadRegistry } from "@/lib/data";
+import { loadAgentConfig, loadRegistry, type AgentConfig } from "@/lib/data";
 import { AgentsGrid } from "@/components/agents/AgentsGrid";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const agents = loadAgentConfig();
+  const agents = (() => { try { return loadAgentConfig(); } catch { return {} as AgentConfig; } })();
   const count = Object.keys(agents).length;
   return {
     title: "Agents",
@@ -17,8 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function AgentsPage() {
-  const agents = loadAgentConfig();
-  const registry = loadRegistry();
+  const agents = (() => { try { return loadAgentConfig(); } catch { return {} as AgentConfig; } })();
+  const registry = (() => { try { return loadRegistry(); } catch { return []; } })();
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">

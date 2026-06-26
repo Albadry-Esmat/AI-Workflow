@@ -3,7 +3,7 @@ import { SkillsClient } from "@/components/skills/SkillsClient";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const skills = loadAllSkills();
+  const skills = (() => { try { return loadAllSkills(); } catch { return []; } })();
   return {
     title: "Skills Directory",
     description: `All ${skills.length} skills in the ASE-OS registry — filterable by domain, mastery level, and dependencies.`,
@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function SkillsPage() {
-  const skills = loadAllSkills();
+  const skills = (() => { try { return loadAllSkills(); } catch { return []; } })();
   return (
     <div className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-12 text-center">

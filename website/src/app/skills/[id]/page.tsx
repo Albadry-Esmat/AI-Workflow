@@ -10,31 +10,41 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  // loadSkillIndex is lighter than loadAllSkills — we only need the IDs here
-  const skills = loadSkillIndex();
-  return skills.map((s) => ({ id: s.id }));
+  try {
+    const skills = loadSkillIndex();
+    return skills.map((s) => ({ id: s.id }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const skill = loadSkillDetail(id);
-  if (!skill) {
+  try {
+    const skill = loadSkillDetail(id);
+    if (!skill) return { title: "Skill Not Found" };
+    return {
+      title: skill.name,
+      description: skill.short_description,
+      openGraph: {
+        title: `${skill.name} — ASE-OS Skills`,
+        description: skill.short_description,
+        type: "website",
+      },
+    };
+  } catch {
     return { title: "Skill Not Found" };
   }
-  return {
-    title: skill.name,
-    description: skill.short_description,
-    openGraph: {
-      title: `${skill.name} — ASE-OS Skills`,
-      description: skill.short_description,
-      type: "website",
-    },
-  };
 }
 
 export default async function SkillDetailPage({ params }: Props) {
   const { id } = await params;
-  const skill = loadSkillDetail(id);
+  let skill: ReturnType<typeof loadSkillDetail> = null;
+  try {
+    skill = loadSkillDetail(id);
+  } catch {
+    notFound();
+  }
   if (!skill) notFound();
   // Render markdown → HTML on the server, then sanitize to prevent XSS
   const specHtml = skill.spec?.content

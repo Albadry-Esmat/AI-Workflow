@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
 import { GettingStartedSteps } from "@/components/getting-started/GettingStartedSteps";
-import { loadSiteStats, loadSkillGraph } from "@/lib/data";
+import { loadSiteStats, loadSkillGraph, type SkillGraph } from "@/lib/data";
+
+const FALLBACK_STATS = {
+  totalSkills: 0, totalNodes: 0, totalEdges: 0, totalPipelinePhases: 0,
+  totalPipelines: 0, totalAgents: 0,
+  domainCounts: {} as Record<string, number>,
+  registryVersion: "0.0.0",
+};
+const FALLBACK_GRAPH: SkillGraph = {
+  meta: { version: "0.0.0", total_nodes: 0, total_edges: 0 },
+  nodes: [],
+  edges: [],
+};
 
 export const metadata: Metadata = {
   title: "Getting Started",
@@ -13,8 +25,10 @@ export const metadata: Metadata = {
 };
 
 export default function GettingStartedPage() {
-  const stats = loadSiteStats();
-  const graph = loadSkillGraph();
+  let stats = FALLBACK_STATS;
+  let graph: SkillGraph = FALLBACK_GRAPH;
+  try { stats = loadSiteStats(); } catch { /* data unavailable */ }
+  try { graph = loadSkillGraph(); } catch { /* data unavailable */ }
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <div className="mb-16 text-center">

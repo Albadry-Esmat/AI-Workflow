@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadSkillGraph, loadAgentConfig } from "@/lib/data";
+import { loadSkillGraph, loadAgentConfig, type AgentConfig } from "@/lib/data";
 import { AgentDiagram } from "@/components/arch/AgentDiagram";
 import { StateDiagram } from "@/components/arch/StateDiagram";
 import { GraphOverview } from "@/components/arch/GraphOverview";
@@ -15,8 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default function ArchitecturePage() {
-  const graph = loadSkillGraph();
-  const agents = loadAgentConfig();
+  const graph = (() => {
+    try { return loadSkillGraph(); }
+    catch { return { meta: { version: "0.0.0", total_nodes: 0, total_edges: 0 }, nodes: [], edges: [] }; }
+  })();
+  const agents = (() => { try { return loadAgentConfig(); } catch { return {} as AgentConfig; } })();
   return (
     <div className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-16 text-center">
