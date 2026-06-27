@@ -73,7 +73,7 @@ skills:
   - agile
   - milestones
   - dependencies
-  version: 2.0.0
+  version: 2.1.0
   depends_on:
   - SKL-001
   - SKL-002

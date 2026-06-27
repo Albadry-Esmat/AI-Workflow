@@ -95,7 +95,7 @@
     "planner": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": { "edit": "ask", "bash": "deny" },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
       "skill": ".opencode/skills/feature-planning/SKILL.md"
     },
