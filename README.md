@@ -25,7 +25,6 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 | Skills | 101 (SKL-001 → SKL-107) |
 | Agents | 18 specialized + 1 primary orchestrator |
 | Pipeline templates | 21 |
-| Website pages | 117 (static generation) |
 
 ---
 
@@ -35,7 +34,6 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 
 - [opencode](https://opencode.ai) — the AI coding tool that powers the agent runtime
 - A GitHub Copilot subscription (or any LLM provider supported by opencode)
-- Node.js 20+ (for the website only)
 
 ### 1 — Clone
 
@@ -64,16 +62,6 @@ review code in <path>
 plan this feature: <description>
 ```
 
-### 4 — (Optional) Run the website locally
-
-```bash
-cd website
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) — a live catalog of every skill, agent, and pipeline template.
-
 ---
 
 ## How It Works
@@ -92,7 +80,7 @@ A **skill** is a markdown file (`SKILL.md`) with 13 sections that define exactly
 └── ... (101 total)
 ```
 
-The skill registry (`skills/index.yaml`) is the single source of truth for all skill metadata. The website reads from this file at build time.
+The skill registry (`skills/index.yaml`) is the single source of truth for all skill metadata.
 
 ### Pipeline Templates
 
@@ -167,33 +155,7 @@ ai-workflow/
 ├── examples/                  ← starter files for new projects
 │   ├── goal-file-example.md
 │   └── adr/
-└── website/                   ← Next.js 15 documentation site
 ```
-
----
-
-## Personalising
-
-All owner-specific content is driven by environment variables. Nothing in the source code needs changing.
-
-```bash
-cd website
-cp .env.example .env.local
-# edit .env.local with your values
-```
-
-Key variables:
-
-| Variable | What it controls |
-|----------|-----------------|
-| `NEXT_PUBLIC_SITE_URL` | Canonical URL for SEO / sitemap |
-| `NEXT_PUBLIC_REPO_URL` | "Star on GitHub" button link |
-| `NEXT_PUBLIC_CREATOR_NAME` | Name shown in footer and About page |
-| `NEXT_PUBLIC_CREATOR_TITLE` | Subtitle on About page |
-| `NEXT_PUBLIC_CREATOR_BIO` | Bio paragraph on About page |
-| `NEXT_PUBLIC_CREATOR_GITHUB_URL` | GitHub link (leave blank to hide) |
-| `NEXT_PUBLIC_CREATOR_TWITTER_URL` | X / Twitter link (leave blank to hide) |
-| ... | (see `website/.env.example` for all 16 vars) |
 
 ---
 
@@ -232,4 +194,4 @@ Full system documentation lives in [`docs/`](docs/):
 | `docs/workflows.md` | End-to-end pipeline execution |
 | `docs/changelog.md` | Version history |
 
-The website at `/docs` and `/skills` renders all of this interactively.
+The [AI Workflow website](https://github.com/your-username/ase-os-website) — a separate repo — renders all of this interactively as a browsable skill catalog.
