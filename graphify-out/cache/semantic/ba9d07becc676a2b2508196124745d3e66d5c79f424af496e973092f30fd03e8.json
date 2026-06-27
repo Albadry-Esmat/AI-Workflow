@@ -1,1 +1,0 @@
-{"nodes": [{"id": "documenter_agent", "label": "Documenter Agent", "file_type": "code", "source_file": ".opencode/agent/documenter.md"}], "edges": [{"source": "documenter_agent", "target": "documentation_generator_skill", "relation": "calls", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": ".opencode/agent/documenter.md"}], "hyperedges": []}

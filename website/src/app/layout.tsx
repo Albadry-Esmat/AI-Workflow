@@ -5,7 +5,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
 import { loadSiteStats } from "@/lib/data";
-import { SITE_URL, REPO_URL } from "@/lib/site.config";
+import { SITE_URL, REPO_URL, CREATOR_NAME } from "@/lib/site.config";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href="/about"
                     className="font-semibold text-zinc-700 dark:text-zinc-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
                   >
-                    Albadry Esmat
+                    {CREATOR_NAME}
                   </Link>
                 </span>
                 <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">·</span>

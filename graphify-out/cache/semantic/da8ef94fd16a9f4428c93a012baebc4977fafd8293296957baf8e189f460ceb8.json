@@ -1,1 +1,0 @@
-{"nodes": [{"id": "tester_agent", "label": "Tester Agent", "file_type": "code", "source_file": ".opencode/agent/tester.md"}], "edges": [{"source": "tester_agent", "target": "testing_strategy_skill", "relation": "calls", "confidence": "INFERRED", "confidence_score": 0.9, "source_file": ".opencode/agent/tester.md"}], "hyperedges": []}

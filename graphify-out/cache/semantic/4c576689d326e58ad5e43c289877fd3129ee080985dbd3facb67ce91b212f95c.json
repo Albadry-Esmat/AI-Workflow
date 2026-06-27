@@ -1,1 +1,0 @@
-{"nodes": [{"id": "primary_agent", "label": "Primary Orchestrator Agent", "file_type": "code", "source_file": ".opencode/agent/primary.md"}], "edges": [{"source": "primary_agent", "target": "orchestrator_skill", "relation": "calls", "confidence": "INFERRED", "confidence_score": 0.9, "source_file": ".opencode/agent/primary.md"}], "hyperedges": []}

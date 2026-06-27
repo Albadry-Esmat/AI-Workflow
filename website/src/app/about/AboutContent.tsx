@@ -2,6 +2,24 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Globe, ExternalLink, ArrowRight } from "lucide-react";
+import {
+  CREATOR_NAME,
+  CREATOR_TITLE,
+  CREATOR_BIO,
+  CREATOR_INITIALS,
+  CREATOR_GITHUB_HANDLE,
+  CREATOR_GITHUB_URL,
+  CREATOR_TWITTER_HANDLE,
+  CREATOR_TWITTER_URL,
+  CREATOR_LINKEDIN_HANDLE,
+  CREATOR_LINKEDIN_URL,
+  CREATOR_YOUTUBE_HANDLE,
+  CREATOR_YOUTUBE_URL,
+  CREATOR_INSTAGRAM_HANDLE,
+  CREATOR_INSTAGRAM_URL,
+  CREATOR_WEBSITE_HANDLE,
+  CREATOR_WEBSITE_URL,
+} from "@/lib/site.config";
 
 /* ── Inline brand SVGs (lucide-react v1.20 removed brand icons) ── */
 function GitHubIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
@@ -44,15 +62,13 @@ function InstagramIcon({ size = 18, className = "" }: { size?: number; className
   );
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Social media links
-───────────────────────────────────────────────────────────── */
+// ─── Social links — built from CREATOR_* env vars; empty href = hidden ────────
 const SOCIAL_LINKS = [
   {
     platform: "GitHub",
-    handle: "@albadryesmat",
+    handle: CREATOR_GITHUB_HANDLE,
     description: "Open-source projects, code, and repositories",
-    href: "https://github.com/albadryesmat",
+    href: CREATOR_GITHUB_URL,
     Icon: GitHubIcon,
     color: "text-zinc-900 dark:text-white",
     bg: "bg-zinc-100 dark:bg-zinc-800",
@@ -62,9 +78,9 @@ const SOCIAL_LINKS = [
   },
   {
     platform: "X / Twitter",
-    handle: "@albadryesmat",
+    handle: CREATOR_TWITTER_HANDLE,
     description: "Thoughts on AI, engineering, and building in public",
-    href: "https://x.com/albadryesmat",
+    href: CREATOR_TWITTER_URL,
     Icon: XIcon,
     color: "text-zinc-900 dark:text-white",
     bg: "bg-zinc-50 dark:bg-zinc-900/60",
@@ -74,9 +90,9 @@ const SOCIAL_LINKS = [
   },
   {
     platform: "LinkedIn",
-    handle: "Albadry Esmat",
+    handle: CREATOR_LINKEDIN_HANDLE,
     description: "Professional background, experience, and network",
-    href: "https://linkedin.com/in/albadryesmat",
+    href: CREATOR_LINKEDIN_URL,
     Icon: LinkedInIcon,
     color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-50 dark:bg-blue-950/40",
@@ -86,9 +102,9 @@ const SOCIAL_LINKS = [
   },
   {
     platform: "YouTube",
-    handle: "@albadryesmat",
+    handle: CREATOR_YOUTUBE_HANDLE,
     description: "Videos on AI engineering, system design, and tutorials",
-    href: "https://youtube.com/@albadryesmat",
+    href: CREATOR_YOUTUBE_URL,
     Icon: YouTubeIcon,
     color: "text-red-600 dark:text-red-400",
     bg: "bg-red-50 dark:bg-red-950/40",
@@ -98,9 +114,9 @@ const SOCIAL_LINKS = [
   },
   {
     platform: "Instagram",
-    handle: "@albadryesmat",
+    handle: CREATOR_INSTAGRAM_HANDLE,
     description: "Behind the scenes, projects, and personal updates",
-    href: "https://instagram.com/albadryesmat",
+    href: CREATOR_INSTAGRAM_URL,
     Icon: InstagramIcon,
     color: "text-pink-600 dark:text-pink-400",
     bg: "bg-pink-50 dark:bg-pink-950/40",
@@ -110,9 +126,9 @@ const SOCIAL_LINKS = [
   },
   {
     platform: "Personal Website",
-    handle: "albadryesmat.com",
+    handle: CREATOR_WEBSITE_HANDLE,
     description: "Portfolio, writing, and everything I'm working on",
-    href: "https://albadryesmat.com",
+    href: CREATOR_WEBSITE_URL,
     Icon: Globe,
     color: "text-cyan-600 dark:text-cyan-400",
     bg: "bg-cyan-50 dark:bg-cyan-950/40",
@@ -120,7 +136,7 @@ const SOCIAL_LINKS = [
     hoverBorder: "hover:border-cyan-400 dark:hover:border-cyan-500",
     badge: "bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300",
   },
-];
+].filter((link) => link.href !== ""); // hide cards with no URL set
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -149,7 +165,7 @@ export function AboutContent() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 via-violet-500 to-pink-500 text-3xl font-black text-white shadow-xl"
           >
-            AE
+            {CREATOR_INITIALS}
           </motion.div>
 
           {/* Name */}
@@ -159,7 +175,7 @@ export function AboutContent() {
             transition={{ delay: 0.2 }}
             className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2"
           >
-            Albadry Esmat
+            {CREATOR_NAME}
           </motion.h1>
 
           {/* Title */}
@@ -169,7 +185,7 @@ export function AboutContent() {
             transition={{ delay: 0.3 }}
             className="text-lg font-medium bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 bg-clip-text text-transparent mb-4"
           >
-            Creator of ASE-OS
+            {CREATOR_TITLE}
           </motion.p>
 
           {/* Bio */}
@@ -179,10 +195,7 @@ export function AboutContent() {
             transition={{ delay: 0.4 }}
             className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-8 text-base"
           >
-            I build AI systems that do real engineering work — not just assistants that answer
-            questions. ASE-OS is my attempt to create a complete, skill-driven operating system
-            for software development: one that designs, generates, tests, reviews, and deploys
-            code autonomously, with full traceability and no documentation drift.
+            {CREATOR_BIO}
           </motion.p>
 
           {/* Hero CTAs */}
@@ -192,131 +205,143 @@ export function AboutContent() {
             transition={{ delay: 0.5 }}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            <a
-              href="https://albadryesmat.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 px-6 py-3 text-sm font-semibold text-zinc-950 transition-colors"
-            >
-              <Globe size={15} />
-              Visit My Website
-            </a>
-            <a
-              href="https://github.com/albadryesmat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-500 px-6 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
-            >
-              <GitHubIcon size={15} />
-              Follow on GitHub
-            </a>
+            {CREATOR_WEBSITE_URL && (
+              <a
+                href={CREATOR_WEBSITE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 px-6 py-3 text-sm font-semibold text-zinc-950 transition-colors"
+              >
+                <Globe size={15} />
+                Visit My Website
+              </a>
+            )}
+            {CREATOR_GITHUB_URL && (
+              <a
+                href={CREATOR_GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-500 px-6 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+              >
+                <GitHubIcon size={15} />
+                Follow on GitHub
+              </a>
+            )}
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ── Follow CTA banner ────────────────────────────────────── */}
-      <section className="border-y border-cyan-200 dark:border-cyan-900/40 bg-gradient-to-r from-cyan-50 via-violet-50 to-pink-50 dark:from-cyan-950/30 dark:via-violet-950/30 dark:to-pink-950/30 py-8 px-6">
-        <div className="mx-auto max-w-3xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div>
-            <p className="text-zinc-900 dark:text-white font-semibold text-base">
-              Stay in the loop
-            </p>
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5">
-              Follow me for updates on ASE-OS, AI engineering patterns, and new features as they ship.
-            </p>
+      {/* ── Follow CTA banner — only shown if Twitter or LinkedIn are set ─── */}
+      {(CREATOR_TWITTER_URL || CREATOR_LINKEDIN_URL) && (
+        <section className="border-y border-cyan-200 dark:border-cyan-900/40 bg-gradient-to-r from-cyan-50 via-violet-50 to-pink-50 dark:from-cyan-950/30 dark:via-violet-950/30 dark:to-pink-950/30 py-8 px-6">
+          <div className="mx-auto max-w-3xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+              <p className="text-zinc-900 dark:text-white font-semibold text-base">
+                Stay in the loop
+              </p>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5">
+                Follow me for updates on AI Workflow, AI engineering patterns, and new features as they ship.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              {CREATOR_TWITTER_URL && (
+                <a
+                  href={CREATOR_TWITTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 px-5 py-2.5 text-sm font-semibold text-white dark:text-zinc-900 transition-colors"
+                >
+                  <XIcon size={14} />
+                  Follow on X
+                </a>
+              )}
+              {CREATOR_LINKEDIN_URL && (
+                <a
+                  href={CREATOR_LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-blue-300 dark:border-blue-700 hover:border-blue-500 dark:hover:border-blue-400 px-5 py-2.5 text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"
+                >
+                  <LinkedInIcon size={14} />
+                  Connect on LinkedIn
+                </a>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <a
-              href="https://x.com/albadryesmat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 px-5 py-2.5 text-sm font-semibold text-white dark:text-zinc-900 transition-colors"
-            >
-              <XIcon size={14} />
-              Follow on X
-            </a>
-            <a
-              href="https://linkedin.com/in/albadryesmat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-blue-300 dark:border-blue-700 hover:border-blue-500 dark:hover:border-blue-400 px-5 py-2.5 text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"
-            >
-              <LinkedInIcon size={14} />
-              Connect on LinkedIn
-            </a>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Social links grid ────────────────────────────────────── */}
-      <section className="mx-auto max-w-5xl px-6 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center"
-        >
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white mb-3">
-            Find Me Online
-          </h2>
-          <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-            Connect, follow, or reach out — I&apos;d love to hear from you.
-          </p>
-        </motion.div>
+      {SOCIAL_LINKS.length > 0 && (
+        <section className="mx-auto max-w-5xl px-6 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10 text-center"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white mb-3">
+              Find Me Online
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+              Connect, follow, or reach out — I&apos;d love to hear from you.
+            </p>
+          </motion.div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          {SOCIAL_LINKS.map((link) => (
-            <motion.a
-              key={link.platform}
-              variants={item}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`group relative rounded-xl border ${link.border} ${link.bg} ${link.hoverBorder} p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 flex flex-col gap-3`}
-            >
-              {/* Icon + platform */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`rounded-lg p-2 ${link.bg} border ${link.border}`}>
-                    <link.Icon size={18} className={link.color} />
-                  </div>
-                  <div>
-                    <div className={`text-sm font-semibold ${link.color}`}>{link.platform}</div>
-                    <div className={`text-xs font-mono px-1.5 py-0.5 rounded ${link.badge} mt-0.5 inline-block`}>
-                      {link.handle}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            {SOCIAL_LINKS.map((link) => (
+              <motion.a
+                key={link.platform}
+                variants={item}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group relative rounded-xl border ${link.border} ${link.bg} ${link.hoverBorder} p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 flex flex-col gap-3`}
+              >
+                {/* Icon + platform */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-lg p-2 ${link.bg} border ${link.border}`}>
+                      <link.Icon size={18} className={link.color} />
+                    </div>
+                    <div>
+                      <div className={`text-sm font-semibold ${link.color}`}>{link.platform}</div>
+                      <div className={`text-xs font-mono px-1.5 py-0.5 rounded ${link.badge} mt-0.5 inline-block`}>
+                        {link.handle}
+                      </div>
                     </div>
                   </div>
+                  <ExternalLink
+                    size={14}
+                    className="text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors"
+                  />
                 </div>
-                <ExternalLink
-                  size={14}
-                  className="text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors"
-                />
-              </div>
 
-              {/* Description */}
-              <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">
-                {link.description}
-              </p>
+                {/* Description */}
+                <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">
+                  {link.description}
+                </p>
 
-              {/* Follow button */}
-              <div
-                className={`mt-auto inline-flex items-center gap-1.5 text-xs font-semibold ${link.color} group-hover:gap-2.5 transition-all`}
-              >
-                Follow
-                <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </motion.a>
-          ))}
-        </motion.div>
-      </section>
+                {/* Follow button */}
+                <div
+                  className={`mt-auto inline-flex items-center gap-1.5 text-xs font-semibold ${link.color} group-hover:gap-2.5 transition-all`}
+                >
+                  Follow
+                  <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </motion.a>
+            ))}
+          </motion.div>
+        </section>
+      )}
 
-      {/* ── ASE-OS project CTA ───────────────────────────────────── */}
+      {/* ── AI Workflow project CTA ───────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-6 pb-24">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -328,10 +353,10 @@ export function AboutContent() {
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-cyan-500/10 blur-[70px]" />
           </div>
           <h3 className="relative text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mb-3">
-            Explore ASE-OS
+            Explore AI Workflow
           </h3>
           <p className="relative text-zinc-600 dark:text-zinc-400 text-sm max-w-md mx-auto mb-6 leading-relaxed">
-            Dive into the skill system, pipeline architecture, and how ASE-OS takes ideas
+            Dive into the skill system, pipeline architecture, and how AI Workflow takes ideas
             all the way to deployed software — automatically.
           </p>
           <div className="relative flex flex-wrap justify-center gap-3">
