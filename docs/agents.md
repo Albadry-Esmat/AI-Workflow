@@ -1,6 +1,6 @@
 # Agents — Agent Definitions
 
-**Version:** 1.4.0 | **Last updated:** 2026-06-25
+**Version:** 1.4.1 | **Last updated:** 2026-06-28
 
 ## What Is an Agent
 
@@ -46,7 +46,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 |-------|---------------|------|------------|
 | `analyzer` | `requirement-analyzer` | `subagent` | read-only |
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
-| `planner` | `feature-planning` | `subagent` | read-only |
+| `planner` | `feature-planning` | `subagent` | edit: ask |
 | `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `security-guard`, `implementation-completeness-guard` | `subagent` | edit: ask |
 | `tester` | `testing-strategy`, `test-generator`, `mutation-test-generator` | `subagent` | read-only |
 | `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
@@ -120,7 +120,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     "planner": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": { "edit": "ask", "bash": "deny" },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
       "skill": ".opencode/skills/feature-planning/SKILL.md"
     },

@@ -1,6 +1,6 @@
 ---
 name: feature-planning
-version: 2.1.0
+version: 2.1.1
 domain: planning
 description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
@@ -183,13 +183,16 @@ Step 7c — Feature folder materialization (always-on)
       Append to state work_items.items[]:
         { id: FEATURE-{NNN}, type: FEATURE, title: requirement.statement|truncate(80),
           status: draft, priority: requirement.priority, req_id: requirement.id,
-          file_path: "work-items/features/FEATURE-{NNN}-{slug}/" }
+          file_path: "work-items/features/FEATURE-{NNN}-{slug}/request.md" }
   After all requirements processed:
-    Rebuild work-items/indexes/features.md:
-      Write header: "# Feature Index\n\nAll active feature requests for this project.\n\n| ID | Title | Status | Priority |\n|----|-------|--------|----------|"
-      Append one table row per created feature: "| {FEATURE-NNN} | {title|truncate(60)} | draft | {priority} |"
-      If file previously had existing rows (pre-existing features), preserve them above new rows.
-      If file only contained the placeholder row ("| — | — | — |"), replace entirely.
+    Rebuild work-items/indexes/features.md (idempotent read→merge→write):
+      1. Read existing rows: parse current features.md table → existing_rows[] keyed by FEATURE-NNN ID
+         (treat file as empty if absent, blank, or contains only the placeholder row "| — |")
+      2. Build new_rows[] for each feature created in this execution (not skipped ones)
+      3. Merge: union of existing_rows + new_rows, deduplicated by FEATURE-NNN ID, sorted ascending by ID
+      4. Write complete table (replaces entire file):
+           "# Feature Index\n\nAll active feature requests for this project.\n\n| ID | Title | Status | Priority |\n|----|-------|--------|----------|\n"
+           + one row per merged entry: "| {FEATURE-NNN} | {title|truncate(60)} | {status} | {priority} |"
   Output: feature_folders[] (paths of created folders), feature_count (integer)
 ```
 
