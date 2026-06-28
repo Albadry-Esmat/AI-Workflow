@@ -1,8 +1,8 @@
 ---
 name: work-item-exporter
-version: 1.0.0
+version: 1.1.0
 domain: integration
-description: 'Use when work items need to be exported to an external platform or file. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs". One-way outbound export only — no status read-back from external platforms.'
+description: 'Use when work items need to be exported to an external platform or file. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs". One-way outbound export only — no status read-back from external platforms. FEATURE work items are mapped to Jira Epics automatically.'
 author: system
 ---
 
@@ -87,16 +87,28 @@ Step 3 — PII scrubbing
 
 Step 4 — Build Jira Bulk Import JSON (if "jira" in export_formats)
   For each scrubbed_item:
-    Map fields per docs/work-item-foundation.md Jira Field Mapping table:
-      summary ← title
-      issuetype ← jira_issue_type (from front matter)
-      priority ← jira_priority (from front matter)
+    Determine Jira issue type:
+      IF work_item_type == "FEATURE":
+        issuetype ← "Epic"
+        epic_name ← title (truncated to 255 chars)
+        customfield_10011 ← epic_name   (Epic Name field — Jira Cloud classic)
+        parent field MUST be omitted (Epics cannot be sub-tasks in Jira)
+        IF parent_id is set on the FEATURE item:
+          Emit `warning` feedback: "FEATURE {id} has parent_id set but Epics cannot have parents in Jira — parent field omitted"
+      ELSE:
+        Map fields per docs/work-item-foundation.md Jira Field Mapping table:
+          issuetype ← jira_issue_type (from front matter)
+          parent    ← parent_id (if non-null; links TASK/BUG to its FEATURE Epic by externalId)
+
+    Common field mapping (all types):
+      summary   ← title
+      priority  ← jira_priority (from front matter)
       description ← body description section (markdown)
-      labels ← jira_labels[] (from front matter)
+      labels    ← jira_labels[] (from front matter)
       components ← jira_components[] (from front matter)
       externalId ← id (for deduplication on re-import)
-      parent ← parent_id (if non-null)
       issuelinks ← linked_items[] mapped to Jira link type names
+
     Build Jira Bulk Import envelope:
       {
         "projects": [{
@@ -238,6 +250,9 @@ Step 8 — Assemble output
 - [ ] PII scrubbing ran before any file write
 - [ ] Jira export conforms to Bulk Import JSON envelope format (`projects[].issues[]`)
 - [ ] All items have `externalId` set to their work item ID
+- [ ] **FEATURE items mapped to `issuetype: Epic` with `customfield_10011` (Epic Name) set**
+- [ ] **FEATURE items have no `parent` field in Jira export (Epics cannot be sub-tasks)**
+- [ ] **TASK/BUG items with `parent_id` pointing to a FEATURE use the FEATURE's `externalId` as `parent`**
 - [ ] Parent-child relationships preserved in Jira export (`parent` field for sub-tasks)
 - [ ] `strip_internal_fields=true` removes `created_by_skill`, `file_path`, `last_updated_by_skill`
 - [ ] Manifest written with correct item count and type breakdown
@@ -254,6 +269,8 @@ Step 8 — Assemble output
 | PII pattern found in content | Redact in-memory (do not modify source `.md` file), emit `warning` feedback, write export with redacted content. |
 | `exports/` directory missing | Create directory, continue. |
 | Jira format version incompatibility | Fall back to JSONL-only export, emit `warning` with note to update Jira field mapping. |
+| `FEATURE` item has `parent_id` set | Omit `parent` field from Jira export, emit `warning` feedback: "FEATURE {id} has parent_id set but Epics cannot have parents in Jira — parent field omitted". |
+| `FEATURE` item missing `title` (Epic Name) | Emit `warning`, use `id` as Epic Name fallback, continue export. |
 
 ## 12. Human-in-the-Loop Gates
 

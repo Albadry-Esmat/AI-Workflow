@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-version: 1.1.0
+version: 1.2.0
 domain: meta
 description: 'Use ONLY when creating, refactoring, splitting, validating, or evolving a skill in the skill system. Triggers on: "create a new skill", "add a skill", "refactor this skill", "split this skill", "validate this skill", "evolve the skill", "skill authoring". Do NOT use for general code tasks.'
 author: system
@@ -416,6 +416,7 @@ Step 10 — Generate activation tests
 | New domain introduced | `operation` is `new` AND domain does not exist in current index | 300s | Pause after step 3; present boundary analysis for approval before generating artifacts |
 | Overlap detected | An existing skill partially covers the same scope | 300s | Present overlap report, request decision: extend / merge / differentiate |
 | Split operation | `split` would produce > 3 child skills | 300s | Present decomposition plan for approval before generating each child |
+| Quality score below threshold | `quality_score.total < 60` after scoring step | 300s | Invoke `quality-scoring` skill, present 7-dimension breakdown to user, **block registration** until score ≥ 60 OR user explicitly overrides with justification. If override: emit `warning` feedback with override reason and set `quality_override: true` in output. |
 
 ## 13. Skill Composition
 
@@ -433,6 +434,17 @@ composes:
     output_map:
       skill_md_content: "updated_skill_md"
       validation_report: "evolution_validation"
+  - skill: quality-scoring
+    version: "^1.0.0"
+    role: quality_gate
+    trigger: "quality_score.total < 60"
+    input_map:
+      skill_md_content: "draft_skill_md"
+      skill_id: "proposed_skill_id"
+    output_map:
+      score: "quality_score"
+      recommendations: "quality_recommendations"
+    note: "Invoked automatically when draft score is below threshold. Blocks registration until score >= 60 or human overrides."
   - skill: doc-maintainer
     version: "^1.1.0"
     input_map:

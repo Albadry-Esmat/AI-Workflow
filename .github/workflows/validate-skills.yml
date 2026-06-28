@@ -6,11 +6,13 @@ on:
       - "skills/**"
       - ".opencode/skills/**"
       - "opencode.json"
+      - "docs/**"
   pull_request:
     paths:
       - "skills/**"
       - ".opencode/skills/**"
       - "opencode.json"
+      - "docs/**"
 
 jobs:
   validate:
@@ -206,3 +208,56 @@ jobs:
       - name: Summary
         if: always()
         run: echo "=== Skill validation complete ==="
+
+  docs-link-check:
+    name: Docs Broken-Link Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check internal Markdown links in docs/
+        run: |
+          python3 - <<'PYEOF'
+          import re, sys
+          from pathlib import Path
+
+          ROOT = Path(".")
+          DOCS_DIR = ROOT / "docs"
+          broken = []
+
+          md_files = list(DOCS_DIR.rglob("*.md")) + list(ROOT.glob("*.md"))
+
+          # Match [text](path) links — skip http/https/mailto/anchors-only
+          link_re = re.compile(r'\[([^\]]*)\]\(([^)]+)\)')
+
+          for md_file in md_files:
+              content = md_file.read_text(errors="replace")
+              for m in link_re.finditer(content):
+                  raw_target = m.group(2).strip()
+                  # Skip external URLs and anchor-only refs
+                  if raw_target.startswith(("http://", "https://", "mailto:", "#")):
+                      continue
+                  # Strip inline anchor from path
+                  path_part = raw_target.split("#")[0]
+                  if not path_part:
+                      continue
+                  target = (md_file.parent / path_part).resolve()
+                  if not target.exists():
+                      rel_source = md_file.relative_to(ROOT)
+                      broken.append(f"  FAIL: {rel_source} → {raw_target}")
+
+          if broken:
+              print("=== Broken internal links in docs/ ===")
+              for b in broken:
+                  print(b)
+              sys.exit(1)
+          else:
+              print(f"  PASS: All internal Markdown links resolve ({len(md_files)} files checked)")
+          PYEOF
