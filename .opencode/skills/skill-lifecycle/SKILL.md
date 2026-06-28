@@ -1,5 +1,6 @@
 ---
 name: skill-lifecycle
+version: 1.0.0
 description: 'Use when checking or advancing a skill through its lifecycle stages — from draft to active to deprecated to retired. Triggers on: "skill lifecycle", "what stage is this skill", "retire this skill", "deprecate skill", "promote skill to active", "skill status".'
 ---
 

@@ -166,6 +166,43 @@ jobs:
           fi
           echo "  PASS: Node counts match ($GRAPH_NODES)"
 
+      - name: Check index.yaml version matches SKILL.md frontmatter version
+        run: |
+          echo "=== Checking index.yaml version vs SKILL.md frontmatter ==="
+          pip install -q pyyaml 2>/dev/null || true
+          python3 - <<'PYEOF'
+          import re, sys
+
+          with open("skills/index.yaml") as f:
+              raw = f.read()
+
+          blocks = raw.split("\n- id:")
+          mismatches = []
+
+          for block in blocks[1:]:
+              skill_match   = re.search(r'executable_skill:\s*(.+)', block)
+              version_match = re.search(r'(?m)^  version:\s*(.+)', block)
+              if not skill_match or not version_match:
+                  continue
+              skill_path = skill_match.group(1).strip()
+              idx_ver    = version_match.group(1).strip()
+              try:
+                  with open(skill_path) as sf:
+                      content = sf.read()
+                  m = re.search(r'^version:\s*(.+)$', content, re.MULTILINE)
+                  skill_ver = m.group(1).strip().strip('"\'') if m else "MISSING"
+              except FileNotFoundError:
+                  skill_ver = "FILE_NOT_FOUND"
+              if idx_ver != skill_ver:
+                  mismatches.append(f"  FAIL: {skill_path}  index.yaml={idx_ver}  SKILL.md={skill_ver}")
+              else:
+                  print(f"  PASS: {skill_path}  ({idx_ver})")
+
+          for m_line in mismatches:
+              print(m_line)
+          sys.exit(1 if mismatches else 0)
+          PYEOF
+
       - name: Summary
         if: always()
         run: echo "=== Skill validation complete ==="

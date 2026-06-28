@@ -1,5 +1,6 @@
 ---
 name: quality-scoring
+version: 1.0.0
 description: 'Use when evaluating or scoring a skill before registering it. Triggers on: "score this skill", "evaluate skill quality", "is this skill good enough", "quality check", "can I register this skill", "skill quality score".'
 ---
 

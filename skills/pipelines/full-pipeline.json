@@ -47,7 +47,7 @@
       "id": "phase-4-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^2.1.0", "max_retries": 2}
+        { "name": "feature-planning", "version": "^2.2.0", "max_retries": 2}
       ]
     },
     {

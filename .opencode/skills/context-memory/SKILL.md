@@ -1,5 +1,6 @@
 ---
 name: context-memory
+version: 1.0.0
 description: 'Use when managing session state, persisting context between turns, or preventing state bleed across executions in multi-turn skill orchestration. Triggers on: "remember this", "persist context", "restore session", "state management", "multi-turn".'
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: feature-planning
-version: 2.1.1
+version: 2.2.0
 domain: planning
 description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
@@ -430,7 +430,7 @@ Step 7c — Feature folder materialization (always-on)
 |------|---------|---------|----------|
 | Roadmap approval | Total story points > 100 OR milestone count > 4 OR any task has `confidence: low` | 3600s | Pause, present task summary and critical path for stakeholder approval |
 
-- Gate presents: phase count, total complexity, critical path, risks.
+- Gate presents: phase count, total complexity, critical path, risks, **feature folders created** (`feature_folders[]` with path and work-item type for each entry).
 - If rejected: revise scope, re-run from Step 1.
 
 ## 13. Skill Composition
@@ -440,7 +440,7 @@ Step 7c — Feature folder materialization (always-on)
 ```yaml
   composes:
   - skill: feature-planning
-    version: "^2.1.0"
+    version: "^2.2.0"
     input_map: { "modules": "architecture_modules", "requirements": "requirements", "companion_generation": "companion_generation" }
     output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones", "companion_tasks": "companion_tasks", "work_item_summary": "work_item_summary", "feature_folders": "feature_folders", "feature_count": "feature_count" }
   - skill: state-manager

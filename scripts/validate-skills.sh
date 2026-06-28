@@ -240,7 +240,53 @@ else
   echo "  SKIP: node not found"
 fi
 
-# ─── Summary ──────────────────────────────────────────────────────────────────
+# ─── 9. index.yaml version vs SKILL.md frontmatter consistency ────────────────
+header "index.yaml version vs SKILL.md frontmatter consistency"
+if command -v python3 &>/dev/null; then
+  python3 - <<'PYEOF' && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+import re, sys
+
+index_path = "skills/index.yaml"
+
+# Minimal YAML parser: extract (executable_skill, version) pairs
+with open(index_path) as f:
+    raw = f.read()
+
+blocks = raw.split("\n- id:")
+mismatches = []
+passes = []
+
+for block in blocks[1:]:          # skip everything before first entry
+    skill_match  = re.search(r'executable_skill:\s*(.+)', block)
+    version_match = re.search(r'(?m)^  version:\s*(.+)', block)
+    if not skill_match or not version_match:
+        continue
+    skill_path = skill_match.group(1).strip()
+    idx_ver    = version_match.group(1).strip()
+    try:
+        with open(skill_path) as sf:
+            content = sf.read()
+        m = re.search(r'^version:\s*(.+)$', content, re.MULTILINE)
+        skill_ver = m.group(1).strip().strip('"\'') if m else "MISSING"
+    except FileNotFoundError:
+        skill_ver = "FILE_NOT_FOUND"
+
+    if idx_ver != skill_ver:
+        mismatches.append(f"  FAIL: {skill_path}  index.yaml={idx_ver}  SKILL.md={skill_ver}")
+    else:
+        passes.append(skill_path)
+
+for p in passes:
+    print(f"  PASS: {p}")
+for m in mismatches:
+    print(m)
+
+if mismatches:
+    sys.exit(1)
+PYEOF
+else
+  echo "  SKIP: python3 not found"
+fi
 echo
 echo "════════════════════════════════════════"
 echo "  Results: $PASS passed, $FAIL failed"
