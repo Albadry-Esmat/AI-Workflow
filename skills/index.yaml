@@ -1638,8 +1638,8 @@ skills:
     scope or task graph.
 - id: SKL-057
   name: Work Item Exporter
-  short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — one-way outbound
-    export, async, runs at pipeline completion or on demand
+  short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — supports
+    bidirectional sync (pull Jira status back to local work items via HITL-gated proposals)
   reference_path: docs/work-item-foundation.md
   reference_sections:
   - '## 2. Jira-Compatible Base Schema'
@@ -1654,7 +1654,7 @@ skills:
   - outbound
   - jsonl
   - markdown
-  version: 1.1.0
+  version: 2.0.0
   depends_on:
   - SKL-021
   - SKL-055

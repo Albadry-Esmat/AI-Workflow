@@ -1,21 +1,28 @@
 ---
 name: work-item-exporter
-version: 1.1.0
+version: 2.0.0
 domain: integration
-description: 'Use when work items need to be exported to an external platform or file. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs". One-way outbound export only — no status read-back from external platforms. FEATURE work items are mapped to Jira Epics automatically.'
+description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync". Supports two modes: export (one-way outbound, default) and sync (bidirectional — reads Jira status back and proposes local updates via HITL gate). FEATURE work items are mapped to Jira Epics automatically.'
 author: system
 ---
 
 ## Purpose
 
-Transform all tracked work items from the internal `work-items/` store into export-ready formats for external work management platforms. The primary output is a **Jira Bulk Import JSON** file that can be imported directly into any Jira project without additional transformation. Secondary outputs are JSON Lines (universal machine-readable fallback) and a Markdown summary table (human-readable). Export is one-way (outbound only) and non-blocking — it runs as an async final step at pipeline completion or on demand. The exported files are written to the `exports/` directory with a timestamp and session suffix.
+Transform all tracked work items from the internal `work-items/` store into export-ready formats for external work management platforms, and optionally pull status updates back from Jira into local work item files. The skill operates in two modes:
+
+- **`export` mode (default):** One-way outbound. Produces a Jira Bulk Import JSON file, JSON Lines, and Markdown summary. Async and non-blocking.
+- **`sync` mode:** Bidirectional. After export, fetches the current status of each exported issue from the Jira REST API, diffs against local `lifecycle_state`, and proposes state updates for human approval via HITL gate. No local file is modified without explicit human approval.
 
 ## Inputs
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `mode` | `string` | No | Operation mode: `"export"` (default) or `"sync"`. Sync mode requires `jira_base_url` and `jira_api_token_env`. |
 | `export_formats` | `array[string]` | No | Formats to generate. Default: `["jira", "jsonl", "markdown"]` |
-| `jira_project_key` | `string` | No | Jira project key for the export (e.g. `PROJ`). Included in manifest; not required for file generation. |
+| `jira_project_key` | `string` | No (required in sync mode) | Jira project key for the export (e.g. `PROJ`). Included in manifest; required for sync API calls. |
+| `jira_base_url` | `string` | Sync only | Base URL of the Jira instance (e.g. `https://myorg.atlassian.net`). Required when `mode=sync`. |
+| `jira_api_token_env` | `string` | Sync only | Name of the environment variable holding the Jira API token (e.g. `JIRA_API_TOKEN`). The token value is NEVER inlined in input — only the env var name is passed. |
+| `jira_user_email` | `string` | Sync only | Email of the Jira user whose API token is used for authentication. |
 | `filter` | `object` | No | Filtering options. Default: export all items. |
 | `filter.types` | `array[string]` | No | Work item types to include. Default: all types. |
 | `filter.statuses` | `array[string]` | No | Lifecycle statuses to include. Default: all statuses. |
@@ -30,12 +37,20 @@ Transform all tracked work items from the internal `work-items/` store into expo
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["export", "sync"],
+      "default": "export"
+    },
     "export_formats": {
       "type": "array",
       "items": { "type": "string", "enum": ["jira", "jsonl", "markdown"] },
       "default": ["jira", "jsonl", "markdown"]
     },
     "jira_project_key": { "type": "string", "pattern": "^[A-Z]{2,10}$" },
+    "jira_base_url": { "type": "string", "format": "uri" },
+    "jira_api_token_env": { "type": "string", "description": "Env var NAME only — not the token value" },
+    "jira_user_email": { "type": "string", "format": "email" },
     "filter": {
       "type": "object",
       "properties": {
@@ -46,7 +61,9 @@ Transform all tracked work items from the internal `work-items/` store into expo
       }
     },
     "strip_internal_fields": { "type": "boolean", "default": true }
-  }
+  },
+  "if": { "properties": { "mode": { "const": "sync" } }, "required": ["mode"] },
+  "then": { "required": ["jira_base_url", "jira_api_token_env", "jira_user_email", "jira_project_key"] }
 }
 ```
 
@@ -56,6 +73,7 @@ Transform all tracked work items from the internal `work-items/` store into expo
 - `work-items/{TYPE}-{NNNN}.md` files: full detail for each item (read per item as needed).
 - `session_id` from state: included in export file naming and manifest.
 - Foundation schema from `docs/work-item-foundation.md` §2: Jira field mapping table used for format transformation.
+- *(sync mode only)* Jira REST API access: base URL + credentials from environment variable named by `jira_api_token_env`. Credentials are read from the environment at runtime and are NEVER written to state, logs, or export files.
 
 ## Execution Logic
 
@@ -151,9 +169,62 @@ Step 7 — Write export manifest
   Write to: exports/{date}_{session_prefix}_manifest.json
   Output: manifest
 
-Step 8 — Assemble output
+Step 8 — Assemble output (export mode)
   Emit event: file.written (for each export file produced)
   Return output.
+
+Step 9 — Fetch Jira issue statuses (sync mode only; skip entirely if mode=export)
+  Validate sync inputs: jira_base_url, jira_api_token_env, jira_user_email, jira_project_key all present.
+  Read API token: token = os.environ[jira_api_token_env]
+    IF env var is absent or empty: emit `warning` feedback, set sync_report.status="credential_error", return early.
+  For each item in filtered_items[]:
+    Call: GET {jira_base_url}/rest/api/3/issue/{jira_project_key}-{item.id}?fields=status,resolution,assignee
+    On HTTP 200: store { jira_key, jira_status: response.fields.status.name, jira_resolution: response.fields.resolution?.name }
+    On HTTP 404: mark item as jira_status="NOT_FOUND" (not yet imported)
+    On HTTP 401/403: emit `warning` feedback "Jira auth failed", abort sync, return partial output.
+    On other errors: emit `warning`, skip item, continue.
+  NEVER log or persist the API token value.
+  Output: jira_statuses[] (map of item_id → jira_status)
+
+Step 10 — Diff Jira statuses vs local lifecycle_state (sync mode only)
+  Define Jira→local status mapping:
+    "To Do"       → "open"
+    "In Progress" → "in_progress"
+    "Done"        → "done"
+    "Closed"      → "done"
+    "Won't Do"    → "cancelled"
+    (unmapped)    → null (no proposal made)
+  For each item with a known jira_status:
+    mapped_local = jira_to_local_map[jira_status]
+    IF mapped_local is null: skip (no proposal)
+    IF mapped_local == item.lifecycle_state: no change needed
+    IF mapped_local != item.lifecycle_state:
+      Add to proposed_updates[]: { item_id, file_path, current_state: item.lifecycle_state, proposed_state: mapped_local, jira_status, jira_key }
+  Output: proposed_updates[]
+
+Step 11 — HITL gate: present proposed updates for human approval (sync mode only)
+  IF proposed_updates[] is empty:
+    Set sync_report.status = "in_sync" — no changes needed. Skip gate. Return.
+  Present to human:
+    - Total proposed updates count
+    - Table: Item ID | Current local state | Jira status | Proposed local state
+    - Warning: "These changes will modify local work-item .md files."
+  Human choices:
+    "approve all" → apply all proposed_updates
+    "approve subset" → human selects item IDs to apply
+    "reject all" → skip all updates, set sync_report.status="rejected"
+  Gate timeout: 600s. On timeout: skip all updates, emit `warning` feedback.
+
+Step 12 — Apply approved updates (sync mode only)
+  For each approved item in proposed_updates[]:
+    Read work-items/{file_path}
+    Update front matter: lifecycle_state ← proposed_state
+    Append audit_trail entry: { timestamp, action: "sync_from_jira", previous_state: current_state, new_state: proposed_state, jira_key }
+    Write file back.
+    Emit event: file.written (for each updated file)
+  Build sync_report:
+    { status: "applied", proposed: N, approved: N, applied: N, skipped: N, items: proposed_updates[] with applied flag }
+  Output: sync_report
 ```
 
 ## Outputs
@@ -165,8 +236,9 @@ Step 8 — Assemble output
 | `items_exported` | `integer` | Total work items included in the export |
 | `type_breakdown` | `object` | Count per work item type |
 | `manifest` | `object` | Full export manifest object |
+| `sync_report` | `object` \| `null` | Sync mode only. `{ status, proposed, approved, applied, skipped, items[] }`. `null` in export mode. |
 | `metrics` | `object` | Execution metrics |
-| `feedback` | `array[object]` | Feedback loop entries (warnings for PII redactions, empty work item store, etc.) |
+| `feedback` | `array[object]` | Feedback loop entries (warnings for PII redactions, empty work item store, sync errors, etc.) |
 
 **Output Schema:**
 
@@ -174,7 +246,7 @@ Step 8 — Assemble output
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "metrics", "feedback"],
+  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "metrics", "feedback"],
   "properties": {
     "export_id": { "type": "string" },
     "files_produced": {
@@ -190,6 +262,18 @@ Step 8 — Assemble output
     "items_exported": { "type": "integer", "minimum": 0 },
     "type_breakdown": { "type": "object", "additionalProperties": { "type": "integer" } },
     "manifest": { "type": "object" },
+    "sync_report": {
+      "type": ["object", "null"],
+      "description": "null in export mode; populated in sync mode",
+      "properties": {
+        "status":   { "type": "string", "enum": ["in_sync", "applied", "rejected", "credential_error", "partial"] },
+        "proposed": { "type": "integer" },
+        "approved": { "type": "integer" },
+        "applied":  { "type": "integer" },
+        "skipped":  { "type": "integer" },
+        "items":    { "type": "array", "items": { "type": "object" } }
+      }
+    },
     "metrics": {
       "type": "object",
       "required": ["tokens_in", "tokens_out", "duration_ms", "items_produced", "version"],
@@ -221,8 +305,8 @@ Step 8 — Assemble output
 
 ## Rules & Constraints
 
-- Export is **one-way (outbound) only**. work-item-exporter MUST NOT read status back from Jira or any external platform. There is no sync path.
-- Export is **non-blocking and async**. It runs at pipeline completion (parallel with doc-maintainer) and MUST NOT gate any preceding pipeline phase.
+- **Export mode** is one-way (outbound only) and **non-blocking and async**. It runs at pipeline completion (parallel with doc-maintainer) and MUST NOT gate any preceding pipeline phase.
+- **Sync mode** is bidirectional but **always HITL-gated**. No local `.md` file may be modified without explicit human approval of the proposed update set (Step 11). Sync mode runs on-demand only — it MUST NOT be triggered automatically without user intent.
 - PII scrubbing (Step 3) is **mandatory** and MUST run before any export file is written. No raw personal data may appear in exported files.
 - `exports/` directory is created if absent.
 - Export files are **idempotent**: re-exporting the same state produces the same file content (modulo timestamps in the manifest).
@@ -237,6 +321,7 @@ Step 8 — Assemble output
 - Jira export files may be uploaded to external systems. Never include: API credentials, internal service URLs, session tokens, or infrastructure details.
 - The `exports/` directory is a project artifact visible in git. Sensitive defect descriptions (security vulnerabilities) should be flagged for human review before export commit.
 - If a work item was tagged with `jira_labels: ["security"]` (from security-review defects), emit a `warning` feedback entry: "Security defect {id} is included in export — verify disclosure appropriateness before uploading to Jira."
+- **Sync mode credentials:** The Jira API token is read from the environment variable named by `jira_api_token_env` at runtime. The token value MUST NEVER appear in: skill inputs, state, logs, feedback entries, export files, or audit trail entries. Only the env var name is ever stored or logged.
 
 ## Token Optimization
 
@@ -259,6 +344,10 @@ Step 8 — Assemble output
 - [ ] `exports/` directory created if absent
 - [ ] Empty item store handled gracefully (manifest only, no empty files)
 - [ ] Security-sourced items flagged in feedback if present
+- [ ] *(sync mode)* API token read from environment — never from input value, never logged
+- [ ] *(sync mode)* No local `.md` file modified without passing HITL gate (Step 11)
+- [ ] *(sync mode)* `sync_report` populated with accurate proposed/approved/applied/skipped counts
+- [ ] *(sync mode)* Audit trail entry appended to each updated work item file
 
 ## Failure Scenarios
 
@@ -271,10 +360,19 @@ Step 8 — Assemble output
 | Jira format version incompatibility | Fall back to JSONL-only export, emit `warning` with note to update Jira field mapping. |
 | `FEATURE` item has `parent_id` set | Omit `parent` field from Jira export, emit `warning` feedback: "FEATURE {id} has parent_id set but Epics cannot have parents in Jira — parent field omitted". |
 | `FEATURE` item missing `title` (Epic Name) | Emit `warning`, use `id` as Epic Name fallback, continue export. |
+| Sync mode: `jira_api_token_env` env var absent or empty | Set sync_report.status="credential_error", emit `warning`, skip sync steps, return export-only output. |
+| Sync mode: Jira HTTP 401/403 | Abort sync, emit `warning` "Jira auth failed — check {jira_api_token_env}", return export-only output. |
+| Sync mode: Jira HTTP 404 for an item | Mark item as jira_status="NOT_FOUND" (not yet imported), exclude from proposed_updates. |
+| Sync mode: HITL gate timeout (600s) | Skip all updates, set sync_report.status="rejected", emit `warning` "Sync gate timed out — no local files modified". |
+| Sync mode: human rejects all proposals | Set sync_report.status="rejected", emit `info` feedback, return without modifying any files. |
 
 ## 12. Human-in-the-Loop Gates
 
-No HITL gates. work-item-exporter is fully automated and non-blocking.
+| Gate | Trigger | Timeout | Behavior |
+|------|---------|---------|----------|
+| Sync approval | `mode=sync` AND `proposed_updates[]` is non-empty | 600s | Present diff table (Item ID, current state, Jira status, proposed state). Human approves all, subset, or rejects. No file written without approval. |
+
+No HITL gates in export mode. work-item-exporter export mode is fully automated and non-blocking.
 
 Exception: if a security-sourced defect (`jira_labels` includes `"security"`) is included in the export, emit a `warning` feedback entry requesting human review before the export file is shared externally. This is advisory, not a blocking gate.
 
