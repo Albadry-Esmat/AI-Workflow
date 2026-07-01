@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.4.0
+version: 1.5.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -18,6 +18,8 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `initial_payload` | `object` | Yes | Raw input for the first skill in the pipeline |
 | `session_context` | `object` | No | Persisted context from prior orchestration runs |
 | `resume_from` | `string` | No | Skill ID to resume from after a HITL gate or failure |
+| `resume_from_phase` | `string` | No | Phase ID to resume from — all prior phases skipped, outputs loaded from checkpoint (TASK-0056) |
+| `memoization_enabled` | `boolean` | No | Default `true`. Set `false` to disable invocation cache (TASK-0057) |
 
 **Pipeline Config Schema:**
 
@@ -165,6 +167,19 @@ Step 2 — Load session context
   If resume_from is provided: load session_context from `.opencode/state/sessions/<session_id>.json`.
   Hydrate state: prior skill outputs, user decisions, gate approvals.
   After hydration, update `last_session.txt` with the current session_id.
+
+  [TASK-0056] If resume_from_phase is provided:
+    Validate that (session_id, phase_checkpoint_id) match a persisted checkpoint.
+    Load session_context from the checkpoint; skip all phases prior to resume_from_phase.
+    Prior-phase outputs are pre-populated from checkpoint state — the orchestrator MUST NOT
+    re-invoke any skill whose phase_id precedes resume_from_phase.
+    Log resume event: { event_type: "pipeline.resumed", from_phase: resume_from_phase, session_id }.
+    If checkpoint not found → reject with {"error": "CHECKPOINT_NOT_FOUND"}.
+
+  [TASK-0058] Initialize async_task_registry in session_context if not present:
+    session_context.async_task_registry = []
+    This registry tracks all async skill invocations dispatched in this session.
+
   Output: hydrated context
 
 Step 3 — Execute skills (mode-dependent)
@@ -180,7 +195,32 @@ Step 3 — Execute skills (mode-dependent)
          iv) Always exclude from handoff: metrics{}, feedback[] (route to telemetry instead).
          v)  Record projected token_count in session_context event_log for observability.
          Expected reduction: 40–60% per inter-skill handoff vs. full output passthrough.
-    c) Invoke skill
+    b2) [TASK-0055] Lazy SKILL.md section loading:
+         Load ONLY mandatory core sections for each skill invocation by default:
+           Purpose, Inputs, Input Schema, Required Context, Execution Logic,
+           Outputs, Output Schema, Rules & Constraints.
+         Conditionally load additional sections:
+           Security Considerations → if skill has security_sensitive: true in registry
+           Failure Scenarios       → if retry_count > 0 for this invocation
+           HITL Gates              → only when evaluating HITL conditions for this skill
+           Quality Checklist       → only during post-execution validation pass
+           Token Optimization      → only on first invocation of a skill in a session
+           Skill Composition       → never loaded at runtime (design-time only)
+         On first invocation of any skill in a session: load all sections once (full load)
+         to populate session_context.skill_sections_cache. Subsequent invocations use cache.
+    c) [TASK-0057] Check invocation memoization cache before invoking:
+         Compute input_hash = SHA-256(canonical JSON of projected input payload).
+         Look up invocation_cache["{skill_name}:{input_hash}"].
+         If CACHE_HIT:
+           Return cached output. Increment cache_entry.hit_count. Log CACHE_HIT event.
+           Skip steps c1–c4.
+         If CACHE_MISS: proceed with invocation.
+         Cache invalidation: if any session_context field declared in the skill's
+           Required Context section has changed since the cache entry was written,
+           invalidate that entry before lookup.
+         Cache capacity: 50 entries. LRU eviction on overflow.
+    c1) Invoke skill
+    c2) Store result in invocation_cache["{skill_name}:{input_hash}"] with invoked_at timestamp.
     d) Validate output against skill's output schema (via schema-validator)
     e) If validation fails AND retries remain → re-invoke with corrected input
     f) If validation fails AND no retries → emit error, pause pipeline
@@ -201,6 +241,11 @@ Step 3 — Execute skills (mode-dependent)
            Record session_context[skill_N].compressed = true, compression_ratio.
          This enforces the "keep last 3 skill outputs at full size" retention policy
          from context-engineering.md and prevents state bloat in late pipeline phases.
+    j) [TASK-0058] If skill has async: true:
+         Register in async_task_registry:
+           { task_id: UUID, skill: skill_name, started_at: <now>,
+             status: "running", result_ref: null, error: null }
+         Do NOT wait for completion. Pipeline advances immediately.
   Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
     writes from each group MUST be serialized (one at a time, mutex-locked). Concurrent
     skill execution is allowed; concurrent writes to session_context are not.
@@ -236,6 +281,21 @@ Step 7 — Assemble final result + session summary
     Run: graphify update . (AST-only, no API cost) to keep the knowledge graph current.
     Append session summary entry to `.opencode/state/session_summaries.jsonl`:
       { session_id, pipeline_template, skills_run, outcome, timestamp, key_decisions[] }
+
+  [TASK-0058] Reconcile async_task_registry:
+    For each entry in async_task_registry with status="running":
+      Attempt to retrieve result from skill invocation handle.
+      If completed: update status="completed", result_ref, completed_at.
+      If failed:    update status="failed", error. Surface in pipeline_result.failed_async_tasks[].
+      If still running: leave status="running"; surface in pipeline_result.pending_async_tasks[].
+    All async task outcomes are non-blocking — the pipeline result is returned regardless.
+
+  [TASK-0056] Write phase checkpoints for resume_from_phase:
+    After each HITL gate is approved, write a checkpoint to session state:
+      { checkpoint_id: UUID, phase_id: <current_phase>, session_id,
+        approved_at: <now>, state_keys: [list of populated state keys] }
+    Checkpoints enable resume_from_phase in subsequent orchestrator invocations.
+
   Output: complete pipeline result
 ```
 

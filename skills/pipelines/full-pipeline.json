@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.0.0",
-  "description": "Full idea-to-production pipeline (v3.0.0): requirements \u2192 architecture + UX/DB design \u2192 design system \u2192 dependency graph \u2192 impact analysis \u2192 code generation \u2192 guard layer \u2192 quality + testing \u2192 completeness audit \u2192 defect management (conditional) \u2192 deployment \u2192 export + docs",
+  "version": "3.1.0",
+  "description": "Full idea-to-production pipeline (v3.1.0): requirements → architecture + UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -51,20 +51,16 @@
       ]
     },
     {
-      "id": "phase-2c-design-system",
-      "label": "Design System Generation",
+      "id": "phase-2c-design-and-graph",
+      "label": "Design System + Dependency Graph",
+      "parallel": true,
+      "note": "TASK-0054: design-system-generator and dependency-analyzer have no data dependency on each other — run concurrently to save one sequential phase.",
       "skills": [
         {
           "name": "design-system-generator",
           "version": "^2.0.0",
           "max_retries": 2
-        }
-      ]
-    },
-    {
-      "id": "phase-3-graph",
-      "label": "Dependency Graph",
-      "skills": [
+        },
         {
           "name": "dependency-analyzer",
           "version": "^1.0.0",
@@ -263,6 +259,10 @@
       "database-architect"
     ],
     [
+      "design-system-generator",
+      "dependency-analyzer"
+    ],
+    [
       "clean-code-review",
       "testing-strategy",
       "security-review",
@@ -296,9 +296,9 @@
       "timeout": 3600
     },
     {
-      "after_phase": "phase-2c-design-system",
+      "after_phase": "phase-2c-design-and-graph",
       "type": "human_approval",
-      "label": "Approve design system token files and component stubs before planning",
+      "label": "Approve design system token files and dependency graph before planning",
       "timeout": 3600
     },
     {

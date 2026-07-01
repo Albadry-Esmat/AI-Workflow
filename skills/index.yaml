@@ -265,7 +265,7 @@ skills:
   - meta-skill
   - retry
   - feedback-loop
-  version: 1.4.0
+  version: 1.5.0
   depends_on:
   - SKL-001
   - SKL-002
