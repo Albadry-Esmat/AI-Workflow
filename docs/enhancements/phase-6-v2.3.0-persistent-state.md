@@ -29,10 +29,10 @@ manual invocation.
 
 | ID | Title | SP | Status |
 |----|-------|----|--------|
-| TASK-0060 | Standardize inter-skill artifact envelope schema | 5 | pending |
-| TASK-0062 | Pipeline snapshot API — named snapshots at HITL gate boundaries | 5 | pending |
-| TASK-0061 | `work-item-exporter` v2.1.0 — webhook trigger mode | 8 | pending |
-| TASK-0059 | `context-memory` v2.0.0 — cross-session archival memory blocks | 13 | pending |
+| TASK-0060 | Standardize inter-skill artifact envelope schema | 5 | complete |
+| TASK-0062 | Pipeline snapshot API — named snapshots at HITL gate boundaries | 5 | complete |
+| TASK-0061 | `work-item-exporter` v2.1.0 — webhook trigger mode | 8 | complete |
+| TASK-0059 | `context-memory` v2.0.0 — cross-session archival memory blocks | 13 | complete |
 
 ---
 

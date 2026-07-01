@@ -262,10 +262,10 @@ skills:
   - pipeline
   - routing
   - hitl
-  - meta-skill
-  - retry
-  - feedback-loop
-  version: 1.5.0
+   - meta-skill
+   - retry
+   - feedback-loop
+   version: 1.6.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -349,10 +349,10 @@ skills:
   - context
   - state
   - persistence
-  - multi-turn
-  - resumption
-  - compression
-  version: 1.0.0
+   - multi-turn
+   - resumption
+   - compression
+   version: 2.0.0
   depends_on: []
   mastery_level: intermediate
   use_when: 'Managing state across multiple pipeline turns, resuming a halted pipeline session, or preventing context bleed
@@ -1651,10 +1651,10 @@ skills:
   - integration
   - work-items
   - async
-  - outbound
-  - jsonl
-  - markdown
-  version: 2.0.0
+   - outbound
+   - jsonl
+   - markdown
+   version: 2.1.0
   depends_on:
   - SKL-021
   - SKL-055

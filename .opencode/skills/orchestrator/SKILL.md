@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.5.0
+version: 1.6.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -20,6 +20,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `resume_from` | `string` | No | Skill ID to resume from after a HITL gate or failure |
 | `resume_from_phase` | `string` | No | Phase ID to resume from — all prior phases skipped, outputs loaded from checkpoint (TASK-0056) |
 | `memoization_enabled` | `boolean` | No | Default `true`. Set `false` to disable invocation cache (TASK-0057) |
+| `restore_from_snapshot` | `string` | No | Snapshot ID (e.g. `snap-phase-4-planning-approved`). Restores all state keys and artifacts from that snapshot, then continues from the phase immediately after the snapshot's `phase_id`. Enables cross-session resume without a live session_context (TASK-0062). |
 
 **Pipeline Config Schema:**
 
@@ -180,6 +181,14 @@ Step 2 — Load session context
     session_context.async_task_registry = []
     This registry tracks all async skill invocations dispatched in this session.
 
+  [TASK-0062] If restore_from_snapshot is provided:
+    Look up snapshot by snapshot_id in `.opencode/state/sessions/<session_id>.json`
+    (the session_id is resolved from `last_session.txt` when not explicitly provided).
+    If found: restore all state_keys and artifact payloads from the snapshot into
+    session_context. Set resume_from_phase = phase immediately after snapshot.phase_id.
+    If not found: reject with {"error": "SNAPSHOT_NOT_FOUND", "snapshot_id": "..."}.
+    Takes precedence over resume_from_phase if both are provided.
+
   Output: hydrated context
 
 Step 3 — Execute skills (mode-dependent)
@@ -206,8 +215,28 @@ Step 3 — Execute skills (mode-dependent)
            Quality Checklist       → only during post-execution validation pass
            Token Optimization      → only on first invocation of a skill in a session
            Skill Composition       → never loaded at runtime (design-time only)
-         On first invocation of any skill in a session: load all sections once (full load)
-         to populate session_context.skill_sections_cache. Subsequent invocations use cache.
+          On first invocation of any skill in a session: load all sections once (full load)
+          to populate session_context.skill_sections_cache. Subsequent invocations use cache.
+     b3) [TASK-0060] Wrap pruned output in Artifact envelope before dispatch:
+          After output-field pruning (step b), wrap the payload in a typed Artifact envelope:
+            {
+              "artifact_id":    "art-<sequence>",
+              "source_skill":   "<producing_skill_name>",
+              "target_skill":   "<consuming_skill_name>",
+              "content_type":   "<skill_output_type>",   // e.g. "architecture_output"
+              "payload":        { ...pruned_output... },
+              "created_at":     "<ISO8601>",
+              "token_count":    <measured_token_count>,  // measured, not estimated
+              "compressed":     false,
+              "schema_version": "1.0.0"
+            }
+          Measure token_count of the payload immediately before wrapping (actual count).
+          Record artifact dispatch in session_context event_log:
+            { id: "evt-N", type: "artifact.dispatched", artifact_id, source_skill,
+              target_skill, token_count, timestamp }
+          The receiving skill's step c1 unpacks the payload from the Artifact envelope
+          before invocation — skills operate on the raw payload, not the envelope.
+          Expected benefit: exact per-transfer token accounting; enables TASK-0066 observability.
     c) [TASK-0057] Check invocation memoization cache before invoking:
          Compute input_hash = SHA-256(canonical JSON of projected input payload).
          Look up invocation_cache["{skill_name}:{input_hash}"].
@@ -264,6 +293,21 @@ Step 5 — Check HITL gates
     Emit approval request: { gate: name, context: summary, artifacts: [...], action_required: "approve"|"reject"|"modify" }
     Wait for response (up to timeout configured in pipeline_config)
     If approved: continue
+        [TASK-0062] Take named snapshot immediately after approval:
+          Write snapshot to session_context.snapshots[]:
+            {
+              "snapshot_id":   "snap-<phase_id>-<gate_decision>",
+              "session_id":    "<session_id>",
+              "phase_id":      "<current_phase>",
+              "gate_decision": "approve",
+              "taken_at":      "<ISO8601>",
+              "state_keys":    [<list of all populated session_context keys at this point>],
+              "artifact_ids":  [<artifact_id of every Artifact dispatched up to this gate>]
+            }
+          Full artifact payloads are stored with the snapshot (not references only).
+          Max 10 snapshots per project; LRU eviction on the 11th with a warning emitted.
+          This durable snapshot enables restore_from_snapshot across session boundaries
+          (TASK-0065 warm-start in Phase 7 builds on this).
     If rejected: halt pipeline, return partial results
     If modified: apply modifications, re-validate, continue
   Output: gate decision log
@@ -308,6 +352,8 @@ Step 7 — Assemble final result + session summary
 | `session_context` | `object` | Serialized context for resumption |
 | `metrics` | `object` | Aggregate pipeline metrics |
 | `gate_decisions` | `array[object]` | All HITL gate outcomes |
+| `snapshots` | `array[object]` | Named snapshots taken at each approved HITL gate (TASK-0062) |
+| `artifact_log` | `array[object]` | Every inter-skill artifact dispatch: `artifact_id`, `source_skill`, `target_skill`, `token_count` (TASK-0060) |
 
 ## Human-in-the-Loop Gates
 

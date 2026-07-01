@@ -1,8 +1,8 @@
 ---
 name: work-item-exporter
-version: 2.0.0
+version: 2.1.0
 domain: integration
-description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync". Supports two modes: export (one-way outbound, default) and sync (bidirectional — reads Jira status back and proposes local updates via HITL gate). FEATURE work items are mapped to Jira Epics automatically.'
+description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items, or when a Jira/GitHub/Linear webhook event needs to trigger an automated sync. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync", "webhook trigger", "Jira webhook", "auto-sync on status change". Supports three modes: export (one-way outbound, default), sync (bidirectional — reads Jira status back and proposes local updates via HITL gate), and webhook (event-driven — validates incoming webhook payload, maps event to a sync or export operation, and dispatches automatically). FEATURE work items are mapped to Jira Epics automatically.'
 author: system
 ---
 
@@ -12,12 +12,13 @@ Transform all tracked work items from the internal `work-items/` store into expo
 
 - **`export` mode (default):** One-way outbound. Produces a Jira Bulk Import JSON file, JSON Lines, and Markdown summary. Async and non-blocking.
 - **`sync` mode:** Bidirectional. After export, fetches the current status of each exported issue from the Jira REST API, diffs against local `lifecycle_state`, and proposes state updates for human approval via HITL gate. No local file is modified without explicit human approval.
+- **`webhook` mode:** Event-driven. Receives a raw webhook payload from Jira, GitHub, or Linear; validates the HMAC signature; maps the event type to an export or sync operation; and dispatches automatically. Deletion events are HITL-gated (no auto-delete).
 
 ## Inputs
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `mode` | `string` | No | Operation mode: `"export"` (default) or `"sync"`. Sync mode requires `jira_base_url` and `jira_api_token_env`. |
+| `mode` | `string` | No | Operation mode: `"export"` (default), `"sync"`, or `"webhook"`. Sync mode requires `jira_base_url` and `jira_api_token_env`. Webhook mode requires `webhook_config` and `payload`. |
 | `export_formats` | `array[string]` | No | Formats to generate. Default: `["jira", "jsonl", "markdown"]` |
 | `jira_project_key` | `string` | No (required in sync mode) | Jira project key for the export (e.g. `PROJ`). Included in manifest; required for sync API calls. |
 | `jira_base_url` | `string` | Sync only | Base URL of the Jira instance (e.g. `https://myorg.atlassian.net`). Required when `mode=sync`. |
@@ -29,6 +30,11 @@ Transform all tracked work items from the internal `work-items/` store into expo
 | `filter.exclude_cancelled` | `boolean` | No | Exclude `cancelled` items from export. Default: `true`. |
 | `filter.date_from` | `string` | No | ISO date — only export items created on or after this date. |
 | `strip_internal_fields` | `boolean` | No | Remove internal system fields (metrics, feedback refs) from export payload. Default: `true`. |
+| `webhook_config` | `object` | Webhook only | Webhook configuration. Required when `mode=webhook`. |
+| `webhook_config.source` | `string` | Webhook only | Webhook source platform: `"jira"`, `"github"`, or `"linear"`. |
+| `webhook_config.event_filter` | `array[string]` | Webhook only | Event types to act on. E.g. `["issue_status_changed", "issue_created", "issue_deleted"]`. Events not in this list are silently ignored. |
+| `webhook_config.secret_env_var` | `string` | Webhook only | Name of the environment variable holding the HMAC webhook secret (e.g. `JIRA_WEBHOOK_SECRET`). The secret value is NEVER inlined — only the env var name is passed. |
+| `payload` | `object` | Webhook only | Raw webhook event payload received from the external platform. |
 
 **Input Schema:**
 
@@ -39,7 +45,7 @@ Transform all tracked work items from the internal `work-items/` store into expo
   "properties": {
     "mode": {
       "type": "string",
-      "enum": ["export", "sync"],
+      "enum": ["export", "sync", "webhook"],
       "default": "export"
     },
     "export_formats": {
@@ -60,10 +66,30 @@ Transform all tracked work items from the internal `work-items/` store into expo
         "date_from":          { "type": "string", "format": "date" }
       }
     },
-    "strip_internal_fields": { "type": "boolean", "default": true }
+    "strip_internal_fields": { "type": "boolean", "default": true },
+    "webhook_config": {
+      "type": "object",
+      "description": "Required when mode=webhook",
+      "properties": {
+        "source":         { "type": "string", "enum": ["jira", "github", "linear"] },
+        "event_filter":   { "type": "array", "items": { "type": "string" } },
+        "secret_env_var": { "type": "string", "description": "Env var NAME only — never the secret value" }
+      },
+      "required": ["source", "event_filter", "secret_env_var"]
+    },
+    "payload": {
+      "type": "object",
+      "description": "Raw webhook event payload. Required when mode=webhook."
+    }
   },
   "if": { "properties": { "mode": { "const": "sync" } }, "required": ["mode"] },
-  "then": { "required": ["jira_base_url", "jira_api_token_env", "jira_user_email", "jira_project_key"] }
+  "then": { "required": ["jira_base_url", "jira_api_token_env", "jira_user_email", "jira_project_key"] },
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "webhook" } }, "required": ["mode"] },
+      "then": { "required": ["webhook_config", "payload"] }
+    }
+  ]
 }
 ```
 
@@ -225,6 +251,55 @@ Step 12 — Apply approved updates (sync mode only)
   Build sync_report:
     { status: "applied", proposed: N, approved: N, applied: N, skipped: N, items: proposed_updates[] with applied flag }
   Output: sync_report
+
+Step 13 — Validate webhook signature (webhook mode only; skip if mode≠webhook)
+  Read HMAC secret: secret = os.environ[webhook_config.secret_env_var]
+    IF env var absent or empty: reject with {"error": "WEBHOOK_SECRET_NOT_CONFIGURED"}.
+  Verify X-Hub-Signature-256 header against HMAC-SHA256(secret, raw payload bytes).
+    IF header absent: reject with {"error": "INVALID_WEBHOOK_SIGNATURE", "reason": "missing_header"}.
+    IF signature mismatch: reject with {"error": "INVALID_WEBHOOK_SIGNATURE", "reason": "signature_mismatch"}.
+  NEVER log the secret value or include it in any output, feedback, or error message.
+  Output: signature_valid=true
+
+Step 14 — Parse webhook event (webhook mode only)
+  Extract from payload: event_type, issue_id, from_status, to_status, timestamp.
+  Normalize event_type per source platform:
+    Jira:   "jira:issue_updated" → "issue_status_changed"; "jira:issue_created" → "issue_created"
+            "jira:issue_deleted" → "issue_deleted"
+    GitHub: "issues.closed" → "issue_status_changed"; "issues.opened" → "issue_created"
+            "issues.deleted" → "issue_deleted"
+    Linear: "Issue.update" → "issue_status_changed"; "Issue.create" → "issue_created"
+            "Issue.remove" → "issue_deleted"
+  Apply event_filter: IF normalized event_type NOT in webhook_config.event_filter:
+    Return {"webhook_accepted": true, "sync_triggered": false, "reason": "event_filtered_out"}.
+  Rate limit check: enforce max 10 webhook invocations per minute per source.
+    IF rate exceeded: queue with backpressure warning; emit `warning` feedback.
+  Output: parsed_event { event_type, issue_id, from_status, to_status, timestamp }
+
+Step 15 — Map event to operation (webhook mode only)
+  event_type = "issue_status_changed":
+    Trigger mode=sync scoped to issue_id. Proceed to Step 16.
+  event_type = "issue_created":
+    IF a local work item with matching externalId/issue_id exists:
+      Trigger mode=export scoped to that item. Proceed to Step 16.
+    ELSE:
+      Return {"webhook_accepted": true, "sync_triggered": false, "reason": "no_local_item_for_created_event"}.
+  event_type = "issue_deleted":
+    DO NOT auto-delete the local work item.
+    Flag in local state: set work item field `jira_deleted_flag: true` (requires HITL approval to act on).
+    Emit `warning` feedback: "Jira issue {issue_id} was deleted. Local work item flagged but NOT deleted — HITL approval required before any local deletion."
+    Raise HITL gate: present deletion event to human for explicit approval.
+    On approval: human decides whether to delete, archive, or retain the local item.
+    On rejection / timeout (600s): retain local item unchanged.
+    Return {"webhook_accepted": true, "sync_triggered": false, "deletion_flagged": true}.
+
+Step 16 — Invoke sync/export operation (webhook mode only)
+  Dispatch the operation determined in Step 15 as an internal skill invocation
+  (same as calling mode=sync or mode=export with scope filter = issue_id).
+  Return:
+    { "webhook_accepted": true, "sync_triggered": true, "scope": issue_id,
+      "operation": "sync" | "export", "dispatch_id": UUID }
+  Output: webhook_response
 ```
 
 ## Outputs
@@ -236,7 +311,8 @@ Step 12 — Apply approved updates (sync mode only)
 | `items_exported` | `integer` | Total work items included in the export |
 | `type_breakdown` | `object` | Count per work item type |
 | `manifest` | `object` | Full export manifest object |
-| `sync_report` | `object` \| `null` | Sync mode only. `{ status, proposed, approved, applied, skipped, items[] }`. `null` in export mode. |
+| `sync_report` | `object` \| `null` | Sync mode only. `{ status, proposed, approved, applied, skipped, items[] }`. `null` in export/webhook mode. |
+| `webhook_response` | `object` \| `null` | Webhook mode only. `{ webhook_accepted, sync_triggered, scope, operation, dispatch_id }`. `null` in export/sync mode. |
 | `metrics` | `object` | Execution metrics |
 | `feedback` | `array[object]` | Feedback loop entries (warnings for PII redactions, empty work item store, sync errors, etc.) |
 
@@ -246,7 +322,7 @@ Step 12 — Apply approved updates (sync mode only)
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "metrics", "feedback"],
+  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "webhook_response", "metrics", "feedback"],
   "properties": {
     "export_id": { "type": "string" },
     "files_produced": {
@@ -264,7 +340,7 @@ Step 12 — Apply approved updates (sync mode only)
     "manifest": { "type": "object" },
     "sync_report": {
       "type": ["object", "null"],
-      "description": "null in export mode; populated in sync mode",
+      "description": "null in export/webhook mode; populated in sync mode",
       "properties": {
         "status":   { "type": "string", "enum": ["in_sync", "applied", "rejected", "credential_error", "partial"] },
         "proposed": { "type": "integer" },
@@ -273,6 +349,20 @@ Step 12 — Apply approved updates (sync mode only)
         "skipped":  { "type": "integer" },
         "items":    { "type": "array", "items": { "type": "object" } }
       }
+    },
+    "webhook_response": {
+      "type": ["object", "null"],
+      "description": "null in export/sync mode; populated in webhook mode",
+      "properties": {
+        "webhook_accepted":  { "type": "boolean" },
+        "sync_triggered":    { "type": "boolean" },
+        "scope":             { "type": ["string", "null"] },
+        "operation":         { "type": "string", "enum": ["sync", "export"] },
+        "dispatch_id":       { "type": "string" },
+        "deletion_flagged":  { "type": "boolean" },
+        "reason":            { "type": "string" }
+      },
+      "required": ["webhook_accepted", "sync_triggered"]
     },
     "metrics": {
       "type": "object",
@@ -307,6 +397,7 @@ Step 12 — Apply approved updates (sync mode only)
 
 - **Export mode** is one-way (outbound only) and **non-blocking and async**. It runs at pipeline completion (parallel with doc-maintainer) and MUST NOT gate any preceding pipeline phase.
 - **Sync mode** is bidirectional but **always HITL-gated**. No local `.md` file may be modified without explicit human approval of the proposed update set (Step 11). Sync mode runs on-demand only — it MUST NOT be triggered automatically without user intent.
+- **Webhook mode** is event-driven and automated for `issue_status_changed` and `issue_created` events. The `issue_deleted` event MUST NEVER auto-delete a local work item — it raises a HITL gate. Rate limit: max 10 invocations per minute per source platform.
 - PII scrubbing (Step 3) is **mandatory** and MUST run before any export file is written. No raw personal data may appear in exported files.
 - `exports/` directory is created if absent.
 - Export files are **idempotent**: re-exporting the same state produces the same file content (modulo timestamps in the manifest).
@@ -322,6 +413,8 @@ Step 12 — Apply approved updates (sync mode only)
 - The `exports/` directory is a project artifact visible in git. Sensitive defect descriptions (security vulnerabilities) should be flagged for human review before export commit.
 - If a work item was tagged with `jira_labels: ["security"]` (from security-review defects), emit a `warning` feedback entry: "Security defect {id} is included in export — verify disclosure appropriateness before uploading to Jira."
 - **Sync mode credentials:** The Jira API token is read from the environment variable named by `jira_api_token_env` at runtime. The token value MUST NEVER appear in: skill inputs, state, logs, feedback entries, export files, or audit trail entries. Only the env var name is ever stored or logged.
+- **Webhook mode credentials:** The HMAC webhook secret is read from the env var named by `webhook_config.secret_env_var` at runtime. The secret value MUST NEVER appear in any output, log, feedback entry, error message, or state. Only the env var name is stored. Any incoming webhook with a missing or invalid HMAC signature MUST be rejected immediately (Step 13) before any payload processing occurs.
+- **Webhook deletion safety:** `issue_deleted` events MUST NOT trigger any local work item deletion — auto-deletion is prohibited. The event only sets a flag and raises a HITL gate. Deletion of local state requires explicit human decision.
 
 ## Token Optimization
 
@@ -348,6 +441,11 @@ Step 12 — Apply approved updates (sync mode only)
 - [ ] *(sync mode)* No local `.md` file modified without passing HITL gate (Step 11)
 - [ ] *(sync mode)* `sync_report` populated with accurate proposed/approved/applied/skipped counts
 - [ ] *(sync mode)* Audit trail entry appended to each updated work item file
+- [ ] *(webhook mode)* HMAC signature validated before any payload processing (Step 13)
+- [ ] *(webhook mode)* Webhook secret read from env var — value never logged or outputted
+- [ ] *(webhook mode)* `issue_deleted` event does NOT auto-delete local work item — HITL gate raised
+- [ ] *(webhook mode)* Rate limit enforced (max 10/min per source)
+- [ ] *(webhook mode)* `webhook_response` populated with accurate `webhook_accepted`, `sync_triggered`, `scope`
 
 ## Failure Scenarios
 
@@ -365,12 +463,18 @@ Step 12 — Apply approved updates (sync mode only)
 | Sync mode: Jira HTTP 404 for an item | Mark item as jira_status="NOT_FOUND" (not yet imported), exclude from proposed_updates. |
 | Sync mode: HITL gate timeout (600s) | Skip all updates, set sync_report.status="rejected", emit `warning` "Sync gate timed out — no local files modified". |
 | Sync mode: human rejects all proposals | Set sync_report.status="rejected", emit `info` feedback, return without modifying any files. |
+| Webhook mode: `secret_env_var` absent or empty | Reject with {"error": "WEBHOOK_SECRET_NOT_CONFIGURED"}. No payload processing occurs. |
+| Webhook mode: HMAC signature missing or invalid | Reject with {"error": "INVALID_WEBHOOK_SIGNATURE"}. No payload processing occurs. |
+| Webhook mode: event_type not in event_filter | Return {"webhook_accepted": true, "sync_triggered": false, "reason": "event_filtered_out"}. No-op. |
+| Webhook mode: rate limit exceeded (>10/min) | Queue event with backpressure warning; emit `warning` feedback. |
+| Webhook mode: `issue_deleted` event | Flag local item, raise HITL gate. Do NOT delete. |
 
 ## 12. Human-in-the-Loop Gates
 
 | Gate | Trigger | Timeout | Behavior |
 |------|---------|---------|----------|
 | Sync approval | `mode=sync` AND `proposed_updates[]` is non-empty | 600s | Present diff table (Item ID, current state, Jira status, proposed state). Human approves all, subset, or rejects. No file written without approval. |
+| Webhook deletion | `mode=webhook` AND `event_type=issue_deleted` | 600s | Present deletion event details. Human decides: delete, archive, or retain local work item. No local deletion without explicit approval. |
 
 No HITL gates in export mode. work-item-exporter export mode is fully automated and non-blocking.
 
@@ -394,6 +498,7 @@ pipeline_entry:
   - pipeline: change-request
     phase: final-export (async)
   - direct_invocation: true (can be called standalone via routing table)
+  - webhook_invocation: true (mode=webhook invoked on incoming Jira/GitHub/Linear events)
 
 event_emissions:
   - event: file.written

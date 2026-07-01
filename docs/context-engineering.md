@@ -1,6 +1,6 @@
 # Context Engineering — Memory & Retrieval
 
-**Version:** 2.2.0 | **Last updated:** 2026-06-18
+**Version:** 2.3.0 | **Last updated:** 2026-07-02
 
 ## Context Model
 
@@ -185,3 +185,235 @@ When budget is exhausted:
 - Changing context compression rules requires updating this file AND `skills/memory/context-protocol.md`.
 - Adding a new context level requires updating the architecture documentation.
 - Token budget changes require updating `skills/memory/context-protocol.md` AND this file.
+
+---
+
+## Artifact Envelope
+
+> Added in v2.3.0 (TASK-0060) — inspired by AgentScope's typed `Msg` schema.
+
+Every inter-skill data transfer is wrapped in a typed `Artifact` envelope. The envelope
+provides measurable, prunable, auditable inter-skill data transfer.
+
+### Schema
+
+```json
+{
+  "artifact_id":    "art-0042",
+  "source_skill":   "architecture-design",
+  "target_skill":   "feature-planning",
+  "content_type":   "architecture_output",
+  "payload":        { "...pruned output..." },
+  "created_at":     "2026-07-02T10:30:00Z",
+  "token_count":    1840,
+  "compressed":     false,
+  "schema_version": "1.0.0"
+}
+```
+
+### Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `artifact_id` | `string` | Unique ID for this artifact transfer (`art-<sequence>`) |
+| `source_skill` | `string` | Skill that produced the payload |
+| `target_skill` | `string` | Skill that will consume the payload |
+| `content_type` | `string` | Semantic type of payload (e.g. `architecture_output`, `requirement_set`) |
+| `payload` | `object` | The pruned output object (Phase 4 TASK-0051 pruning applied before wrapping) |
+| `created_at` | `ISO8601` | Timestamp of envelope creation |
+| `token_count` | `integer` | Measured token count of the payload (not estimated) |
+| `compressed` | `boolean` | `true` if the payload has been compressed by context-compressor |
+| `schema_version` | `string` | Envelope schema version — always `"1.0.0"` for Phase 6 envelopes |
+
+### Lifecycle
+
+```
+[Source skill produces output]
+        │
+        ▼
+[Output-field pruning — Step 3b] (TASK-0051)
+        │
+        ▼
+[Wrap in Artifact envelope — Step 3b3] (TASK-0060)
+        │  token_count measured here (actual)
+        ▼
+[Dispatch to target skill] ──► event_log: { type: "artifact.dispatched", artifact_id, token_count }
+        │
+        ▼
+[Target skill unpacks payload from envelope]
+        │
+        ▼
+[If skill output consumed and > 3 prior outputs: compress — Step 3i]
+        └──► envelope.compressed = true
+```
+
+### Observability
+
+Every artifact dispatch is recorded in `session_context.event_log`:
+```json
+{ "id": "evt-N", "type": "artifact.dispatched", "artifact_id": "art-0042",
+  "source_skill": "architecture-design", "target_skill": "feature-planning",
+  "token_count": 1840, "timestamp": "2026-07-02T10:30:00Z" }
+```
+
+This record enables exact token-per-transfer accounting — the foundation for Phase 7
+TASK-0066 token observability dashboards.
+
+### Artifact IDs in Snapshots
+
+Snapshot objects (see Pipeline Snapshot API below) carry `artifact_ids[]` — the list of
+every `artifact_id` dispatched up to the snapshot's gate boundary. This allows full
+reconstruction of inter-skill data flow from a restored snapshot.
+
+---
+
+## Pipeline Snapshot API
+
+> Added in v2.3.0 (TASK-0062). Extends TASK-0056 `resume_from_phase` with durable,
+> cross-session persistence.
+
+### Problem
+
+Phase 5's `resume_from_phase` resumes from in-memory state. If the session restarts
+(new conversation turn, process restart), prior state is lost. Named snapshots persist
+state to a durable location keyed by `(session_id, phase_id)` so resume works across
+conversation boundaries.
+
+### Snapshot Schema
+
+```json
+{
+  "snapshot_id":   "snap-phase-4-planning-approved",
+  "session_id":    "sess-001",
+  "phase_id":      "phase-4-planning",
+  "gate_decision": "approve",
+  "taken_at":      "2026-07-02T10:30:00Z",
+  "state_keys":    ["requirements", "architecture", "dependency_graph", "task_graph"],
+  "artifact_ids":  ["art-0001", "art-0002", "art-0003", "art-0004"]
+}
+```
+
+Snapshots are stored in `session_context.snapshots[]` with full artifact payloads (not
+references) and persisted in the session file at
+`.opencode/state/sessions/<session_id>.json`.
+
+### When Snapshots Are Taken
+
+The orchestrator automatically takes a snapshot **immediately after each approved HITL
+gate**. No manual invocation is required.
+
+| HITL Gate (after skill) | Auto-snapshot ID pattern |
+|------------------------|--------------------------|
+| `requirement-analyzer` | `snap-phase-1-requirements-approved` |
+| `architecture-design` | `snap-phase-2-architecture-approved` |
+| `feature-planning` | `snap-phase-3-planning-approved` |
+| `security-review` | `snap-phase-4-security-approved` |
+| `deployment-strategy` | `snap-phase-5-deploy-approved` |
+
+### Restore Usage
+
+```json
+{ "restore_from_snapshot": "snap-phase-2-architecture-approved" }
+```
+
+This input to the orchestrator:
+1. Loads the named snapshot from the persisted session file
+2. Restores all `state_keys` and artifact payloads into `session_context`
+3. Sets `resume_from_phase` to the phase immediately after `snapshot.phase_id`
+4. Continues pipeline execution from that phase
+
+### Snapshot Limits
+
+- Max **10 snapshots per project**
+- LRU eviction when the 11th is created (oldest removed, warning emitted)
+- Snapshot files MUST NOT contain credentials, tokens, or PII
+
+### Relationship to TASK-0056
+
+| Feature | TASK-0056 `resume_from_phase` | TASK-0062 `restore_from_snapshot` |
+|---------|-------------------------------|-----------------------------------|
+| Scope | In-memory, same session | Durable, cross-session |
+| Persistence | None (memory only) | `.opencode/state/sessions/*.json` |
+| Granularity | Phase boundary | Gate-approved checkpoint |
+| Phase 7 | — | Foundation for TASK-0065 warm-start |
+
+---
+
+## Cross-Session Memory (Archival)
+
+> Added in v2.3.0 (TASK-0059). Implemented in `context-memory` v2.0.0, inspired by
+> Letta (MemGPT) tiered memory architecture.
+
+### Problem
+
+`context-memory` v1.0.0 is session-scoped only. Starting a new pipeline for the same
+project re-runs requirement-analysis, architecture-design, and dependency-graph phases
+even when their outputs haven't changed. This is the largest avoidable token cost in
+iterative development workflows.
+
+### Three-Tier Memory Model
+
+```
+Tier 1: Working Memory      (session-scoped, in-flight)
+  ├─ Pipeline artifacts in flight
+  ├─ Current HITL gate state
+  └─ Active skill invocation context
+
+Tier 2: Session Memory      (session-scoped, persisted until explicit clear)
+  ├─ Architecture decisions
+  ├─ ADR index
+  ├─ Dependency graph (module-level, not code-level)
+  └─ req_task_map from last feature-planning run
+
+Tier 3: Archival Memory     (cross-session, project-scoped, persistent)
+  ├─ Approved architecture decisions (post "Sign off architecture" gate)
+  ├─ Accepted ADRs
+  ├─ Module boundaries + responsibility map
+  └─ Approved task graph (milestones, phases)
+```
+
+### Archival Memory Persistence
+
+Archival memory blocks are stored at:
+```
+.opencode/state/archival/<project_id>/
+  architecture.json     ← approved architecture output + content_hash
+  adr_index.json        ← accepted ADRs
+  module_map.json       ← module boundaries + responsibility map
+  task_graph.json       ← approved task graph (milestones, phases)
+```
+
+Each block carries a `content_hash` (SHA-256 of source artifact payload). The orchestrator
+invalidates the block if the hash no longer matches the current artifact.
+
+### Orchestrator Integration
+
+| Event | Archival Write |
+|-------|----------------|
+| Architecture HITL gate approved | Write architecture output → `archival/architecture.json` |
+| Feature-planning HITL gate approved | Write task_graph → `archival/task_graph.json` |
+| ADR accepted (state-manager ADR write) | Write/merge → `archival/adr_index.json` |
+
+**On pipeline start:** if `archival_memory` exists for `project_id`, the orchestrator
+pre-populates session state with Tier 3 blocks and **skips phases whose outputs are already
+in archival** (content_hash verified against current artifacts).
+
+### Expected Token Savings
+
+| Run | Phases Skipped via Archival | Token Saving |
+|-----|-----------------------------|--------------|
+| First run | None (cold start) | 0 |
+| Second run (new feature, same architecture) | phases 1–4 | ~40,000 tokens |
+| Third+ runs | phases 1–4 (+ more blocks accumulate) | compounding |
+
+### Isolation Guarantee
+
+- Archival memory is **strictly scoped to `project_id`**
+- Cross-project reads are rejected — `context-memory` rejects any `inherit_from` that
+  resolves to a different `project_id`
+- Credentials, tokens, and PII MUST NOT appear in any archival memory block
+
+### Backward Compatibility (v1.0.0 → v2.0.0)
+
+Callers using the v1.0.0 API (`operation=write, tier=working`) continue to work without
+modification. The v2.0.0 shim maps v1.0.0 behavior to Tier 1 automatically.
