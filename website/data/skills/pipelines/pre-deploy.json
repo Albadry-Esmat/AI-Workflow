@@ -1,0 +1,90 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "pre-deploy",
+  "version": "2.1.0",
+  "description": "Pre-deployment checklist (v2.1.0): testing strategy → security review → guard layer → completeness audit → release gate → deployment. Use before any release to staging or production.",
+  "mode": "sequential",
+  "phases": [
+    {
+      "id": "phase-1-testing",
+      "label": "Testing Strategy",
+      "skills": [
+        { "name": "testing-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-security",
+      "label": "Security Review",
+      "skills": [
+        { "name": "security-review", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "database-guard",           "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard",        "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard",   "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-4-audit",
+      "label": "Completeness Audit",
+      "skills": [
+        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-release-guard",
+      "label": "Release Gate",
+      "skills": [
+        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-6-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-2-security",
+      "type": "human_approval",
+      "label": "Approve security posture before guard layer",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-3-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-5-release-guard",
+      "type": "condition",
+      "label": "Block if completeness score below threshold",
+      "condition": "release_guard.verdict === 'pass'"
+    },
+    {
+      "after_phase": "phase-6-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "async_skills": [],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  }
+}

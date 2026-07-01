@@ -1,0 +1,2034 @@
+meta:
+  version: 3.0.0
+  last_updated: '2026-06-24'
+  total_nodes: 101
+  total_edges: 328
+  schema: skills/graph/graph-schema.yaml
+nodes:
+- id: SKL-001
+  name: requirement-analysis
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.2.0
+  status: active
+  layer: pipeline-entry
+- id: SKL-002
+  name: architecture-design
+  domain: architecture
+  mastery_level: advanced
+  version: 1.3.0
+  status: active
+  layer: pipeline-core
+- id: SKL-003
+  name: feature-planning
+  domain: planning
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-004
+  name: clean-code-review
+  domain: review
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-005
+  name: testing-strategy
+  domain: testing
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-006
+  name: security-review
+  domain: security
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-007
+  name: deployment-strategy
+  domain: deployment
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: pipeline-release
+- id: SKL-008
+  name: documentation-generation
+  domain: documentation
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: pipeline-support
+- id: SKL-009
+  name: schema-validation
+  domain: validation
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-010
+  name: orchestration
+  domain: system
+  mastery_level: advanced
+  version: 1.2.0
+  status: active
+  layer: meta
+- id: SKL-011
+  name: documentation-maintenance
+  domain: documentation
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: pipeline-support
+- id: SKL-012
+  name: skill-authoring
+  domain: meta
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: meta
+- id: SKL-013
+  name: context-memory
+  domain: system
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-014
+  name: observability
+  domain: system
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: utility
+- id: SKL-015
+  name: quality-scoring
+  domain: meta
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-016
+  name: skill-lifecycle
+  domain: meta
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-017
+  name: trigger-engineering
+  domain: meta
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-018
+  name: validation-rules
+  domain: meta
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-019
+  name: versioning
+  domain: meta
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-020
+  name: create-sub-agent
+  domain: meta
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: meta
+- id: SKL-021
+  name: state-manager
+  domain: orchestration
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: infrastructure
+- id: SKL-022
+  name: context-compressor
+  domain: orchestration
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: infrastructure
+- id: SKL-023
+  name: dependency-analyzer
+  domain: architecture
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: pipeline-core
+- id: SKL-024
+  name: change-impact-analyzer
+  domain: architecture
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: pipeline-core
+- id: SKL-025
+  name: event-router
+  domain: orchestration
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: infrastructure
+- id: SKL-026
+  name: code-generator
+  domain: implementation
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-027
+  name: adr-generator
+  domain: documentation
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-028
+  name: test-generator
+  domain: testing
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-029
+  name: code-repair
+  domain: implementation
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-030
+  name: rollback-manager
+  domain: orchestration
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-safety
+- id: SKL-031
+  name: frontend-ux-architect
+  domain: design
+  mastery_level: advanced
+  version: 2.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-032
+  name: database-architect
+  domain: database
+  mastery_level: advanced
+  version: 1.1.0
+  status: active
+  layer: pipeline-core
+- id: SKL-033
+  name: implementation-completeness-auditor
+  domain: quality
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-034
+  name: database-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-035
+  name: performance-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-036
+  name: ui-ux-compliance-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-037
+  name: implementation-completeness-guard
+  domain: governance
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-038
+  name: design-system-generator
+  domain: design
+  mastery_level: intermediate
+  version: 2.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-039
+  name: seo-optimizer
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-040
+  name: prompt-normalizer
+  domain: meta
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: orchestration
+- id: SKL-041
+  name: security-guard
+  domain: governance
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-042
+  name: ci-pipeline-generator
+  domain: deployment
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-043
+  name: ai-agent-specialist
+  domain: domain-specialist
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-044
+  name: mobile-platform-specialist
+  domain: domain-specialist
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-045
+  name: saas-enterprise-architect
+  domain: domain-specialist
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-046
+  name: systems-specialist
+  domain: domain-specialist
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-core
+- id: SKL-047
+  name: behavioral-telemetry-collector
+  domain: system
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: utility
+- id: SKL-048
+  name: session-insights
+  domain: system
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: utility
+- id: SKL-049
+  name: enhancement-dashboard
+  domain: system
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-050
+  name: adaptive-proposal-generator
+  domain: system
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-051
+  name: adaptation-applicator
+  domain: system
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-052
+  name: motion-design-architect
+  domain: design
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: domain
+- id: SKL-053
+  name: ux-research-synthesizer
+  domain: design
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: domain
+- id: SKL-054
+  name: creative-experience-architect
+  domain: design
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: domain
+- id: SKL-055
+  name: defect-manager
+  domain: lifecycle
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: lifecycle
+- id: SKL-056
+  name: change-request-manager
+  domain: lifecycle
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: lifecycle
+- id: SKL-057
+  name: work-item-exporter
+  domain: integration
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: integration
+- id: SKL-058
+  name: work-item-lifecycle-guard
+  domain: governance
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-065
+  name: gap-to-skill-pipeline
+  domain: meta
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: meta
+- id: SKL-066
+  name: semantic-diff-analyzer
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: analysis
+- id: SKL-067
+  name: acceptance-criteria-generator
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: requirements
+- id: SKL-068
+  name: technical-debt-tracker
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: quality
+- id: SKL-069
+  name: architecture-evolution-planner
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-070
+  name: compliance-mapper
+  domain: governance
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: governance
+- id: SKL-071
+  name: api-deprecation-manager
+  domain: architecture
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: lifecycle
+- id: SKL-072
+  name: infrastructure-cost-estimator
+  domain: deployment
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: deployment
+- id: SKL-073
+  name: mutation-test-generator
+  domain: testing
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: testing
+- id: SKL-074
+  name: skill-simulator
+  domain: system
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: orchestration
+- id: SKL-075
+  name: multi-repo-coordinator
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-076
+  name: domain-knowledge-extractor
+  domain: system
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: system
+- id: SKL-077
+  name: pipeline-branching
+  domain: orchestration
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: orchestration
+- id: SKL-078
+  name: data-pipeline-architect
+  domain: data
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-079
+  name: data-quality-validator
+  domain: data
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-080
+  name: ml-pipeline-architect
+  domain: data
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-081
+  name: analytics-schema-designer
+  domain: data
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-082
+  name: data-contract-enforcer
+  domain: data
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-083
+  name: api-design-architect
+  domain: api
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: integration
+- id: SKL-084
+  name: graphql-architect
+  domain: api
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: integration
+- id: SKL-085
+  name: event-schema-designer
+  domain: api
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: integration
+- id: SKL-086
+  name: microservices-architect
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-087
+  name: event-sourcing-designer
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-088
+  name: distributed-resilience-architect
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-089
+  name: cloud-architecture-reviewer
+  domain: cloud
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: infrastructure
+- id: SKL-090
+  name: serverless-architect
+  domain: cloud
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: infrastructure
+- id: SKL-091
+  name: container-orchestration-architect
+  domain: cloud
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: infrastructure
+- id: SKL-092
+  name: threat-model-designer
+  domain: security
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: pipeline-safety
+- id: SKL-093
+  name: secrets-management-architect
+  domain: security
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: pipeline-safety
+- id: SKL-094
+  name: devsecops-pipeline-designer
+  domain: security
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: pipeline-safety
+- id: SKL-095
+  name: load-test-designer
+  domain: testing
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: testing
+- id: SKL-096
+  name: profiling-advisor
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: quality
+- id: SKL-097
+  name: slo-sla-designer
+  domain: deployment
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: deployment
+- id: SKL-098
+  name: runbook-generator
+  domain: documentation
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-099
+  name: chaos-engineering-designer
+  domain: testing
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: testing
+- id: SKL-100
+  name: state-management-architect
+  domain: design
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-101
+  name: micro-frontend-architect
+  domain: design
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-102
+  name: web-performance-optimizer
+  domain: design
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-103
+  name: ddd-architect
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-104
+  name: caching-strategy-designer
+  domain: architecture
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-105
+  name: localization-architect
+  domain: design
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: architecture
+- id: SKL-106
+  name: product-analytics-designer
+  domain: planning
+  mastery_level: intermediate
+  version: 1.0.0
+  status: draft
+  layer: domain
+- id: SKL-107
+  name: realtime-system-architect
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: draft
+  layer: architecture
+edges:
+- from: SKL-001
+  to: SKL-002
+  type: dependency
+  label: requirements → architecture needs validated requirements
+- from: SKL-001
+  to: SKL-003
+  type: dependency
+  label: requirements → feature-planning needs requirement IDs for traceability
+- from: SKL-001
+  to: SKL-005
+  type: dependency
+  label: requirements → testing needs requirement IDs for test case mapping
+- from: SKL-001
+  to: SKL-008
+  type: dependency
+  label: requirements → documentation generation needs requirement summaries
+- from: SKL-002
+  to: SKL-003
+  type: dependency
+  label: architecture → feature-planning derives tasks from modules
+- from: SKL-002
+  to: SKL-005
+  type: dependency
+  label: architecture → testing needs module boundaries for coverage targets
+- from: SKL-002
+  to: SKL-006
+  type: dependency
+  label: architecture → security review needs architecture for threat modeling
+- from: SKL-002
+  to: SKL-007
+  type: dependency
+  label: architecture → deployment strategy needs module topology
+- from: SKL-002
+  to: SKL-008
+  type: dependency
+  label: architecture → documentation generation uses modules + integration points
+- from: SKL-003
+  to: SKL-004
+  type: dependency
+  label: feature-planning → code review scope defined by task breakdown
+- from: SKL-003
+  to: SKL-005
+  type: dependency
+  label: feature-planning → testing strategy maps test cases to tasks
+- from: SKL-004
+  to: SKL-006
+  type: dependency
+  label: code-review → security review uses code snippets from review
+- from: SKL-004
+  to: SKL-008
+  type: dependency
+  label: code-review → documentation generation uses quality findings for onboarding
+- from: SKL-005
+  to: SKL-007
+  type: dependency
+  label: testing → deployment strategy uses quality gates for promotion rules
+- from: SKL-008
+  to: SKL-011
+  type: dependency
+  label: doc-generation → doc-maintenance keeps generated docs in sync
+- from: SKL-009
+  to: SKL-011
+  type: dependency
+  label: schema-validation → doc-maintainer validates new doc file structure
+- from: SKL-009
+  to: SKL-012
+  type: dependency
+  label: schema-validation → skill-authoring validates generated skill schemas
+- from: SKL-011
+  to: SKL-012
+  type: dependency
+  label: doc-maintenance → skill-authoring triggers doc updates after registration
+- from: SKL-010
+  to: SKL-001
+  type: composition
+  label: orchestrator drives requirement-analysis as pipeline entry
+- from: SKL-010
+  to: SKL-002
+  type: composition
+  label: orchestrator drives architecture-design
+- from: SKL-010
+  to: SKL-003
+  type: composition
+  label: orchestrator drives feature-planning
+- from: SKL-010
+  to: SKL-004
+  type: composition
+  label: orchestrator drives clean-code-review
+- from: SKL-010
+  to: SKL-005
+  type: composition
+  label: orchestrator drives testing-strategy
+- from: SKL-010
+  to: SKL-006
+  type: composition
+  label: orchestrator drives security-review
+- from: SKL-010
+  to: SKL-007
+  type: composition
+  label: orchestrator drives deployment-strategy
+- from: SKL-010
+  to: SKL-009
+  type: composition
+  label: orchestrator invokes schema-validator after every step
+- from: SKL-011
+  to: SKL-008
+  type: extension
+  label: doc-maintenance extends doc-generation (maintenance specializes generation)
+- from: SKL-012
+  to: SKL-010
+  type: extension
+  label: skill-authoring extends orchestration at the meta level (creates what orchestrator runs)
+- from: SKL-004
+  to: SKL-006
+  type: co_occurrence
+  label: code-review and security-review run together in full-audit mode
+- from: SKL-005
+  to: SKL-007
+  type: co_occurrence
+  label: testing and deployment strategy are always planned together pre-release
+- from: SKL-008
+  to: SKL-011
+  type: co_occurrence
+  label: doc generation and maintenance are tightly coupled in the documentation domain
+- from: SKL-010
+  to: SKL-013
+  type: composition
+  label: orchestrator invokes context-memory to serialize, compress, and restore session state
+- from: SKL-010
+  to: SKL-014
+  type: composition
+  label: orchestrator aggregates per-skill observability metrics into pipeline report
+- from: SKL-015
+  to: SKL-012
+  type: dependency
+  label: quality-scoring is consumed by skill-authoring to gate registration at quality_score >= 60
+- from: SKL-017
+  to: SKL-012
+  type: dependency
+  label: trigger-engineering produces activation tests consumed by skill-authoring during validation
+- from: SKL-009
+  to: SKL-018
+  type: dependency
+  label: validation-rules depends on schema-validator to check index.yaml field conformance
+- from: SKL-018
+  to: SKL-012
+  type: dependency
+  label: validation-rules produces validation_report consumed by skill-authoring Step 8
+- from: SKL-019
+  to: SKL-012
+  type: dependency
+  label: versioning produces version_assignment consumed by skill-authoring Step 9
+- from: SKL-009
+  to: SKL-020
+  type: dependency
+  label: create-sub-agent uses schema-validator to validate input and output contracts
+- from: SKL-016
+  to: SKL-012
+  type: co_occurrence
+  label: skill-lifecycle and skill-authoring are co-used in every skill evolution and retirement workflow
+- from: SKL-015
+  to: SKL-016
+  type: co_occurrence
+  label: quality-scoring and skill-lifecycle used together during monitoring stage to decide evolution or deprecation
+- from: SKL-019
+  to: SKL-016
+  type: co_occurrence
+  label: versioning and skill-lifecycle co-occur during deprecation and retirement stage transitions
+- from: SKL-020
+  to: SKL-012
+  type: co_occurrence
+  label: create-sub-agent and skill-authoring are co-used when scaffolding a new skill that includes a sub-agent
+- from: SKL-010
+  to: SKL-021
+  type: composition
+  label: orchestrator invokes state-manager for every read, write, snapshot, and restore of shared state
+- from: SKL-013
+  to: SKL-021
+  type: composition
+  label: context-memory delegates all state persistence and restoration to state-manager
+- from: SKL-013
+  to: SKL-022
+  type: dependency
+  label: context-memory uses context-compressor to compress session state when token budget is exceeded
+- from: SKL-010
+  to: SKL-022
+  type: composition
+  label: orchestrator invokes context-compressor automatically when context.pressure_high event fires
+- from: SKL-023
+  to: SKL-002
+  type: dependency
+  label: dependency-analyzer requires architecture module list to map files to owning modules
+- from: SKL-023
+  to: SKL-021
+  type: composition
+  label: dependency-analyzer reads code_map and writes updated dependency_graph via state-manager
+- from: SKL-024
+  to: SKL-023
+  type: dependency
+  label: change-impact-analyzer uses dependency_graph from dependency-analyzer for transitive impact traversal
+- from: SKL-010
+  to: SKL-024
+  type: composition
+  label: orchestrator invokes change-impact-analyzer before any code modification to compute required_skills
+- from: SKL-025
+  to: SKL-021
+  type: dependency
+  label: event-router reads dispatch_map and event_log from state-manager for routing and deduplication
+- from: SKL-010
+  to: SKL-025
+  type: composition
+  label: orchestrator routes every system event through event-router before reaching skill executors
+- from: SKL-026
+  to: SKL-002
+  type: dependency
+  label: code-generator requires architecture modules for import resolution and contract adherence
+- from: SKL-026
+  to: SKL-003
+  type: dependency
+  label: code-generator uses feature-planning task list to determine which modules and stubs to generate
+- from: SKL-004
+  to: SKL-026
+  type: co_occurrence
+  label: clean-code-review is mandated after every code-generator output — never skip this pairing
+- from: SKL-027
+  to: SKL-002
+  type: dependency
+  label: adr-generator is invoked by architecture-design and requires its decision output as primary input
+- from: SKL-007
+  to: SKL-027
+  type: co_occurrence
+  label: doc-maintainer runs after adr-generator to sync /docs/adr index and cross-references
+- from: SKL-028
+  to: SKL-005
+  type: dependency
+  label: test-generator uses testing-strategy tier targets and edge_cases list to guide test case generation
+- from: SKL-028
+  to: SKL-026
+  type: dependency
+  label: test-generator takes code-generator artifacts as primary target for test suite generation
+- from: SKL-028
+  to: SKL-024
+  type: dependency
+  label: test-generator uses change-impact-analyzer invalidated_tests list to regenerate only affected tests
+- from: SKL-029
+  to: SKL-026
+  type: dependency
+  label: code-repair targets code-generator artifacts when they produce compile errors or test failures
+- from: SKL-029
+  to: SKL-025
+  type: dependency
+  label: code-repair is activated by test.failed events dispatched through event-router
+- from: SKL-030
+  to: SKL-021
+  type: dependency
+  label: rollback-manager reads all snapshots and pipeline state from state-manager to compute rollback plan
+- from: SKL-030
+  to: SKL-025
+  type: dependency
+  label: rollback-manager is triggered by critical failure events dispatched through event-router
+- from: SKL-010
+  to: SKL-030
+  type: composition
+  label: orchestrator invokes rollback-manager when impact_severity=critical and code-repair is exhausted
+- from: SKL-029
+  to: SKL-030
+  type: dependency
+  label: code-repair escalation path (repair_outcome.escalated=true) activates rollback-manager for state recovery
+- from: SKL-001
+  to: SKL-031
+  type: dependency
+  label: requirements → frontend-ux-architect needs UI-bearing requirements for screen inventory
+- from: SKL-002
+  to: SKL-031
+  type: dependency
+  label: architecture → frontend-ux-architect maps modules to UI regions and navigation zones
+- from: SKL-001
+  to: SKL-032
+  type: dependency
+  label: requirements → database-architect needs data-bearing requirements for entity design
+- from: SKL-002
+  to: SKL-032
+  type: dependency
+  label: architecture → database-architect maps module boundaries to schema ownership domains
+- from: SKL-001
+  to: SKL-033
+  type: dependency
+  label: requirements → completeness-auditor uses requirement IDs as the audit contract
+- from: SKL-003
+  to: SKL-033
+  type: dependency
+  label: feature-planning → completeness-auditor uses task assignments to map code artifacts to requirements
+- from: SKL-021
+  to: SKL-033
+  type: dependency
+  label: state-manager → completeness-auditor reads code_map and test_state from shared system state
+- from: SKL-002
+  to: SKL-033
+  type: dependency
+  label: architecture-design module map is required to trace requirement coverage across implementation artifacts
+- from: SKL-026
+  to: SKL-033
+  type: dependency
+  label: code-generator artifacts are the primary subject of completeness auditing
+- from: SKL-032
+  to: SKL-034
+  type: dependency
+  label: database-architect output (migration_plan, db_entities) is the primary input to database-guard
+- from: SKL-002
+  to: SKL-035
+  type: dependency
+  label: architecture → performance-guard uses module topology to scope query pattern detection
+- from: SKL-004
+  to: SKL-035
+  type: co_occurrence
+  label: clean-code-review and performance-guard co-occur in every full implementation quality pass
+- from: SKL-031
+  to: SKL-036
+  type: dependency
+  label: frontend-ux-architect component_contracts are the validation target for ui-ux-compliance-guard
+- from: SKL-033
+  to: SKL-037
+  type: dependency
+  label: implementation-completeness-auditor readiness_score and gaps are the sole inputs to the completeness guard
+- from: SKL-010
+  to: SKL-031
+  type: composition
+  label: orchestrator drives frontend-ux-architect after architecture-design in the UI pipeline
+- from: SKL-010
+  to: SKL-032
+  type: composition
+  label: orchestrator drives database-architect after architecture-design in the data pipeline
+- from: SKL-010
+  to: SKL-033
+  type: composition
+  label: orchestrator invokes completeness-auditor as the last quality check before the deployment gate
+- from: SKL-010
+  to: SKL-034
+  type: composition
+  label: orchestrator invokes database-guard as a validation_check gate after database-architect
+- from: SKL-010
+  to: SKL-035
+  type: composition
+  label: orchestrator invokes performance-guard as a validation_check gate after code-generator
+- from: SKL-010
+  to: SKL-036
+  type: composition
+  label: orchestrator invokes ui-ux-compliance-guard as a validation_check gate after UI code generation
+- from: SKL-010
+  to: SKL-037
+  type: composition
+  label: orchestrator invokes implementation-completeness-guard as the final release gate before deployment-strategy
+- from: SKL-031
+  to: SKL-032
+  type: co_occurrence
+  label: frontend-ux-architect and database-architect are designed in parallel — both depend on architecture-design
+- from: SKL-037
+  to: SKL-007
+  type: co_occurrence
+  label: implementation-completeness-guard must pass before deployment-strategy generates the approval request
+- from: SKL-031
+  to: SKL-038
+  type: dependency
+  label: frontend-ux-architect token_requirements and component_contracts are the sole inputs to design-system-generator
+- from: SKL-001
+  to: SKL-039
+  type: dependency
+  label: requirement-analyzer validated requirements drive structured data type selection and page intent classification in
+    seo-optimizer
+- from: SKL-031
+  to: SKL-039
+  type: dependency
+  label: frontend-ux-architect screen inventory (routes, layout_types) is the primary input to seo-optimizer for sitemap and
+    meta tag generation
+- from: SKL-038
+  to: SKL-026
+  type: dependency
+  label: design-system-generator token files and component stubs establish the design contract that code-generator implements
+- from: SKL-039
+  to: SKL-007
+  type: dependency
+  label: seo-optimizer sitemap, robots.txt, and CWV budget must be bundled into the deployment artifact
+- from: SKL-010
+  to: SKL-038
+  type: composition
+  label: orchestrator drives design-system-generator after frontend-ux-architect in website pipeline design system phase
+- from: SKL-010
+  to: SKL-039
+  type: composition
+  label: orchestrator drives seo-optimizer after code-generator and before deployment-strategy in website pipelines
+- from: SKL-010
+  to: SKL-040
+  type: composition
+  label: orchestrator invokes prompt-normalizer before routing table lookup to normalize vague user prompts
+- from: SKL-040
+  to: SKL-001
+  type: co_occurrence
+  label: normalized prompt from prompt-normalizer is the primary input to requirement-analyzer in requirements pipelines
+- from: SKL-025
+  to: SKL-040
+  type: co_occurrence
+  label: event-router handles internal system events; prompt-normalizer handles human-typed prompts — both run before pipeline
+    routing
+- from: SKL-006
+  to: SKL-041
+  type: dependency
+  label: security-review findings (CVSS scores, OWASP matches) are the mandatory input to security-guard
+- from: SKL-010
+  to: SKL-041
+  type: composition
+  label: orchestrator invokes security-guard as a validation_check gate immediately after security-review
+- from: SKL-007
+  to: SKL-042
+  type: dependency
+  label: deployment-strategy (environments, promotion rules, feature flags) is the mandatory input to ci-pipeline-generator
+- from: SKL-002
+  to: SKL-042
+  type: dependency
+  label: architecture module topology drives pipeline stage structure and artifact packaging in ci-pipeline-generator
+- from: SKL-010
+  to: SKL-042
+  type: composition
+  label: orchestrator invokes ci-pipeline-generator as the final CI scaffold step after deployment-strategy
+- from: SKL-001
+  to: SKL-043
+  type: dependency
+  label: requirement-analyzer provides domain-classified requirements to ai-agent-specialist
+- from: SKL-002
+  to: SKL-043
+  type: dependency
+  label: architecture-design module topology is the augmentation target for ai-agent-specialist
+- from: SKL-010
+  to: SKL-043
+  type: composition
+  label: orchestrator activates ai-agent-specialist when domain_context.domain_primary == ai_agent
+- from: SKL-043
+  to: SKL-002
+  type: co_occurrence
+  label: ai-agent-specialist co-occurs with architecture-design — specialist augments the architecture phase for AI systems
+- from: SKL-001
+  to: SKL-044
+  type: dependency
+  label: requirement-analyzer provides domain-classified requirements to mobile-platform-specialist
+- from: SKL-002
+  to: SKL-044
+  type: dependency
+  label: architecture-design module topology is the augmentation target for mobile-platform-specialist
+- from: SKL-010
+  to: SKL-044
+  type: composition
+  label: orchestrator activates mobile-platform-specialist when domain_context.domain_primary == mobile
+- from: SKL-044
+  to: SKL-002
+  type: co_occurrence
+  label: mobile-platform-specialist co-occurs with architecture-design — specialist augments the architecture phase for mobile
+    apps
+- from: SKL-001
+  to: SKL-045
+  type: dependency
+  label: requirement-analyzer provides domain-classified requirements to saas-enterprise-architect
+- from: SKL-002
+  to: SKL-045
+  type: dependency
+  label: architecture-design module topology is the augmentation target for saas-enterprise-architect
+- from: SKL-010
+  to: SKL-045
+  type: composition
+  label: orchestrator activates saas-enterprise-architect when domain_context.domain_primary == saas or enterprise
+- from: SKL-045
+  to: SKL-002
+  type: co_occurrence
+  label: saas-enterprise-architect co-occurs with architecture-design — specialist augments the architecture phase for SaaS
+    platforms
+- from: SKL-001
+  to: SKL-046
+  type: dependency
+  label: requirement-analyzer provides domain-classified requirements to systems-specialist
+- from: SKL-002
+  to: SKL-046
+  type: dependency
+  label: architecture-design module topology is the augmentation target for systems-specialist
+- from: SKL-010
+  to: SKL-046
+  type: composition
+  label: orchestrator activates systems-specialist when domain_context.domain_primary == embedded_iot or game
+- from: SKL-046
+  to: SKL-002
+  type: co_occurrence
+  label: systems-specialist co-occurs with architecture-design — specialist augments the architecture phase for embedded/IoT/game
+    systems
+- from: SKL-010
+  to: SKL-047
+  type: composition
+  label: orchestrator fires pipeline_stage.complete events consumed by behavioral-telemetry-collector as async hooks
+- from: SKL-047
+  to: SKL-048
+  type: dependency
+  label: behavioral-telemetry-collector emits behavioral_telemetry.events consumed by session-insights for analysis
+- from: SKL-010
+  to: SKL-048
+  type: composition
+  label: orchestrator triggers session-insights at pipeline completion or on session.end event
+- from: SKL-048
+  to: SKL-049
+  type: dependency
+  label: session-insights session_summary is the sole input to enhancement-dashboard for report rendering
+- from: SKL-010
+  to: SKL-049
+  type: composition
+  label: orchestrator invokes enhancement-dashboard to present the final session report to the human operator
+- from: SKL-048
+  to: SKL-050
+  type: dependency
+  label: session-insights session_summary is primary input to adaptive-proposal-generator for pattern analysis
+- from: SKL-049
+  to: SKL-050
+  type: co_occurrence
+  label: enhancement-dashboard and adaptive-proposal-generator co-occur at session end — dashboard renders first, then proposals
+    are generated
+- from: SKL-015
+  to: SKL-050
+  type: composition
+  label: quality-scoring criteria are applied to score and rank AdaptationProposals before HITL gate
+- from: SKL-010
+  to: SKL-050
+  type: composition
+  label: orchestrator triggers adaptive-proposal-generator at session end after session-insights completes
+- from: SKL-050
+  to: SKL-051
+  type: dependency
+  label: 'adaptive-proposal-generator proposals (hitl_status: approved) are sole input to adaptation-applicator'
+- from: SKL-010
+  to: SKL-051
+  type: composition
+  label: 'orchestrator triggers adaptation-applicator only after HITL gate sets hitl_status: approved on a proposal'
+- from: SKL-051
+  to: SKL-012
+  type: composition
+  label: adaptation-applicator delegates new SKILL.md generation to skill-authoring (SKL-012) for new_skill proposals
+- from: SKL-051
+  to: SKL-011
+  type: composition
+  label: adaptation-applicator triggers doc-maintainer after successful change application to keep docs in sync
+- from: SKL-031
+  to: SKL-052
+  type: dependency
+  label: frontend-ux-architect motion_spec is the primary input to motion-design-architect
+- from: SKL-052
+  to: SKL-038
+  type: dependency
+  label: motion-design-architect motion_token_set extends the design-system-generator token output
+- from: SKL-052
+  to: SKL-036
+  type: co_occurrence
+  label: motion-design-architect motion_quality_preview informs ui-ux-compliance-guard motion quality scoring
+- from: SKL-031
+  to: SKL-053
+  type: dependency
+  label: frontend-ux-architect screens and navigation_map are the primary inputs to ux-research-synthesizer
+- from: SKL-053
+  to: SKL-031
+  type: co_occurrence
+  label: ux-research-synthesizer backpropagates critical UX findings to trigger frontend-ux-architect redesign
+- from: SKL-031
+  to: SKL-054
+  type: dependency
+  label: frontend-ux-architect screens and component_contracts are optional inputs to creative-experience-architect
+- from: SKL-054
+  to: SKL-052
+  type: co_occurrence
+  label: creative-experience-architect creative_brief feeds motion choreography requirements to motion-design-architect
+- from: SKL-054
+  to: SKL-053
+  type: co_occurrence
+  label: creative-experience-architect and ux-research-synthesizer co-occur in premium design pipeline
+- from: SKL-021
+  to: SKL-055
+  type: dependency
+  label: state-manager work_items scope is the read/write interface for defect-manager
+- from: SKL-003
+  to: SKL-055
+  type: composition
+  label: feature-planning implementation gaps (missings) escalate to defect-manager for FIX+TEST+VALIDATION chain
+- from: SKL-033
+  to: SKL-055
+  type: composition
+  label: implementation-completeness-auditor missings route to defect-manager to generate FIX tasks
+- from: SKL-029
+  to: SKL-055
+  type: co_occurrence
+  label: code-repair escalation triggers defect-manager when all repair candidates fail
+- from: SKL-055
+  to: SKL-029
+  type: composition
+  label: defect-manager FIX-NNNN task delegates to code-repair for implementation
+- from: SKL-055
+  to: SKL-028
+  type: composition
+  label: defect-manager TEST-NNNN task delegates to test-generator for regression test authoring
+- from: SKL-055
+  to: SKL-004
+  type: composition
+  label: defect-manager REVIEW-NNNN task delegates to clean-code-review for fix quality review
+- from: SKL-055
+  to: SKL-057
+  type: composition
+  label: defect-manager BUG records and chain items are exported by work-item-exporter
+- from: SKL-055
+  to: SKL-058
+  type: composition
+  label: defect-manager state transitions are validated by work-item-lifecycle-guard before write
+- from: SKL-021
+  to: SKL-056
+  type: dependency
+  label: state-manager work_items scope is the read/write interface for change-request-manager
+- from: SKL-056
+  to: SKL-024
+  type: dependency
+  label: change-request-manager delegates impact computation to change-impact-analyzer
+- from: SKL-056
+  to: SKL-003
+  type: composition
+  label: change-request-manager approved task delta feeds back into feature-planning for re-planning
+- from: SKL-056
+  to: SKL-057
+  type: composition
+  label: change-request-manager CR records are exported by work-item-exporter
+- from: SKL-056
+  to: SKL-058
+  type: composition
+  label: change-request-manager state transitions are validated by work-item-lifecycle-guard before write
+- from: SKL-021
+  to: SKL-057
+  type: dependency
+  label: work-item-exporter reads work_items scope from state-manager
+- from: SKL-058
+  to: SKL-055
+  type: co_occurrence
+  label: work-item-lifecycle-guard co-occurs with defect-manager in all defect lifecycle pipelines
+- from: SKL-058
+  to: SKL-056
+  type: co_occurrence
+  label: work-item-lifecycle-guard co-occurs with change-request-manager in all CR pipelines
+- from: SKL-047
+  to: SKL-065
+  type: dependency
+  label: behavioral-telemetry-collector emits capability_gap events consumed by gap-to-skill-pipeline as gap_context
+- from: SKL-048
+  to: SKL-065
+  type: dependency
+  label: session-insights gap analysis populates the gap_context that gap-to-skill-pipeline restores
+- from: SKL-065
+  to: SKL-012
+  type: composition
+  label: gap-to-skill-pipeline invokes skill-authoring in gap_seed operation mode to generate the draft skill
+- from: SKL-065
+  to: SKL-015
+  type: composition
+  label: gap-to-skill-pipeline invokes quality-scoring as a pre-HITL quality gate (min score 70)
+- from: SKL-024
+  to: SKL-066
+  type: dependency
+  label: semantic-diff-analyzer consumes change-impact-analyzer output as triggering context
+- from: SKL-066
+  to: SKL-006
+  type: dependency
+  label: semantic-diff-analyzer security_signals feed into security-review as behavioral evidence
+- from: SKL-066
+  to: SKL-028
+  type: dependency
+  label: semantic-diff-analyzer test_invalidation_reasons feed into test-generator for targeted re-generation
+- from: SKL-066
+  to: SKL-004
+  type: co_occurrence
+  label: semantic-diff-analyzer contract_diff surfaces to clean-code-review for review prioritization
+- from: SKL-001
+  to: SKL-067
+  type: dependency
+  label: acceptance-criteria-generator consumes structured requirements from requirement-analyzer
+- from: SKL-067
+  to: SKL-005
+  type: dependency
+  label: acceptance-criteria-generator outputs feed into testing-strategy as testability-rated criteria
+- from: SKL-067
+  to: SKL-028
+  type: dependency
+  label: acceptance-criteria-generator outputs feed into test-generator for traceable test generation
+- from: SKL-004
+  to: SKL-068
+  type: dependency
+  label: technical-debt-tracker consumes clean-code-review issues to build cross-session debt register
+- from: SKL-021
+  to: SKL-068
+  type: dependency
+  label: technical-debt-tracker reads and writes debt register via state-manager
+- from: SKL-068
+  to: SKL-003
+  type: dependency
+  label: technical-debt-tracker remediation backlog feeds into feature-planning for sprint prioritization
+- from: SKL-002
+  to: SKL-069
+  type: dependency
+  label: architecture-evolution-planner consumes current and target architecture from architecture-design
+- from: SKL-029
+  to: SKL-069
+  type: dependency
+  label: architecture-evolution-planner uses adr-generator to produce ADR stubs per evolution phase
+- from: SKL-023
+  to: SKL-069
+  type: dependency
+  label: architecture-evolution-planner uses dependency-analyzer for safe refactoring order computation
+- from: SKL-069
+  to: SKL-003
+  type: dependency
+  label: architecture-evolution-planner produces evolution phases fed into feature-planning as phased tasks
+- from: SKL-069
+  to: SKL-029
+  type: composition
+  label: architecture-evolution-planner triggers adr-generator for each significant evolution decision
+- from: SKL-001
+  to: SKL-070
+  type: dependency
+  label: compliance-mapper maps structured requirements to regulatory clauses
+- from: SKL-002
+  to: SKL-070
+  type: dependency
+  label: compliance-mapper analyzes data flows in architecture for compliance scope
+- from: SKL-006
+  to: SKL-070
+  type: dependency
+  label: compliance-mapper builds on security-review findings to enrich compliance evidence
+- from: SKL-070
+  to: SKL-041
+  type: dependency
+  label: compliance-mapper compliance gaps feed into security-guard as additional blocking conditions
+- from: SKL-070
+  to: SKL-008
+  type: dependency
+  label: compliance-mapper evidence checklist feeds into documentation-generator for audit docs
+- from: SKL-024
+  to: SKL-071
+  type: dependency
+  label: api-deprecation-manager triggered when change-impact-analyzer detects breaking API changes
+- from: SKL-021
+  to: SKL-071
+  type: dependency
+  label: api-deprecation-manager maintains API registry via state-manager
+- from: SKL-071
+  to: SKL-008
+  type: dependency
+  label: api-deprecation-manager migration guides feed into documentation-generator
+- from: SKL-071
+  to: SKL-007
+  type: co_occurrence
+  label: api-deprecation-manager deprecation timeline informs deployment-strategy release sequencing
+- from: SKL-007
+  to: SKL-072
+  type: dependency
+  label: infrastructure-cost-estimator consumes deployment-strategy for resource specification
+- from: SKL-002
+  to: SKL-072
+  type: dependency
+  label: infrastructure-cost-estimator uses architecture-design for workload profiling
+- from: SKL-072
+  to: SKL-007
+  type: co_occurrence
+  label: infrastructure-cost-estimator cost estimates presented alongside deployment-strategy HITL gate
+- from: SKL-028
+  to: SKL-073
+  type: dependency
+  label: mutation-test-generator analyzes test suites produced by test-generator
+- from: SKL-027
+  to: SKL-073
+  type: dependency
+  label: mutation-test-generator analyzes code artifacts produced by code-generator
+- from: SKL-073
+  to: SKL-028
+  type: dependency
+  label: mutation-test-generator assertion_gaps feed back into test-generator for targeted strengthening
+- from: SKL-010
+  to: SKL-074
+  type: dependency
+  label: skill-simulator uses orchestrator execution model for pipeline graph resolution
+- from: SKL-021
+  to: SKL-074
+  type: dependency
+  label: skill-simulator reads session context from state-manager for simulation baseline
+- from: SKL-074
+  to: SKL-010
+  type: dependency
+  label: skill-simulator go/no-go report presented to orchestrator before real pipeline execution
+- from: SKL-024
+  to: SKL-075
+  type: dependency
+  label: multi-repo-coordinator uses change-impact-analyzer findings for cross-boundary impact computation
+- from: SKL-023
+  to: SKL-075
+  type: dependency
+  label: multi-repo-coordinator extends dependency-analyzer to cross-repo dependency graph
+- from: SKL-021
+  to: SKL-075
+  type: dependency
+  label: multi-repo-coordinator maintains cross-repo registry via state-manager
+- from: SKL-075
+  to: SKL-007
+  type: dependency
+  label: multi-repo-coordinator migration_coordination_plan informs deployment-strategy sequencing
+- from: SKL-001
+  to: SKL-076
+  type: dependency
+  label: domain-knowledge-extractor receives requirements as primary domain signal for extraction
+- from: SKL-002
+  to: SKL-076
+  type: dependency
+  label: domain-knowledge-extractor receives architecture artifacts for pattern extraction
+- from: SKL-006
+  to: SKL-076
+  type: dependency
+  label: domain-knowledge-extractor captures security patterns from security-review findings
+- from: SKL-021
+  to: SKL-076
+  type: dependency
+  label: domain-knowledge-extractor reads and writes domain knowledge base via state-manager
+- from: SKL-076
+  to: SKL-001
+  type: co_occurrence
+  label: domain-knowledge-extractor injects domain context into requirement-analyzer at pipeline start
+- from: SKL-076
+  to: SKL-002
+  type: co_occurrence
+  label: domain-knowledge-extractor injects architecture patterns into architecture-design at pipeline start
+- from: SKL-002
+  to: SKL-077
+  type: dependency
+  label: pipeline-branching forks from architecture-design output — requires two architecture variants
+- from: SKL-003
+  to: SKL-077
+  type: dependency
+  label: pipeline-branching runs feature-planning for both branches to generate comparative estimates
+- from: SKL-006
+  to: SKL-077
+  type: dependency
+  label: pipeline-branching runs security-review for both branches as part of comparison scorecard
+- from: SKL-005
+  to: SKL-077
+  type: dependency
+  label: pipeline-branching runs testing-strategy for both branches for testability comparison
+- from: SKL-021
+  to: SKL-077
+  type: dependency
+  label: pipeline-branching manages isolated branch execution contexts via state-manager
+- from: SKL-077
+  to: SKL-010
+  type: dependency
+  label: pipeline-branching selected_artifacts promoted to main pipeline by orchestrator after HITL selection
+- from: SKL-077
+  to: SKL-029
+  type: composition
+  label: pipeline-branching produces ADR stub documenting the branch selection decision
+- from: SKL-002
+  to: SKL-078
+  type: dependency
+  label: SKL-002 output consumed by data-pipeline-architect
+- from: SKL-032
+  to: SKL-078
+  type: dependency
+  label: SKL-032 output consumed by data-pipeline-architect
+- from: SKL-078
+  to: SKL-079
+  type: composition
+  label: data-pipeline-architect produces output consumed by data-quality-validator
+- from: SKL-078
+  to: SKL-081
+  type: composition
+  label: data-pipeline-architect produces output consumed by analytics-schema-designer
+- from: SKL-078
+  to: SKL-007
+  type: composition
+  label: data-pipeline-architect produces output consumed by deployment-strategy
+- from: SKL-078
+  to: SKL-079
+  type: dependency
+  label: SKL-078 output consumed by data-quality-validator
+- from: SKL-079
+  to: SKL-082
+  type: composition
+  label: data-quality-validator produces output consumed by data-contract-enforcer
+- from: SKL-079
+  to: SKL-007
+  type: composition
+  label: data-quality-validator produces output consumed by deployment-strategy
+- from: SKL-002
+  to: SKL-080
+  type: dependency
+  label: SKL-002 output consumed by ml-pipeline-architect
+- from: SKL-078
+  to: SKL-080
+  type: dependency
+  label: SKL-078 output consumed by ml-pipeline-architect
+- from: SKL-080
+  to: SKL-007
+  type: composition
+  label: ml-pipeline-architect produces output consumed by deployment-strategy
+- from: SKL-080
+  to: SKL-032
+  type: composition
+  label: ml-pipeline-architect produces output consumed by database-architect
+- from: SKL-078
+  to: SKL-081
+  type: dependency
+  label: SKL-078 output consumed by analytics-schema-designer
+- from: SKL-032
+  to: SKL-081
+  type: dependency
+  label: SKL-032 output consumed by analytics-schema-designer
+- from: SKL-081
+  to: SKL-026
+  type: composition
+  label: analytics-schema-designer produces output consumed by code-generator
+- from: SKL-081
+  to: SKL-007
+  type: composition
+  label: analytics-schema-designer produces output consumed by deployment-strategy
+- from: SKL-079
+  to: SKL-082
+  type: dependency
+  label: SKL-079 output consumed by data-contract-enforcer
+- from: SKL-078
+  to: SKL-082
+  type: dependency
+  label: SKL-078 output consumed by data-contract-enforcer
+- from: SKL-082
+  to: SKL-007
+  type: composition
+  label: data-contract-enforcer produces output consumed by deployment-strategy
+- from: SKL-082
+  to: SKL-042
+  type: composition
+  label: data-contract-enforcer produces output consumed by ci-pipeline-generator
+- from: SKL-002
+  to: SKL-083
+  type: dependency
+  label: SKL-002 output consumed by api-design-architect
+- from: SKL-001
+  to: SKL-083
+  type: dependency
+  label: SKL-001 output consumed by api-design-architect
+- from: SKL-083
+  to: SKL-026
+  type: composition
+  label: api-design-architect produces output consumed by code-generator
+- from: SKL-083
+  to: SKL-028
+  type: composition
+  label: api-design-architect produces output consumed by test-generator
+- from: SKL-083
+  to: SKL-042
+  type: composition
+  label: api-design-architect produces output consumed by ci-pipeline-generator
+- from: SKL-002
+  to: SKL-084
+  type: dependency
+  label: SKL-002 output consumed by graphql-architect
+- from: SKL-001
+  to: SKL-084
+  type: dependency
+  label: SKL-001 output consumed by graphql-architect
+- from: SKL-084
+  to: SKL-026
+  type: composition
+  label: graphql-architect produces output consumed by code-generator
+- from: SKL-084
+  to: SKL-028
+  type: composition
+  label: graphql-architect produces output consumed by test-generator
+- from: SKL-086
+  to: SKL-085
+  type: dependency
+  label: SKL-086 output consumed by event-schema-designer
+- from: SKL-002
+  to: SKL-085
+  type: dependency
+  label: SKL-002 output consumed by event-schema-designer
+- from: SKL-085
+  to: SKL-026
+  type: composition
+  label: event-schema-designer produces output consumed by code-generator
+- from: SKL-085
+  to: SKL-007
+  type: composition
+  label: event-schema-designer produces output consumed by deployment-strategy
+- from: SKL-002
+  to: SKL-086
+  type: dependency
+  label: SKL-002 output consumed by microservices-architect
+- from: SKL-103
+  to: SKL-086
+  type: dependency
+  label: SKL-103 output consumed by microservices-architect
+- from: SKL-086
+  to: SKL-085
+  type: composition
+  label: microservices-architect produces output consumed by event-schema-designer
+- from: SKL-086
+  to: SKL-083
+  type: composition
+  label: microservices-architect produces output consumed by api-design-architect
+- from: SKL-086
+  to: SKL-007
+  type: composition
+  label: microservices-architect produces output consumed by deployment-strategy
+- from: SKL-086
+  to: SKL-087
+  type: dependency
+  label: SKL-086 output consumed by event-sourcing-designer
+- from: SKL-103
+  to: SKL-087
+  type: dependency
+  label: SKL-103 output consumed by event-sourcing-designer
+- from: SKL-087
+  to: SKL-032
+  type: composition
+  label: event-sourcing-designer produces output consumed by database-architect
+- from: SKL-087
+  to: SKL-026
+  type: composition
+  label: event-sourcing-designer produces output consumed by code-generator
+- from: SKL-087
+  to: SKL-028
+  type: composition
+  label: event-sourcing-designer produces output consumed by test-generator
+- from: SKL-002
+  to: SKL-088
+  type: dependency
+  label: SKL-002 output consumed by distributed-resilience-architect
+- from: SKL-086
+  to: SKL-088
+  type: dependency
+  label: SKL-086 output consumed by distributed-resilience-architect
+- from: SKL-088
+  to: SKL-007
+  type: composition
+  label: distributed-resilience-architect produces output consumed by deployment-strategy
+- from: SKL-088
+  to: SKL-099
+  type: composition
+  label: distributed-resilience-architect produces output consumed by chaos-engineering-designer
+- from: SKL-002
+  to: SKL-089
+  type: dependency
+  label: SKL-002 output consumed by cloud-architecture-reviewer
+- from: SKL-089
+  to: SKL-007
+  type: composition
+  label: cloud-architecture-reviewer produces output consumed by deployment-strategy
+- from: SKL-089
+  to: SKL-006
+  type: composition
+  label: cloud-architecture-reviewer produces output consumed by security-review
+- from: SKL-002
+  to: SKL-090
+  type: dependency
+  label: SKL-002 output consumed by serverless-architect
+- from: SKL-089
+  to: SKL-090
+  type: dependency
+  label: SKL-089 output consumed by serverless-architect
+- from: SKL-090
+  to: SKL-007
+  type: composition
+  label: serverless-architect produces output consumed by deployment-strategy
+- from: SKL-090
+  to: SKL-042
+  type: composition
+  label: serverless-architect produces output consumed by ci-pipeline-generator
+- from: SKL-002
+  to: SKL-091
+  type: dependency
+  label: SKL-002 output consumed by container-orchestration-architect
+- from: SKL-093
+  to: SKL-091
+  type: dependency
+  label: SKL-093 output consumed by container-orchestration-architect
+- from: SKL-091
+  to: SKL-007
+  type: composition
+  label: container-orchestration-architect produces output consumed by deployment-strategy
+- from: SKL-091
+  to: SKL-042
+  type: composition
+  label: container-orchestration-architect produces output consumed by ci-pipeline-generator
+- from: SKL-002
+  to: SKL-092
+  type: dependency
+  label: SKL-002 output consumed by threat-model-designer
+- from: SKL-001
+  to: SKL-092
+  type: dependency
+  label: SKL-001 output consumed by threat-model-designer
+- from: SKL-092
+  to: SKL-006
+  type: composition
+  label: threat-model-designer produces output consumed by security-review
+- from: SKL-092
+  to: SKL-041
+  type: composition
+  label: threat-model-designer produces output consumed by security-guard
+- from: SKL-002
+  to: SKL-093
+  type: dependency
+  label: SKL-002 output consumed by secrets-management-architect
+- from: SKL-092
+  to: SKL-093
+  type: dependency
+  label: SKL-092 output consumed by secrets-management-architect
+- from: SKL-093
+  to: SKL-007
+  type: composition
+  label: secrets-management-architect produces output consumed by deployment-strategy
+- from: SKL-093
+  to: SKL-091
+  type: composition
+  label: secrets-management-architect produces output consumed by container-orchestration-architect
+- from: SKL-006
+  to: SKL-094
+  type: dependency
+  label: SKL-006 output consumed by devsecops-pipeline-designer
+- from: SKL-092
+  to: SKL-094
+  type: dependency
+  label: SKL-092 output consumed by devsecops-pipeline-designer
+- from: SKL-094
+  to: SKL-042
+  type: composition
+  label: devsecops-pipeline-designer produces output consumed by ci-pipeline-generator
+- from: SKL-005
+  to: SKL-095
+  type: dependency
+  label: SKL-005 output consumed by load-test-designer
+- from: SKL-097
+  to: SKL-095
+  type: dependency
+  label: SKL-097 output consumed by load-test-designer
+- from: SKL-095
+  to: SKL-096
+  type: composition
+  label: load-test-designer produces output consumed by profiling-advisor
+- from: SKL-095
+  to: SKL-042
+  type: composition
+  label: load-test-designer produces output consumed by ci-pipeline-generator
+- from: SKL-095
+  to: SKL-096
+  type: dependency
+  label: SKL-095 output consumed by profiling-advisor
+- from: SKL-096
+  to: SKL-035
+  type: composition
+  label: profiling-advisor produces output consumed by performance-guard
+- from: SKL-002
+  to: SKL-097
+  type: dependency
+  label: SKL-002 output consumed by slo-sla-designer
+- from: SKL-001
+  to: SKL-097
+  type: dependency
+  label: SKL-001 output consumed by slo-sla-designer
+- from: SKL-097
+  to: SKL-014
+  type: composition
+  label: slo-sla-designer produces output consumed by observability
+- from: SKL-097
+  to: SKL-095
+  type: composition
+  label: slo-sla-designer produces output consumed by load-test-designer
+- from: SKL-097
+  to: SKL-098
+  type: composition
+  label: slo-sla-designer produces output consumed by runbook-generator
+- from: SKL-097
+  to: SKL-098
+  type: dependency
+  label: SKL-097 output consumed by runbook-generator
+- from: SKL-014
+  to: SKL-098
+  type: dependency
+  label: SKL-014 output consumed by runbook-generator
+- from: SKL-098
+  to: SKL-008
+  type: composition
+  label: runbook-generator produces output consumed by documentation-generator
+- from: SKL-088
+  to: SKL-099
+  type: dependency
+  label: SKL-088 output consumed by chaos-engineering-designer
+- from: SKL-097
+  to: SKL-099
+  type: dependency
+  label: SKL-097 output consumed by chaos-engineering-designer
+- from: SKL-099
+  to: SKL-098
+  type: composition
+  label: chaos-engineering-designer produces output consumed by runbook-generator
+- from: SKL-099
+  to: SKL-014
+  type: composition
+  label: chaos-engineering-designer produces output consumed by observability
+- from: SKL-002
+  to: SKL-100
+  type: dependency
+  label: SKL-002 output consumed by state-management-architect
+- from: SKL-003
+  to: SKL-100
+  type: dependency
+  label: SKL-003 output consumed by state-management-architect
+- from: SKL-100
+  to: SKL-026
+  type: composition
+  label: state-management-architect produces output consumed by code-generator
+- from: SKL-002
+  to: SKL-101
+  type: dependency
+  label: SKL-002 output consumed by micro-frontend-architect
+- from: SKL-003
+  to: SKL-101
+  type: dependency
+  label: SKL-003 output consumed by micro-frontend-architect
+- from: SKL-101
+  to: SKL-026
+  type: composition
+  label: micro-frontend-architect produces output consumed by code-generator
+- from: SKL-101
+  to: SKL-038
+  type: composition
+  label: micro-frontend-architect produces output consumed by design-system-generator
+- from: SKL-002
+  to: SKL-102
+  type: dependency
+  label: SKL-002 output consumed by web-performance-optimizer
+- from: SKL-031
+  to: SKL-102
+  type: dependency
+  label: SKL-031 output consumed by web-performance-optimizer
+- from: SKL-102
+  to: SKL-042
+  type: composition
+  label: web-performance-optimizer produces output consumed by ci-pipeline-generator
+- from: SKL-001
+  to: SKL-103
+  type: dependency
+  label: SKL-001 output consumed by ddd-architect
+- from: SKL-103
+  to: SKL-002
+  type: composition
+  label: ddd-architect produces output consumed by architecture-design
+- from: SKL-103
+  to: SKL-086
+  type: composition
+  label: ddd-architect produces output consumed by microservices-architect
+- from: SKL-103
+  to: SKL-032
+  type: composition
+  label: ddd-architect produces output consumed by database-architect
+- from: SKL-002
+  to: SKL-104
+  type: dependency
+  label: SKL-002 output consumed by caching-strategy-designer
+- from: SKL-032
+  to: SKL-104
+  type: dependency
+  label: SKL-032 output consumed by caching-strategy-designer
+- from: SKL-104
+  to: SKL-007
+  type: composition
+  label: caching-strategy-designer produces output consumed by deployment-strategy
+- from: SKL-002
+  to: SKL-105
+  type: dependency
+  label: SKL-002 output consumed by localization-architect
+- from: SKL-003
+  to: SKL-105
+  type: dependency
+  label: SKL-003 output consumed by localization-architect
+- from: SKL-105
+  to: SKL-026
+  type: composition
+  label: localization-architect produces output consumed by code-generator
+- from: SKL-003
+  to: SKL-106
+  type: dependency
+  label: SKL-003 output consumed by product-analytics-designer
+- from: SKL-001
+  to: SKL-106
+  type: dependency
+  label: SKL-001 output consumed by product-analytics-designer
+- from: SKL-106
+  to: SKL-026
+  type: composition
+  label: product-analytics-designer produces output consumed by code-generator
+- from: SKL-106
+  to: SKL-078
+  type: composition
+  label: product-analytics-designer produces output consumed by data-pipeline-architect
+- from: SKL-002
+  to: SKL-107
+  type: dependency
+  label: SKL-002 output consumed by realtime-system-architect
+- from: SKL-088
+  to: SKL-107
+  type: dependency
+  label: SKL-088 output consumed by realtime-system-architect
+- from: SKL-107
+  to: SKL-026
+  type: composition
+  label: realtime-system-architect produces output consumed by code-generator
+- from: SKL-107
+  to: SKL-007
+  type: composition
+  label: realtime-system-architect produces output consumed by deployment-strategy

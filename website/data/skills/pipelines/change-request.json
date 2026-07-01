@@ -1,0 +1,103 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "change-request",
+  "version": "1.1.0",
+  "description": "Change request intake → impact analysis → HITL approval → re-planning → execution → completeness validation → closure. Triggered by change_request.created event or direct invocation.",
+  "mode": "sequential",
+  "phases": [
+    {
+      "id": "phase-1-intake",
+      "label": "Change Request Intake",
+      "skills": [
+        { "name": "change-request-manager", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
+      "id": "phase-3-replan",
+      "label": "Re-Planning",
+      "condition": "cr.approval_status === 'approved'",
+      "skills": [
+        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-lifecycle-guard",
+      "label": "Lifecycle State Validation",
+      "skills": [
+        { "name": "work-item-lifecycle-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-5-execution",
+      "label": "Code Generation",
+      "condition": "cr.task_delta.new_tasks.length > 0",
+      "skills": [
+        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-validation",
+      "label": "Completeness Audit",
+      "skills": [
+        { "name": "implementation-completeness-auditor", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6b-completeness-guard",
+      "label": "Completeness Readiness Gate",
+      "skills": [
+        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-7-export",
+      "label": "Work Item Export",
+      "async": true,
+      "skills": [
+        { "name": "work-item-exporter", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
+      "id": "phase-8-docs",
+      "label": "Documentation Sync",
+      "async": true,
+      "skills": [
+        { "name": "doc-maintainer", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "adr-generator", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-intake",
+      "type": "human_approval",
+      "label": "Review impact summary (modules affected, tasks affected, effort delta) and approve or reject the change request",
+      "timeout": 7200
+    },
+    {
+      "after_phase": "phase-1-intake",
+      "type": "human_approval",
+      "condition": "cr.new_requirements.length > 0",
+      "label": "Confirm scope: new requirements identified by this CR — review and approve before re-planning begins",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-lifecycle-guard",
+      "type": "condition",
+      "label": "Block if lifecycle guard verdict is 'block'",
+      "condition": "lifecycle_guard.verdict !== 'block'"
+    },
+    {
+      "after_phase": "phase-6b-completeness-guard",
+      "type": "human_approval",
+      "label": "Confirm scope of change is fully delivered and completeness threshold is met before closure",
+      "timeout": 3600
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["work-item-exporter", "doc-maintainer", "adr-generator"]
+}

@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "requirements-only",
   "version": "1.0.0",
-  "description": "Extract, normalize, and validate requirements from raw input. Stops after requirement analysis — use when scoping a feature before committing to design.",
+  "description": "Extract, normalize, and validate requirements from raw input. Stops after requirement analysis \u2014 use when scoping a feature before committing to design.",
   "mode": "sequential",
   "skills": [
     {
@@ -20,5 +20,26 @@
       "timeout": 3600
     }
   ],
-  "async_skills": []
+  "async_skills": [],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

@@ -1,0 +1,131 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "api-first",
+  "version": "1.0.0",
+  "description": "API-first design pipeline (v1.0.0): requirements → architecture → API contract design (REST/GraphQL/Events) → security review → code generation → testing → deployment. Use for API-centric products where contract-first design is mandated.",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-api-contracts",
+      "label": "API Contract Design",
+      "parallel": true,
+      "skills": [
+        { "name": "api-design-architect",  "version": "^1.0.0", "max_retries": 2 },
+        { "name": "graphql-architect",     "version": "^1.0.0", "max_retries": 2 },
+        { "name": "event-schema-designer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-threat-model",
+      "label": "Threat Modeling",
+      "skills": [
+        { "name": "threat-model-designer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-security",
+      "label": "Security Review",
+      "skills": [
+        { "name": "security-review", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-planning",
+      "label": "Planning",
+      "skills": [
+        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-code",
+      "label": "Code Generation",
+      "skills": [
+        { "name": "code-generator",  "version": "^1.0.0", "max_retries": 2 },
+        { "name": "test-generator",  "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8-guards",
+      "label": "Guard Layer",
+      "parallel": true,
+      "skills": [
+        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-9-deploy",
+      "label": "Deployment",
+      "skills": [
+        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-10-docs",
+      "label": "API Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 },
+        { "name": "adr-generator",           "version": "^1.0.0", "max_retries": 1, "async": true }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["api-design-architect", "graphql-architect", "event-schema-designer"],
+    ["security-guard", "performance-guard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Confirm API style requirements (REST/GraphQL/events) and consumer expectations",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-3-api-contracts",
+      "type": "human_approval",
+      "label": "Approve API contracts before security review — contracts are the binding interface",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-security",
+      "type": "human_approval",
+      "label": "Approve security posture before code generation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-8-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block'",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-9-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+}

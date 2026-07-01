@@ -76,7 +76,7 @@
     },
     "analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
       "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
@@ -140,7 +140,7 @@
     },
     "impact-analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
@@ -164,7 +164,7 @@
     },
     "deployer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
       "skill": ".opencode/skills/deployment-strategy/SKILL.md"

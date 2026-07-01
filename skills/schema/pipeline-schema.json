@@ -136,6 +136,49 @@
       "type": "boolean",
       "default": false,
       "description": "If true, all intermediate artifacts are retained in the pipeline result. Increases token usage significantly."
+    },
+    "resumable": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, the pipeline supports resume_from_phase — HITL rejections can resume from any prior phase without restarting from phase 1."
+    },
+    "token_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Token budget and auto-compression policy for this pipeline (governance §7).",
+      "required": ["auto_compress", "trigger_at_percent", "budget_tiers"],
+      "properties": {
+        "auto_compress": {
+          "type": "boolean",
+          "description": "If true, context-compressor is triggered automatically when context pressure reaches trigger_at_percent."
+        },
+        "trigger_at_percent": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 99,
+          "description": "Percentage of the active budget ceiling at which auto-compression fires."
+        },
+        "default_tier": {
+          "type": "string",
+          "enum": ["standard", "large", "xl"],
+          "description": "Default budget tier for this pipeline. Orchestrator uses this tier when no per-phase override is set."
+        },
+        "budget_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Available budget tiers. Each tier defines a ceiling and cascade mode.",
+          "items": {
+            "type": "object",
+            "required": ["name", "ceiling", "cascade_mode"],
+            "additionalProperties": false,
+            "properties": {
+              "name":         { "type": "string", "enum": ["standard", "large", "xl"] },
+              "ceiling":      { "type": "integer", "minimum": 1000 },
+              "cascade_mode": { "type": "string", "enum": ["single_pass", "cascade"] }
+            }
+          }
+        }
+      }
     }
   },
   "oneOf": [

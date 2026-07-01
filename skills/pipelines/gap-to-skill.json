@@ -7,12 +7,12 @@
   "skills": [
     {
       "name": "gap-to-skill-pipeline",
-      "note": "Entry skill — restores gap context, generates scaffold seed, coordinates skill-authoring and quality-scoring. Guards: aborts if gap_to_skill_active flag is already set; aborts if gap_context is absent in session state.",
+      "note": "Entry skill \u2014 restores gap context, generates scaffold seed, coordinates skill-authoring and quality-scoring. Guards: aborts if gap_to_skill_active flag is already set; aborts if gap_context is absent in session state.",
       "max_retries": 0
     },
     {
       "name": "skill-authoring",
-      "note": "Invoked in gap_seed operation mode — Steps 0 (dedup) through 9 (registration) with seed values pre-populated from gap_context.",
+      "note": "Invoked in gap_seed operation mode \u2014 Steps 0 (dedup) through 9 (registration) with seed values pre-populated from gap_context.",
       "max_retries": 1,
       "config": {
         "operation": "gap_seed"
@@ -39,5 +39,26 @@
     "on_critical_failure": "rollback-manager",
     "max_repair_iterations": 2,
     "rollback_scope": "pipeline_run"
+  },
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
   }
 }

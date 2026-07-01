@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "architecture-only",
   "version": "1.0.0",
-  "description": "Quick architecture review: requirements → architecture design. Use when you have existing requirements and need an architecture decision only.",
+  "description": "Quick architecture review: requirements \u2192 architecture design. Use when you have existing requirements and need an architecture decision only.",
   "mode": "sequential",
   "skills": [
     {
@@ -25,5 +25,26 @@
       "timeout": 3600
     }
   ],
-  "async_skills": []
+  "async_skills": [],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

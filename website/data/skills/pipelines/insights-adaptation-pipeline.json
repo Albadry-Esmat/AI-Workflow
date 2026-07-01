@@ -1,0 +1,77 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "insights-adaptation-pipeline",
+  "version": "1.0.0",
+  "description": "Observability-to-adaptation pipeline (v1.0.0): telemetry collection → session insights + dashboard → adaptive proposals → HITL approval → adaptation application. Runs the full SKL-047→SKL-051 chain for continuous, human-supervised skill improvement.",
+  "mode": "hybrid",
+  "phases": [
+    {
+      "id": "phase-1-telemetry",
+      "label": "Telemetry Collection",
+      "skills": [
+        { "name": "behavioral-telemetry-collector", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-insights",
+      "label": "Insights + Dashboard",
+      "parallel": true,
+      "skills": [
+        { "name": "session-insights",      "version": "^1.0.0", "max_retries": 2 },
+        { "name": "enhancement-dashboard", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-proposals",
+      "label": "Adaptive Proposals",
+      "skills": [
+        { "name": "adaptive-proposal-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-apply",
+      "label": "Adaptation Application",
+      "skills": [
+        { "name": "adaptation-applicator", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    },
+    {
+      "id": "phase-5-docs",
+      "label": "Documentation Sync",
+      "async": true,
+      "skills": [
+        { "name": "doc-maintainer", "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["session-insights", "enhancement-dashboard"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-2-insights",
+      "type": "condition",
+      "label": "Skip adaptation if no actionable patterns detected",
+      "condition": "insights.actionable_patterns.length > 0"
+    },
+    {
+      "after_phase": "phase-3-proposals",
+      "type": "human_approval",
+      "label": "Review and approve adaptation proposals before application — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    },
+    {
+      "after_phase": "phase-4-apply",
+      "type": "condition",
+      "label": "Block if adaptation applicator did not confirm success",
+      "condition": "adaptation.status === 'applied'"
+    }
+  ],
+  "async_skills": ["doc-maintainer"],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 1,
+    "rollback_scope": "pipeline_stage"
+  }
+}

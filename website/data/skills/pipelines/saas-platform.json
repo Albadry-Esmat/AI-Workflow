@@ -1,0 +1,243 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "saas-platform",
+  "version": "1.0.0",
+  "description": "End-to-end pipeline for SaaS platforms and B2B enterprise products: requirements → architecture + SaaS domain constraints (multi-tenancy, RBAC, SSO, billing, compliance) → UX + multi-tenant DB design → planning → code generation → tenant isolation guard layer → compliance + quality audit → release gate → deployment + CI scaffold → docs",
+  "mode": "hybrid",
+  "domain": "saas",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture (first pass)",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2 },
+        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+      ]
+    },
+    {
+      "id": "phase-2c-domain",
+      "label": "SaaS & Enterprise Domain Specialist",
+      "note": "Injects multi-tenancy model, RBAC architecture, subscription billing design, enterprise SSO (SAML/OIDC/SCIM), compliance framework controls, white-labeling, and audit logging requirements into domain_constraints.",
+      "skills": [
+        { "name": "saas-enterprise-architect", "version": "^1.0.0", "max_retries": 2,
+          "config": { "domain_context": { "domain_primary": "saas" } } }
+      ]
+    },
+    {
+      "id": "phase-2d-architecture-refine",
+      "label": "Architecture (second pass — SaaS-constrained)",
+      "skills": [
+        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2,
+          "input_overrides": { "domain_constraints": "$phase-2c-domain.domain_constraints" } }
+      ]
+    },
+    {
+      "id": "phase-2b-design",
+      "label": "UX + Multi-Tenant Database Design",
+      "parallel": true,
+      "note": "database-architect receives tenancy_model from domain_constraints; produces multi-tenant schema with RLS or schema-per-tenant setup.",
+      "skills": [
+        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
+        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2,
+          "config": { "mode": "multi_tenant" } }
+      ]
+    },
+    {
+      "id": "phase-2e-design-system",
+      "label": "Design System Generation",
+      "skills": [
+        { "name": "design-system-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-3-graph",
+      "label": "Dependency Graph",
+      "skills": [
+        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-4-planning",
+      "label": "Planning",
+      "skills": [
+        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-5-impact",
+      "label": "Impact Analysis",
+      "skills": [
+        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-6-execution",
+      "label": "Code Generation",
+      "skills": [
+        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7-quality",
+      "label": "Quality + Testing",
+      "parallel": true,
+      "skills": [
+        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
+        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2,
+          "config": { "domain_hints": ["tenant_isolation", "rbac_boundary", "billing_webhook_idempotency", "sso_saml_oidc", "compliance_controls"] } },
+        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
+        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-7b-guards",
+      "label": "Guard Layer (Tenant Isolation + Compliance)",
+      "parallel": true,
+      "skills": [
+        { "name": "security-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check",
+          "config": { "domain": "saas" },
+          "note": "Flags cross-tenant data access, missing audit logging, and compliance control gaps as blocks." },
+        { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check",
+          "config": { "check_rls": true, "check_tenant_scope": true } },
+        { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
+        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-8-repair",
+      "label": "Repair (conditional)",
+      "condition": "test.failed OR build.broken",
+      "skills": [
+        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+      ]
+    },
+    {
+      "id": "phase-8b-audit",
+      "label": "Completeness Audit",
+      "skills": [
+        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+      ]
+    },
+    {
+      "id": "phase-8c-release-guard",
+      "label": "Release Gate",
+      "skills": [
+        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+      ]
+    },
+    {
+      "id": "phase-9-deploy",
+      "label": "Deployment + CI Scaffold",
+      "parallel": true,
+      "skills": [
+        { "name": "deployment-strategy",   "version": "^1.1.0", "max_retries": 2,
+          "config": { "strategy_hints": ["blue_green", "feature_flags", "tenant_staged_rollout"] } },
+        { "name": "ci-pipeline-generator", "version": "^1.0.0", "max_retries": 2,
+          "config": { "secret_scan": true } }
+      ]
+    },
+    {
+      "id": "phase-10-docs",
+      "label": "Documentation",
+      "async": true,
+      "skills": [
+        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
+        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["frontend-ux-architect", "database-architect"],
+    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
+    ["security-guard", "database-guard", "performance-guard", "ui-ux-compliance-guard"],
+    ["deployment-strategy", "ci-pipeline-generator"]
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Validate SaaS requirements — confirm tenant scale, compliance frameworks, pricing model, and SSO requirements before domain specialist runs",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2-architecture",
+      "type": "human_approval",
+      "label": "Sign off on initial architecture before SaaS domain specialist runs",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2c-domain",
+      "type": "human_approval",
+      "label": "Approve SaaS domain constraints: tenancy model, RBAC, billing provider, SSO scope, compliance controls — these decisions are expensive to change post-implementation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2d-architecture-refine",
+      "type": "human_approval",
+      "label": "Approve multi-tenant architecture before UX/DB design layer",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2b-design",
+      "type": "human_approval",
+      "label": "Approve multi-tenant database schema and UX architecture — RLS policies and tenant scoping must be validated before planning",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2e-design-system",
+      "type": "human_approval",
+      "label": "Approve design system (including white-label theming architecture if applicable) before planning",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-4-planning",
+      "type": "human_approval",
+      "label": "Approve roadmap and impact surface before SaaS platform implementation",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-5-impact",
+      "type": "condition",
+      "label": "Block if impact_severity=critical",
+      "condition": "change_impact.impact_severity !== 'critical'"
+    },
+    {
+      "after_phase": "phase-7b-guards",
+      "type": "condition",
+      "label": "Block if any guard verdict is 'block' — tenant isolation failures and missing audit logs are non-bypassable",
+      "condition": "guards.every(g => g.verdict === 'pass')"
+    },
+    {
+      "after_phase": "phase-7-quality",
+      "type": "human_approval",
+      "label": "Approve security posture, tenant isolation test coverage, and compliance control verification before audit",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-8c-release-guard",
+      "type": "condition",
+      "label": "Block if completeness guard verdict is 'block'",
+      "condition": "release_guard.verdict === 'pass'"
+    },
+    {
+      "after_phase": "phase-9-deploy",
+      "type": "human_approval",
+      "label": "Mandatory deployment approval — non-bypassable",
+      "bypass_on_timeout": false,
+      "timeout": 0
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 3,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+}

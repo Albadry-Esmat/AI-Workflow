@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.3.0
+version: 1.4.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -173,12 +173,34 @@ Step 3 — Execute skills (mode-dependent)
   Hybrid mode: execute per parallel_groups definition.
   Per skill:
     a) Compress input (strip non-essential fields per skill's Token Optimization section)
-    b) Invoke skill
-    c) Validate output against skill's output schema (via schema-validator)
-    d) If validation fails AND retries remain → re-invoke with corrected input
-    e) If validation fails AND no retries → emit error, pause pipeline
-    f) Check HITL gate (if configured for this skill) — pause and wait for approval/rejection
-    g) Append output to session_context
+    b) [TASK-0051] Project output of prior skill before passing as input (output-field pruning):
+         i)  Load target skill's input schema (required + optional fields only).
+         ii) Project prior skill's output to include ONLY fields present in target schema.
+         iii) Always include: id fields, status fields, error fields (for error propagation).
+         iv) Always exclude from handoff: metrics{}, feedback[] (route to telemetry instead).
+         v)  Record projected token_count in session_context event_log for observability.
+         Expected reduction: 40–60% per inter-skill handoff vs. full output passthrough.
+    c) Invoke skill
+    d) Validate output against skill's output schema (via schema-validator)
+    e) If validation fails AND retries remain → re-invoke with corrected input
+    f) If validation fails AND no retries → emit error, pause pipeline
+    g) Check HITL gate (if configured for this skill) — pause and wait for approval/rejection
+    h) Append output to session_context
+    i) [TASK-0053] Compress completed skill state after downstream consumption:
+         If skill N output has been consumed by skill N+1 (input mapped, step b complete)
+         AND the completed skill count exceeds 3 (i.e., there are more than 3 prior outputs):
+           Invoke context-compressor(
+             content         = serialized session_context[skill_N].output,
+             content_type    = "skill_output",
+             max_tokens      = 500,
+             compression_goal = "lossless_index",
+             cascade_mode    = "single_pass",
+             auto_compress   = true
+           )
+           Replace session_context[skill_N].output with compressed_content.
+           Record session_context[skill_N].compressed = true, compression_ratio.
+         This enforces the "keep last 3 skill outputs at full size" retention policy
+         from context-engineering.md and prevents state bloat in late pipeline phases.
   Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
     writes from each group MUST be serialized (one at a time, mutex-locked). Concurrent
     skill execution is allowed; concurrent writes to session_context are not.

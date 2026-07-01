@@ -1,0 +1,29 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "architecture-only",
+  "version": "1.0.0",
+  "description": "Quick architecture review: requirements → architecture design. Use when you have existing requirements and need an architecture decision only.",
+  "mode": "sequential",
+  "skills": [
+    {
+      "name": "requirement-analyzer",
+      "version": "^1.1.0",
+      "max_retries": 2
+    },
+    {
+      "name": "architecture-design",
+      "version": "^1.1.0",
+      "max_retries": 2
+    }
+  ],
+  "parallel_groups": [],
+  "gates": [
+    {
+      "after_skill": "architecture-design",
+      "type": "human_approval",
+      "label": "Sign off on architecture",
+      "timeout": 3600
+    }
+  ],
+  "async_skills": []
+}
