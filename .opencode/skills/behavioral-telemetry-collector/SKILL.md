@@ -1,6 +1,6 @@
 ---
 name: behavioral-telemetry-collector
-version: 1.1.0
+version: 1.2.0
 domain: system
 description: 'Use when collecting anonymized behavioral telemetry from pipeline sessions for later insight generation. Triggers on: "collect telemetry", "record session events", "behavioral telemetry", "pipeline behavior tracking". Always checks opt-out flag first — if set, exits immediately without collecting any data. Never collects PII, user inputs, code content, or credentials.'
 author: ASE-OS
@@ -63,7 +63,7 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `capability_gap` |
+| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `capability_gap`, `skill.tokens_consumed` |
 | `skill_name` | `string` | Yes | Registered skill identifier (e.g. `architecture-design`). Use `"orchestrator"` for `capability_gap` events. |
 | `session_id` | `string` | Yes | UUID v4 session identifier |
 | `pipeline_phase` | `string` | No | Current pipeline phase ID |
@@ -72,6 +72,12 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 | `hitl_verdict` | `string\|null` | No | One of: `approved`, `rejected`, `modified`, `timeout`, `null` (for gate events only) |
 | `detected_domain` | `string` | No | For `capability_gap` events only — the classified intent domain (enum-bound). One of: `testing`, `security`, `deployment`, `architecture`, `data`, `frontend`, `mobile`, `embedded`, `skill-management`, `unknown` |
 | `gap_id` | `string` | No | For `capability_gap` events only — UUID v4 of the logged gap (from `gap_context.gap_id`) |
+| `tokens_in` | `integer` | No | For `skill.tokens_consumed` events only — token count of all input artifacts for this invocation (sum of Artifact.token_count from TASK-0060). |
+| `tokens_out` | `integer` | No | For `skill.tokens_consumed` events only — token count of the skill's output artifact (from Artifact envelope `token_count`). |
+| `tokens_total` | `integer` | No | For `skill.tokens_consumed` events only — `tokens_in + tokens_out`. |
+| `model` | `string` | No | For `skill.tokens_consumed` events only — model ID used for this invocation (e.g. `claude-sonnet-4.6`). |
+| `cache_hit` | `boolean` | No | For `skill.tokens_consumed` events only — `true` if output was served from memoization cache (TASK-0057); `false` otherwise. |
+| `artifact_ids` | `array[string]` | No | For `skill.tokens_consumed` events only — `artifact_id` values of all output artifacts produced. |
 | `current_state` | `object` | Yes | Scoped read of `behavioral_telemetry` from state-manager (to check opt_out flag) |
 
 **Input Schema:**
@@ -86,7 +92,8 @@ This skill does **not** produce alerts, health status, or aggregations — that 
     "event_type": {
       "type": "string",
       "enum": ["skill.started", "skill.completed", "skill.failed",
-               "gate.passed", "gate.blocked", "feedback.triggered", "capability_gap"]
+               "gate.passed", "gate.blocked", "feedback.triggered",
+               "capability_gap", "skill.tokens_consumed"]
     },
     "skill_name":      { "type": "string", "minLength": 1 },
     "session_id":      { "type": "string", "format": "uuid" },
@@ -110,6 +117,12 @@ This skill does **not** produce alerts, health status, or aggregations — that 
       "format": "uuid",
       "description": "For capability_gap events only."
     },
+    "tokens_in":    { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "tokens_out":   { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "tokens_total": { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "model":        { "type": "string",  "description": "For skill.tokens_consumed events only." },
+    "cache_hit":    { "type": "boolean", "description": "For skill.tokens_consumed events only." },
+    "artifact_ids": { "type": "array",   "items": { "type": "string" }, "description": "For skill.tokens_consumed events only." },
     "current_state": {
       "type": "object",
       "description": "Scoped behavioral_telemetry slice from state-manager. May be null for first event in session."
@@ -139,10 +152,12 @@ Step 1 — Opt-out gate (UNCONDITIONAL FIRST CHECK)
   Output: opt_out_cleared = true
 
 Step 2 — Validate event inputs
-  Verify event_type is one of 7 known event types.
+  Verify event_type is one of 8 known event types (7 existing + skill.tokens_consumed).
   Verify session_id is a valid UUID v4.
   Reject path traversal patterns in session_id (../  /etc/  etc.).
   For capability_gap events: verify detected_domain is in the allowed enum; verify gap_id is a valid UUID v4.
+  For skill.tokens_consumed events: verify tokens_in, tokens_out, tokens_total are non-negative integers;
+    verify tokens_total == tokens_in + tokens_out (if all three provided); verify model is non-empty string.
   IF validation fails: return { collected: false, reason: "invalid_input", events_written: 0 }
   Output: validated_event
 
@@ -156,6 +171,10 @@ Step 3 — PII scrub
     hitl_verdict: allow (enum / null)
     duration_ms: allow (integer)
     timestamp: generated internally — never from input
+    tokens_in, tokens_out, tokens_total: allow (integers — no user content)
+    model: allow (model identifier string — no user content)
+    cache_hit: allow (boolean)
+    artifact_ids: allow (artifact ID strings — no user content; each ID truncated at 64 chars)
   Scrubber rules (applied in order):
     1. Replace any value matching credential patterns (Bearer .*, key=.*, password=.*) → "[REDACTED]"
     2. Replace any value matching email patterns → "[REDACTED_EMAIL]"
@@ -179,6 +198,15 @@ Step 4 — Construct anonymized event record
     {
       gap_domain:     <detected_domain enum value — not user text>,
       gap_id:         <validated UUID>
+    }
+  For skill.tokens_consumed events (TASK-0066), also include:
+    {
+      tokens_in:    <integer>,
+      tokens_out:   <integer>,
+      tokens_total: <integer>,
+      model:        <model identifier string>,
+      cache_hit:    <boolean>,
+      artifact_ids: <array of artifact ID strings>
     }
   Deduplication: capability_gap events with identical (session_id, gap_id) are silently dropped.
   Output: anonymized_event

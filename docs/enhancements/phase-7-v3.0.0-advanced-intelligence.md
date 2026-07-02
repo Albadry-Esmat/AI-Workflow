@@ -31,10 +31,10 @@ resumable, debate-validated pipeline with reliable async execution.
 
 | ID | Title | SP | Status |
 |----|-------|----|--------|
-| TASK-0066 | Token efficiency observability — per-skill telemetry, trends, adaptive proposals | 8 | pending |
-| TASK-0065 | Pipeline warm-start from HITL gate snapshot (cross-session resume) | 8 | pending |
-| TASK-0063 | New skill: `multi-agent-debate` — architect + reviewer debate loop | 13 | pending |
-| TASK-0064 | Durable async skill execution — job queue with retry, status, callbacks | 13 | pending |
+| TASK-0066 | Token efficiency observability — per-skill telemetry, trends, adaptive proposals | 8 | complete |
+| TASK-0065 | Pipeline warm-start from HITL gate snapshot (cross-session resume) | 8 | complete |
+| TASK-0063 | New skill: `multi-agent-debate` — architect + reviewer debate loop | 13 | complete |
+| TASK-0064 | Durable async skill execution — job queue with retry, status, callbacks | 13 | complete |
 
 ---
 

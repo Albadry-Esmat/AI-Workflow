@@ -1,7 +1,7 @@
 meta:
   version: 3.0.0
   last_updated: '2026-06-24'
-  total_nodes: 101
+  total_nodes: 102
   total_edges: 328
   schema: skills/graph/graph-schema.yaml
 nodes:
@@ -352,7 +352,7 @@ nodes:
   name: adaptive-proposal-generator
   domain: system
   mastery_level: advanced
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: utility
 - id: SKL-051
@@ -711,6 +711,13 @@ nodes:
   mastery_level: advanced
   version: 1.0.0
   status: draft
+  layer: architecture
+- id: SKL-108
+  name: multi-agent-debate
+  domain: architecture
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
   layer: architecture
 edges:
 - from: SKL-001
@@ -2032,3 +2039,19 @@ edges:
   to: SKL-007
   type: composition
   label: realtime-system-architect produces output consumed by deployment-strategy
+- from: SKL-002
+  to: SKL-108
+  type: dependency
+  label: architecture-design proposal is primary input to multi-agent-debate
+- from: SKL-108
+  to: SKL-003
+  type: composition
+  label: multi-agent-debate hardened architecture consumed by feature-planning
+- from: SKL-108
+  to: SKL-031
+  type: composition
+  label: multi-agent-debate hardened architecture consumed by frontend-ux-architect
+- from: SKL-108
+  to: SKL-032
+  type: composition
+  label: multi-agent-debate hardened architecture consumed by database-architect

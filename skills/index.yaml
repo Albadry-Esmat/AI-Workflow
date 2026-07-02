@@ -265,7 +265,7 @@ skills:
    - meta-skill
    - retry
    - feedback-loop
-   version: 1.6.0
+   version: 2.0.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -1352,7 +1352,7 @@ skills:
   - events
   - pipeline
   - monitoring
-  version: 1.1.0
+  version: 1.2.0
   depends_on:
   - SKL-014
   - SKL-021
@@ -1379,7 +1379,7 @@ skills:
   - performance
   - session
   - telemetry
-  version: 1.1.0
+  version: 1.2.0
   depends_on:
   - SKL-047
   mastery_level: intermediate
@@ -1405,7 +1405,7 @@ skills:
   - human-review
   - suggestions
   - read-only
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-048
   mastery_level: beginner
@@ -1431,7 +1431,7 @@ skills:
   - patterns
   - hitl-gated
   - suggestion-only
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-048
   - SKL-015
@@ -3048,3 +3048,36 @@ skills:
     presence systems, live notification fan-out.'
   do_not_use_when: Polling-based refresh is sufficient. Batch processing systems. REST-only APIs without bidirectional streaming
     requirements.
+- id: SKL-108
+  name: Multi-Agent Debate
+  short_description: Runs an adversarial Architect vs. Reviewer debate loop to produce a critique-hardened architecture artifact
+    before feature planning begins
+  reference_path: .opencode/skills/multi-agent-debate/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/multi-agent-debate/SKILL.md
+  tags:
+  - multi-agent
+  - debate
+  - architecture
+  - adversarial
+  - consensus
+  - hitl
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  related_skills:
+  - SKL-002
+  - SKL-003
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'Hardening an architecture proposal through adversarial Architect vs. Reviewer debate before feature planning begins.
+    Enabled by pipeline_config.debate_architecture: true. Use when architecture quality or security risk is high enough to warrant
+    multi-round critique.'
+  do_not_use_when: 'pipeline_config.debate_architecture is false or not set. Do not invoke for quick single-pass architecture
+    review — use clean-code-review or security-review instead. Do not use on time-constrained pipelines where debate overhead
+    is unacceptable.'

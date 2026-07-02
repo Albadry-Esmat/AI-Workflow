@@ -1,6 +1,6 @@
 # Context Engineering — Memory & Retrieval
 
-**Version:** 2.3.0 | **Last updated:** 2026-07-02
+**Version:** 3.0.0 | **Last updated:** 2026-07-02
 
 ## Context Model
 
@@ -417,3 +417,208 @@ in archival** (content_hash verified against current artifacts).
 
 Callers using the v1.0.0 API (`operation=write, tier=working`) continue to work without
 modification. The v2.0.0 shim maps v1.0.0 behavior to Tier 1 automatically.
+
+---
+
+## Token Efficiency Events
+
+> Added in v3.0.0 (TASK-0066). Uses Artifact envelope `token_count` from TASK-0060.
+
+### Event Schema
+
+After every skill invocation (including cache hits), the orchestrator emits a
+`skill.tokens_consumed` event to `behavioral-telemetry-collector`:
+
+```json
+{
+  "event_type":   "skill.tokens_consumed",
+  "skill_name":   "architecture-design",
+  "session_id":   "sess-001",
+  "pipeline_phase": "phase-2-architecture",
+  "tokens_in":    1240,
+  "tokens_out":   3800,
+  "tokens_total": 5040,
+  "model":        "claude-sonnet-4.6",
+  "cache_hit":    false,
+  "artifact_ids": ["art-0003"]
+}
+```
+
+- `tokens_in` = sum of `Artifact.token_count` for all input artifacts passed to the skill.
+- `tokens_out` = `Artifact.token_count` of the output artifact produced.
+- For cache hits: `tokens_out = 0` (no LLM call made); `cache_hit = true`.
+- Events are **fire-and-forget** — they MUST NOT block pipeline execution.
+
+### session_summary.token_efficiency
+
+`session-insights` (SKL-048) aggregates all `skill.tokens_consumed` events into a
+`token_efficiency` block appended to the session_summary:
+
+```json
+"token_efficiency": {
+  "total_tokens_consumed": 42000,
+  "by_skill": [
+    { "skill": "code-generator",     "tokens": 12000, "pct_of_total": 28.6 },
+    { "skill": "architecture-design","tokens":  5040, "pct_of_total": 12.0 }
+  ],
+  "cache_hit_rate":     0.15,
+  "compression_events": 3,
+  "outlier_skills":     [{ "skill": "code-generator", "tokens": 12000, "pct_of_total": 28.6 }],
+  "vs_baseline":        -0.38
+}
+```
+
+`vs_baseline` is negative for improvement (–38% = 38% fewer tokens than pre-Phase-4
+baseline) and positive for regression. The baseline is stored at
+`behavioral_telemetry.baseline_tokens_per_session` in state.
+
+### Observability Pipeline
+
+```
+[Orchestrator Step 3c3] ──► behavioral-telemetry-collector (SKL-047)
+        (fire-and-forget token event)           │
+                                                ▼
+                                    session-insights (SKL-048)
+                                    adds token_efficiency block
+                                                │
+                                                ▼
+                                    enhancement-dashboard (SKL-049)
+                                    renders Token Efficiency tab
+                                                │
+                                                ▼
+                                    adaptive-proposal-generator (SKL-050)
+                                    generates model_tier_downgrade /
+                                    output_pruning_candidate /
+                                    compression_policy_tighten proposals
+```
+
+---
+
+## Durable Job Registry
+
+> Added in v3.0.0 (TASK-0064). Extends TASK-0058's `async_task_registry` with persistence
+> and retry logic.
+
+### Problem
+
+The four async skills (`documentation-generator`, `doc-maintainer`, `adr-generator`,
+`work-item-exporter`) are fire-and-forget. If the session ends before they complete, their
+state is silently abandoned with no retry or failure reporting.
+
+### Job Entry Schema
+
+```json
+{
+  "job_id":           "job-doc-001",
+  "skill":            "documentation-generator",
+  "session_id":       "sess-001",
+  "dispatched_at":    "2026-07-02T10:30:00Z",
+  "status":           "pending",
+  "retry_count":      0,
+  "max_retries":      3,
+  "retry_policy":     { "backoff": "exponential", "initial_delay_ms": 5000 },
+  "last_error":       null,
+  "completed_at":     null,
+  "result_ref":       null,
+  "completion_event": "documentation.completed"
+}
+```
+
+### Status Lifecycle
+
+```
+[pending] ──► [running] ──► [completed]
+                  │
+                  └──► [retrying] ──► [running] (after backoff)
+                  │
+                  └──► [failed]    (max_retries exhausted)
+```
+
+### Storage
+
+Durable jobs are persisted to `.opencode/state/sessions/<session_id>.json` under
+`job_registry[]`. This allows jobs to survive session restarts — the orchestrator checks
+for in-progress jobs on session resume and re-dispatches them if needed.
+
+### Idempotency
+
+Each job carries a `job_id` (idempotency key). Skills receiving a durable job dispatch
+MUST check for an existing `job_id` before writing output. Duplicate `job_id` writes are
+silently skipped, preventing double-write on retry.
+
+### Base Mode vs. Advanced Mode
+
+| Mode | Job Storage | Use Case |
+|------|------------|----------|
+| Base (default) | Session state file | Self-contained; no external infrastructure |
+| Advanced (future) | External queue adapter (Trigger.dev, SQS) | High-throughput; multi-worker |
+
+Phase 7 ships base mode only. Advanced mode is a future extension with a defined adapter
+contract (dispatch/callback interface).
+
+### Query API
+
+```json
+{ "query_async_jobs": { "session_id": "sess-001", "status_filter": "all" } }
+```
+
+Returns the current `job_registry` filtered by session and status. Does NOT run any
+pipeline step — it is a pure read operation.
+
+---
+
+## Warm-Start
+
+> Added in v3.0.0 (TASK-0065). Unifies TASK-0056 `resume_from_phase` and TASK-0062
+> snapshot persistence into a single user-facing capability.
+
+### Problem
+
+Prior capabilities:
+- TASK-0056: `resume_from_phase` — in-memory resume; lost on session restart
+- TASK-0062: `restore_from_snapshot` — durable restore; requires manual snapshot_id
+
+Warm-start unifies both into one input with three intents covering all use cases.
+
+### `warm_start` Input
+
+```json
+{
+  "warm_start": {
+    "snapshot_id":     "snap-phase-2-architecture-approved",
+    "intent":          "re_run_from_snapshot",
+    "artifact_diff":   null,
+    "force_warm_start": false
+  }
+}
+```
+
+### Intents
+
+| Intent | Behavior | Use Case |
+|--------|----------|----------|
+| `re_run_from_snapshot` | Restore state; re-run all phases from snapshot's `phase_id` onward | Re-run with same inputs after a code fix |
+| `modify_and_continue` | Restore state; apply `artifact_diff`; re-run from that phase | Tweak architecture decision, re-run planning onward |
+| `branch` | Restore into a NEW session; run variant without affecting original | A/B comparison of two architecture approaches |
+
+### Snapshot Menu (at HITL Gates)
+
+After every HITL gate pause, the orchestrator surfaces available warm-start points:
+
+```
+Available warm-start points:
+  snap-phase-1-requirements   (after: requirement-analyzer)
+  snap-phase-2-architecture   (after: architecture-design)   ← last approved
+  snap-phase-3-planning       (pending approval)
+```
+
+### Content Hash Guard
+
+Before restoring, the orchestrator validates the snapshot's `artifact_ids` content
+hashes against current session inputs. A mismatch emits a warning:
+
+> "Snapshot content_hash mismatch — codebase may have diverged. Use
+> `force_warm_start: true` to override."
+
+Set `force_warm_start: true` only when you intentionally want to warm-start from a
+snapshot that was taken on a different version of the codebase.

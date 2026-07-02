@@ -13,6 +13,47 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.0.0] — 2026-07-02
+
+### Added
+
+- **TASK-0063** — New skill: `multi-agent-debate` v1.0.0 — adversarial Architect vs. Reviewer
+  debate loop. Runs up to `max_rounds` critique cycles; produces a `final_architecture` artifact
+  hardened by consensus, a full `debate_transcript`, and `unresolved_concerns[]` passed as
+  `architecture_risks[]` to feature-planning. Enabled by `pipeline_config.debate_architecture: true`.
+  Quality-scored 87/100; registered as SKL-108 in `skills/index.yaml`.
+- **TASK-0064** — Durable async job registry in `orchestrator` v2.0.0 (Step 3j): every async
+  skill dispatch creates a `job_registry[]` entry with idempotency key, retry policy (max 3,
+  exponential backoff), and completion callbacks. Step 7 durable job reconciliation added.
+  New inputs: `query_async_jobs`. New output: `job_registry[]`.
+- **TASK-0065** — Pipeline warm-start from HITL gate snapshot: `orchestrator` v2.0.0 adds
+  `warm_start` input with three intents (`re_run_from_snapshot`, `modify_and_continue`, `branch`).
+  Content-hash guard prevents restoring a stale snapshot when inputs have changed. Snapshot
+  selection menu presented at every HITL gate. New output: `warm_start_result`.
+- **TASK-0066** — Token efficiency observability loop across four skills:
+  `behavioral-telemetry-collector` v1.2.0 adds `skill.tokens_consumed` event type;
+  `session-insights` v1.2.0 adds `token_efficiency` block to session summary;
+  `enhancement-dashboard` v1.1.0 adds Token Efficiency tab (6th section);
+  `adaptive-proposal-generator` v1.1.0 adds 3 new token-efficiency proposal types
+  (`model_tier_downgrade`, `output_pruning_candidate`, `compression_policy_tighten`).
+  `orchestrator` fires `skill.tokens_consumed` event fire-and-forget after every skill invocation.
+- `full-pipeline.json` v3.1.0 → v3.2.0: optional `phase-2a-debate` phase added with conditional
+  HITL gate; enabled by `pipeline_config.debate_architecture: true`.
+- `docs/context-engineering.md` v3.0.0: Token Efficiency Events, Durable Job Registry, and
+  Warm-Start sections added.
+
+### Changed
+
+- `orchestrator` SKILL.md v1.6.0 → v2.0.0: warm-start intents (Step 2), durable job registry
+  (Step 3j), token event hook (Step 3c3), job reconciliation (Step 7).
+- `skills/index.yaml`: `orchestrator` → 2.0.0; `behavioral-telemetry-collector` → 1.2.0;
+  `session-insights` → 1.2.0; `enhancement-dashboard` → 1.1.0;
+  `adaptive-proposal-generator` → 1.1.0; `multi-agent-debate` SKL-108 added.
+- `skills/registry.json`: `multi-agent-debate` entry added; `realtime-system-architect` name
+  field restored; `adaptive-proposal-generator` version synced to 1.1.0.
+
+---
+
 ## [2.3.0] — 2026-07-02
 
 ### Added

@@ -1,6 +1,6 @@
 ---
 name: adaptive-proposal-generator
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: 'Use when analyzing session telemetry to generate ranked improvement proposals for skills, pipelines, or agents. Triggers on: "suggest improvements", "analyze usage patterns", "adaptive proposals", "what should we improve", "session analysis", "self-improvement suggestions". Requires session-insights (SKL-048) to have produced a session_summary. ALL proposals require HITL approval — nothing is applied automatically.'
 author: ASE-OS
@@ -43,7 +43,7 @@ adaptive-proposal-generator (SKL-050)   ← this skill
 adaptation-applicator (SKL-051)
 ```
 
-**Five proposal types:**
+**Five core proposal types + three token-efficiency types:**
 
 | Type | Triggers When | Example |
 |------|--------------|---------|
@@ -52,6 +52,9 @@ adaptation-applicator (SKL-051)
 | `retire_skill` | A skill is never invoked across N sessions and has a replacement | "context-memory not invoked in 10 sessions — propose deprecation" |
 | `new_pipeline` | A group of 3+ skills are always invoked together with no pipeline template | "skills A→B→C→D always run together — propose a named pipeline template" |
 | `new_agent` | A new skill is approved that has no assigned agent | "behavioral-telemetry-collector has no dedicated agent — propose assignment" |
+| `model_tier_downgrade` | A skill consistently uses a high-tier model but could use a lower tier | "Skill X consumed avg 8,000 tokens/run over 5 sessions using sonnet; haiku achieves comparable output — downgrade candidate" |
+| `output_pruning_candidate` | A skill's output has many fields but downstream consumes only a few | "Skill Y output has 8 fields; downstream skill consumes only 2 — add projection rule" |
+| `compression_policy_tighten` | Pipeline state is approaching auto-compress trigger threshold | "Phase Z state at 90% ceiling before auto-compress triggers — reduce trigger_at_percent from 85% to 70%" |
 
 **Core constraint:** This skill is **suggestion-only**. It never writes to system state, registry, or pipeline files. Its sole output is a list of proposals for the human to review.
 
@@ -85,7 +88,8 @@ adaptation-applicator (SKL-051)
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["new_skill", "modify_skill", "retire_skill", "new_pipeline", "new_agent"]
+        "enum": ["new_skill", "modify_skill", "retire_skill", "new_pipeline", "new_agent",
+                 "model_tier_downgrade", "output_pruning_candidate", "compression_policy_tighten"]
       }
     },
     "max_proposals": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 }
@@ -176,14 +180,53 @@ Step 6 — Inactivity Analysis (retire candidates)
             sessions_checked: 5
           }
 
+Step 6a — Token Efficiency Analysis (TASK-0066)
+  IF session_summary.token_efficiency is null:
+    SKIP this step.
+  te = session_summary.token_efficiency
+
+  FOR each skill_entry in te.by_skill:
+    IF skill_entry is in te.outlier_skills (tokens > p90):
+      IF analysis_mode == "multi_session":
+        avg_tokens = average tokens for this skill across historical_summaries.token_efficiency.by_skill
+        IF avg_tokens > 5000:
+          ADD candidate: {
+            type: "model_tier_downgrade",
+            target: skill_entry.skill,
+            signal: "high_token_p90_outlier",
+            value: skill_entry.tokens,
+            avg_tokens: avg_tokens
+          }
+
+  FOR each skill_entry in te.by_skill:
+    IF skill_entry.pct_of_total > 25.0:
+      ADD candidate: {
+        type: "output_pruning_candidate",
+        target: skill_entry.skill,
+        signal: "output_is_high_pct_of_session_tokens",
+        value: skill_entry.pct_of_total
+      }
+
+  IF te.vs_baseline is not null AND te.vs_baseline > 0.10:
+    ← positive vs_baseline = regression (worse than baseline)
+    ADD candidate: {
+      type: "compression_policy_tighten",
+      target: "pipeline-state",
+      signal: "token_regression_vs_baseline",
+      value: te.vs_baseline
+    }
+
 Step 7 — Score and rank proposals
   FOR each candidate:
     impact_score  = compute_impact(candidate):
-      - modify_skill: failure_rate or rejection_ratio (0.0–1.0)
-      - new_skill:    number of sessions with feedback loop (0.0–1.0 normalized)
-      - retire_skill: 0.3 (low urgency)
-      - new_pipeline: observed_sessions / 10 (capped at 1.0)
-      - new_agent:    0.5 (medium urgency)
+      - modify_skill:                failure_rate or rejection_ratio (0.0–1.0)
+      - new_skill:                   number of sessions with feedback loop (0.0–1.0 normalized)
+      - retire_skill:                0.3 (low urgency)
+      - new_pipeline:                observed_sessions / 10 (capped at 1.0)
+      - new_agent:                   0.5 (medium urgency)
+      - model_tier_downgrade:        min(1.0, avg_tokens / 10000) (higher tokens = higher impact)
+      - output_pruning_candidate:    min(1.0, pct_of_total / 50.0) (higher pct = higher impact)
+      - compression_policy_tighten:  min(1.0, vs_baseline * 2)    (larger regression = higher impact)
     confidence    = single_session ? 0.6 : min(1.0, sessions_observed / 5)
     priority_score = impact_score * confidence
     SET candidate.priority_score = priority_score

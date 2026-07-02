@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.1.0",
-  "description": "Full idea-to-production pipeline (v3.1.0): requirements → architecture + UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.2.0",
+  "description": "Full idea-to-production pipeline (v3.2.0): requirements → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -30,6 +30,18 @@
           "version": "^1.0.0",
           "max_retries": 1,
           "async": true
+        }
+      ]
+    },
+    {
+      "id": "phase-2a-debate",
+      "label": "Architecture Debate (optional)",
+      "condition": "pipeline_config.debate_architecture === true",
+      "skills": [
+        {
+          "name": "multi-agent-debate",
+          "version": "^1.0.0",
+          "max_retries": 1
         }
       ]
     },
@@ -287,6 +299,13 @@
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
       "label": "Sign off on architecture before design layer",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2a-debate",
+      "type": "human_approval",
+      "condition": "pipeline_config.debate_architecture === true",
+      "label": "Review debate transcript and approve hardened architecture before design layer",
       "timeout": 3600
     },
     {

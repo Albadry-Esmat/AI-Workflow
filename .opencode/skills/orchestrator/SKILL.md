@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.6.0
+version: 2.0.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -21,6 +21,13 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `resume_from_phase` | `string` | No | Phase ID to resume from — all prior phases skipped, outputs loaded from checkpoint (TASK-0056) |
 | `memoization_enabled` | `boolean` | No | Default `true`. Set `false` to disable invocation cache (TASK-0057) |
 | `restore_from_snapshot` | `string` | No | Snapshot ID (e.g. `snap-phase-4-planning-approved`). Restores all state keys and artifacts from that snapshot, then continues from the phase immediately after the snapshot's `phase_id`. Enables cross-session resume without a live session_context (TASK-0062). |
+| `warm_start` | `object` | No | Warm-start configuration. Restores a named snapshot and applies the specified intent (TASK-0065). Takes precedence over `restore_from_snapshot` when both are provided. |
+| `warm_start.snapshot_id` | `string` | Yes (if warm_start) | Snapshot ID to restore from. |
+| `warm_start.intent` | `string` | Yes (if warm_start) | One of: `re_run_from_snapshot`, `modify_and_continue`, `branch`. |
+| `warm_start.artifact_diff` | `object` | No | Only for `modify_and_continue` — diff to apply to the snapshot artifact before re-running. |
+| `query_async_jobs` | `object` | No | When present, returns current job_registry status instead of running a pipeline (TASK-0064). |
+| `query_async_jobs.session_id` | `string` | No | Session to query. Defaults to last active session. |
+| `query_async_jobs.status_filter` | `string` | No | One of: `all`, `running`, `completed`, `failed`, `retrying`. Default: `all`. |
 
 **Pipeline Config Schema:**
 
@@ -189,6 +196,41 @@ Step 2 — Load session context
     If not found: reject with {"error": "SNAPSHOT_NOT_FOUND", "snapshot_id": "..."}.
     Takes precedence over resume_from_phase if both are provided.
 
+  [TASK-0065] If warm_start is provided (takes precedence over restore_from_snapshot):
+    Resolve snapshot from warm_start.snapshot_id (same lookup as TASK-0062 above).
+    If not found: reject with {"error": "SNAPSHOT_NOT_FOUND"}.
+    Validate content_hash of snapshot artifacts against current session inputs.
+    IF hash mismatch (snapshot from diverged codebase):
+      Emit warning: "Snapshot <snapshot_id> content_hash mismatch — codebase may have
+      diverged since this snapshot was taken. Use force_warm_start: true to override."
+      HALT unless warm_start.force_warm_start === true.
+
+    warm_start.intent = "re_run_from_snapshot":
+      Restore snapshot state. Set resume_from_phase to phase after snapshot.phase_id.
+      Re-run all phases from that point (no artifact diff applied).
+
+    warm_start.intent = "modify_and_continue":
+      Restore snapshot state. Apply warm_start.artifact_diff to the restored snapshot
+      artifact (deep merge, diff wins on key conflicts).
+      Set resume_from_phase to phase after snapshot.phase_id.
+      Re-run all downstream phases with the modified artifact as input.
+
+    warm_start.intent = "branch":
+      Restore snapshot state into a NEW session (generate new session_id).
+      Do NOT modify the original session.
+      Run new pipeline variant from snapshot.phase_id onward in the new session.
+      Return: { branched_session_id: <new_session_id>, warm_start_snapshot: snapshot_id }
+
+    Surface available warm-start points at each HITL gate pause:
+      "Available warm-start points:"
+      For each snapshot in session_context.snapshots[]:
+        "  <snapshot_id>  (after: <snapshot.phase_id>)  <← last approved marker if applicable>"
+
+  [TASK-0064] If query_async_jobs is provided:
+    Load job_registry from session state for query_async_jobs.session_id (or last session).
+    Apply status_filter. Return filtered job list. Do NOT run any pipeline step.
+    Return: { job_registry: filtered_jobs[], queried_at: <now>, session_id: resolved_session_id }
+
   Output: hydrated context
 
 Step 3 — Execute skills (mode-dependent)
@@ -248,8 +290,22 @@ Step 3 — Execute skills (mode-dependent)
            Required Context section has changed since the cache entry was written,
            invalidate that entry before lookup.
          Cache capacity: 50 entries. LRU eviction on overflow.
-    c1) Invoke skill
-    c2) Store result in invocation_cache["{skill_name}:{input_hash}"] with invoked_at timestamp.
+     c1) Invoke skill
+     c2) Store result in invocation_cache["{skill_name}:{input_hash}"] with invoked_at timestamp.
+     c3) [TASK-0066] Emit token consumption telemetry event (fire-and-forget, non-blocking):
+          Dispatch to behavioral-telemetry-collector:
+            { event_type: "skill.tokens_consumed",
+              skill_name:  skill_name,
+              session_id:  session_id,
+              pipeline_phase: current_phase_id,
+              tokens_in:   sum(input_artifact.token_count for all input artifacts),
+              tokens_out:  output_artifact.token_count,
+              tokens_total: tokens_in + tokens_out,
+              model:       resolved_model_for_skill,
+              cache_hit:   false,
+              artifact_ids: [output_artifact.artifact_id] }
+          For CACHE_HIT (step c): emit same event with cache_hit=true, tokens_out=0.
+          Overhead < 50ms per event; do NOT block pipeline progression.
     d) Validate output against skill's output schema (via schema-validator)
     e) If validation fails AND retries remain → re-invoke with corrected input
     f) If validation fails AND no retries → emit error, pause pipeline
@@ -270,11 +326,41 @@ Step 3 — Execute skills (mode-dependent)
            Record session_context[skill_N].compressed = true, compression_ratio.
          This enforces the "keep last 3 skill outputs at full size" retention policy
          from context-engineering.md and prevents state bloat in late pipeline phases.
-    j) [TASK-0058] If skill has async: true:
-         Register in async_task_registry:
-           { task_id: UUID, skill: skill_name, started_at: <now>,
-             status: "running", result_ref: null, error: null }
-         Do NOT wait for completion. Pipeline advances immediately.
+     j) [TASK-0058 + TASK-0064] If skill has async: true:
+          [TASK-0058] Register in async_task_registry:
+            { task_id: UUID, skill: skill_name, started_at: <now>,
+              status: "running", result_ref: null, error: null }
+          [TASK-0064] Additionally write a durable job entry to job_registry:
+            {
+              job_id:           "job-<skill_name>-<sequence>",
+              skill:            skill_name,
+              session_id:       session_id,
+              dispatched_at:    <now>,
+              status:           "pending",
+              retry_count:      0,
+              max_retries:      3,
+              retry_policy:     { backoff: "exponential", initial_delay_ms: 5000 },
+              last_error:       null,
+              completed_at:     null,
+              result_ref:       null,
+              completion_event: "<skill_name>.completed"
+            }
+          Persist job_registry to `.opencode/state/sessions/<session_id>.json`
+          (survives session restart — enables durable async execution).
+          Update job status: "pending" → "running" after dispatch confirmation.
+          Do NOT wait for completion. Pipeline advances immediately.
+
+          On skill completion callback:
+            Update job_registry entry: status="completed", result_ref, completed_at.
+            Emit completion_event to event_log.
+            If a downstream skill was waiting on this job: dispatch it with result_ref payload.
+          On skill failure:
+            IF retry_count < max_retries:
+              Update status="retrying", increment retry_count.
+              Schedule retry with exponential backoff (initial_delay_ms * 2^retry_count).
+            ELSE (retry_count >= max_retries):
+              Update status="failed", last_error.
+              Emit failure event to event_log.
   Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
     writes from each group MUST be serialized (one at a time, mutex-locked). Concurrent
     skill execution is allowed; concurrent writes to session_context are not.
@@ -334,6 +420,16 @@ Step 7 — Assemble final result + session summary
       If still running: leave status="running"; surface in pipeline_result.pending_async_tasks[].
     All async task outcomes are non-blocking — the pipeline result is returned regardless.
 
+  [TASK-0064] Reconcile durable job_registry:
+    For each job in job_registry with status != "completed":
+      Attempt to fetch result from persisted result_ref or callback.
+      If completed: update status="completed", completed_at.
+      If retrying:  check if retry delay has elapsed; if so, re-dispatch skill.
+      If failed:    surface in pipeline_result.failed_jobs[] with job_id, skill, last_error.
+    Persist final job_registry state to session file.
+    Surface all failed_jobs[] in pipeline result with error details — the pipeline result
+    is returned regardless of durable job status.
+
   [TASK-0056] Write phase checkpoints for resume_from_phase:
     After each HITL gate is approved, write a checkpoint to session state:
       { checkpoint_id: UUID, phase_id: <current_phase>, session_id,
@@ -354,6 +450,8 @@ Step 7 — Assemble final result + session summary
 | `gate_decisions` | `array[object]` | All HITL gate outcomes |
 | `snapshots` | `array[object]` | Named snapshots taken at each approved HITL gate (TASK-0062) |
 | `artifact_log` | `array[object]` | Every inter-skill artifact dispatch: `artifact_id`, `source_skill`, `target_skill`, `token_count` (TASK-0060) |
+| `job_registry` | `array[object]` | Current durable job entries with status, retry_count, error (TASK-0064). Present in every pipeline result. |
+| `warm_start_result` | `object` \| `null` | Populated when `warm_start` input was provided. Contains `intent`, `snapshot_id`, `branched_session_id` (for `branch` intent), `phases_skipped[]` (TASK-0065). |
 
 ## Human-in-the-Loop Gates
 
@@ -442,6 +540,9 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - **Prompt normalization gate:** Step 0 (prompt-normalizer SKL-040) MUST complete before any pipeline resolution begins. A `halt` or `ask_clarification` result from SKL-040 terminates the orchestrator immediately with a clarification request to the user.
 - **Gap detection recursion guard (FEATURE-001):** The orchestrator MUST check `session_state["gap_to_skill_active"]` before emitting any `capability_gap` event. If `gap_to_skill_active == true`, gap emission is suppressed and an error is surfaced.
 - **Retry recursion guard (FEATURE-005):** The orchestrator MUST check `session_state["retry_in_progress"]` before emitting any `capability_gap` event. If `retry_in_progress == true`, gap emission is suppressed. This breaks the retry → no-match → new-gap → new-retry infinite loop.
+- **Warm-start content hash guard (TASK-0065):** Before restoring a warm-start snapshot, the orchestrator MUST validate the snapshot's artifact content_hash against current session inputs. A mismatch triggers a warning and halts the warm-start unless `force_warm_start: true` is explicitly set.
+- **Durable job idempotency (TASK-0064):** Each job entry carries a `job_id` that acts as an idempotency key. Skills that receive a durable job dispatch MUST check for an existing `job_id` before writing — duplicate job_id writes are silently skipped. This prevents duplicate `doc-maintainer` writes on retry.
+- **Token events are fire-and-forget (TASK-0066):** `skill.tokens_consumed` events dispatched to `behavioral-telemetry-collector` MUST NOT block pipeline progression. If the telemetry collector is unavailable, the event is silently dropped — it MUST NOT cause pipeline failure.
 
 ## 8. Security Considerations
 
