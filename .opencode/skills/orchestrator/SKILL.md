@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 2.0.0
+version: 2.4.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -28,6 +28,8 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `query_async_jobs` | `object` | No | When present, returns current job_registry status instead of running a pipeline (TASK-0064). |
 | `query_async_jobs.session_id` | `string` | No | Session to query. Defaults to last active session. |
 | `query_async_jobs.status_filter` | `string` | No | One of: `all`, `running`, `completed`, `failed`, `retrying`. Default: `all`. |
+| `cache_control_strategy` | `string` | No | `"auto"` \| `"explicit"` \| `"disabled"`. Default `"auto"`. Controls Anthropic prompt-cache breakpoint placement per skill invocation (TASK-0067). |
+| `budget_forcing_enabled` | `boolean` | No | Default `true`. When `true`, an explicit output-length instruction is prepended to each skill invocation (TASK-0068). Set `false` to disable. |
 
 **Pipeline Config Schema:**
 
@@ -85,7 +87,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 
 | Pipeline File | Purpose | Entry Skills |
 |---------------|---------|--------------|
-| `skills/pipelines/full-pipeline.json` v3.0.0 | Full idea-to-production delivery | requirement-analyzer → … → deployment-strategy |
+| `skills/pipelines/full-pipeline.json` v3.3.0 | Full idea-to-production delivery | requirement-analyzer → … → deployment-strategy |
 | `skills/pipelines/requirements-only.json` | Requirements extraction only | requirement-analyzer |
 | `skills/pipelines/architecture-only.json` | Architecture design only | requirement-analyzer → architecture-design |
 | `skills/pipelines/quick-review.json` | Code/security review | clean-code-review / security-review |
@@ -260,25 +262,85 @@ Step 3 — Execute skills (mode-dependent)
           On first invocation of any skill in a session: load all sections once (full load)
           to populate session_context.skill_sections_cache. Subsequent invocations use cache.
      b3) [TASK-0060] Wrap pruned output in Artifact envelope before dispatch:
-          After output-field pruning (step b), wrap the payload in a typed Artifact envelope:
-            {
-              "artifact_id":    "art-<sequence>",
-              "source_skill":   "<producing_skill_name>",
-              "target_skill":   "<consuming_skill_name>",
-              "content_type":   "<skill_output_type>",   // e.g. "architecture_output"
-              "payload":        { ...pruned_output... },
-              "created_at":     "<ISO8601>",
-              "token_count":    <measured_token_count>,  // measured, not estimated
-              "compressed":     false,
-              "schema_version": "1.0.0"
-            }
-          Measure token_count of the payload immediately before wrapping (actual count).
-          Record artifact dispatch in session_context event_log:
-            { id: "evt-N", type: "artifact.dispatched", artifact_id, source_skill,
-              target_skill, token_count, timestamp }
-          The receiving skill's step c1 unpacks the payload from the Artifact envelope
-          before invocation — skills operate on the raw payload, not the envelope.
-          Expected benefit: exact per-transfer token accounting; enables TASK-0066 observability.
+           After output-field pruning (step b), wrap the payload in a typed Artifact envelope:
+             {
+               "artifact_id":    "art-<sequence>",
+               "source_skill":   "<producing_skill_name>",
+               "target_skill":   "<consuming_skill_name>",
+               "content_type":   "<skill_output_type>",   // e.g. "architecture_output"
+               "payload":        { ...pruned_output... },
+               "created_at":     "<ISO8601>",
+               "token_count":    <measured_token_count>,  // measured, not estimated
+               "compressed":     false,
+               "schema_version": "1.0.0"
+             }
+           Measure token_count of the payload immediately before wrapping (actual count).
+           Record artifact dispatch in session_context event_log:
+             { id: "evt-N", type: "artifact.dispatched", artifact_id, source_skill,
+               target_skill, token_count, timestamp }
+           The receiving skill's step c1 unpacks the payload from the Artifact envelope
+           before invocation — skills operate on the raw payload, not the envelope.
+           Expected benefit: exact per-transfer token accounting; enables TASK-0066 observability.
+     b4) [TASK-0067] Apply Anthropic prompt-cache breakpoints before each skill invocation:
+           IF cache_control_strategy != "disabled":
+             Identify the static prefix = all SKILL.md sections loaded in Step b2.
+             IF static_prefix token_count >= 1024 (Claude Sonnet minimum cacheable length):
+               Mark the end of the static prefix with:
+                 cache_control: {type: "ephemeral", ttl: "1h"}
+               (1-hour TTL — SKILL.md content is session-stable and cross-session reusable;
+                2× write cost but read hits cost 10% of base; break-even at ~2 reads/write)
+             If a prior-turn complete assistant message exists in the conversation:
+               Mark it with cache_control: {type: "ephemeral"}
+               (5-minute TTL — conversation-level reuse within a single session)
+             After invocation, record API response cache fields in prompt_cache_log:
+               { skill_name, cache_creation_input_tokens, cache_read_input_tokens, input_tokens }
+             Emit fire-and-forget api.cache_hit event to behavioral-telemetry-collector
+               when cache_read_input_tokens > 0.
+           Rules:
+             NEVER place cache_control on blocks that change per-invocation:
+               current task description, dynamic artifact payloads, user message.
+             Static prefix = everything before the dynamic task description block.
+             Do NOT cache the artifact payload itself.
+           Expected savings: 90% cost reduction on reused SKILL.md prefixes per invocation.
+     b5) [TASK-0068] Inject token budget instruction before each skill invocation:
+           IF budget_forcing_enabled == true
+              AND skill.name NOT IN budget_forcing_exempt_skills:
+             Compute budget = skill.max_output_tokens (from index.yaml, default 4000 if absent).
+             On retry (retry_count > 0): tighten budget by 20% per retry iteration.
+             Prepend BEFORE the dynamic task description (not mixed into it):
+               "[TOKEN BUDGET: Keep your entire response under {budget} tokens.
+                 Be concise and direct. Omit preamble, repetition, and meta-commentary.]"
+             Record budget_instruction_applied: true in execution_log for this invocation.
+           budget_forcing_exempt_skills (output length is inherent to the artifact):
+             code-generator, design-system-generator, test-generator,
+             mutation-test-generator, documentation-generator, adr-generator
+     b6) [TASK-0069] Externalize large artifact payloads after Artifact envelope wrapping:
+           After Step b3 (Artifact envelope), check artifact.token_count:
+           IF artifact.token_count > token_policy.externalize_threshold (default: 8000)
+              AND artifact.content_type IN ["code", "documentation", "design_system",
+                                            "test_suite", "dependency_graph"]:
+             1. Write full payload to `.opencode/state/artifacts/<artifact_id>.json`.
+             2. Replace artifact.payload in-context with ExternalizedPayloadStub:
+                  {
+                    "artifact_ref":     "state/artifacts/<artifact_id>.json",
+                    "artifact_id":      "<artifact_id>",
+                    "summary":          first_500_chars(serialized_payload),
+                    "full_token_count": <original_token_count>,
+                    "externalized":     true,
+                    "content_type":     "<content_type>"
+                  }
+             3. Update artifact.token_count to stub token count (~100–150 tokens).
+             4. Emit fire-and-forget artifact.externalized telemetry event:
+                  { artifact_id, original_tokens, stub_tokens, saving_pct }
+             5. Add artifact_id to session_context.externalized_artifacts[].
+           Step b7 — Downstream skill fetch:
+             IF consuming skill's input schema declares field type "full_artifact"
+                AND incoming artifact is externalized:
+               Load full payload from artifact_ref before invoking.
+               Record fetch_token_cost in execution_log.
+           Never externalize (must remain in-context for reasoning quality):
+             requirements, architecture_proposal, final_architecture, feature_plan,
+             security_findings, completeness_report
     c) [TASK-0057] Check invocation memoization cache before invoking:
          Compute input_hash = SHA-256(canonical JSON of projected input payload).
          Look up invocation_cache["{skill_name}:{input_hash}"].
@@ -361,7 +423,28 @@ Step 3 — Execute skills (mode-dependent)
             ELSE (retry_count >= max_retries):
               Update status="failed", last_error.
               Emit failure event to event_log.
-  Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
+     k) [TASK-0070] Route eligible skills through Batch API:
+          IF pipeline_config.batch_policy.enabled == true (default: false):
+            Before invoking a skill, check if skill.name IN batch_policy.eligible_skills.
+            Default eligible set: documentation-generator, doc-maintainer, adr-generator,
+              work-item-exporter, behavioral-telemetry-collector.
+            IF skill is batch-eligible AND batch_policy.mode == "async":
+              Submit invocation to Anthropic Batch API:
+                POST /v1/messages/batches with custom_id = "job-<skill_name>-<sequence>"
+              Record in batch_registry:
+                { batch_id, skill_name, custom_id, submitted_at, status: "in_flight",
+                  expected_completion: now + 24h, result_ref: null }
+              Add batch_id to session_context.active_batches[].
+              Do NOT wait for batch completion — continue pipeline with stub output.
+              Emit fire-and-forget batch.submitted event to behavioral-telemetry-collector:
+                { skill_name, batch_id, custom_id, estimated_saving_pct: 50 }
+            IF skill is batch-eligible AND batch_policy.mode == "sync_override":
+              Skip batching — invoke synchronously (used for time-sensitive gate dependencies).
+          Cost benefit: 50% cost reduction vs. real-time API per eligible skill invocation.
+          Latency tradeoff: up to 24h for batch completion — ONLY use for non-blocking skills
+            that do not gate downstream pipeline progression.
+
+   Parallel write-back rule (D3): When parallel_groups run concurrently, session_context
     writes from each group MUST be serialized (one at a time, mutex-locked). Concurrent
     skill execution is allowed; concurrent writes to session_context are not.
   Output: intermediate results per step
@@ -436,6 +519,28 @@ Step 7 — Assemble final result + session summary
         approved_at: <now>, state_keys: [list of populated state keys] }
     Checkpoints enable resume_from_phase in subsequent orchestrator invocations.
 
+  [TASK-0070] Reconcile batch_registry:
+    For each entry in batch_registry with status == "in_flight":
+      Query Anthropic Batch API: GET /v1/messages/batches/<batch_id>
+      IF processing_status == "ended":
+        Retrieve results: GET /v1/messages/batches/<batch_id>/results
+        For each result matching custom_id:
+          IF result.result.type == "succeeded":
+            Update batch_registry entry: status="completed", result_ref, completed_at.
+            Move batch_id from active_batches[] to completed_batches[] in session_context.
+          IF result.result.type == "errored":
+            Update batch_registry entry: status="failed", error.
+            Surface in pipeline_result.failed_batches[].
+      IF processing_status != "ended":
+        Leave status="in_flight", surface in pipeline_result.pending_batches[].
+    Surface prompt_cache_stats aggregated from all prompt_cache_log entries:
+      { total_cache_hits, total_cache_misses, cache_creation_tokens,
+        cache_read_tokens, estimated_savings_pct }
+    Surface externalized_artifacts[] from session_context.externalized_artifacts.
+    Persist final batch_registry state to session file.
+    All batch reconciliation is non-blocking — pipeline result is returned regardless
+    of in_flight batch status.
+
   Output: complete pipeline result
 ```
 
@@ -452,6 +557,10 @@ Step 7 — Assemble final result + session summary
 | `artifact_log` | `array[object]` | Every inter-skill artifact dispatch: `artifact_id`, `source_skill`, `target_skill`, `token_count` (TASK-0060) |
 | `job_registry` | `array[object]` | Current durable job entries with status, retry_count, error (TASK-0064). Present in every pipeline result. |
 | `warm_start_result` | `object` \| `null` | Populated when `warm_start` input was provided. Contains `intent`, `snapshot_id`, `branched_session_id` (for `branch` intent), `phases_skipped[]` (TASK-0065). |
+| `prompt_cache_stats` | `object` | Aggregated prompt-cache metrics across all skill invocations: `total_cache_hits`, `total_cache_misses`, `cache_creation_tokens`, `cache_read_tokens`, `estimated_savings_pct` (TASK-0067). |
+| `externalized_artifacts` | `array[string]` | Artifact IDs written to disk at `.opencode/state/artifacts/<id>.json` because their token_count exceeded `externalize_threshold` (TASK-0069). |
+| `active_batches` | `array[object]` | Batch API jobs still in_flight at pipeline completion. Each entry: `batch_id`, `skill_name`, `submitted_at`, `expected_completion` (TASK-0070). |
+| `pending_batches` | `array[object]` | Alias view of `active_batches` — batch jobs not yet completed. Consumers should poll Step 7 reconciliation on subsequent orchestrator calls (TASK-0070). |
 
 ## Human-in-the-Loop Gates
 
@@ -543,6 +652,10 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - **Warm-start content hash guard (TASK-0065):** Before restoring a warm-start snapshot, the orchestrator MUST validate the snapshot's artifact content_hash against current session inputs. A mismatch triggers a warning and halts the warm-start unless `force_warm_start: true` is explicitly set.
 - **Durable job idempotency (TASK-0064):** Each job entry carries a `job_id` that acts as an idempotency key. Skills that receive a durable job dispatch MUST check for an existing `job_id` before writing — duplicate job_id writes are silently skipped. This prevents duplicate `doc-maintainer` writes on retry.
 - **Token events are fire-and-forget (TASK-0066):** `skill.tokens_consumed` events dispatched to `behavioral-telemetry-collector` MUST NOT block pipeline progression. If the telemetry collector is unavailable, the event is silently dropped — it MUST NOT cause pipeline failure.
+- **Prompt-cache breakpoints are static-only (TASK-0067):** `cache_control` breakpoints MUST only be placed on the static SKILL.md prefix (loaded in Step b2). They MUST NOT be placed on dynamic blocks: current task description, artifact payloads, or user messages. Violating this rule corrupts cache state and invalidates hits on all subsequent invocations in the session.
+- **Budget forcing exemptions are fixed (TASK-0068):** The `budget_forcing_exempt_skills` list (code-generator, design-system-generator, test-generator, mutation-test-generator, documentation-generator, adr-generator) MUST NOT be modified at runtime. These skills produce artifacts whose token length is inherent to their output — truncating them produces broken artifacts.
+- **Batch routing is non-blocking and non-gating (TASK-0070):** Skills submitted to the Batch API MUST NOT appear in any `gates` dependency chain. If a pipeline config lists a batch-eligible skill as a gate dependency, the orchestrator MUST override `batch_policy.mode` to `sync_override` for that invocation and emit a warning: `{"warning": "BATCH_GATE_CONFLICT", "skill": "<name>", "overriding_to": "sync"}`.
+- **Artifact externalization is disk-backed (TASK-0069):** Externalized artifacts MUST be written atomically to `.opencode/state/artifacts/<artifact_id>.json` before the in-context payload stub is written. If the write fails, the full payload MUST remain in-context (do not stub without a successful write).
 
 ## 8. Security Considerations
 

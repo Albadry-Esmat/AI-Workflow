@@ -1,6 +1,6 @@
 ---
 name: session-insights
-version: 1.2.0
+version: 1.3.0
 domain: system
 description: 'Use when generating per-skill performance insights from collected behavioral telemetry. Triggers on: "session insights", "skill performance report", "analyze telemetry", "pipeline performance", "HITL rejection ratio", "latency p95". Requires behavioral-telemetry-collector (SKL-047) to have run first. Read-only — does not modify behavioral_telemetry.events.'
 author: ASE-OS
@@ -191,8 +191,30 @@ Step 4a — Compute token efficiency metrics (TASK-0066)
       cache_hit_rate:         cache_hit_rate,
       compression_events:     compression_events,
       outlier_skills:         outlier_skills,
-      vs_baseline:            vs_baseline   (null if no baseline)
+      vs_baseline:            vs_baseline,   (null if no baseline)
+      prompt_cache_efficiency: (computed below — null if no api.cache_hit events)
     }
+
+    [TASK-0067] Compute prompt_cache_efficiency sub-block:
+    cache_events = filtered_events where event_type == "api.cache_hit"
+    IF cache_events is empty:
+      prompt_cache_efficiency = null
+    ELSE:
+      pc_total_cache_hits      = count(cache_events where cache_read_tokens > 0)
+      pc_total_cache_misses    = count(cache_events where cache_read_tokens == 0)
+      pc_cache_creation_tokens = sum(event.cache_creation_tokens for event in cache_events)
+      pc_cache_read_tokens     = sum(event.cache_read_tokens     for event in cache_events)
+      // Cost model: cache reads cost 10% of base; cache writes cost 200% of base.
+      // Saving per read = 0.9 × read_tokens; extra cost per write = 1.0 × write_tokens.
+      net_saved_tokens = (pc_cache_read_tokens * 0.9) - (pc_cache_creation_tokens * 1.0)
+      estimated_savings_pct = max(0, net_saved_tokens / total_tokens_consumed * 100).toFixed(1)
+      prompt_cache_efficiency = {
+        total_cache_hits:       pc_total_cache_hits,
+        total_cache_misses:     pc_total_cache_misses,
+        cache_creation_tokens:  pc_cache_creation_tokens,
+        cache_read_tokens:      pc_cache_read_tokens,
+        estimated_savings_pct:  estimated_savings_pct
+      }
 
   Output: token_efficiency
 
@@ -446,5 +468,7 @@ produces_for:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.3.0 | 2026-07-03 | TASK-0067: Added `prompt_cache_efficiency` sub-block to `token_efficiency` — computes `total_cache_hits`, `total_cache_misses`, `cache_creation_tokens`, `cache_read_tokens`, `estimated_savings_pct` from `api.cache_hit` events |
+| 1.2.0 | 2026-06-27 | TASK-0066: Added Step 4a token efficiency computation — `total_tokens_consumed`, `by_skill`, `cache_hit_rate`, `compression_events`, `outlier_skills`, `vs_baseline` |
 | 1.1.0 | 2026-06-24 | FEATURE-001: Added gap metrics — `total_capability_gaps`, `top_gap_domains`, `gap_ids` — to session_summary output |
 | 1.0.0 | 2026-06-20 | Initial version — per-skill invocation/success/failure/p95/HITL metrics, session aggregates, anomaly flags, state-manager integration |

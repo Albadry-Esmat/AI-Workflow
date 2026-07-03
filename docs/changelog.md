@@ -13,6 +13,25 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.1.0] — 2026-07-03
+
+### Added
+
+- **TASK-0067** — `orchestrator` v2.0.0→v2.4.0: Anthropic prompt-cache breakpoint injection (Step 3b4) — marks static SKILL.md prefix with `cache_control: {type: "ephemeral", ttl: "1h"}` per invocation; 90% read-hit cost reduction. New inputs: `cache_control_strategy`, `budget_forcing_enabled`. New outputs: `prompt_cache_stats`, `externalized_artifacts`, `active_batches`, `pending_batches`.
+- **TASK-0067** — `behavioral-telemetry-collector` v1.2.0→v1.3.0: `api.cache_hit` event type (9th) with `cache_creation_tokens` + `cache_read_tokens` fields; `batch.submitted` event type (10th) with `batch_id`, `batch_custom_id`, `estimated_saving_pct` fields.
+- **TASK-0067** — `session-insights` v1.2.0→v1.3.0: `prompt_cache_efficiency` sub-block in `token_efficiency` — `total_cache_hits`, `total_cache_misses`, `cache_creation_tokens`, `cache_read_tokens`, `estimated_savings_pct` derived from `api.cache_hit` events.
+- **TASK-0068** — `orchestrator` Step 3b5: Token budget forcing — prepends `[TOKEN BUDGET: ...]` instruction before each skill invocation (exempt: code-generator, design-system-generator, test-generator, mutation-test-generator, documentation-generator, adr-generator). `max_output_tokens` field added to orchestrator, btc, and session-insights in `index.yaml`.
+- **TASK-0069** — `orchestrator` Steps 3b6–3b7: Artifact externalization — payloads > 8 000 tokens with eligible `content_type` are written to `.opencode/state/artifacts/<id>.json` and replaced in-context with a `ExternalizedPayloadStub`; estimated 60–80% context reduction for large code/doc artifacts.
+- **TASK-0070** — `orchestrator` Step 3k + Step 7 batch reconciliation: Anthropic Batch API routing for 5 eligible non-blocking skills; 50% cost reduction; gate-conflict guard enforces `sync_override` when a batch-eligible skill is in a gate dependency chain.
+- **TASK-0070** — `full-pipeline.json` v3.2.0→v3.3.0: `batch_policy` block (disabled by default) + `externalize_threshold: 8000` in `token_policy`.
+
+### Changed
+
+- `skills/graph/skill-graph.yaml` + website mirror: SKL-010 v1.2.0→v2.4.0, SKL-047 v1.1.0→v1.3.0, SKL-048 v1.1.0→v1.3.0.
+- `skills/index.yaml`: orchestrator→2.4.0, behavioral-telemetry-collector→1.3.0, session-insights→1.3.0.
+
+---
+
 ## [3.0.0] — 2026-07-02
 
 ### Added

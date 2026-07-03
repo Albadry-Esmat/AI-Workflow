@@ -72,7 +72,7 @@ nodes:
   name: orchestration
   domain: system
   mastery_level: advanced
-  version: 1.2.0
+  version: 2.4.0
   status: active
   layer: meta
 - id: SKL-011
@@ -331,14 +331,14 @@ nodes:
   name: behavioral-telemetry-collector
   domain: system
   mastery_level: intermediate
-  version: 1.1.0
+  version: 1.3.0
   status: active
   layer: utility
 - id: SKL-048
   name: session-insights
   domain: system
   mastery_level: intermediate
-  version: 1.1.0
+  version: 1.3.0
   status: active
   layer: utility
 - id: SKL-049

@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.2.0",
-  "description": "Full idea-to-production pipeline (v3.2.0): requirements → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.3.0",
+  "description": "Full idea-to-production pipeline (v3.3.0): requirements → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -380,6 +380,7 @@
     "auto_compress": true,
     "trigger_at_percent": 85,
     "default_tier": "large",
+    "externalize_threshold": 8000,
     "budget_tiers": [
       {
         "name": "standard",
@@ -397,5 +398,17 @@
         "cascade_mode": "cascade"
       }
     ]
+  },
+  "batch_policy": {
+    "enabled": false,
+    "mode": "async",
+    "eligible_skills": [
+      "documentation-generator",
+      "doc-maintainer",
+      "adr-generator",
+      "work-item-exporter",
+      "behavioral-telemetry-collector"
+    ],
+    "comment": "Set enabled:true to route eligible non-blocking skills through Anthropic Batch API (50% cost reduction, up to 24h latency). Never enable for skills in a gate dependency chain — orchestrator Step 3k enforces this and overrides to sync_override with a warning."
   }
 }
