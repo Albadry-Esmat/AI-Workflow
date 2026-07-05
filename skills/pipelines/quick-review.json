@@ -25,9 +25,9 @@
   "gates": [
     {
       "after_skill": "security-review",
-      "type": "condition",
+      "type": "human_approval",
       "condition": "output.vulnerabilities.filter(v => v.severity === 'critical').length > 0",
-      "label": "Critical vulnerabilities detected \u2014 approval required before merge",
+      "label": "Critical vulnerabilities detected — approval required before merge",
       "timeout": 3600
     }
   ],
@@ -35,6 +35,7 @@
   "token_policy": {
     "auto_compress": true,
     "trigger_at_percent": 85,
+    "default_tier": "standard",
     "budget_tiers": [
       {
         "name": "standard",

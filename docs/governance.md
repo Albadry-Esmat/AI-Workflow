@@ -1,6 +1,6 @@
 # Governance — Approval Gates & Quality Enforcement
 
-**Version:** 2.5.0 | **Last updated:** 2026-06-24
+**Version:** 2.6.0 | **Last updated:** 2026-07-05
 
 ## Governance Model
 
@@ -348,14 +348,14 @@ This section governs the use of Model Context Protocol (MCP) servers registered 
 
 | Server | Package | Default State | Credentials Required |
 |--------|---------|--------------|---------------------|
-| `github` | `@modelcontextprotocol/server-github` | Enabled | `GITHUB_TOKEN` |
-| `brave-search` | `@modelcontextprotocol/server-brave-search` | Enabled | `BRAVE_API_KEY` |
-| `memory` | `@modelcontextprotocol/server-memory` | Enabled | None |
+| `github` | `@modelcontextprotocol/server-github@2025.4.8` | Enabled | `GITHUB_TOKEN` |
+| `brave-search` | `@modelcontextprotocol/server-brave-search@0.6.2` | Enabled | `BRAVE_API_KEY` |
+| `memory` | `@modelcontextprotocol/server-memory@2026.7.4` | Enabled | None |
 | `fetch` | `@modelcontextprotocol/server-fetch` | Enabled | None |
-| `context7` | `@upstash/context7-mcp@latest` | Enabled | `CONTEXT7_API_KEY` |
-| `playwright` | `@playwright/mcp@latest` | Enabled | None |
-| `slack` | `@modelcontextprotocol/server-slack` | Disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
-| `vercel` | `vercel-mcp` | Disabled | `VERCEL_TOKEN` |
+| `context7` | `@upstash/context7-mcp@3.2.2` | Enabled | `CONTEXT7_API_KEY` |
+| `playwright` | `@playwright/mcp@0.0.77` | Enabled | None |
+| `slack` | `@modelcontextprotocol/server-slack@2025.4.25` | Disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
+| `vercel` | `vercel-mcp@0.0.7` | Disabled | `VERCEL_TOKEN` |
 
 ### MCP Credential Policy
 

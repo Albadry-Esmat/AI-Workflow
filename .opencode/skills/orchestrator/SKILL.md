@@ -573,6 +573,49 @@ Gates are configured in `pipeline_config.gates`. Each gate defines:
 | `condition` | `string` | Expression evaluated against output (e.g., `output.risks.length > 0`) |
 | `timeout` | `integer` | Max wait seconds for manual gates (default: 3600) |
 
+### Gate Types
+
+| Type | When to Use | Behaviour |
+|------|-------------|-----------|
+| `human_approval` | Irreversible decisions, architecture sign-offs, deployment go/no-go | Pipeline pauses; waits for `approve`, `reject`, or `modify` response from the primary agent |
+| `validation_check` | Automated guard verdicts (`pass`/`block`) | Orchestrator reads `verdict` field from skill output — `block` halts immediately |
+| `condition` | Automated branching — advance only when expression is true | Expression is evaluated; pipeline continues if `true`, halts if `false` |
+
+> **Rule:** A gate with `timeout` ≥ 1 AND a blocking consequence MUST use type `human_approval`, not `condition`. Use `condition` only for purely automated checks that require no human decision.
+
+### Condition Expression Language
+
+`condition` expressions are JavaScript-style strings evaluated in a sandboxed context against the pipeline state at the gate point. The context object is:
+
+```javascript
+{
+  output:           // The most recent skill output (the skill named in after_skill)
+  guards:           // Array of all guard verdict objects: [{ skill, verdict, violations }]
+  change_impact:    // Output of change-impact-analyzer (if run)
+  release_guard:    // Output of implementation-completeness-guard (if run)
+  pipeline_config:  // The full pipeline configuration object
+  phase_outputs:    // Map of phase_id → skill output for all completed phases
+}
+```
+
+**Supported operators and patterns:**
+
+| Pattern | Example | Notes |
+|---------|---------|-------|
+| Property access | `output.risks.length > 0` | Supports nested dot notation |
+| Array filter | `output.vulnerabilities.filter(v => v.severity === 'critical').length > 0` | Standard JS Array methods |
+| Strict equality | `change_impact.impact_severity !== 'critical'` | Use `===` / `!==` |
+| Boolean check | `release_guard.verdict === 'pass'` | String comparison |
+| Array every/some | `guards.every(g => g.verdict === 'pass')` | All guards must pass |
+| Pipeline config | `pipeline_config.debate_architecture === true` | Read pipeline config flags |
+
+**Not supported:** `eval`, `require`, `import`, `fetch`, async expressions, side effects, or accessing the filesystem.
+
+**Evaluation rules:**
+1. Any expression that throws a runtime error (e.g., accessing `.length` on `null`) is treated as `false` — the pipeline halts.
+2. Expressions must be synchronous and return a boolean.
+3. Short-circuit evaluation is supported (`&&`, `||`).
+
 **Recommended gate points:**
 - After `requirement-analyzer` — validate requirements before architecture
 - After `architecture-design` — sign off on architecture before planning

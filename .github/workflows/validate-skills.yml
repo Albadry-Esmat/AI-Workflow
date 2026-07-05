@@ -7,14 +7,17 @@ on:
       - ".opencode/skills/**"
       - "opencode.json"
       - "docs/**"
+      - "scripts/**"
   pull_request:
     paths:
       - "skills/**"
       - ".opencode/skills/**"
       - "opencode.json"
       - "docs/**"
+      - "scripts/**"
 
 jobs:
+  # ── Job 1: Full skill validation suite (10 checks) ──────────────────────────
   validate:
     name: Skill Validation
     runs-on: ubuntu-latest
@@ -28,56 +31,68 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install ajv-cli (JSON Schema validator)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install pyyaml --quiet
+
+      - name: Install ajv-cli
         run: npm install -g ajv-cli ajv-formats
 
-      - name: Validate pipeline configs against pipeline-schema.json
+      # ── Check 0 ─────────────────────────────────────────────────────────────
+      - name: "0/10 — YAML syntax check (skills/index.yaml)"
+        if: success() || failure()
+        run: |
+          python3 -c "
+          import yaml, sys
+          try:
+              with open('skills/index.yaml') as f:
+                  yaml.safe_load(f.read())
+              print('  PASS: skills/index.yaml parses as valid YAML')
+          except yaml.YAMLError as e:
+              print(f'  FAIL: skills/index.yaml YAML parse error: {e}', file=sys.stderr)
+              sys.exit(1)
+          "
+
+      # ── Check 1 ─────────────────────────────────────────────────────────────
+      - name: "1/10 — Validate pipeline configs against pipeline-schema.json"
+        if: success() || failure()
         run: |
           echo "=== Validating pipeline configs ==="
+          FAILED=0
           for f in skills/pipelines/*.json; do
-            echo "Checking $f ..."
+            [ -f "$f" ] || continue   # guard: skip if glob did not expand (empty dir)
             ajv validate \
               -s skills/schema/pipeline-schema.json \
               -d "$f" \
               --spec=draft7 \
               --allow-union-types \
               && echo "  PASS: $f" \
-              || { echo "  FAIL: $f"; exit 1; }
+              || { echo "  FAIL: $f"; FAILED=1; }
           done
+          [ "$FAILED" -eq 0 ] || exit 1
 
-      - name: Check all SKILL.md files have required sections
+      # ── Check 2 ─────────────────────────────────────────────────────────────
+      - name: "2/10 — SKILL.md required sections (12-keyword check)"
+        if: success() || failure()
+        shell: bash
         run: |
-          echo "=== Checking SKILL.md section headers (13-section template) ==="
-          # Keyword patterns that match the actual ## headings used in every pipeline SKILL.md
           REQUIRED_SECTIONS=(
-            "Purpose"
-            "Inputs"
-            "Required Context"
-            "Execution Logic"
-            "Outputs"
-            "Rules"
-            "Security"
-            "Token Optim"
-            "Quality Check"
-            "Failure"
-            "Human-in-the-Loop"
-            "Skill Composition"
+            "Purpose" "Inputs" "Required Context" "Execution Logic"
+            "Outputs" "Rules" "Security" "Token Optim"
+            "Quality Check" "Failure" "Human-in-the-Loop" "Skill Composition"
           )
-          # Meta-format skills use a non-standard layout and are exempted from the 13-section check
           META_SKILLS=(
-            "context-memory"
-            "observability"
-            "quality-scoring"
-            "skill-lifecycle"
-            "trigger-engineering"
-            "validation-rules"
-            "versioning"
+            "context-memory" "observability" "quality-scoring"
+            "skill-lifecycle" "trigger-engineering" "validation-rules" "versioning"
           )
           FAILED=0
           for skill_dir in .opencode/skills/*/; do
             skill_name=$(basename "$skill_dir")
             skill_file="${skill_dir}SKILL.md"
-            # Skip meta-format skills
             skip=0
             for meta in "${META_SKILLS[@]}"; do
               [ "$skill_name" = "$meta" ] && skip=1 && break
@@ -87,7 +102,7 @@ jobs:
               continue
             fi
             if [ ! -f "$skill_file" ]; then
-              echo "  MISSING: $skill_file"
+              echo "  FAIL: Missing $skill_file"
               FAILED=1
               continue
             fi
@@ -100,28 +115,29 @@ jobs:
             if [ "${#missing[@]}" -eq 0 ]; then
               echo "  PASS: $skill_file"
             else
-              echo "  FAIL: $skill_file missing sections: ${missing[*]}"
+              echo "  FAIL: $skill_file — missing sections: ${missing[*]}"
               FAILED=1
             fi
           done
           [ "$FAILED" -eq 0 ] || exit 1
 
-      - name: Check all index.yaml skill IDs are unique
+      # ── Check 3 ─────────────────────────────────────────────────────────────
+      - name: "3/10 — Unique skill IDs in skills/index.yaml"
+        if: success() || failure()
         run: |
-          echo "=== Checking index.yaml for duplicate IDs ==="
           DUPES=$(grep "^- id:" skills/index.yaml | sort | uniq -d || true)
           if [ -n "$DUPES" ]; then
-            echo "  FAIL: Duplicate skill IDs found:"
-            echo "$DUPES"
+            echo "  FAIL: Duplicate skill IDs found: $DUPES"
             exit 1
           fi
           echo "  PASS: All skill IDs are unique"
 
-      - name: Check index.yaml skill count matches .opencode/skills/ directory count
+      # ── Check 4 ─────────────────────────────────────────────────────────────
+      - name: "4/10 — Skill count: index.yaml vs .opencode/skills/"
+        if: success() || failure()
         run: |
-          echo "=== Checking skill count consistency ==="
           INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
-          DIR_COUNT=$(ls -d .opencode/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
+          DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
           echo "  index.yaml entries : $INDEX_COUNT"
           echo "  .opencode/skills/  : $DIR_COUNT"
           if [ "$INDEX_COUNT" -ne "$DIR_COUNT" ]; then
@@ -130,10 +146,10 @@ jobs:
           fi
           echo "  PASS: Counts match ($INDEX_COUNT)"
 
-      - name: Check all opencode.json skill paths exist
+      # ── Check 5 ─────────────────────────────────────────────────────────────
+      - name: "5/10 — opencode.json skill paths exist on disk"
+        if: success() || failure()
         run: |
-          echo "=== Checking opencode.json skill paths ==="
-          # Extract paths to a temp file to avoid pipe subshell isolation
           node -e "
             const fs = require('fs');
             const cfg = JSON.parse(fs.readFileSync('opencode.json', 'utf8'));
@@ -155,32 +171,100 @@ jobs:
           done < /tmp/skill_paths.txt
           [ "$FAILED" -eq 0 ] || exit 1
 
-      - name: Validate graph node count matches index entry count
+      # ── Check 6 ─────────────────────────────────────────────────────────────
+      - name: "6/10 — skill-graph.yaml total_nodes matches index.yaml entry count"
+        if: success() || failure()
         run: |
-          echo "=== Checking skill-graph.yaml node count ==="
           GRAPH_NODES=$(grep "total_nodes:" skills/graph/skill-graph.yaml | awk '{print $2}')
           INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
           echo "  graph total_nodes  : $GRAPH_NODES"
           echo "  index.yaml entries : $INDEX_COUNT"
           if [ "$GRAPH_NODES" -ne "$INDEX_COUNT" ]; then
-            echo "  FAIL: Node count mismatch"
+            echo "  FAIL: Node count mismatch — update total_nodes in skill-graph.yaml to $INDEX_COUNT"
             exit 1
           fi
           echo "  PASS: Node counts match ($GRAPH_NODES)"
 
-      - name: Check index.yaml version matches SKILL.md frontmatter version
+      # ── Check 7 ─────────────────────────────────────────────────────────────
+      - name: "7/10 — Version consistency: registry.json vs skill-graph.yaml"
+        if: success() || failure()
         run: |
-          echo "=== Checking index.yaml version vs SKILL.md frontmatter ==="
-          pip install -q pyyaml 2>/dev/null || true
+          node -e "
+            const fs = require('fs');
+            const registry = JSON.parse(fs.readFileSync('skills/registry.json', 'utf8'));
+            const yaml = fs.readFileSync('skills/graph/skill-graph.yaml', 'utf8');
+            const graphVersions = {};
+            for (const block of yaml.split(/\n- id:/).slice(1)) {
+              const nameMatch = block.match(/name:\s+(\S+)/);
+              const verMatch  = block.match(/version:\s+(\S+)/);
+              if (nameMatch && verMatch) graphVersions[nameMatch[1]] = verMatch[1];
+            }
+            let mismatches = 0;
+            for (const skill of registry.skills) {
+              const graphVer = graphVersions[skill.name];
+              if (!graphVer) continue;
+              if (graphVer !== skill.version) {
+                process.stderr.write('  FAIL: ' + skill.name
+                  + '  registry=' + skill.version + '  graph=' + graphVer + '\n');
+                mismatches++;
+              }
+            }
+            if (mismatches === 0) {
+              console.log('  PASS: All registry versions match skill-graph.yaml');
+              process.exit(0);
+            } else {
+              process.exit(1);
+            }
+          "
+
+      # ── Check 8 ─────────────────────────────────────────────────────────────
+      - name: "8/10 — origin_metadata shape validation (registry.json)"
+        if: success() || failure()
+        run: |
+          node -e "
+            const fs = require('fs');
+            const registry = JSON.parse(fs.readFileSync('skills/registry.json', 'utf8'));
+            const REQUIRED_FIELDS = ['source', 'approval_tier', 'created_at'];
+            const VALID_SOURCES = new Set(['human', 'gap-triggered', 'migrated', 'unknown']);
+            const VALID_TIERS   = new Set(['standard', 'expedited', 'legacy']);
+            let warnings = 0;
+            let errors   = 0;
+            let valid    = 0;
+            for (const skill of registry.skills) {
+              if (!skill.origin_metadata) { warnings++; continue; }
+              const om = skill.origin_metadata;
+              const missing = REQUIRED_FIELDS.filter(f => !(f in om));
+              if (missing.length > 0) {
+                process.stderr.write('  FAIL: ' + skill.name + ' origin_metadata missing: ' + missing.join(', ') + '\n');
+                errors++;
+                continue;
+              }
+              if (!VALID_SOURCES.has(om.source)) {
+                process.stderr.write('  FAIL: ' + skill.name + ' origin_metadata.source invalid: ' + om.source + '\n');
+                errors++;
+              }
+              if (!VALID_TIERS.has(om.approval_tier)) {
+                process.stderr.write('  FAIL: ' + skill.name + ' origin_metadata.approval_tier invalid: ' + om.approval_tier + '\n');
+                errors++;
+              }
+              if (errors === 0) valid++;
+            }
+            if (errors > 0) { process.exit(1); }
+            if (valid > 0) console.log('  PASS: origin_metadata valid for ' + valid + ' skill(s)');
+            if (warnings > 0) console.log('  WARN: ' + warnings + ' pre-v5.1.0 skill(s) exempted');
+            process.exit(0);
+          "
+
+      # ── Check 9 ─────────────────────────────────────────────────────────────
+      - name: "9/10 — index.yaml version matches SKILL.md frontmatter version"
+        if: success() || failure()
+        run: |
           python3 - <<'PYEOF'
           import re, sys
-
           with open("skills/index.yaml") as f:
               raw = f.read()
-
           blocks = raw.split("\n- id:")
           mismatches = []
-
           for block in blocks[1:]:
               skill_match   = re.search(r'executable_skill:\s*(.+)', block)
               version_match = re.search(r'(?m)^  version:\s*(.+)', block)
@@ -199,9 +283,8 @@ jobs:
                   mismatches.append(f"  FAIL: {skill_path}  index.yaml={idx_ver}  SKILL.md={skill_ver}")
               else:
                   print(f"  PASS: {skill_path}  ({idx_ver})")
-
-          for m_line in mismatches:
-              print(m_line)
+          for m in mismatches:
+              print(m)
           sys.exit(1 if mismatches else 0)
           PYEOF
 
@@ -209,6 +292,7 @@ jobs:
         if: always()
         run: echo "=== Skill validation complete ==="
 
+  # ── Job 2: Docs broken-link check ──────────────────────────────────────────
   docs-link-check:
     name: Docs Broken-Link Check
     runs-on: ubuntu-latest
@@ -222,29 +306,32 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Check internal Markdown links in docs/
+      - name: Check internal Markdown links in docs/ and root .md files
         run: |
           python3 - <<'PYEOF'
           import re, sys
           from pathlib import Path
 
-          ROOT = Path(".")
+          ROOT     = Path(".")
           DOCS_DIR = ROOT / "docs"
-          broken = []
+          broken   = []
 
-          md_files = list(DOCS_DIR.rglob("*.md")) + list(ROOT.glob("*.md"))
+          # Check docs/, root .md files, and examples/ (if it exists)
+          examples_dir = ROOT / "examples"
+          md_files = (
+            list(DOCS_DIR.rglob("*.md"))
+            + list(ROOT.glob("*.md"))
+            + (list(examples_dir.rglob("*.md")) if examples_dir.exists() else [])
+          )
 
-          # Match [text](path) links — skip http/https/mailto/anchors-only
           link_re = re.compile(r'\[([^\]]*)\]\(([^)]+)\)')
 
           for md_file in md_files:
               content = md_file.read_text(errors="replace")
               for m in link_re.finditer(content):
                   raw_target = m.group(2).strip()
-                  # Skip external URLs and anchor-only refs
                   if raw_target.startswith(("http://", "https://", "mailto:", "#")):
                       continue
-                  # Strip inline anchor from path
                   path_part = raw_target.split("#")[0]
                   if not path_part:
                       continue
@@ -254,10 +341,68 @@ jobs:
                       broken.append(f"  FAIL: {rel_source} → {raw_target}")
 
           if broken:
-              print("=== Broken internal links in docs/ ===")
+              print("=== Broken internal links ===")
               for b in broken:
                   print(b)
               sys.exit(1)
           else:
               print(f"  PASS: All internal Markdown links resolve ({len(md_files)} files checked)")
           PYEOF
+
+  # ── Job 3: Website data sync check ─────────────────────────────────────────
+  website-sync-check:
+    name: Website Data Sync Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check website/data/ is in sync with source files
+        run: |
+          # Only run if website/data/ exists — skip gracefully otherwise
+          if [ ! -d "website/data" ]; then
+            echo "  INFO: website/data/ not present — sync check skipped"
+            exit 0
+          fi
+
+          FAILED=0
+
+          check_file() {
+            local src="$1"
+            local dst="$2"
+            if [ ! -f "$src" ]; then
+              echo "  WARN: Source not found: $src — skipping"
+              return
+            fi
+            if [ ! -f "$dst" ]; then
+              echo "  FAIL: website/data copy missing: $dst"
+              echo "        Fix: run 'make sync' and commit the result"
+              FAILED=1
+              return
+            fi
+            if ! cmp -s "$src" "$dst"; then
+              echo "  FAIL: Out of sync: $src vs $dst"
+              echo "        Fix: run 'make sync' and commit the result"
+              FAILED=1
+            else
+              echo "  PASS: In sync: $dst"
+            fi
+          }
+
+          # Key files that must always be in sync
+          check_file "skills/index.yaml"             "website/data/skills/index.yaml"
+          check_file "skills/registry.json"          "website/data/skills/registry.json"
+          check_file "skills/graph/skill-graph.yaml" "website/data/skills/graph/skill-graph.yaml"
+          check_file "docs/changelog.md"             "website/data/docs/changelog.md"
+          check_file "opencode.json"                 "website/data/opencode.json"
+
+          # Check pipeline files
+          for f in skills/pipelines/*.json; do
+            [ -f "$f" ] || continue   # guard: skip if glob did not expand (empty dir)
+            fname=$(basename "$f")
+            check_file "$f" "website/data/skills/pipelines/$fname"
+          done
+
+          [ "$FAILED" -eq 0 ] || exit 1
+          echo "  PASS: All website/data/ files are in sync"

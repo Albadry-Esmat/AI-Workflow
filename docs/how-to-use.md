@@ -1,8 +1,53 @@
 # How to Use — Developer & AI Agent Guide
 
-**Version:** 2.2.0 | **Last updated:** 2026-06-18
+**Version:** 2.3.0 | **Last updated:** 2026-07-03
+
+---
 
 ## For Developers
+
+### Setup
+
+Clone the repository and run the single setup command:
+
+```bash
+git clone https://github.com/your-org/ai-workflow.git
+cd ai-workflow
+make setup
+```
+
+Then open `.env` and fill in your credentials:
+
+```bash
+# Minimum required
+GITHUB_TOKEN=ghp_...          # https://github.com/settings/tokens
+
+# Optional but recommended
+CONTEXT7_API_KEY=...           # https://context7.com
+BRAVE_API_KEY=...              # https://api.search.brave.com/app/keys
+```
+
+Verify the environment:
+
+```bash
+make health     # prints PASS/WARN/FAIL per check
+opencode        # start the AI workflow
+```
+
+### Available Commands
+
+| Command | What it does |
+|---------|-------------|
+| `make setup` | Install deps, create `.env`, validate environment |
+| `make health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
+| `make validate` | Run all 9 skill validation checks |
+| `make sync` | Sync `website/data/` from source files |
+| `make graph` | Rebuild the knowledge graph |
+| `make clean` | Remove build artifacts |
+| `make reset` | Reset to clean state (removes `.env`, sessions) |
+| `make update` | Update `.opencode/` plugin dependencies |
+| `make sessions` | Show expired session files (dry-run) |
+| `make sessions-delete` | Delete expired session files |
 
 ### How to Add a New Feature
 
@@ -34,44 +79,32 @@
 ### How to Create a New Skill
 
 ```
-1. Copy skills/template/skill-template.md to skills/<domain>/<skill-name>.md
-2. Fill in all 13 sections:
-   - Header: name, version (start at 1.0.0), domain, description, author
-   - Purpose: one-paragraph description
-   - Inputs: define fields + JSON Schema
-   - Required Context: preconditions
-   - Execution Logic: numbered atomic steps
-   - Outputs: define fields + JSON Schema (include $defs.metrics + $defs.feedback_entry)
-   - Rules & Constraints: invariants
-   - Security Considerations: guardrails
-   - Token Optimization: compression rules
-   - Quality Checklist: validation items
-   - Failure Scenarios: fallback behavior
-   - HITL Gates: (if applicable)
-   - Skill Composition: (if applicable)
-3. Add skill entry to skills/registry.json
-4. Update docs/skills-registry.md with new skill entry
-5. Update docs/changelog.md
-6. If new workflow sequence, update docs/workflows.md
+1. Copy skills/template/skill-template.md to .opencode/skills/<name>/SKILL.md
+2. Fill in all 13 sections (see CONTRIBUTING.md for section list)
+3. Add entry to skills/index.yaml (follow exact format)
+4. Add entry to skills/registry.json
+5. Increment total_nodes in skills/graph/skill-graph.yaml
+6. Update docs/changelog.md
+7. Run: make validate && make sync
 ```
 
 ### How to Create a New Agent
 
 ```
-1. Define agent capability: which skill(s) it will execute
-2. Add agent config to the system's opencode.json:
+1. Define capability: which skill(s) it will execute
+2. Add agent config to opencode.json:
    {
      "agent": {
        "<agent-name>": {
          "mode": "subagent",
-         "model": "<model>",
-         "permission": { "edit": "deny" },
+         "model": "github-copilot/claude-sonnet-4.6",
+         "permission": { "edit": "deny", "bash": "deny" },
          "description": "..."
        }
      }
    }
-3. Add agent to docs/agents.md with inputs, outputs, dependencies
-4. If the agent introduces a new workflow path, update docs/workflows.md
+3. Create .opencode/agent/<agent-name>.md (follow existing agent files)
+4. Add agent to docs/agents.md with inputs, outputs, dependencies
 5. Update docs/changelog.md
 ```
 
@@ -88,28 +121,29 @@
 ### How to Deploy Changes
 
 ```
-1. Ensure all quality gates pass:
-   - Unit tests
-   - Integration tests
-   - Schema validation
-   - Security scan
-2. Bump version per semver rules (see docs/versioning.md)
-3. Update docs/changelog.md with change summary
-4. Follow promotion flow: dev → staging → pre-prod → production
-5. Each promotion gate requires HITL approval (see docs/governance.md)
-6. Monitor after deployment (see docs/monitoring.md)
+1. Ensure make validate passes (0 failures)
+2. Run make sync to update website/data/
+3. Bump version per semver rules (see docs/versioning.md)
+4. Update docs/changelog.md with change summary
+5. Follow promotion flow: dev → staging → pre-prod → production
+6. Each promotion gate requires HITL approval (see docs/governance.md)
+7. Monitor after deployment (see docs/monitoring.md)
 ```
 
 ### How to Debug Issues
 
-| Symptom | Likely Cause | Check First |
-|---------|-------------|-------------|
-| Schema validation error | Mismatch between skill output and expected input | Skill's schema, upstream output |
-| Pipeline halted | HITL gate timeout or rejection | docs/governance.md gate rules |
-| Feedback loop exceeded | Circular skill dependency | Workflow dependency graph |
-| Token budget exhausted | Context not compressed | skills/memory/context-protocol.md |
-| Skill not found | Registry not updated | skills/registry.json |
-| Agent permission denied | Incorrect agent config | Agent permission settings |
+| Symptom | Likely Cause | Fix |
+|---------|-------------|-----|
+| Schema validation error | Mismatch between skill output and expected input | Run `make validate`; check skill schema |
+| Pipeline halted | HITL gate timeout or rejection | See `docs/governance.md` gate rules |
+| Feedback loop exceeded | Circular skill dependency | Check workflow dependency graph |
+| Token budget exhausted | Context not compressed | See `docs/context-engineering.md` |
+| Skill not found | Registry not updated | Run `make validate` to find which entry is missing |
+| Agent permission denied | Incorrect agent config | Check permission in `opencode.json` |
+| `ajv: command not found` | ajv-cli not installed | Run `npm install -g ajv-cli ajv-formats` |
+| `GITHUB_TOKEN is not set` | Missing env var | Add `GITHUB_TOKEN=` to `.env` |
+
+---
 
 ## For AI Agents
 
@@ -180,13 +214,20 @@ the registry is your single source of truth.
 6. Stay within token budget (32K/64K/128K per session type)
 ```
 
+---
+
 ## Quick Reference
 
 | Action | Command / File |
 |--------|---------------|
-| Add a skill | Copy template → write spec → update registry → update docs |
-| Add an agent | Create config → update agents.md → update changelog |
-| Run pipeline | Call orchestrator with pipeline_config |
-| Validate output | Run schema-validator with data + schema |
-| Track changes | See changelog.md |
-| Report issue | Check governance.md for escalation path |
+| First-time setup | `make setup` |
+| Validate environment | `make health` |
+| Validate skills | `make validate` |
+| Sync website data | `make sync` |
+| Update knowledge graph | `make graph` |
+| Add a skill | Copy template → write spec → `make validate && make sync` |
+| Add an agent | Create config + instruction file → update agents.md + changelog |
+| Run pipeline | Call orchestrator with `pipeline_config` |
+| Validate output | Run `schema-validator` with data + schema |
+| Track changes | See `docs/changelog.md` |
+| Report issue | Check `docs/governance.md` for escalation path |

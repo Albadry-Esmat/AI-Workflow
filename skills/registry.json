@@ -1,6 +1,6 @@
 {
   "version": "5.3.0",
-  "description": "Central registry of all skills in the Skill System Standard",
+  "description": "Orchestrator skill registry — contains skills with full I/O contracts, feedback routes, and orchestration metadata required for pipeline routing. This is a curated subset of skills/index.yaml; not every skill needs a registry entry (only those the orchestrator needs to resolve explicitly). The complete skill catalog is in skills/index.yaml.",
   "parallel_groups": [
     {
       "id": "quality-parallel",
@@ -9,7 +9,8 @@
         "testing-strategy",
         "security-review"
       ],
-      "description": "Code review, testing strategy, and security review run concurrently during implementation phase"
+      "description": "Code review, testing strategy, and security review run concurrently during implementation phase",
+      "note": "Priority: clean-code-review output is consumed by performance-guard (downstream), so it must complete before the guard layer. Parallel execution is safe because these three skills share no direct output dependency."
     },
     {
       "id": "insights-pipeline",
@@ -17,7 +18,8 @@
         "behavioral-telemetry-collector",
         "session-insights"
       ],
-      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended — non-blocking"
+      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended — non-blocking",
+      "note": "Priority: session-insights depends on behavioral-telemetry-collector output (session_summary). These run sequentially within the async group, not truly in parallel."
     }
   ],
   "skills": [
@@ -151,7 +153,7 @@
     {
       "name": "realtime-system-architect",
       "version": "1.0.0",
-      "status": "draft",
+      "status": "active",
       "domain": "architecture",
       "path": ".opencode/skills/realtime-system-architect/SKILL.md",
       "description": "Use when designing real-time systems with WebSockets, Server-Sent Events, or WebRTC. Triggers on: \"real-time architecture\", \"WebSocket design\", \"WebRTC\", \"collaborative editing\", \"CRDT\", \"presence system\". Do NOT use for batch or polling-based systems. Do NOT use for simple REST APIs.",

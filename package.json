@@ -1,4 +1,16 @@
 {
   "name": "ai-workflow",
-  "private": true
+  "private": true,
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "health": "bash scripts/health-check.sh",
+    "validate": "bash scripts/validate-skills.sh",
+    "clean": "bash scripts/clean.sh",
+    "reset": "bash scripts/reset.sh",
+    "sync": "bash scripts/sync-website-data.sh",
+    "website": "bash rebuild.sh",
+    "sessions": "bash scripts/cleanup-sessions.sh",
+    "sessions:delete": "bash scripts/cleanup-sessions.sh --delete",
+    "update": "npm install --prefix .opencode"
+  }
 }

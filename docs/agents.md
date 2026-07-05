@@ -1,6 +1,6 @@
 # Agents — Agent Definitions
 
-**Version:** 1.4.1 | **Last updated:** 2026-06-28
+**Version:** 1.5.0 | **Last updated:** 2026-07-03
 
 ## What Is an Agent
 
@@ -48,7 +48,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
 | `planner` | `feature-planning` | `subagent` | edit: ask |
 | `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `security-guard`, `implementation-completeness-guard` | `subagent` | edit: ask |
-| `tester` | `testing-strategy`, `test-generator`, `mutation-test-generator` | `subagent` | read-only |
+| `tester` | `testing-strategy`, `mutation-test-generator` | `subagent` | read-only |
 | `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
 | `impact-analyzer` | `dependency-analyzer`, `change-impact-analyzer` | `subagent` | read-only |
 | `test-generator` | `test-generator` | `subagent` | edit: ask |
@@ -101,7 +101,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
       "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
@@ -147,7 +147,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
       "skills": [
         ".opencode/skills/testing-strategy/SKILL.md",
-        ".opencode/skills/test-generator/SKILL.md",
         ".opencode/skills/mutation-test-generator/SKILL.md"
       ]
     },
@@ -165,7 +164,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "impact-analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
@@ -189,7 +188,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "deployer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
       "skill": ".opencode/skills/deployment-strategy/SKILL.md"
@@ -285,7 +284,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 }
 ```
 
-Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config.
+Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 19 agents (1 primary + 18 subagents) have corresponding instruction files.
 
 ## Model Configuration
 

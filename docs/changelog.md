@@ -13,6 +13,38 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.2.0] — 2026-07-03
+
+### Added
+
+- **Infrastructure** — `.env.example`: Complete environment variable template with inline documentation for every variable. Resolves the critical onboarding gap where `cp .env.example .env` was documented but the file did not exist.
+- **Infrastructure** — `Makefile`: Primary developer CLI entry point. Provides `make setup`, `make health`, `make validate`, `make sync`, `make graph`, `make clean`, `make reset`, `make update`, `make website`, `make sessions`, `make sessions-delete`, and `make help`.
+- **Infrastructure** — `scripts/setup.sh`: Single-command project setup. Checks prerequisites, installs `ajv-cli`, installs `.opencode/` npm packages (skips if already done), creates `.env` from template, creates required runtime directories, and runs health check.
+- **Infrastructure** — `scripts/health-check.sh`: Environment validation script. Checks required tools, optional tools, `.env` existence, `GITHUB_TOKEN` (masked), optional env vars, `.opencode/node_modules`, skill count sanity, and `opencode.json` path integrity. Outputs PASS/WARN/FAIL with actionable guidance per item.
+- **Infrastructure** — `scripts/sync-website-data.sh`: Automates the `website/data/` data sync. Copies `skills/`, `docs/changelog.md`, `opencode.json`, and all SKILL.md files to their `website/data/` mirror. Supports `--dry-run` and `--check` (CI mode) flags.
+- **Infrastructure** — `scripts/clean.sh`: Removes build artifacts and cache files safely (website/.next/, graphify-out/cache/, dated graphify snapshots).
+- **Infrastructure** — `scripts/reset.sh`: Resets workspace to clean state with confirmation prompt. Removes `.env`, session state, exports, and build artifacts. Accepts `--yes` to skip confirmation.
+- **Infrastructure** — `scripts/lib/common.sh`: Shared bash utilities library. Provides color output (auto-disabled in CI/non-TTY), `ok/fail/warn/info/header/banner/step` helpers, `check_tool`, `require_tool`, `require_file`, `require_env`, `check_env`, and `load_env` functions. Sourced by all scripts.
+- **Agents** — `.opencode/agent/data-engineer.md`, `api-designer.md`, `distributed-systems.md`, `cloud-platform.md`, `security-specialist.md`, `sre.md`: Created the 6 missing agent instruction files. All 19 agents now have `.opencode/agent/<name>.md` files, consistent with the convention documented in `docs/agents.md`.
+
+### Changed
+
+- **`package.json`**: Added `scripts` block with `npm run` aliases for all Makefile targets (`setup`, `health`, `validate`, `clean`, `reset`, `sync`, `website`, `sessions`, `sessions:delete`, `update`).
+- **`rebuild.sh`**: Shebang changed from `zsh` to `bash` for cross-platform consistency. Port now reads `WEBSITE_PORT` env var (falls back to 3000). Added guard that exits with a clear message if `website/package.json` is missing. Added 30-second server readiness timeout.
+- **`scripts/cleanup-sessions.sh`**: Now reads `SESSION_RETENTION_DAYS` env var as default retention window (overridable via `--days`). Sources `scripts/lib/common.sh` for consistent output. Updated header/help text.
+- **`scripts/validate-skills.sh`**: Sources `scripts/lib/common.sh`. Added section numbering (`1/9` through `9/9`). Added actionable `Fix:` hint after every failure. Standardized SKIP output. Uses `find` instead of `ls` for portable directory counting.
+- **`.github/workflows/validate-skills.yml`**: Added trigger on `scripts/**` path changes. Added checks 7/9 (registry.json↔skill-graph.yaml version consistency) and 8/9 (origin_metadata shape validation) — CI now runs all 9 checks matching the local validation script. Added third CI job `website-sync-check` that verifies key `website/data/` files are in sync with source. Docs link check now also covers `examples/` directory.
+- **`docs/agents.md`**: Fixed stale model assignments in the JSON code block — `analyzer`, `impact-analyzer`, and `deployer` now correctly show `claude-haiku-4.5` (matching `opencode.json`). Added note that all 19 agents now have instruction files. Bumped version to 1.5.0.
+- **`docs/how-to-use.md`**: Updated setup section to use `make setup`. Added Commands table. Updated debug table with new failure modes. Added env var configuration section. Bumped version to 2.3.0.
+- **`README.md`**: Full rewrite. Updated skill count from 101 to 102 (SKL-001→SKL-108). Added Quick Start using `make setup`. Added Commands table. Added Configuration table. Added Troubleshooting section. Added Prerequisites table.
+- **`CONTRIBUTING.md`**: Full rewrite. Setup section now uses `make setup`. Added complete step-by-step for adding skills (including registry.json, skill-graph.yaml, and sync steps). Fixed broken `.env.example` reference. Updated validation to use `make validate`. Fixed model tier documentation.
+
+### Removed
+
+- **`.opencode/opencode.json`**: Deleted stale duplicate of the root `opencode.json`. The opencode runtime reads from the project root. Eliminates the risk of the two copies diverging.
+
+---
+
 ## [3.1.0] — 2026-07-03
 
 ### Added

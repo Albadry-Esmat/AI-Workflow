@@ -83,6 +83,7 @@
     {
       "id": "phase-4-planning",
       "label": "Planning",
+      "note": "Phase numbering gap: phase-3 is intentionally reserved. The design layer (phase-2b + phase-2c) occupies the logical phase-3 slot. Numbering skips to phase-4 to preserve roadmap compatibility.",
       "skills": [
         {
           "name": "feature-planning",
@@ -409,6 +410,6 @@
       "work-item-exporter",
       "behavioral-telemetry-collector"
     ],
-    "comment": "Set enabled:true to route eligible non-blocking skills through Anthropic Batch API (50% cost reduction, up to 24h latency). Never enable for skills in a gate dependency chain — orchestrator Step 3k enforces this and overrides to sync_override with a warning."
+    "comment": "Set enabled:true to route eligible non-blocking skills through an async batch endpoint. NOTE: The github-copilot/claude-sonnet-4.6 model does not expose a batch API — this policy is reserved for future use when the runtime supports async batch processing. Never enable for skills in a gate dependency chain — orchestrator Step 3k enforces this and overrides to sync_override with a warning."
   }
 }

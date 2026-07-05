@@ -2,7 +2,28 @@
 
 **An open framework that takes ideas to production using a pipeline of specialized AI agents.**
 
-AI Workflow provides a structured skill system — 101 skills, 18 agents, and 21 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
+AI Workflow provides a structured skill system — 102 skills, 18 agents, and 21 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/your-org/ai-workflow.git
+cd ai-workflow
+make setup
+```
+
+`make setup` checks prerequisites, installs dependencies, creates your `.env` from the template, and validates the environment. Then:
+
+```bash
+# Edit .env and set your GITHUB_TOKEN
+# (get one at https://github.com/settings/tokens — scopes: repo, read:org)
+make health     # verify everything is configured
+opencode        # start the AI workflow
+```
+
+That's it. See [Commands](#commands) for the full list of available targets.
 
 ---
 
@@ -22,45 +43,67 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 
 | What | Count |
 |------|-------|
-| Skills | 101 (SKL-001 → SKL-107) |
+| Skills | 102 |
 | Agents | 18 specialized + 1 primary orchestrator |
 | Pipeline templates | 21 |
 
 ---
 
-## Quick Start
+## Prerequisites
 
-### Prerequisites
+| Tool | Required | Purpose |
+|------|----------|---------|
+| [opencode](https://opencode.ai) | **Yes** | Runs the AI agent runtime |
+| [Node.js](https://nodejs.org) ≥ 18 | **Yes** | Pipeline schema validation + plugin runtime |
+| [Python 3](https://python.org) ≥ 3.9 | **Yes** | SKILL.md version consistency checks |
+| [Git](https://git-scm.com) | **Yes** | Version control |
+| [ajv-cli](https://github.com/ajv-validator/ajv-cli) | Optional | JSON Schema validation (auto-installed by `make setup`) |
+| [graphify](https://graphify.ai) | Optional | Knowledge graph queries |
 
-- [opencode](https://opencode.ai) — the AI coding tool that powers the agent runtime
-- A GitHub Copilot subscription (or any LLM provider supported by opencode)
+A GitHub Copilot subscription (or another LLM provider supported by opencode) is also required.
 
-### 1 — Clone
+---
+
+## Commands
+
+Run `make help` to see the full list at any time.
+
+| Command | What it does |
+|---------|-------------|
+| `make setup` | **Start here** — install deps, create `.env`, validate environment |
+| `make health` | Check tools, `.env`, and configuration — prints PASS/WARN/FAIL |
+| `make validate` | Run all 10 skill validation checks before committing |
+| `make sync` | Sync `website/data/` from source files after changing skills |
+| `make graph` | Rebuild the knowledge graph after code changes |
+| `make clean` | Remove build artifacts and cache files (safe, reversible) |
+| `make reset` | Reset to a clean state — removes `.env`, sessions, artifacts |
+| `make update` | Update `.opencode/` plugin dependencies |
+| `make website` | Build and start the website locally (requires companion repo — see below) |
+| `make sessions` | Show expired session files (dry-run) |
+| `make sessions-delete` | Delete expired session files (no confirmation prompt) |
+
+All commands are also available as `npm run <command>` (e.g., `npm run validate`).
+
+---
+
+## Configuration
+
+All configuration lives in `.env`. Copy the template on first setup:
 
 ```bash
-git clone https://github.com/your-username/ai-workflow.git
-cd ai-workflow
+cp .env.example .env
 ```
 
-### 2 — Open in opencode
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GITHUB_TOKEN` | **Yes** | GitHub PAT — used by the `github` MCP server |
+| `CONTEXT7_API_KEY` | No | Context7 library docs in agent context |
+| `BRAVE_API_KEY` | No | Brave Search for agent web lookups |
+| `VERCEL_TOKEN` | No | Vercel deployment operations |
+| `WEBSITE_PORT` | No | Local website port (default: `3000`) |
+| `SESSION_RETENTION_DAYS` | No | Session cleanup window in days (default: `30`) |
 
-```bash
-opencode
-```
-
-opencode reads `opencode.json` and loads all 18 agents automatically.
-
-### 3 — Run a pipeline
-
-Type any of the following to start a pipeline:
-
-```
-analyze requirements for <your idea>
-design the architecture for <system>
-full pipeline — build this feature: <description>
-review code in <path>
-plan this feature: <description>
-```
+See `.env.example` for full documentation of every variable.
 
 ---
 
@@ -77,7 +120,7 @@ A **skill** is a markdown file (`SKILL.md`) with 13 sections that define exactly
 ├── feature-planning/SKILL.md
 ├── clean-code-review/SKILL.md
 ├── security-review/SKILL.md
-└── ... (101 total)
+└── ... (102 total)
 ```
 
 The skill registry (`skills/index.yaml`) is the single source of truth for all skill metadata.
@@ -101,21 +144,21 @@ skills/pipelines/
 
 ```
 Primary agent (orchestrator)
-├── analyzer      → requirement-analyzer
-├── architect     → architecture-design, frontend-ux-architect, database-architect
-├── planner       → feature-planning
-├── builder       → code-generator, code-repair, design-system-generator, seo-optimizer
-├── reviewer      → clean-code-review, security-review, + 6 governance guards
-├── tester        → testing-strategy, test-generator, mutation-test-generator
-├── deployer      → deployment-strategy
-├── documenter    → documentation-generator
-├── doc-maintainer→ doc-maintainer
-├── data-engineer → 5 data platform skills
-├── api-designer  → 3 API contract skills
+├── analyzer          → requirement-analyzer
+├── architect         → architecture-design, frontend-ux-architect, database-architect
+├── planner           → feature-planning
+├── builder           → code-generator, code-repair, design-system-generator, seo-optimizer
+├── reviewer          → clean-code-review, security-review, + 6 governance guards
+├── tester            → testing-strategy, test-generator, mutation-test-generator
+├── deployer          → deployment-strategy
+├── documenter        → documentation-generator
+├── doc-maintainer    → doc-maintainer
+├── data-engineer     → 5 data platform skills
+├── api-designer      → 3 API contract skills
 ├── distributed-systems → 6 distributed architecture skills
-├── cloud-platform→ 3 cloud infrastructure skills
+├── cloud-platform    → 3 cloud infrastructure skills
 ├── security-specialist → 3 security depth skills
-└── sre           → 5 reliability engineering skills
+└── sre               → 5 reliability engineering skills
 ```
 
 ### HITL Gates
@@ -125,7 +168,19 @@ The pipeline pauses for your approval before:
 - Beginning code generation (after planning)
 - Deploying to production (after testing)
 
-You review the output, approve or request changes, and the pipeline continues.
+---
+
+## Running a Pipeline
+
+Type any of the following inside an `opencode` session to start a pipeline:
+
+```
+analyze requirements for <your idea>
+design the architecture for <system>
+full pipeline — build this feature: <description>
+review code in <path>
+plan this feature: <description>
+```
 
 ---
 
@@ -133,51 +188,72 @@ You review the output, approve or request changes, and the pipeline continues.
 
 ```
 ai-workflow/
-├── opencode.json              ← agent config, model assignments, permissions
+├── opencode.json              ← agent config, model assignments, MCP servers
+├── .env.example               ← environment variable template (copy to .env)
+├── Makefile                   ← developer CLI entry point
 ├── .opencode/
-│   ├── skills/                ← 101 SKILL.md files (the skill system)
-│   └── agent/                 ← per-agent instruction files
+│   ├── skills/                ← 102 SKILL.md files (AI-executable skill specs)
+│   └── agent/                 ← per-agent instruction files (19 files)
 ├── skills/
 │   ├── index.yaml             ← skill registry (single source of truth)
+│   ├── registry.json          ← machine-readable runtime registry
 │   ├── pipelines/             ← 21 pipeline template JSON files
-│   └── registry.json          ← machine-readable registry
-├── docs/                      ← system documentation
-│   ├── governance.md          ← approval gates, quality enforcement rules
-│   ├── architecture.md        ← full system architecture
-│   ├── changelog.md           ← version history
-│   └── ...
-├── work-items/                ← task/feature/bug tracking templates
-│   ├── TASK-TEMPLATE.md
-│   └── features/FEATURE-TEMPLATE/
+│   ├── graph/skill-graph.yaml ← 102 nodes, 328 edges
+│   └── schema/                ← JSON schemas for pipelines and registry
 ├── scripts/
-│   ├── validate-skills.sh     ← validates all SKILL.md files against the template
-│   └── cleanup-sessions.sh
+│   ├── setup.sh               ← one-command project setup
+│   ├── health-check.sh        ← environment validation
+│   ├── validate-skills.sh     ← 10-check skill validation suite
+│   ├── sync-website-data.sh   ← sync website/data/ from source
+│   ├── clean.sh               ← remove build artifacts
+│   ├── reset.sh               ← reset to clean state
+│   ├── cleanup-sessions.sh    ← prune expired session files
+│   └── lib/common.sh          ← shared bash utilities
+├── docs/                      ← system documentation (25 files)
 ├── examples/                  ← starter files for new projects
-│   ├── goal-file-example.md
-│   └── adr/
+├── work-items/                ← task/feature/bug tracking templates
+└── exports/                   ← work item export output
 ```
 
 ---
 
 ## Validating Skills
 
-Before committing new or modified skills, run the validator:
+Before committing new or modified skills:
 
 ```bash
-bash scripts/validate-skills.sh
+make validate
 ```
 
-Expected output: `0 failures`. All 101 skills must pass.
+Expected output: `All checks passed — N passed, 0 failed`. All 10 checks must pass.
+
+---
+
+## Troubleshooting
+
+### `opencode: command not found`
+Install opencode from [opencode.ai](https://opencode.ai).
+
+### `GITHUB_TOKEN is not set`
+Open `.env` and add your token. Create one at [github.com/settings/tokens](https://github.com/settings/tokens) with scopes: `repo`, `read:org`.
+
+### `ajv: command not found` during validation
+Run: `npm install -g ajv-cli ajv-formats` (or just re-run `make setup`).
+
+### `Skill count mismatch` in validation
+Every SKILL.md directory under `.opencode/skills/` must have a corresponding `- id:` entry in `skills/index.yaml`. Run `make validate` for the specific skill that is missing.
+
+### `.opencode/node_modules missing`
+Run: `npm install --prefix .opencode` (or `make update`).
+
+### Website won't start (`website/package.json not found`)
+The website source lives in a separate companion repository. The `website/` directory in this repo contains only the data mirror. Run `make sync` to update that mirror, then deploy via Vercel.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide on:
-- Adding a new skill
-- Adding a pipeline template
-- Modifying agents
-- PR and review process
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide on adding skills, pipeline templates, and agents.
 
 ---
 
@@ -192,6 +268,5 @@ Full system documentation lives in [`docs/`](docs/):
 | `docs/governance.md` | Approval gates and quality rules |
 | `docs/agents.md` | All 18 agents and their skill assignments |
 | `docs/workflows.md` | End-to-end pipeline execution |
+| `docs/how-to-use.md` | Step-by-step guides for developers and agents |
 | `docs/changelog.md` | Version history |
-
-The [AI Workflow website](https://github.com/your-username/ase-os-website) — a separate repo — renders all of this interactively as a browsable skill catalog.

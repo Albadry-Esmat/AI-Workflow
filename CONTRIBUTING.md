@@ -6,13 +6,36 @@ Thank you for contributing! This guide covers everything you need to add a skill
 
 ## Table of Contents
 
-1. [Branching strategy](#branching-strategy)
-2. [Adding a skill](#adding-a-skill)
-3. [Adding a pipeline template](#adding-a-pipeline-template)
-4. [Modifying an agent](#modifying-an-agent)
-5. [Validating your changes](#validating-your-changes)
-6. [Running the website locally](#running-the-website-locally)
-7. [PR checklist](#pr-checklist)
+1. [Setup](#setup)
+2. [Branching strategy](#branching-strategy)
+3. [Adding a skill](#adding-a-skill)
+4. [Adding a pipeline template](#adding-a-pipeline-template)
+5. [Modifying an agent](#modifying-an-agent)
+6. [Validating your changes](#validating-your-changes)
+7. [Running the website locally](#running-the-website-locally)
+8. [PR checklist](#pr-checklist)
+
+---
+
+## Setup
+
+Clone the repo and run the single setup command:
+
+```bash
+git clone https://github.com/your-org/ai-workflow.git
+cd ai-workflow
+make setup
+```
+
+Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
+
+```bash
+make health     # verify your environment
+make validate   # run the full skill validation suite
+opencode        # start the AI workflow
+```
+
+See `make help` for a full list of available commands.
 
 ---
 
@@ -35,29 +58,34 @@ Thank you for contributing! This guide covers everything you need to add a skill
 
 ### 1 — Create the SKILL.md file
 
-Every skill lives at `.opencode/skills/<skill-name>/SKILL.md`. Copy the structure from an existing skill (e.g., `.opencode/skills/requirement-analyzer/SKILL.md`) and fill in all 13 sections:
+Every skill lives at `.opencode/skills/<skill-name>/SKILL.md`. Copy the structure from the template:
+
+```bash
+cp skills/template/skill-template.md .opencode/skills/<skill-name>/SKILL.md
+```
+
+Fill in all 12 sections:
 
 ```
 ## 1. Purpose
-## 2. Trigger Conditions
-## 3. Input Contract
-## 4. Output Contract
-## 5. Quality Gates
-## 6. Execution Steps
-## 7. Error Handling
-## 8. Examples
-## 9. Anti-Patterns
-## 10. Related Skills
-## 11. Governance
-## 12. Changelog
-## 13. Skill Composition
+## 2. Inputs
+## 3. Required Context
+## 4. Execution Logic
+## 5. Outputs
+## 6. Rules
+## 7. Security
+## 8. Token Optimization
+## 9. Quality Check
+## 10. Failure Handling
+## 11. Human-in-the-Loop
+## 12. Skill Composition
 ```
 
-All 13 sections are **required**. The validator will fail if any section is missing.
+All 12 sections are **required**. `make validate` will fail if any are missing.
 
 ### 2 — Assign a Skill ID
 
-Skill IDs follow the format `SKL-NNN` (zero-padded to 3 digits). Check the last entry in `skills/index.yaml` to find the next available number:
+Skill IDs follow the format `SKL-NNN` (zero-padded to 3 digits). Find the next available:
 
 ```bash
 grep "^- id:" skills/index.yaml | tail -5
@@ -75,34 +103,37 @@ Add a new entry at the end of `skills/index.yaml`. Follow the exact format of ex
   status: active
   category: <category>
   agent: <agent-name>
-  path: .opencode/skills/your-skill-name/SKILL.md
+  executable_skill: .opencode/skills/your-skill-name/SKILL.md
   description: "One sentence description."
-  triggers:
-    - "trigger phrase one"
-    - "trigger phrase two"
-  inputs:
-    - name: input_name
-      type: string
-      required: true
-      description: "What this input is"
-  outputs:
-    - name: output_name
-      type: object
-      description: "What this output contains"
-  dependencies: []
-  pipeline_position: <position>
-  hitl_gate: false
 ```
 
 > **Note:** `- id:` lines must be at column 0 (no leading spaces).
 
-### 4 — Validate
+### 4 — Update skills/registry.json
+
+Add the skill entry to `skills/registry.json` following the existing schema. Required fields: `name`, `version`, `path`, `status`, `domain`, `inputs`, `outputs`.
+
+### 5 — Update skills/graph/skill-graph.yaml
+
+Add a node entry and increment `total_nodes` by 1.
+
+### 6 — Update docs/changelog.md
+
+Add an entry to the `[Unreleased]` section.
+
+### 7 — Sync website data
 
 ```bash
-bash scripts/validate-skills.sh
+make sync
 ```
 
-Expected: `0 failures`.
+### 8 — Validate
+
+```bash
+make validate
+```
+
+Expected: `All checks passed — N passed, 0 failed`.
 
 ---
 
@@ -132,7 +163,11 @@ Pipeline templates are JSON files in `skills/pipelines/`. Create a new file name
 }
 ```
 
-Reference the pipeline in `skills/registry.json` if it should appear in the website's pipeline catalog.
+Then validate against the pipeline schema:
+
+```bash
+make validate
+```
 
 ---
 
@@ -147,40 +182,45 @@ When you add a skill to an existing agent, update both `opencode.json` (add the 
 
 When you add a **new** agent:
 1. Add it to `opencode.json` under `"agent"`.
-2. Create `.opencode/agent/<name>.md`.
+2. Create `.opencode/agent/<name>.md` (follow the existing agent files as a template).
 3. Update `docs/agents.md` — add to the agent definitions table and the capability mapping table.
 4. Update `docs/changelog.md`.
 
 ### Model IDs
 
-Use only verified model IDs from `opencode models`. Do not invent model names. Current assignments use tier labels in documentation (`Standard` / `Lightweight`), never exact model IDs in the website UI.
+Use only verified model IDs from `opencode models`. Current assignments:
+
+- **Standard tier** (`claude-sonnet-4.6`): architect, planner, reviewer, tester, builder, recovery, documenter, data-engineer, api-designer, distributed-systems, cloud-platform, security-specialist, sre
+- **Lightweight tier** (`claude-haiku-4.5`): analyzer, impact-analyzer, test-generator, deployer, doc-maintainer
 
 ---
 
 ## Validating your changes
 
 ```bash
-# Validate all SKILL.md files (required before any PR)
-bash scripts/validate-skills.sh
-
-# Build the website (must be 117+/117 pages, 0 errors)
-cd website && npm run build
+# Run the full 9-check validation suite (required before any PR)
+make validate
 ```
 
-Both must pass with **zero failures / zero errors** before opening a PR.
+Expected: `All checks passed — N passed, 0 failed`.
+
+If `website/data/` exists locally, also sync it:
+
+```bash
+make sync
+```
 
 ---
 
 ## Running the website locally
 
+The website source lives in a separate companion repository. The `website/` directory in this repo contains only the data mirror used at build time. To update it:
+
 ```bash
-cd website
-cp .env.example .env.local   # set your NEXT_PUBLIC_* vars
-npm install
-npm run dev
+make sync     # syncs website/data/ from skills/, docs/, .opencode/skills/, opencode.json
 ```
 
-The site auto-detects data from the parent `ai-workflow/` directory (monorepo mode) — no separate data setup needed.
+Then deploy through Vercel or clone the companion repo into `website/` to run locally.
 
 ---
 
@@ -188,16 +228,17 @@ The site auto-detects data from the parent `ai-workflow/` directory (monorepo mo
 
 Before opening a pull request, verify:
 
-- [ ] `bash scripts/validate-skills.sh` → `0 failures`
-- [ ] `cd website && npm run build` → all pages generated, 0 errors
-- [ ] New skill has all 13 required sections in `SKILL.md`
-- [ ] `skills/index.yaml` entry follows the exact format (no leading spaces on `- id:`)
+- [ ] `make validate` → `All checks passed`
+- [ ] `make sync` run and `website/data/` changes committed (if skills/docs changed)
+- [ ] New skill has all 12 required sections in `SKILL.md`
+- [ ] New skill has entries in both `skills/index.yaml` AND `skills/registry.json`
+- [ ] `skills/graph/skill-graph.yaml` `total_nodes` updated if skill added/removed
 - [ ] `docs/changelog.md` updated with a summary of the change
-- [ ] No personal project data (work-items content, personal identity) included in the PR
-- [ ] No hardcoded owner-specific values in source code (use `NEXT_PUBLIC_*` env vars)
+- [ ] No personal project data (work-items content, personal identity) included
+- [ ] No hardcoded owner-specific values in source files
 
 ---
 
 ## Questions?
 
-Open an issue or start a discussion in the repository. We review PRs that add genuinely useful skills, fix bugs, or improve documentation.
+Open an issue or start a discussion in the repository. PRs that add genuinely useful skills, fix bugs, or improve documentation are welcome.
