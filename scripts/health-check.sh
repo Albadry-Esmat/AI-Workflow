@@ -15,7 +15,7 @@
 #
 # Exit code: 0 if all required checks pass (warnings are non-fatal)
 
-set -uo pipefail
+set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"

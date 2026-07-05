@@ -137,7 +137,7 @@ jobs:
         if: success() || failure()
         run: |
           INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
-          DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
+          DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
           echo "  index.yaml entries : $INDEX_COUNT"
           echo "  .opencode/skills/  : $DIR_COUNT"
           if [ "$INDEX_COUNT" -ne "$DIR_COUNT" ]; then
@@ -175,7 +175,8 @@ jobs:
       - name: "6/10 — skill-graph.yaml total_nodes matches index.yaml entry count"
         if: success() || failure()
         run: |
-          GRAPH_NODES=$(grep "total_nodes:" skills/graph/skill-graph.yaml | awk '{print $2}')
+          GRAPH_NODES=$(grep "total_nodes:" skills/graph/skill-graph.yaml 2>/dev/null | awk '{print $2}' || echo 0)
+          GRAPH_NODES="${GRAPH_NODES:-0}"
           INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
           echo "  graph total_nodes  : $GRAPH_NODES"
           echo "  index.yaml entries : $INDEX_COUNT"

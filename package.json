@@ -11,6 +11,7 @@
     "website": "bash rebuild.sh",
     "sessions": "bash scripts/cleanup-sessions.sh",
     "sessions:delete": "bash scripts/cleanup-sessions.sh --delete",
-    "update": "npm install --prefix .opencode"
+    "update": "npm install --prefix .opencode",
+    "graph": "graphify update ."
   }
 }

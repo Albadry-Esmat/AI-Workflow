@@ -39,7 +39,7 @@ fail() {
 }
 
 warn() {
-  echo -e "  ${YELLOW}WARN${NC} $1"
+  echo -e "  ${YELLOW}WARN${NC} $1" >&2
 }
 
 info() {
@@ -149,13 +149,15 @@ check_env() {
 # NOTE: values must use POSIX shell assignment syntax: KEY=VALUE (no spaces
 # around '=', and no inline comments after the value). Windows CRLF line
 # endings are stripped automatically before sourcing.
+# IMPORTANT: set +o allexport is guarded with '|| true' so that a sourcing
+# failure never leaves allexport permanently enabled for the calling script.
 load_env() {
   local env_file="${1:-.env}"
   if [[ -f "$env_file" ]]; then
     set -o allexport
     # Strip Windows CRLF (\r) before sourcing to avoid invisible \r in values
     # shellcheck disable=SC1090
-    source <(sed 's/\r//' "$env_file")
+    source <(sed 's/\r//' "$env_file") || true
     set +o allexport
   fi
 }

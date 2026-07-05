@@ -23,7 +23,7 @@ nodes:
   name: feature-planning
   domain: planning
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.2.0
   status: active
   layer: pipeline-core
 - id: SKL-004
@@ -86,14 +86,14 @@ nodes:
   name: skill-authoring
   domain: meta
   mastery_level: advanced
-  version: 1.1.0
+  version: 1.2.0
   status: active
   layer: meta
 - id: SKL-013
   name: context-memory
   domain: system
   mastery_level: intermediate
-  version: 1.0.0
+  version: 2.0.0
   status: active
   layer: utility
 - id: SKL-014
@@ -345,7 +345,7 @@ nodes:
   name: enhancement-dashboard
   domain: system
   mastery_level: beginner
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: utility
 - id: SKL-050
@@ -401,7 +401,7 @@ nodes:
   name: work-item-exporter
   domain: integration
   mastery_level: beginner
-  version: 1.0.0
+  version: 2.1.0
   status: active
   layer: integration
 - id: SKL-058
@@ -416,301 +416,301 @@ nodes:
   domain: meta
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: meta
 - id: SKL-066
   name: semantic-diff-analyzer
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: analysis
 - id: SKL-067
   name: acceptance-criteria-generator
   domain: requirements
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: requirements
 - id: SKL-068
   name: technical-debt-tracker
   domain: quality
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: quality
 - id: SKL-069
   name: architecture-evolution-planner
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-070
   name: compliance-mapper
   domain: governance
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: governance
 - id: SKL-071
   name: api-deprecation-manager
   domain: architecture
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: lifecycle
 - id: SKL-072
   name: infrastructure-cost-estimator
   domain: deployment
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: deployment
 - id: SKL-073
   name: mutation-test-generator
   domain: testing
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-074
   name: skill-simulator
   domain: system
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: orchestration
 - id: SKL-075
   name: multi-repo-coordinator
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-076
   name: domain-knowledge-extractor
   domain: system
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: system
 - id: SKL-077
   name: pipeline-branching
   domain: orchestration
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: orchestration
 - id: SKL-078
   name: data-pipeline-architect
   domain: data
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-079
   name: data-quality-validator
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-080
   name: ml-pipeline-architect
   domain: data
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-081
   name: analytics-schema-designer
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-082
   name: data-contract-enforcer
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-083
   name: api-design-architect
   domain: api
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-084
   name: graphql-architect
   domain: api
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-085
   name: event-schema-designer
   domain: api
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-086
   name: microservices-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-087
   name: event-sourcing-designer
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-088
   name: distributed-resilience-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-089
   name: cloud-architecture-reviewer
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-090
   name: serverless-architect
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-091
   name: container-orchestration-architect
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-092
   name: threat-model-designer
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-093
   name: secrets-management-architect
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-094
   name: devsecops-pipeline-designer
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-095
   name: load-test-designer
   domain: testing
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-096
   name: profiling-advisor
   domain: quality
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: quality
 - id: SKL-097
   name: slo-sla-designer
   domain: deployment
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: deployment
 - id: SKL-098
   name: runbook-generator
   domain: documentation
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-099
   name: chaos-engineering-designer
   domain: testing
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-100
   name: state-management-architect
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-101
   name: micro-frontend-architect
   domain: design
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-102
   name: web-performance-optimizer
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-103
   name: ddd-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-104
   name: caching-strategy-designer
   domain: architecture
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-105
   name: localization-architect
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-106
   name: product-analytics-designer
   domain: planning
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-107
   name: realtime-system-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-108
   name: multi-agent-debate
@@ -1423,7 +1423,7 @@ edges:
   to: SKL-069
   type: dependency
   label: architecture-evolution-planner consumes current and target architecture from architecture-design
-- from: SKL-029
+- from: SKL-027
   to: SKL-069
   type: dependency
   label: architecture-evolution-planner uses adr-generator to produce ADR stubs per evolution phase
@@ -1436,7 +1436,7 @@ edges:
   type: dependency
   label: architecture-evolution-planner produces evolution phases fed into feature-planning as phased tasks
 - from: SKL-069
-  to: SKL-029
+  to: SKL-027
   type: composition
   label: architecture-evolution-planner triggers adr-generator for each significant evolution decision
 - from: SKL-001
@@ -1491,7 +1491,7 @@ edges:
   to: SKL-073
   type: dependency
   label: mutation-test-generator analyzes test suites produced by test-generator
-- from: SKL-027
+- from: SKL-026
   to: SKL-073
   type: dependency
   label: mutation-test-generator analyzes code artifacts produced by code-generator

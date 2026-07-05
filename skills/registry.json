@@ -157,8 +157,6 @@
       "domain": "architecture",
       "path": ".opencode/skills/realtime-system-architect/SKILL.md",
       "description": "Use when designing real-time systems with WebSockets, Server-Sent Events, or WebRTC. Triggers on: \"real-time architecture\", \"WebSocket design\", \"WebRTC\", \"collaborative editing\", \"CRDT\", \"presence system\". Do NOT use for batch or polling-based systems. Do NOT use for simple REST APIs.",
-      "phase": 8,
-      "req_id": "N62",
       "inputs": [
         "use_case",
         "scale",
@@ -181,7 +179,7 @@
         "distributed-resilience-architect@^1.0.0"
       ],
       "produces_for": [
-        "code-generator@^1.4.0",
+        "code-generator@^1.1.0",
         "deployment-strategy@^1.1.0"
       ],
       "orchestration": "Invoked after architecture-design when use cases include real-time collaboration, live feeds, or bidirectional streaming",

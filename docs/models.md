@@ -82,16 +82,16 @@ All IDs below are verified against `opencode models` output on 2026-06-25.
 | Agent | Model | Why |
 |-------|-------|-----|
 | `primary` | `claude-sonnet-4.6` | Orchestration requires reliable multi-step reasoning |
-| `analyzer` | `claude-sonnet-4.6` | Requirement ambiguity detection needs depth |
+| `analyzer` | `claude-haiku-4.5` | High-volume requirement extraction — speed and cost matter |
 | `architect` | `claude-sonnet-4.6` | System design decisions have long-range impact |
 | `planner` | `claude-sonnet-4.6` | Dependency mapping needs consistent logic |
 | `reviewer` | `claude-sonnet-4.6` | Security + SOLID analysis — no shortcuts |
 | `tester` | `claude-sonnet-4.6` | Test strategy requires understanding business logic |
 | `builder` | `claude-sonnet-4.6` | Code generation must match architecture contracts |
-| `impact-analyzer` | `claude-sonnet-4.6` | Graph traversal and blast-radius reasoning |
+| `impact-analyzer` | `claude-haiku-4.5` | Graph traversal and blast-radius — speed over depth |
 | `test-generator` | `claude-haiku-4.5` | Rote test file output — speed and volume matter |
 | `recovery` | `claude-sonnet-4.6` | Rollback decisions must be precise |
-| `deployer` | `claude-sonnet-4.6` | Infrastructure decisions have irreversible consequences |
+| `deployer` | `claude-haiku-4.5` | Deployment strategy output is structured and deterministic |
 | `documenter` | `claude-sonnet-4.6` | Doc generation quality affects onboarding |
 | `doc-maintainer` | `claude-haiku-4.5` | Lightweight diff-and-update — no deep reasoning needed |
 | `data-engineer` | `claude-sonnet-4.6` | ETL/ML pipeline design is architecturally complex |

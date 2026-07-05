@@ -61,6 +61,9 @@ step "Starting server on http://localhost:$PORT ..."
 npm start --prefix "$WEBSITE" &
 SERVER_PID=$!
 
+# Ensure the server process is killed on SIGINT (Ctrl+C) or SIGTERM
+trap 'kill "$SERVER_PID" 2>/dev/null; exit' INT TERM
+
 step "Waiting for server to be ready..."
 MAX_WAIT=30
 ELAPSED=0

@@ -1850,7 +1850,7 @@ skills:
   version: 1.0.0
   depends_on:
   - SKL-002
-  - SKL-029
+  - SKL-027
   - SKL-023
   related_skills:
   - SKL-003
@@ -1990,7 +1990,7 @@ skills:
   version: 1.0.0
   depends_on:
   - SKL-028
-  - SKL-027
+  - SKL-026
   related_skills:
   - SKL-005
   mastery_level: advanced

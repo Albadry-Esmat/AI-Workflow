@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# validate-skills.sh — Full skill validation suite (9 checks).
+# validate-skills.sh — Full skill validation suite (10 checks).
 #
 # Run from the project root:  make validate  OR  bash scripts/validate-skills.sh
 #
 # Checks:
+#   0. YAML syntax check — skills/index.yaml parses as valid YAML
 #   1. All pipeline JSON configs validate against pipeline-schema.json
 #   2. All SKILL.md files contain the required 12 section keywords
 #   3. All skill IDs in skills/index.yaml are unique
@@ -14,7 +15,7 @@
 #   8. origin_metadata shape validation for v5.1.0+ skills
 #   9. index.yaml version field matches SKILL.md frontmatter version
 #
-# Requires: node (checks 5, 7, 8), python3 (check 9)
+# Requires: node (checks 5, 7, 8), python3 (checks 0, 9)
 # Optional: ajv-cli (check 1) — install with: npm install -g ajv-cli ajv-formats
 
 set -euo pipefail
@@ -36,8 +37,25 @@ _ok()     { ok "$1";           PASS=$((PASS+1)); }
 _fail()   { fail "$1";         FAIL=$((FAIL+1)); }
 _skip()   { info "SKIP: $1"; }
 
+# ── 0. YAML syntax check ───────────────────────────────────────────────────────
+header "0/10 — YAML syntax check (skills/index.yaml)"
+if command -v python3 &>/dev/null; then
+  python3 -c "
+import yaml, sys
+try:
+    with open('skills/index.yaml') as f:
+        yaml.safe_load(f.read())
+    print('  PASS: skills/index.yaml parses as valid YAML')
+except yaml.YAMLError as e:
+    print(f'  FAIL: skills/index.yaml YAML parse error: {e}', file=sys.stderr)
+    sys.exit(1)
+" && _ok "skills/index.yaml is valid YAML" || { _fail "skills/index.yaml has YAML parse errors — run: python3 -c \"import yaml; yaml.safe_load(open('skills/index.yaml'))\" to debug"; }
+else
+  _skip "python3 not found — fix: https://python.org"
+fi
+
 # ── 1. Pipeline JSON schema validation ────────────────────────────────────────
-header "1/9 — Pipeline configs vs pipeline-schema.json"
+header "1/10 — Pipeline configs vs pipeline-schema.json"
 if command -v ajv &>/dev/null; then
   for f in skills/pipelines/*.json; do
     [[ -f "$f" ]] || continue   # guard: skip if glob did not expand (empty dir)
@@ -56,7 +74,7 @@ else
 fi
 
 # ── 2. SKILL.md required sections ─────────────────────────────────────────────
-header "2/9 — SKILL.md required sections (12-keyword check)"
+header "2/10 — SKILL.md required sections (12-keyword check)"
 
 REQUIRED_SECTIONS=(
   "Purpose"
@@ -123,7 +141,7 @@ for skill_dir in .opencode/skills/*/; do
 done
 
 # ── 3. Unique skill IDs ────────────────────────────────────────────────────────
-header "3/9 — Unique skill IDs in skills/index.yaml"
+header "3/10 — Unique skill IDs in skills/index.yaml"
 if [[ ! -f "skills/index.yaml" ]]; then
   _fail "skills/index.yaml not found"
   echo "         Fix: ensure skills/index.yaml exists at the repository root"
@@ -138,7 +156,7 @@ else
 fi
 
 # ── 4. Count consistency ───────────────────────────────────────────────────────
-header "4/9 — Skill count: index.yaml vs .opencode/skills/"
+header "4/10 — Skill count: index.yaml vs .opencode/skills/"
 INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
 DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
 echo "  index.yaml entries : $INDEX_COUNT"
@@ -151,7 +169,7 @@ else
 fi
 
 # ── 5. opencode.json skill path existence ─────────────────────────────────────
-header "5/9 — opencode.json skill paths exist on disk"
+header "5/10 — opencode.json skill paths exist on disk"
 if command -v node &>/dev/null; then
   while IFS= read -r path; do
     if [[ -f "$path" ]]; then
@@ -175,7 +193,7 @@ else
 fi
 
 # ── 6. Graph node count ────────────────────────────────────────────────────────
-header "6/9 — skill-graph.yaml total_nodes vs index.yaml entry count"
+header "6/10 — skill-graph.yaml total_nodes vs index.yaml entry count"
 GRAPH_NODES=$(grep "total_nodes:" skills/graph/skill-graph.yaml 2>/dev/null | awk '{print $2}')
 GRAPH_NODES="${GRAPH_NODES:-0}"
 echo "  graph total_nodes  : $GRAPH_NODES"
@@ -188,7 +206,7 @@ else
 fi
 
 # ── 7. Version consistency: registry.json vs skill-graph.yaml ─────────────────
-header "7/9 — Version consistency: registry.json vs skill-graph.yaml"
+header "7/10 — Version consistency: registry.json vs skill-graph.yaml"
 if command -v node &>/dev/null; then
   node -e "
     const fs = require('fs');
@@ -227,7 +245,7 @@ else
 fi
 
 # ── 8. origin_metadata shape validation ───────────────────────────────────────
-header "8/9 — origin_metadata shape validation (registry.json, v5.1.0+ skills)"
+header "8/10 — origin_metadata shape validation (registry.json, v5.1.0+ skills)"
 if command -v node &>/dev/null; then
   node -e "
     const fs = require('fs');
@@ -283,7 +301,7 @@ else
 fi
 
 # ── 9. index.yaml version vs SKILL.md frontmatter ─────────────────────────────
-header "9/9 — index.yaml version vs SKILL.md frontmatter version"
+header "9/10 — index.yaml version vs SKILL.md frontmatter version"
 if command -v python3 &>/dev/null; then
   python3 - <<'PYEOF' && PASS=$((PASS+1)) || { FAIL=$((FAIL+1)); echo "         Fix: sync the version field in the failing SKILL.md frontmatter to match index.yaml"; }
 import re, sys
@@ -333,8 +351,7 @@ fi
 echo
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 if [[ "$FAIL" -eq 0 ]]; then
-  echo -e "  ${GREEN}${BOLD}All checks passed${NC} — $PASS passed, 0 failed"
-else
+  echo -e "  ${GREEN}${BOLD}All checks passed${NC} — $PASS passed, 0 failed"else
   echo -e "  ${RED}${BOLD}Validation failed${NC} — $PASS passed, $FAIL failed"
   echo
   echo "  Review the FAIL lines above. Each failure includes a Fix: hint."

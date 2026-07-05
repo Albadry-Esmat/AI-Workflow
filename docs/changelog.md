@@ -13,6 +13,33 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.3.0] — 2026-07-05
+
+### Fixed (Production-Readiness Pass — Second Round)
+
+- **`skills/graph/skill-graph.yaml`**: Corrected 5 stale version entries — `feature-planning` 2.0.0→2.2.0, `skill-authoring` 1.1.0→1.2.0, `context-memory` 1.0.0→2.0.0, `enhancement-dashboard` 1.0.0→1.1.0, `work-item-exporter` 1.0.0→2.1.0.
+- **`skills/graph/skill-graph.yaml`**: Promoted 43 skills (SKL-065 through SKL-107) from `status: draft` → `status: active`. All have complete, validated SKILL.md files and 27 are directly assigned to production agents in `opencode.json`.
+- **`skills/graph/skill-graph.yaml`**: Fixed two wrong edge IDs — `SKL-029→SKL-069` corrected to `SKL-027→SKL-069` (adr-generator, not code-repair); `SKL-027→SKL-073` corrected to `SKL-026→SKL-073` (code-generator, not adr-generator). Also fixed the reverse `SKL-069→SKL-029` composition edge to `SKL-069→SKL-027`.
+- **`skills/registry.json`**: Removed spurious `phase: 8` and `req_id: "N62"` fields from `realtime-system-architect` entry (not part of the registry schema).
+- **`skills/registry.json`**: Fixed broken version constraint `code-generator@^1.4.0` → `code-generator@^1.1.0` (code-generator is at v1.1.0; ^1.4.0 would never resolve).
+- **`skills/index.yaml`**: Fixed SKL-069 `depends_on` — replaced `SKL-029` (code-repair) with `SKL-027` (adr-generator). Fixed SKL-073 `depends_on` — replaced `SKL-027` (adr-generator) with `SKL-026` (code-generator).
+- **`scripts/lib/common.sh`**: `warn()` now writes to stderr (`>&2`) — warnings no longer pollute stdout pipelines.
+- **`scripts/lib/common.sh`**: `load_env()` allexport leak fixed — added `|| true` to `source` call so that `set +o allexport` is always reached even when source fails under `set -e`.
+- **`scripts/health-check.sh`**: Added missing `-e` flag — changed `set -uo pipefail` to `set -euo pipefail` so errors in health check functions abort the script.
+- **`scripts/setup.sh`**: Added `mkdir -p "$HOOKS_DIR"` before writing the pre-commit hook — prevents failure on repositories where `.git/hooks/` doesn't yet exist.
+- **`rebuild.sh`**: Added `trap 'kill "$SERVER_PID" 2>/dev/null; exit' INT TERM` — server process is now killed on Ctrl+C or SIGTERM instead of leaking on the port.
+- **`.github/workflows/validate-skills.yml`**: Check 4 `find` now includes `2>/dev/null` to suppress permission errors. Check 6 `GRAPH_NODES` extraction now includes `2>/dev/null || echo 0` fallback and a guard `GRAPH_NODES="${GRAPH_NODES:-0}"` to prevent unbound variable failures if `skill-graph.yaml` is missing.
+- **`scripts/validate-skills.sh`**: Added YAML parse check 0/10 matching CI check 0/10 — local validation now runs all 10 checks (0–9) instead of 9 (1–9).
+- **`scripts/cleanup-sessions.sh`**: Fixed word-splitting in display loop — changed `echo "$EXPIRED_FILES" | while read -r f` to `while IFS= read -r f; do ... done <<< "$EXPIRED_FILES"` for consistent handling of filenames with special characters.
+- **`docs/models.md`**: Corrected 3 wrong agent model assignments — `analyzer` and `impact-analyzer` changed from `claude-sonnet-4.6` to `claude-haiku-4.5`; `deployer` changed from `claude-sonnet-4.6` to `claude-haiku-4.5` (matching actual `opencode.json` values).
+- **`docs/skills-registry.md`**: Updated skill count from 101 to 102 in the index layer table. Fixed 11 stale `skills/<domain>/<name>.md` path references to use the correct `.opencode/skills/<name>/SKILL.md` format. Updated 5 version numbers to match current skill versions. Converted two broken ADR hyperlinks (`ADR-0001`, `ADR-0002`) to plain text placeholders to prevent CI broken-link failures.
+- **`docs/security.md`**: Updated Agent Permissions table — `Subagents` row split into read-only and write-enabled groups reflecting actual `opencode.json` permissions. Fixed stale skill path reference. Bumped version 1.0.0 → 1.2.0.
+- **`docs/architecture.md`**: Bumped stale version header from 2.2.0 to 5.3.0; updated date to 2026-07-05.
+- **`AGENTS.md`**: Added Pipeline Routing Table — maps trigger keywords to pipeline template files and entry agents. This table was previously only documented in the system prompt, leaving it undocumented at the project level.
+- **`package.json`**: Added `"graph": "graphify update ."` npm script — provides `npm run graph` alias consistent with `make graph`.
+
+---
+
 ## [3.2.0] — 2026-07-03
 
 ### Added

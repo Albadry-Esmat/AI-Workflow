@@ -1,6 +1,6 @@
 # Security — Security Policies & Rules
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 1.2.0 | **Last updated:** 2026-07-05
 
 ## Security Principles
 
@@ -12,7 +12,7 @@
 
 ## Threat Model
 
-The security review skill (`skills/security/security-review.md`) performs STRIDE threat modeling:
+The security review skill (`.opencode/skills/security-review/SKILL.md`) performs STRIDE threat modeling:
 
 | Threat | Description | Mitigation |
 |--------|-------------|------------|
@@ -44,9 +44,9 @@ The security review skill (`skills/security/security-review.md`) performs STRIDE
 
 | Agent | File Access | Edit Permission | Bash Permission |
 |-------|-------------|-----------------|-----------------|
-| Primary | Read all | Ask | Ask |
-| Subagents | Read assigned skill files only | Deny | Deny |
-| Orchestrator | Read registry, skill files | Deny | Deny |
+| `primary` | Read all | Ask | Ask |
+| Read-only subagents (`analyzer`, `architect`, `tester`, `impact-analyzer`, `deployer`, `data-engineer`, `api-designer`, `distributed-systems`, `cloud-platform`, `security-specialist`, `sre`) | Read assigned skill files only | Deny | Deny |
+| Write-enabled subagents (`planner`, `reviewer`, `builder`, `test-generator`, `recovery`, `documenter`, `doc-maintainer`) | Read assigned skill files + write scope | Ask | Deny |
 
 ## Security Skill
 

@@ -145,6 +145,7 @@ if [[ ! -d "$ROOT/.git" ]]; then
 elif [[ -f "$PRECOMMIT" ]]; then
   _ok "pre-commit hook already installed"
 else
+  mkdir -p "$HOOKS_DIR"
   cat > "$PRECOMMIT" << 'HOOK'
 #!/usr/bin/env bash
 # Pre-commit hook — run skill validation before every commit.

@@ -8,9 +8,9 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 101 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 102 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
-| Execution | `skills/<domain>/<skill>.md` | 13-section AI-executable specifications |
+| Execution | `.opencode/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
 
 ## Core Pipeline Skills
 
@@ -19,8 +19,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `requirements` |
-| File | `skills/requirements/requirement-analyzer.md` |
-| Version | 1.1.0 |
+| File | `.opencode/skills/requirement-analyzer/SKILL.md` |
+| Version | 1.2.0 |
 | Purpose | Extract, normalize, and validate requirements from raw input |
 | Consumes from | None (entry point) |
 | Produces for | `architecture-design` |
@@ -32,8 +32,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `architecture` |
-| File | `skills/architecture/architecture-design.md` |
-| Version | 1.1.0 |
+| File | `.opencode/skills/architecture-design/SKILL.md` |
+| Version | 1.3.0 |
 | Purpose | Define modules, data flow, integration points, tech decisions |
 | Consumes from | `requirement-analyzer` |
 | Produces for | `feature-planning`, `security-review`, `documentation-generator` |
@@ -45,8 +45,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `planning` |
-| File | `skills/planning/feature-planning.md` |
-| Version | 1.1.0 |
+| File | `.opencode/skills/feature-planning/SKILL.md` |
+| Version | 2.2.0 |
 | Purpose | Break requirements into tasks, dependencies, roadmap |
 | Consumes from | `architecture-design` |
 | Produces for | `clean-code-review`, `testing-strategy` |
@@ -58,7 +58,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `review` |
-| File | `skills/review/clean-code-review.md` |
+| File | `.opencode/skills/clean-code-review/SKILL.md` |
 | Version | 1.1.0 |
 | Purpose | Validate code against SOLID and clean architecture |
 | Consumes from | `feature-planning` |
@@ -71,8 +71,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `testing` |
-| File | `skills/testing/testing-strategy.md` |
-| Version | 1.1.0 |
+| File | `.opencode/skills/testing-strategy/SKILL.md` |
+| Version | 2.0.0 |
 | Purpose | Define test plan, edge cases, coverage, quality gates |
 | Consumes from | `feature-planning` |
 | Produces for | `deployment-strategy` |
@@ -86,7 +86,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `security` |
-| File | `skills/security/security-review.md` |
+| File | `.opencode/skills/security-review/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Threat modeling, vulnerability detection, remediation |
 | Consumes from | `architecture-design`, `clean-code-review` |
@@ -99,7 +99,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `deployment` |
-| File | `skills/deployment/deployment-strategy.md` |
+| File | `.opencode/skills/deployment-strategy/SKILL.md` |
 | Version | 1.1.0 |
 | Purpose | Environment model, promotion, rollback, IaC scaffold, deployment approval request |
 | Consumes from | `architecture-design`, `testing-strategy` |
@@ -114,7 +114,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `documentation` |
-| File | `skills/documentation/doc-generator.md` |
+| File | `.opencode/skills/documentation-generator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Auto-generate API docs, ADRs, READMEs |
 | Consumes from | `requirement-analyzer`, `architecture-design`, `clean-code-review` |
@@ -129,8 +129,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `system` |
-| File | `skills/orchestrator/orchestrator.md` |
-| Version | 1.1.0 |
+| File | `.opencode/skills/orchestrator/SKILL.md` |
+| Version | 2.4.0 |
 | Purpose | Execute pipeline, route artifacts, validate, manage HITL |
 | Consumes from | Registry |
 | Produces for | Pipeline result |
@@ -142,7 +142,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `validation` |
-| File | `skills/validation/schema-validator.md` |
+| File | `.opencode/skills/schema-validator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Validate JSON data against JSON Schema |
 | Consumes from | None (utility) |
@@ -155,8 +155,8 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `documentation` |
-| File | `skills/documentation/doc-maintainer.md` |
-| Version | 1.0.0 |
+| File | `.opencode/skills/doc-maintainer/SKILL.md` |
+| Version | 1.1.0 |
 | Purpose | Autonomous engine that detects system changes and keeps `/docs` in sync |
 | Consumes from | Change events (any domain) |
 | Produces for | `/docs` files |
@@ -629,7 +629,7 @@ Transforms internal work item records from `work-items/` into export-ready forma
 
 **Supported formats:** Jira Bulk Import JSON, JSON Lines, Markdown
 
-**ADR:** [ADR-0002](adr/ADR-0002-work-item-export-contract.md)
+**ADR:** ADR-0002 (`docs/adr/ADR-0002-work-item-export-contract.md` — to be created)
 
 ---
 
@@ -650,4 +650,4 @@ Enforces the work item lifecycle state machine from `docs/work-item-foundation.m
 
 **Governance layer:** Layer 2 (Guard Skills)
 
-**ADR:** [ADR-0001](adr/ADR-0001-work-lifecycle-persistence-model.md)
+**ADR:** ADR-0001 (`docs/adr/ADR-0001-work-lifecycle-persistence-model.md` — to be created)

@@ -87,10 +87,10 @@ fi
 
 COUNT=$(echo "$EXPIRED_FILES" | wc -l | tr -d ' ')
 echo "  Found $COUNT expired file(s):"
-echo "$EXPIRED_FILES" | while read -r f; do
+while IFS= read -r f; do
   MTIME=$(date -r "$f" "+%Y-%m-%d" 2>/dev/null || stat -c "%y" "$f" 2>/dev/null | cut -d' ' -f1)
   echo "    [$MTIME] $(basename "$f")"
-done
+done <<< "$EXPIRED_FILES"
 echo
 
 # ── Act ───────────────────────────────────────────────────────────────────────
