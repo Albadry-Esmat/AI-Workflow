@@ -88,6 +88,13 @@ Step 6 — Generate clarification questions
 
 Step 7 — Assemble structured document
   Combine all artifacts into the standard output schema.
+  Determine technology_research_needed:
+    Scan normalized requirements[].statement for technology-bearing signals:
+      - Explicit technology nouns: cloud provider, database type, messaging system,
+        authentication protocol, programming language, ML/AI framework.
+      - Open-ended phrases: "using a suitable", "an appropriate", "TBD", "to be decided".
+      - Build-vs-buy indicators: "integrate with third-party", "self-hosted", "managed service".
+    Set technology_research_needed: true if any signal is detected; false otherwise.
   Output: structured requirements document
 ```
 
@@ -99,6 +106,7 @@ Step 7 — Assemble structured document
 | `open_questions` | `array[string]` | Clarification questions for the stakeholder |
 | `assumptions` | `array[object]` | Assumptions detected (statement, confidence) |
 | `risks` | `array[object]` | Risks identified (description, severity, impact) |
+| `technology_research_needed` | `boolean` | `true` when requirements reference novel technologies, unfamiliar domains, or material build-vs-buy decisions. When `true`, the pipeline conditionally invokes `research-artifact` (SKL-112, FEATURE-009) before architecture begins. Default: `false`. |
 | `metadata` | `object` | Input summary, token count, version |
 | `metrics` | `object` | Execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array[object]` | Feedback loop entries for cross-skill communication |
@@ -124,8 +132,7 @@ Step 7 — Assemble structured document
       }
     },
     "open_questions": { "type": "array", "items": { "type": "string" } },
-    "assumptions": {
-      "type": "array",
+    "assumptions": {      "type": "array",
       "items": {
         "type": "object",
         "properties": {
@@ -154,6 +161,11 @@ Step 7 — Assemble structured document
         "requirement_count": { "type": "integer" },
         "version": { "type": "string" }
       }
+    },
+    "technology_research_needed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set to true when requirements contain technology-bearing signals: explicit technology nouns (cloud provider, database type, messaging system, auth protocol, ML framework), open-ended phrases ('using a suitable', 'appropriate', 'TBD', 'to be decided'), or build-vs-buy indicators ('integrate with third-party', 'self-hosted', 'managed service'). Consumed by the pipeline condition for phase-1d-research."
     },
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }

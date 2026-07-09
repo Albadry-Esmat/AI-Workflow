@@ -50,7 +50,11 @@ Cross-check the delivered implementation against every validated requirement and
     "feature_plan":    { "type": "object" },
     "screen_inventory":{ "type": "array" },
     "db_entities":     { "type": "array" },
-    "release_threshold": { "type": "integer", "minimum": 0, "maximum": 100, "default": 85 }
+    "release_threshold": { "type": "integer", "minimum": 0, "maximum": 100, "default": 85 },
+    "rtm_artifact_path": {
+      "type": "string",
+      "description": "Path to artifacts/rtm-<timestamp>.json from traceability-matrix (SKL-111). When provided, pre-computed REQ→TEST and REQ→TASK coverage is used directly, bypassing the internal linkage scan for those fields. Increases accuracy and reduces token cost."
+    }
   }
 }
 ```
@@ -87,6 +91,10 @@ Step 2 — Map code artifacts to requirements
   Output: requirement → code artifact mapping (with source field: "task_map" | "annotation" | "naming" | "unmapped")
 
 Step 3 — Map test cases to requirements
+  If rtm_artifact_path is provided:
+    Load JSON at rtm_artifact_path. Use the pre-computed REQ→TEST linkage directly for
+    test case mapping. Record source: "rtm_artifact" for all entries sourced from the RTM.
+    Fall back to internal scan (below) only for requirements not present in the RTM.
   Scan test_state for test files and test case descriptions.
   Match test cases to requirements via naming, tags, or describe-block text.
   Classify coverage: covered, partial, or untested.
@@ -325,6 +333,7 @@ composes:
       test_state:      "system_state.test_state"
       screen_inventory: "ux_screen_inventory"
       db_entities:     "db_entity_list"
+      rtm_artifact_path: "rtm_artifact_path"
     output_map:
       readiness_score: "release_readiness_score"
       gaps:            "implementation_gaps"

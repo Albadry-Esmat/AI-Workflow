@@ -622,4 +622,3 @@ composes:
 Pipeline position: `phase-1-requirements` (or `phase-1b-clarify` if clarification is enabled) -> `debate-synthesizer` -> `phase-2-architecture`.
 
 `debate-synthesizer` is a terminal node in the requirements phase. Its `unified_requirements[]` output is the authoritative requirements set for all subsequent pipeline phases. Downstream skills (`architecture-design`, `feature-planning`, `database-architect`, etc.) consume `state.requirements` as set by this skill's `output_map`, not the raw requirement-analyzer output.
-```

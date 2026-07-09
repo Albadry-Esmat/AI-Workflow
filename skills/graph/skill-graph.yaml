@@ -2161,7 +2161,7 @@ edges:
   type: dependency
   label: feature-planning tasks[] (with depends_on[], estimated_hours) is primary input to task-dag
 - from: SKL-113
-  to: SKL-004
+  to: SKL-024
   type: composition
   label: task-dag parallel_groups and critical_path passed to impact-analyzer for scheduling context
 - from: SKL-113
@@ -2185,10 +2185,10 @@ edges:
   type: dependency
   label: test-generator test_cases[] (coverage_target) consumed by cross-artifact-consistency for TEST→REQ validation
 - from: SKL-114
-  to: SKL-006
+  to: SKL-026
   type: composition
   label: cross-artifact-consistency verdict gates code-generator (block on error violations)
-- from: SKL-007
+- from: SKL-010
   to: SKL-115
   type: dependency
   label: spec-artifact (FEATURE-007) artifacts/spec-latest.md is the primary input to drift-detector

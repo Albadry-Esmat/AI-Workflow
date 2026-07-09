@@ -3229,10 +3229,10 @@ skills:
   depends_on:
   - SKL-003
   related_skills:
-  - SKL-004
+  - SKL-024
   - SKL-010
   mastery_level: intermediate
-  use_when: 'After feature-planning (SKL-003) in the full pipeline. Automatically inserted as phase-3b-task-dag. Use to
+  use_when: 'After feature-planning (SKL-003) in the full pipeline. Automatically inserted as phase-4b-task-dag. Use to
     identify parallel-safe task groups and reduce perceived delivery time by suggesting concurrent execution.'
   do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Not useful when the task breakdown
     has fewer than 5 tasks (no meaningful parallelism to identify).'
@@ -3288,7 +3288,7 @@ skills:
   - feature-015
   version: 1.0.0
   depends_on:
-  - SKL-007
+  - SKL-010
   - SKL-021
   related_skills:
   - SKL-111

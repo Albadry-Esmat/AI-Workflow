@@ -169,6 +169,7 @@ Step 10 — Emit telemetry and return
 | `md_artifact_path` | `string` | Relative path to Mermaid Markdown artifact. |
 | `json_artifact_path` | `string` | Relative path to JSON DAG artifact. |
 | `metrics` | `object` | `tokens_in`, `tokens_out`, `duration_ms`, `items_produced` (total tasks), `version`. |
+| `feedback` | `array[object]` | Feedback loop entries for cross-skill communication. A `backpropagate` entry targeting `feature-planning` is emitted when cycle-breaking removes more than 3 explicit edges. |
 
 ## Rules & Constraints
 
@@ -232,7 +233,7 @@ The orchestrator presents the `parallel_groups` summary to the user as a recomme
 
 ## Skill Composition
 
-`task-dag` v1.0.0 runs after `feature-planning` and before `code-generator` in the full pipeline. It inserts between `phase-3-planning` and `phase-4-impact-analysis`.
+`task-dag` v1.0.0 runs after `feature-planning` and before `change-impact-analyzer` in the full pipeline. It inserts between `phase-4-planning` and `phase-5-impact`.
 
 ```yaml
 composes:

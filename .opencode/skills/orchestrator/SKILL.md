@@ -69,12 +69,27 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
       "items": {
         "type": "object",
         "properties": {
-          "after_skill": { "type": "string" },
+          "after_skill": { "type": "string", "description": "Pause after this named skill completes (skill-level gate)." },
+          "after_phase": { "type": "string", "description": "Pause after this pipeline phase completes (phase-level gate, preferred for full-pipeline configs)." },
           "type": { "type": "string", "enum": ["human_approval", "validation_check", "condition"] },
           "condition": { "type": "string" },
-          "timeout": { "type": "integer", "description": "Seconds to wait for HITL approval" }
+          "timeout": { "type": "integer", "description": "Seconds to wait for HITL approval" },
+          "bypass_on_timeout": { "type": "boolean", "default": true, "description": "When false, the gate remains blocked after timeout and requires an explicit human decision. Deployment gate always uses false." },
+          "re_invoke_on_pattern": {
+            "type": "object",
+            "description": "When the HITL response text matches `pattern`, re-invoke `skill` with the `inject` fields merged into its prior input. Used for OVERRIDE responses on cross-artifact-consistency and similar guard skills.",
+            "properties": {
+              "pattern": { "type": "string", "description": "JavaScript regex string. Capture groups ($1, $2 ...) are interpolated into inject values." },
+              "skill":   { "type": "string", "description": "Name of the skill to re-invoke." },
+              "inject":  { "type": "object", "description": "Key-value pairs merged into the skill's input. Values beginning with '$' are treated as capture-group references." }
+            },
+            "required": ["pattern", "skill", "inject"]
+          }
         },
-        "required": ["after_skill", "type"]
+        "anyOf": [
+          { "required": ["after_skill", "type"] },
+          { "required": ["after_phase", "type"] }
+        ]
       }
     },
     "mode": { "type": "string", "enum": ["sequential", "parallel", "hybrid"], "default": "sequential" }
@@ -92,7 +107,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 
 | Pipeline File | Purpose | Entry Skills |
 |---------------|---------|--------------|
-| `skills/pipelines/full-pipeline.json` v3.4.0 | Full idea-to-production delivery | requirement-analyzer → clarify → … → deployment-strategy |
+| `skills/pipelines/full-pipeline.json` v3.6.0 | Full idea-to-production delivery | requirement-analyzer → clarify → … → deployment-strategy |
 | `skills/pipelines/requirements-only.json` | Requirements extraction only | requirement-analyzer |
 | `skills/pipelines/architecture-only.json` | Architecture design only | requirement-analyzer → architecture-design |
 | `skills/pipelines/quick-review.json` | Code/security review | clean-code-review / security-review |
@@ -259,13 +274,18 @@ Step 3 — Execute skills (mode-dependent)
        [FEATURE-006] Inject project_context: if session_context.project_context is not null,
          prepend project_context as a read-only field to the skill input before compression.
          Skills MUST NOT modify project_context — it is injected fresh on every invocation.
-    b) [TASK-0051] Project output of prior skill before passing as input (output-field pruning):
-         i)  Load target skill's input schema (required + optional fields only).
-         ii) Project prior skill's output to include ONLY fields present in target schema.
-         iii) Always include: id fields, status fields, error fields (for error propagation).
-         iv) Always exclude from handoff: metrics{}, feedback[] (route to telemetry instead).
-         v)  Record projected token_count in session_context event_log for observability.
-         Expected reduction: 40–60% per inter-skill handoff vs. full output passthrough.
+     b) [TASK-0051] Project output of prior skill before passing as input (output-field pruning):
+          i)  Load target skill's input schema (required + optional fields only).
+          ii) Project prior skill's output to include ONLY fields present in target schema.
+          iii) Always include: id fields, status fields, error fields (for error propagation).
+          iv) Always exclude from handoff: metrics{}, feedback[] (route to telemetry instead).
+          v)  Record projected token_count in session_context event_log for observability.
+          [LOW-05] Special injection rules for phase transitions:
+            After phase-1d-research completes: inject research_artifact_path from
+              phase_outputs["phase-1d-research"].json_artifact_path into architecture-design's
+              input as research_artifact_path. This is NOT auto-projected (different field names)
+              and MUST be explicitly added to architecture-design's input payload before Step c1.
+          Expected reduction: 40–60% per inter-skill handoff vs. full output passthrough.
     b2) [TASK-0055] Lazy SKILL.md section loading:
          Load ONLY mandatory core sections for each skill invocation by default:
            Purpose, Inputs, Input Schema, Required Context, Execution Logic,
@@ -497,6 +517,15 @@ Step 5 — Check HITL gates
           (TASK-0065 warm-start in Phase 7 builds on this).
     If rejected: halt pipeline, return partial results
     If modified: apply modifications, re-validate, continue
+    [HIGH-09] If gate has re_invoke_on_pattern AND response text matches pattern:
+      Extract capture groups from the matched response text.
+      Interpolate capture group references ($1, $2 …) into the gate's inject{} values.
+      Re-invoke the named skill (gate.re_invoke_on_pattern.skill) with the prior phase
+        output merged with the inject{} fields. This enables OVERRIDE <reason> responses
+        to cross-artifact-consistency: the skill is re-invoked with override_approved: true
+        and override_reason: <captured reason>, producing verdict: warn instead of block.
+      Replace the phase output in session_context with the re-invoked skill's new output.
+      Continue pipeline from the gate point with the updated output.
   Output: gate decision log
 
 Step 6 — ADR sync
@@ -651,7 +680,8 @@ Gates are configured in `pipeline_config.gates`. Each gate defines:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `after_skill` | `string` | Pause after this skill completes |
+| `after_skill` | `string` | Pause after this skill completes (use `after_phase` for phase-level gates; must satisfy `anyOf` with `after_phase`) |
+| `after_phase` | `string` | Pause after this pipeline phase completes (preferred in full-pipeline configs; alternative to `after_skill`) |
 | `type` | `enum` | `human_approval` (manual), `validation_check` (auto), `condition` (auto if condition met) |
 | `condition` | `string` | Expression evaluated against output (e.g., `output.risks.length > 0`) |
 | `timeout` | `integer` | Max wait seconds for manual gates (default: 3600) |
@@ -770,6 +800,7 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - HITL gate decisions are append-only — they cannot be modified after being recorded.
 - **The deployment gate MUST NOT be bypassed.** Any pipeline_config without a non-bypassable deployment gate on `deployment-strategy` is rejected before execution starts.
 - **Guard skill verdicts with `verdict: "block"` MUST halt the pipeline gate immediately.** The orchestrator MUST NOT advance past a guard that returned `block`.
+- **`re_invoke_on_pattern` is a HITL extension, not a bypass.** When a gate defines `re_invoke_on_pattern` and the user's response matches the pattern, the orchestrator re-invokes the named skill with the injected fields before advancing. The re-invoked skill's output replaces the prior output in session_context. If the re-invoked skill still returns `verdict: block`, the gate remains blocked — the pattern match does not unconditionally advance the pipeline.
 - **Parallel write-back serialization (D3):** When `mode: "parallel"` or `parallel_groups` are used, concurrent skill execution is permitted, but writes to `session_context` MUST be serialized. Implement a write queue: each group's output is appended to `session_context` only after the previous group's write completes. Race conditions in session_context are a pipeline-integrity error.
 - **ADR canonical source:** All ADR writes go to `scope: "adr_index"` via state-manager. Do NOT write to `decision_log.adrs` (deprecated). The `adr_index` scope is the single source of truth for all architecture decisions.
 - **Prompt normalization gate:** Step 0 (prompt-normalizer SKL-040) MUST complete before any pipeline resolution begins. A `halt` or `ask_clarification` result from SKL-040 terminates the orchestrator immediately with a clarification request to the user.

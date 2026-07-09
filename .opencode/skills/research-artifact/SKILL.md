@@ -144,6 +144,7 @@ Step 5 — Emit telemetry and return
 | `md_artifact_path` | `string` | Relative path to written Markdown artifact. |
 | `json_artifact_path` | `string` | Relative path to written JSON artifact. |
 | `metrics` | `object` | `tokens_in`, `tokens_out`, `duration_ms`, `items_produced`, `version`. |
+| `feedback` | `array[object]` | Feedback loop entries for cross-skill communication. |
 
 **Output Schema (abbreviated):**
 
@@ -151,8 +152,8 @@ Step 5 — Emit telemetry and return
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["research_results", "overall_summary", "research_targets_count",
-               "alternatives_evaluated", "md_artifact_path", "json_artifact_path", "metrics"],
+"required": ["research_results", "overall_summary", "research_targets_count",
+             "alternatives_evaluated", "md_artifact_path", "json_artifact_path", "metrics", "feedback"],
   "properties": {
     "research_results": { "type": "array" },
     "overall_summary":  { "type": "string" },
@@ -160,7 +161,8 @@ Step 5 — Emit telemetry and return
     "alternatives_evaluated":  { "type": "integer", "minimum": 0 },
     "md_artifact_path":  { "type": "string" },
     "json_artifact_path":{ "type": "string" },
-    "metrics": { "type": "object" }
+    "metrics": { "type": "object" },
+    "feedback": { "type": "array", "items": { "type": "object" } }
   }
 }
 ```

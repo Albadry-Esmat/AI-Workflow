@@ -2,7 +2,7 @@
 name: cross-artifact-consistency
 version: 1.0.0
 domain: governance
-description: 'Use after test-generator and before code-generator to validate structural consistency across requirements, architecture modules, tasks, and tests. Checks: every REQ has ≥1 test, every module maps to ≥1 task, every task references a REQ or module. Blocks pipeline on violations. HITL approval allows override with documented reason. Triggers on: "consistency check", "cross-artifact validation", "are artifacts consistent", "orphaned tasks", "uncovered modules".'
+description: 'Use after test-generator to validate structural consistency across requirements, architecture modules, tasks, and tests. Checks: every REQ has ≥1 test, every module maps to ≥1 task, every task references a REQ or module. Blocks pipeline on violations. HITL approval allows override with documented reason. Triggers on: "consistency check", "cross-artifact validation", "are artifacts consistent", "orphaned tasks", "uncovered modules".'
 author: system
 ---
 
@@ -38,7 +38,7 @@ This skill was introduced in FEATURE-010 (Cross-Artifact Consistency Guard) as S
     "tasks":        { "type": "array", "minItems": 1 },
     "test_cases":   { "type": "array" },
     "override_approved": { "type": "boolean" },
-    "override_reason":   { "type": "string" }
+    "override_reason":   { "type": "string", "minLength": 1 }
   }
 }
 ```
@@ -88,8 +88,10 @@ Step 3 — Check B: Module → TASK mapping
 
 Step 4 — Check C: TASK → REQ/MODULE linkage (orphan detection)
   For each task T in tasks[]:
-    has_req_link    = T.req_ids[] is non-empty AND all req_ids in T.req_ids[] are in req_ids
-    has_module_link = T.module_refs[] is non-empty AND all module_refs in T.module_refs[] are in module_names
+    has_req_link      = T.req_ids[] is non-empty
+    has_module_link   = T.module_refs[] is non-empty
+    valid_req_link    = has_req_link AND all req_ids in T.req_ids[] are in req_ids
+    valid_module_link = has_module_link AND all module_refs in T.module_refs[] are in module_names
     If NOT has_req_link AND NOT has_module_link:
       Record violation:
         rule: "TASK_ORPHANED"
@@ -97,20 +99,22 @@ Step 4 — Check C: TASK → REQ/MODULE linkage (orphan detection)
         entity: T.id
         message: "Task <T.id> is not linked to any requirement or architecture module"
         fix_hint: "Add req_ids[] or module_refs[] to task <T.id>"
-    If has_req_link AND some req_id in T.req_ids[] is NOT in req_ids:
-      Record violation:
-        rule: "TASK_UNKNOWN_REQ"
-        severity: "error"
-        entity: T.id
-        message: "Task <T.id> references unknown requirement <bad_req_id>"
-        fix_hint: "Remove or correct the req_id in task <T.id>"
-    If has_module_link AND some module_ref in T.module_refs[] is NOT in module_names:
-      Record violation:
-        rule: "TASK_UNKNOWN_MODULE"
-        severity: "error"
-        entity: T.id
-        message: "Task <T.id> references unknown module '<bad_module>'"
-        fix_hint: "Remove or correct the module_ref in task <T.id>"
+    If has_req_link AND NOT valid_req_link:
+      For each req_id in T.req_ids[] that is NOT in req_ids:
+        Record violation:
+          rule: "TASK_UNKNOWN_REQ"
+          severity: "error"
+          entity: T.id
+          message: "Task <T.id> references unknown requirement <bad_req_id>"
+          fix_hint: "Remove or correct the req_id in task <T.id>"
+    If has_module_link AND NOT valid_module_link:
+      For each module_ref in T.module_refs[] that is NOT in module_names:
+        Record violation:
+          rule: "TASK_UNKNOWN_MODULE"
+          severity: "error"
+          entity: T.id
+          message: "Task <T.id> references unknown module '<bad_module>'"
+          fix_hint: "Remove or correct the module_ref in task <T.id>"
 
 Step 5 — Check D: Test coverage_target validity
   For each test_case T in test_cases[]:
@@ -245,7 +249,7 @@ This gate MUST NOT auto-advance on timeout. A blocked pipeline stays blocked unt
 
 ## Skill Composition
 
-`cross-artifact-consistency` v1.0.0 runs after `test-generator` and before `code-generator` in the full pipeline. It sits between `phase-7a-rtm` and `phase-7b-guards`.
+`cross-artifact-consistency` v1.0.0 runs after `test-generator` in the full pipeline. It sits between `phase-7a-rtm` and `phase-7b-guards`.
 
 ```yaml
 composes:

@@ -29,6 +29,33 @@
       ]
     },
     {
+      "id": "phase-1ca-debate-prep",
+      "label": "Debate Preparation — Advocate + Skeptic (parallel)",
+      "condition": "pipeline_config.debate_requirements === true",
+      "parallel": true,
+      "note": "FEATURE-013: Runs two requirement-analyzer instances in parallel — one as advocate (finds opportunities and value) and one as skeptic (challenges assumptions and finds gaps) — to produce the two inputs required by debate-synthesizer. Only active when pipeline_config.debate_requirements: true.",
+      "skills": [
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.2.0",
+          "config": {
+            "instance": "advocate",
+            "system_prompt_prefix": "Analyze as an advocate: find opportunities and value in these requirements."
+          },
+          "max_retries": 2
+        },
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.2.0",
+          "config": {
+            "instance": "skeptic",
+            "system_prompt_prefix": "Analyze as a skeptic: challenge assumptions, find gaps, and identify risks."
+          },
+          "max_retries": 2
+        }
+      ]
+    },
+    {
       "id": "phase-1c-spec-debate",
       "label": "Spec Debate (optional)",
       "condition": "pipeline_config.debate_requirements === true",
@@ -186,7 +213,7 @@
         },
         {
           "name": "test-generator",
-          "version": "^1.0.0",
+          "version": "^2.0.0",
           "max_retries": 2
         }
       ]
@@ -354,6 +381,10 @@
   ],
   "parallel_groups": [
     [
+      "requirement-analyzer:advocate",
+      "requirement-analyzer:skeptic"
+    ],
+    [
       "frontend-ux-architect",
       "database-architect"
     ],
@@ -397,10 +428,9 @@
     },
     {
       "after_phase": "phase-1d-research",
-      "type": "human_approval",
-      "condition": "pipeline_config.research_enabled === true || state.technology_research_needed === true",
-      "label": "Review technology research recommendations before architecture begins",
-      "timeout": 1800
+      "type": "condition",
+      "condition": "true",
+      "label": "Auto-advance — research-artifact skill manages its own HITL review gate internally"
     },
     {
       "after_phase": "phase-2-architecture",
@@ -436,7 +466,7 @@
     {
       "after_phase": "phase-7a-rtm",
       "type": "condition",
-      "label": "Warn if RTM overall_rtm_score < 60 — low coverage before guards",
+      "label": "Block if RTM overall_rtm_score < 60 — insufficient REQ coverage before guards",
       "condition": "phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score >= 60"
     },
     {
@@ -444,19 +474,19 @@
       "type": "human_approval",
       "condition": "phase_outputs['phase-7b-consistency'].verdict === 'block'",
       "label": "Consistency violations found — review and reply OVERRIDE <reason> to proceed, or fix violations and re-run",
-      "timeout": 3600
+      "timeout": 3600,
+      "bypass_on_timeout": false,
+      "re_invoke_on_pattern": {
+        "pattern": "^OVERRIDE\\s+(.+)$",
+        "skill": "cross-artifact-consistency",
+        "inject": { "override_approved": true, "override_reason": "$1" }
+      }
     },
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
       "label": "Block if any guard verdict is 'block'",
       "condition": "guards.every(g => g.verdict === 'pass')"
-    },
-    {
-      "after_phase": "phase-7-quality",
-      "type": "human_approval",
-      "label": "Approve security posture and coverage before audit",
-      "timeout": 3600
     },
     {
       "after_phase": "phase-8c-release-guard",

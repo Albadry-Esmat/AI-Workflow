@@ -321,6 +321,26 @@
         "note": {
           "type": "string",
           "description": "Optional human-readable annotation for this gate. Shown in pipeline documentation and approval UIs."
+        },
+        "re_invoke_on_pattern": {
+          "type": "object",
+          "description": "When a human_approval gate receives a text reply matching 'pattern', re-invoke the named skill with the injected inputs. Supports capturing groups in 'inject' values via $N references.",
+          "additionalProperties": false,
+          "required": ["pattern", "skill", "inject"],
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "Regular expression matched against the user's reply text."
+            },
+            "skill": {
+              "type": "string",
+              "description": "Skill name to re-invoke when the pattern matches."
+            },
+            "inject": {
+              "type": "object",
+              "description": "Input fields to inject into the skill invocation. Values may reference capture groups as $1, $2, etc."
+            }
+          }
         }
       }
     }
