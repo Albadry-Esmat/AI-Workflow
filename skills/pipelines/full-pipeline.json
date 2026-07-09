@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.7.0",
-  "description": "Full idea-to-production pipeline (v3.7.0): cost estimate (HITL) → requirements → clarify (HITL) [→ optional spec-debate] [→ optional research artifact] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → task DAG → code generation → guard layer → quality + testing → cross-artifact consistency → RTM → completeness audit → drift detection → defect management (conditional) → deployment → export + docs",
+  "version": "3.8.0",
+  "description": "Full idea-to-production pipeline (v3.8.0): cost estimate (HITL) → requirements → clarify (HITL) [→ optional spec-debate] [→ optional research artifact] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → task DAG → code generation → guard layer → quality + testing → cross-artifact consistency → RTM → completeness audit → drift detection → defect management (conditional) → deployment → export + docs + post-run cost report",
   "mode": "hybrid",
   "phases": [
     {
@@ -13,7 +13,11 @@
         {
           "name": "cost-estimator",
           "version": "^1.0.0",
-          "max_retries": 1
+          "max_retries": 1,
+          "config": {
+            "skip_cost_check": "pipeline_config.ci_mode",
+            "mode": "pre_run"
+          }
         }
       ]
     },
@@ -389,6 +393,23 @@
           "max_retries": 1
         }
       ]
+    },
+    {
+      "id": "phase-10c-cost-report",
+      "label": "Post-Run Cost Report",
+      "async": true,
+      "note": "FEATURE-018: Invokes cost-estimator in post_run mode to emit an actual vs. estimated token usage report. Runs asynchronously after all pipeline phases complete — does not block pipeline result.",
+      "skills": [
+        {
+          "name": "cost-estimator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true,
+          "config": {
+            "mode": "post_run"
+          }
+        }
+      ]
     }
   ],
   "parallel_groups": [
@@ -536,7 +557,8 @@
     "documentation-generator",
     "doc-maintainer",
     "adr-generator",
-    "work-item-exporter"
+    "work-item-exporter",
+    "cost-estimator"
   ],
   "token_policy": {
     "auto_compress": true,

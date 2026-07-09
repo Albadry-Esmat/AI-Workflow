@@ -125,14 +125,21 @@
     },
     {
       "id": "phase-6-execution",
-      "label": "Code Generation + Repair (conditional)",
-      "note": "code-generator always runs. code-repair is included for when tests fail or the build is broken (test.failed OR build.broken). Coordinate via pipeline orchestrator conditional re-invocation.",
+      "label": "Code Generation",
       "skills": [
         {
           "name": "code-generator",
           "version": "^1.0.0",
           "max_retries": 2
-        },
+        }
+      ]
+    },
+    {
+      "id": "phase-6b-repair",
+      "label": "Repair (conditional)",
+      "condition": "test.failed OR build.broken",
+      "note": "Mirrors full-pipeline phase-8-repair. code-repair is only invoked when tests fail or the build is broken — not unconditionally after code generation.",
+      "skills": [
         {
           "name": "code-repair",
           "version": "^1.0.0",

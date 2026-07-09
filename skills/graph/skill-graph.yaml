@@ -2,7 +2,7 @@ meta:
   version: 3.1.0
   last_updated: '2026-07-09'
   total_nodes: 113
-  total_edges: 352
+  total_edges: 366
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001

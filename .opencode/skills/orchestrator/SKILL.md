@@ -107,11 +107,12 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 
 | Pipeline File | Purpose | Entry Skills |
 |---------------|---------|--------------|
-| `skills/pipelines/full-pipeline.json` v3.6.0 | Full idea-to-production delivery | requirement-analyzer → clarify → … → deployment-strategy |
+| `skills/pipelines/full-pipeline.json` v3.8.0 | Full idea-to-production delivery | requirement-analyzer → clarify → … → deployment-strategy |
 | `skills/pipelines/requirements-only.json` | Requirements extraction only | requirement-analyzer |
 | `skills/pipelines/architecture-only.json` | Architecture design only | requirement-analyzer → architecture-design |
 | `skills/pipelines/quick-review.json` | Code/security review | clean-code-review / security-review |
 | `skills/pipelines/pre-deploy.json` | Pre-deployment checks | testing-strategy → deployment-strategy |
+| `skills/pipelines/compliance-first.json` v1.0.0 | Compliance-first delivery (SOC 2 / HIPAA / GDPR / ISO 27001) | compliance-profiler → requirement-analyzer → … → deployment-strategy |
 | `skills/pipelines/defect-lifecycle.json` v1.1.0 | Defect intake → triage → fix → closure | defect-manager |
 | `skills/pipelines/change-request.json` v1.1.0 | CR intake → impact → re-plan → delivery | change-request-manager |
 | `skills/pipelines/gap-to-skill.json` v1.0.0 | Reactive gap → skill creation → HITL approval → registration | gap-to-skill-pipeline (SKL-065) |

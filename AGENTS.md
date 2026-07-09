@@ -24,5 +24,6 @@ Match the first row whose triggers overlap with the user's request, then pass th
 | "security review", "find vulnerabilities", "threat modeling", "is this secure", "security audit" | `skills/pipelines/quick-review.json` | `reviewer` |
 | "deploy", "release", "pre-deploy check", "how do we deploy", "CI/CD", "rollback" | `skills/pipelines/pre-deploy.json` | `tester` |
 | "plan this feature", "break this down", "task breakdown", "roadmap", "sprint planning" | `skills/pipelines/full-pipeline.json` (resume from `feature-planning`) | `planner` |
+| "compliance", "SOC 2", "HIPAA", "GDPR", "ISO 27001", "compliance-first", "compliance pipeline", "compliance frameworks" | `skills/pipelines/compliance-first.json` | `analyzer` |
 
 **Fallback:** If no trigger matches, ask the user: "Which stage of the pipeline do you need — requirements, architecture, review, testing, deployment, or the full pipeline?"
