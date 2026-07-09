@@ -14,8 +14,9 @@
 #   7. Version consistency: registry.json versions match skill-graph.yaml nodes
 #   8. origin_metadata shape validation for v5.1.0+ skills
 #   9. index.yaml version field matches SKILL.md frontmatter version
+#   10. Community skill SHA-256 hash verification
 #
-# Requires: node (checks 5, 7, 8), python3 (checks 0, 9)
+# Requires: node (checks 5, 7, 8), python3 (checks 0, 9, 10)
 # Optional: ajv-cli (check 1) — install with: npm install -g ajv-cli ajv-formats
 
 set -euo pipefail
@@ -345,6 +346,68 @@ sys.exit(1 if mismatches else 0)
 PYEOF
 else
   _skip "python3 not found — fix: https://python.org"
+fi
+
+# ── 10. Community skill SHA-256 hash verification ─────────────────────────────
+header "10/10 — Community skill SHA-256 hash verification"
+
+python3 - <<'PYEOF'
+import sys, hashlib, yaml
+from pathlib import Path
+
+root = Path(".")
+index_path = root / "skills" / "index.yaml"
+
+try:
+    with open(index_path) as f:
+        data = yaml.safe_load(f)
+except Exception as e:
+    print(f"  SKIP: Could not read skills/index.yaml: {e}")
+    sys.exit(0)
+
+skills = data.get("skills", []) if isinstance(data, dict) else data
+community_skills = [s for s in skills if
+    isinstance(s.get("origin_metadata"), dict) and
+    s["origin_metadata"].get("source") == "community"]
+
+if not community_skills:
+    print("  PASS: No community skills installed")
+    sys.exit(0)
+
+fail_count = 0
+for skill in community_skills:
+    skill_id   = skill.get("id", "?")
+    skill_name = skill.get("name", "?")
+    skill_path = skill.get("executable_skill") or skill.get("reference_path", "")
+    expected_sha = skill.get("origin_metadata", {}).get("sha256")
+
+    if not expected_sha:
+        print(f"  FAIL [{skill_id} {skill_name}]: origin_metadata.sha256 missing")
+        fail_count += 1
+        continue
+
+    skill_file = root / skill_path
+    if not skill_file.exists():
+        print(f"  FAIL [{skill_id} {skill_name}]: SKILL.md not found at {skill_path}")
+        fail_count += 1
+        continue
+
+    actual_sha = hashlib.sha256(skill_file.read_bytes()).hexdigest()
+    if actual_sha == expected_sha:
+        print(f"  PASS [{skill_id} {skill_name}]: SHA-256 verified")
+    else:
+        print(f"  FAIL [{skill_id} {skill_name}]: SHA-256 mismatch")
+        print(f"    expected: {expected_sha}")
+        print(f"    actual:   {actual_sha}")
+        fail_count += 1
+
+sys.exit(1 if fail_count > 0 else 0)
+PYEOF
+
+if [ $? -eq 0 ]; then
+  _ok "Community skill SHA-256 verification"
+else
+  _fail "Community skill SHA-256 verification — see FAIL lines above"
 fi
 
 # ── Results ───────────────────────────────────────────────────────────────────

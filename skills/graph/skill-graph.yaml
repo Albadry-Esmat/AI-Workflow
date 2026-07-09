@@ -1,8 +1,8 @@
 meta:
   version: 3.1.0
   last_updated: '2026-07-09'
-  total_nodes: 109
-  total_edges: 342
+  total_nodes: 113
+  total_edges: 352
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
@@ -768,6 +768,34 @@ nodes:
   version: 1.0.0
   status: active
   layer: quality
+- id: SKL-116
+  name: compliance-profiler
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-117
+  name: compliance-gate
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-118
+  name: cost-estimator
+  domain: utility
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-119
+  name: skill-registry-client
+  domain: platform
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: platform
 edges:
 - from: SKL-001
   to: SKL-002
@@ -2200,3 +2228,43 @@ edges:
   to: SKL-115
   type: composition
   label: drift-detector runs after implementation-completeness-auditor as the terminal pipeline skill
+- from: SKL-116
+  to: SKL-117
+  type: composition
+  label: compliance-profiler compliance_requirements is primary input to compliance-gate
+- from: SKL-116
+  to: SKL-002
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to architecture-design
+- from: SKL-116
+  to: SKL-003
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to feature-planning
+- from: SKL-116
+  to: SKL-028
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to test-generator
+- from: SKL-002
+  to: SKL-117
+  type: dependency
+  label: architecture-design output consumed by compliance-gate for architecture compliance check
+- from: SKL-028
+  to: SKL-117
+  type: dependency
+  label: test-generator output consumed by compliance-gate for test-suite compliance check
+- from: SKL-010
+  to: SKL-118
+  type: dependency
+  label: orchestrator invokes cost-estimator at pipeline entry (phase-0-cost-estimate) before any skill executes
+- from: SKL-118
+  to: SKL-010
+  type: composition
+  label: cost-estimator approval_status gates orchestrator pipeline execution; rejection aborts pipeline
+- from: SKL-119
+  to: SKL-021
+  type: dependency
+  label: skill-registry-client reads and writes skills/index.yaml via state-manager on install/uninstall
+- from: SKL-119
+  to: SKL-010
+  type: dependency
+  label: skill-registry-client used by orchestrator for community skill management operations

@@ -1,8 +1,8 @@
 ---
 name: work-item-exporter
-version: 2.1.0
+version: 2.2.0
 domain: integration
-description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items, or when a Jira/GitHub/Linear webhook event needs to trigger an automated sync. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync", "webhook trigger", "Jira webhook", "auto-sync on status change". Supports three modes: export (one-way outbound, default), sync (bidirectional — reads Jira status back and proposes local updates via HITL gate), and webhook (event-driven — validates incoming webhook payload, maps event to a sync or export operation, and dispatches automatically). FEATURE work items are mapped to Jira Epics automatically.'
+description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items, or when a Jira/GitHub/Linear webhook event needs to trigger an automated sync. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync", "webhook trigger", "Jira webhook", "auto-sync on status change", "export to GitHub", "create GitHub issues". Supports three modes: export (one-way outbound, default), sync (bidirectional — reads Jira status back and proposes local updates via HITL gate), and webhook (event-driven — validates incoming webhook payload, maps event to a sync or export operation, and dispatches automatically). FEATURE work items are mapped to Jira Epics automatically.'
 author: system
 ---
 
@@ -35,6 +35,9 @@ Transform all tracked work items from the internal `work-items/` store into expo
 | `webhook_config.event_filter` | `array[string]` | Webhook only | Event types to act on. E.g. `["issue_status_changed", "issue_created", "issue_deleted"]`. Events not in this list are silently ignored. |
 | `webhook_config.secret_env_var` | `string` | Webhook only | Name of the environment variable holding the HMAC webhook secret (e.g. `JIRA_WEBHOOK_SECRET`). The secret value is NEVER inlined — only the env var name is passed. |
 | `payload` | `object` | Webhook only | Raw webhook event payload received from the external platform. |
+| `github_repo` | `string` | GitHub only | GitHub repository in `owner/repo` format (e.g. `myorg/myrepo`). Required when `"github"` in `export_formats`. |
+| `github_token_env` | `string` | GitHub only | Name of the environment variable holding the GitHub personal access token with `repo` scope (e.g. `GITHUB_TOKEN`). The token value is NEVER inlined — only the env var name is passed. |
+| `github_milestone` | `string` | No | GitHub milestone title to assign to all exported issues. If the milestone does not exist it is created automatically. |
 
 **Input Schema:**
 
@@ -50,7 +53,7 @@ Transform all tracked work items from the internal `work-items/` store into expo
     },
     "export_formats": {
       "type": "array",
-      "items": { "type": "string", "enum": ["jira", "jsonl", "markdown"] },
+      "items": { "type": "string", "enum": ["jira", "jsonl", "markdown", "github"] },
       "default": ["jira", "jsonl", "markdown"]
     },
     "jira_project_key": { "type": "string", "pattern": "^[A-Z]{2,10}$" },
@@ -80,6 +83,19 @@ Transform all tracked work items from the internal `work-items/` store into expo
     "payload": {
       "type": "object",
       "description": "Raw webhook event payload. Required when mode=webhook."
+    },
+    "github_repo": {
+      "type": "string",
+      "pattern": "^[\\w.-]+/[\\w.-]+$",
+      "description": "GitHub repository in owner/repo format. Required when 'github' in export_formats."
+    },
+    "github_token_env": {
+      "type": "string",
+      "description": "Env var NAME only — not the token value. Must hold a GitHub PAT with repo scope."
+    },
+    "github_milestone": {
+      "type": "string",
+      "description": "GitHub milestone title. Created automatically if absent."
     }
   },
   "if": { "properties": { "mode": { "const": "sync" } }, "required": ["mode"] },
@@ -162,6 +178,48 @@ Step 4 — Build Jira Bulk Import JSON (if "jira" in export_formats)
       }
   Write to: exports/{date}_{session_prefix}_jira.json
   Output: jira_export_path, jira_item_count
+
+Step 4b — Build GitHub Issues (if "github" in export_formats)
+  Validate GitHub inputs: github_repo and github_token_env must be present.
+  IF either is missing: emit `warning` feedback "github_repo and github_token_env required for GitHub export — skipping", continue without GitHub export.
+  Read API token: token = os.environ[github_token_env]
+    IF env var is absent or empty: emit `warning` "GITHUB_TOKEN env var not set — skipping GitHub export", continue.
+  Resolve milestone (if github_milestone provided):
+    GET https://api.github.com/repos/{github_repo}/milestones
+    IF milestone with matching title found: record milestone_number
+    IF not found: POST https://api.github.com/repos/{github_repo}/milestones body {title: github_milestone}
+    Record milestone_number from response
+  For each scrubbed_item in sequential order (sequential to enable cross-linking by issue number):
+    Map fields to GitHub issue:
+      title   ← "[{item.id}] {item.title}" (prefix with item ID for traceability)
+      body    ← Build markdown body:
+                  "## {item.work_item_type}: {item.title}\n\n"
+                  + "**ID:** {item.id}\n"
+                  + "**Priority:** {item.priority}\n"
+                  + "**Status:** {item.lifecycle_state}\n\n"
+                  + "## Description\n\n{item.description}\n\n"
+                  + (if item.acceptance_criteria non-empty): "## Acceptance Criteria\n\n{item.acceptance_criteria}\n\n"
+                  + (if item.linked_items non-empty): "## Linked Items\n\n{item.linked_items joined as '- {id}'}\n\n"
+                  + "_Exported by AI Workflow work-item-exporter v2.2.0_"
+      labels  ← ["ai-workflow", item.work_item_type.toLowerCase(), "priority-{item.priority}"]
+                  + item.jira_labels[] (if present)
+      milestone ← milestone_number (if resolved)
+    POST https://api.github.com/repos/{github_repo}/issues
+      Headers: Authorization: Bearer {token}, Accept: application/vnd.github+json, X-GitHub-Api-Version: 2022-11-28
+      On HTTP 201: record { item_id: item.id, issue_number: response.number, issue_url: response.html_url }
+      On HTTP 403/422: emit `warning` feedback with item.id and error message, mark as skipped
+      On HTTP 429 (rate limit): wait until X-RateLimit-Reset epoch (max wait 60s), retry once
+      On HTTP 503: exponential backoff — wait 2^attempt seconds (max 3 retries), retry
+      NEVER log the token value
+  After all items created:
+    For each item with linked_items[] that were also exported:
+      Compute the GitHub issue numbers for the linked items (from created_issues map)
+      Edit the issue body via PATCH https://api.github.com/repos/{github_repo}/issues/{number}
+        Append cross-link section: "## Related GitHub Issues\n\n{linked issue numbers as '- #{n}'}"
+  Write export manifest entry: github_issues_created = created count, github_issues_skipped = skipped count
+  Write github export manifest to: artifacts/github-export-{timestamp}.json
+    Content: { export_id, exported_at, github_repo, issues: [ { item_id, issue_number, issue_url }[] ] }
+  Output: github_export_path, github_issues_created, github_issues_skipped
 
 Step 5 — Build JSON Lines (if "jsonl" in export_formats)
   For each scrubbed_item:
@@ -315,6 +373,8 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 | `webhook_response` | `object` \| `null` | Webhook mode only. `{ webhook_accepted, sync_triggered, scope, operation, dispatch_id }`. `null` in export/sync mode. |
 | `metrics` | `object` | Execution metrics |
 | `feedback` | `array[object]` | Feedback loop entries (warnings for PII redactions, empty work item store, sync errors, etc.) |
+| `github_export_path` | `string` \| `null` | Path to `artifacts/github-export-<timestamp>.json`. `null` if GitHub export was not requested or failed. |
+| `github_issues_created` | `integer` \| `null` | Number of GitHub issues successfully created. `null` if GitHub export not run. |
 
 **Output Schema:**
 
@@ -322,7 +382,7 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "webhook_response", "metrics", "feedback"],
+  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "webhook_response", "metrics", "feedback", "github_export_path", "github_issues_created"],
   "properties": {
     "export_id": { "type": "string" },
     "files_produced": {
@@ -331,7 +391,8 @@ Step 16 — Invoke sync/export operation (webhook mode only)
         "jira":     { "type": ["string", "null"] },
         "jsonl":    { "type": ["string", "null"] },
         "markdown": { "type": ["string", "null"] },
-        "manifest": { "type": "string" }
+        "manifest": { "type": "string" },
+        "github":   { "type": ["string", "null"] }
       },
       "required": ["manifest"]
     },
@@ -388,7 +449,9 @@ Step 16 — Invoke sync/export operation (webhook mode only)
           "evidence":     { "type": "object" }
         }
       }
-    }
+    },
+    "github_export_path": { "type": ["string", "null"] },
+    "github_issues_created": { "type": ["integer", "null"], "minimum": 0 }
   }
 }
 ```
@@ -405,6 +468,11 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 - If `work_items.items[]` is empty, emit an `info` feedback entry and write only the manifest (with `items_exported: 0`). Do not write empty Jira/JSONL/Markdown files.
 - The `strip_internal_fields=true` default ensures internal fields (`created_by_skill`, `file_path`, `last_updated_by_skill`) do not appear in exported payloads.
 - Session prefix in export file naming: first 8 characters of `session_id` (UUID).
+- **GitHub export** requires `github_repo` and `github_token_env`. Missing either skips GitHub export with a `warning` — it does not abort the rest of the export.
+- GitHub issues are created **sequentially** (not in parallel) to enable monotonically increasing issue numbers for reliable cross-linking.
+- The GitHub API token is read from the environment variable named by `github_token_env` at runtime. The token value MUST NEVER appear in: skill inputs, state, logs, feedback entries, export files, or audit trail entries.
+- Export is idempotent per session: the `artifacts/github-export-<timestamp>.json` manifest records every created issue URL. Re-exporting the same session does not check for existing issues — use `--dry-run` to preview without creating duplicates.
+- **`--dry-run` mode:** When `export_formats` includes `"github"` and `dry_run: true` is set in inputs, serialise the would-be API payloads to `artifacts/github-export-dryrun-<timestamp>.json` without making any network calls.
 
 ## Security Considerations
 
@@ -415,6 +483,8 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 - **Sync mode credentials:** The Jira API token is read from the environment variable named by `jira_api_token_env` at runtime. The token value MUST NEVER appear in: skill inputs, state, logs, feedback entries, export files, or audit trail entries. Only the env var name is ever stored or logged.
 - **Webhook mode credentials:** The HMAC webhook secret is read from the env var named by `webhook_config.secret_env_var` at runtime. The secret value MUST NEVER appear in any output, log, feedback entry, error message, or state. Only the env var name is stored. Any incoming webhook with a missing or invalid HMAC signature MUST be rejected immediately (Step 13) before any payload processing occurs.
 - **Webhook deletion safety:** `issue_deleted` events MUST NOT trigger any local work item deletion — auto-deletion is prohibited. The event only sets a flag and raises a HITL gate. Deletion of local state requires explicit human decision.
+- **GitHub export credentials:** The GitHub PAT is read from the environment variable named by `github_token_env` at runtime. The token value MUST NEVER appear in any output, log, feedback entry, error message, state, or export file. Only the env var name is stored or logged.
+- GitHub issue bodies may expose internal project metadata. If an item was tagged with `jira_labels: ["security"]`, emit a `warning` feedback entry: "Security defect {id} is included in GitHub export — verify disclosure appropriateness before repository is public."
 
 ## Token Optimization
 
@@ -446,6 +516,12 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 - [ ] *(webhook mode)* `issue_deleted` event does NOT auto-delete local work item — HITL gate raised
 - [ ] *(webhook mode)* Rate limit enforced (max 10/min per source)
 - [ ] *(webhook mode)* `webhook_response` populated with accurate `webhook_accepted`, `sync_triggered`, `scope`
+- [ ] *(github mode)* `github_repo` and `github_token_env` validated before any API call
+- [ ] *(github mode)* GitHub PAT read from env var — value never logged or outputted
+- [ ] *(github mode)* Issues created sequentially (not in parallel) for reliable cross-linking
+- [ ] *(github mode)* Rate limit headers checked and respected (X-RateLimit-Reset)
+- [ ] *(github mode)* `artifacts/github-export-<timestamp>.json` manifest written with all issue URLs
+- [ ] *(github mode)* Security-tagged items trigger `warning` feedback before export
 
 ## Failure Scenarios
 
@@ -468,6 +544,10 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 | Webhook mode: event_type not in event_filter | Return {"webhook_accepted": true, "sync_triggered": false, "reason": "event_filtered_out"}. No-op. |
 | Webhook mode: rate limit exceeded (>10/min) | Queue event with backpressure warning; emit `warning` feedback. |
 | Webhook mode: `issue_deleted` event | Flag local item, raise HITL gate. Do NOT delete. |
+| `github_repo` missing when `"github"` in `export_formats` | Emit `warning`, skip GitHub export, continue with other formats. |
+| `github_token_env` env var absent or empty | Emit `warning` "GITHUB_TOKEN env var not set — skipping GitHub export", continue with other formats. |
+| GitHub API HTTP 429 (rate limit) | Wait until `X-RateLimit-Reset` epoch (max 60s), retry once. If still rate-limited, emit `warning` and write partial manifest. |
+| GitHub API HTTP 503 | Exponential backoff: 2, 4, 8s (max 3 retries). On persistent failure, emit `warning` and write partial manifest. |
 
 ## 12. Human-in-the-Loop Gates
 

@@ -1651,20 +1651,21 @@ skills:
   tags:
   - export
   - jira
+  - github
   - integration
   - work-items
   - async
   - outbound
   - jsonl
   - markdown
-  version: 2.1.0
+  version: 2.2.0
   depends_on:
   - SKL-021
   - SKL-055
   - SKL-056
   mastery_level: beginner
-  use_when: Work items need to be exported to Jira, a file, or a human-readable report. Runs async at pipeline completion.
-    Can also be triggered on demand.
+  use_when: Work items need to be exported to Jira, GitHub Issues, a file, or a human-readable report. Runs async at pipeline
+    completion. Can also be triggered on demand.
   do_not_use_when: No work items have been created in this session. This is a one-way export — do not use for bidirectional
     sync or importing external issues.
 - id: SKL-058
@@ -3300,3 +3301,119 @@ skills:
     after pipeline runs and iterative development.'
   do_not_use_when: 'Before artifacts/spec-latest.md exists. Do not run in quick-review or pre-deploy pipelines.
     Not meaningful as a first-run check — requires at least one full pipeline run to have produced a spec artifact.'
+- id: SKL-116
+  name: Compliance Profiler
+  short_description: Collects applicable compliance frameworks (SOC 2 Type II, HIPAA, GDPR, ISO 27001, custom) via HITL and
+    emits a structured compliance_requirements artifact. Must run before any design skill in the compliance-first pipeline.
+  reference_path: .opencode/skills/compliance-profiler/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/compliance-profiler/SKILL.md
+  tags:
+  - governance
+  - compliance
+  - soc2
+  - hipaa
+  - gdpr
+  - iso27001
+  - feature-017
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-117
+  - SKL-002
+  - SKL-003
+  mastery_level: intermediate
+  use_when: 'At the start of the compliance-first pipeline. Run before architecture-design when SOC 2, HIPAA, GDPR,
+    or ISO 27001 compliance is required. Also usable standalone to produce a compliance_requirements artifact.'
+  do_not_use_when: 'In quick-review, full-pipeline (standard), or any non-compliance pipeline. Do not use if compliance
+    is not a project requirement — the HITL gate will unnecessarily block pipeline start.'
+- id: SKL-117
+  name: Compliance Gate
+  short_description: Validates pipeline stage output against the compliance_requirements artifact from compliance-profiler.
+    Computes control coverage and blocks pipeline if must-control coverage is below threshold.
+  reference_path: .opencode/skills/compliance-gate/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/compliance-gate/SKILL.md
+  tags:
+  - governance
+  - guard
+  - compliance
+  - coverage
+  - soc2
+  - hipaa
+  - gdpr
+  - iso27001
+  - feature-017
+  version: 1.0.0
+  depends_on:
+  - SKL-116
+  related_skills:
+  - SKL-116
+  - SKL-043
+  mastery_level: intermediate
+  use_when: 'After architecture-design, after test-generator, and after deployment-strategy in the compliance-first
+    pipeline. Evaluates each stage output against compliance_requirements from compliance-profiler.'
+  do_not_use_when: 'Without compliance-profiler — requires compliance_requirements input. Do not use in standard
+    pipelines (full-pipeline, quick-review) unless compliance-profiler has already run.'
+- id: SKL-118
+  name: Cost Estimator
+  short_description: Pre-run token cost estimator. Computes estimated token count for a pipeline run using skill count and
+    historical multiplier. Presents cost band to user for approval before execution begins.
+  reference_path: .opencode/skills/cost-estimator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/cost-estimator/SKILL.md
+  tags:
+  - utility
+  - cost
+  - tokens
+  - estimate
+  - pre-run
+  - feature-018
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  related_skills:
+  - SKL-010
+  mastery_level: beginner
+  use_when: 'As phase-0 of full-pipeline. Automatically invoked before any skill executes to estimate and confirm the
+    token cost of the run. Set skip_cost_check: true or ci_mode: true to bypass in CI.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines where cost is minimal.
+    Skip in CI mode by setting pipeline_config.ci_mode: true.'
+- id: SKL-119
+  name: Skill Registry Client
+  short_description: Client for the AI Workflow Community Skill Registry. Supports publish, install, search, and uninstall
+    commands. Verifies SHA-256 hash on install. Tags community skills with origin_metadata.source.
+  reference_path: .opencode/skills/skill-registry-client/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/skill-registry-client/SKILL.md
+  tags:
+  - platform
+  - registry
+  - community
+  - install
+  - publish
+  - search
+  - feature-019
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  related_skills:
+  - SKL-021
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'When you want to install a community skill, publish a skill to the registry, search for available
+    skills, or uninstall a previously installed community skill.'
+  do_not_use_when: 'For system skill management (use skill-authoring instead). Not part of any standard delivery
+    pipeline — invoked directly by the user.'
