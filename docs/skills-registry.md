@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 5.5.0 | **Last updated:** 2026-07-09
+**Version:** 5.6.0 | **Last updated:** 2026-07-09
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 105 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 109 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `.opencode/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
 
@@ -60,6 +60,25 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 **When to enable:** Complex or high-stakes features where a single-pass analysis may miss edge cases
 or produce biased interpretations. Not needed for simple, well-understood features.
 
+### 1d. Research Artifact (SKL-112) — FEATURE-009
+
+| Property | Value |
+|----------|-------|
+| Domain | `requirements` |
+| File | `.opencode/skills/research-artifact/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Generate structured technology research artifact (alternatives, pros/cons, references, decision rationale) before architecture |
+| Consumes from | `requirement-analyzer`, `clarify` |
+| Produces for | `architecture-design` |
+| Opt-in | `pipeline_config.research_enabled: true` or `technology_research_needed: true` from requirement-analyzer |
+| HITL gate | Yes (1800s timeout, auto-advance in CI) |
+
+**Key outputs:** `research_results`, `overall_summary`, `research_targets_count`, `alternatives_evaluated`, `md_artifact_path`, `json_artifact_path`
+
+**When to enable:** Features involving novel technologies, unfamiliar domains, or material build-vs-buy decisions. Skip for features with established, well-understood tech stacks.
+
+**Artifacts:** `artifacts/research-<timestamp>.md`, `artifacts/research-<timestamp>.json`, symlink `artifacts/research-latest.json`
+
 ### 2. Architecture Design
 
 | Property | Value |
@@ -85,6 +104,26 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Produces for | `clean-code-review`, `testing-strategy` |
 
 **Key outputs:** `tasks`, `dependency_map`, `phases`, `milestones`
+
+### 3b. Task DAG (SKL-113) — FEATURE-016
+
+| Property | Value |
+|----------|-------|
+| Domain | `planning` |
+| File | `.opencode/skills/task-dag/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Analyze feature-planning task breakdown, build execution DAG, identify parallel-safe groups and critical path |
+| Consumes from | `feature-planning` |
+| Produces for | `orchestrator`, `code-generator` |
+| Pipeline phase | `phase-4b-task-dag` (after phase-4-planning) |
+
+**Key outputs:** `dag_nodes`, `dag_edges`, `parallel_groups`, `critical_path`, `inference_log`, `md_artifact_path`, `json_artifact_path`
+
+**Cycle handling:** Cycles in `depends_on` declarations are broken automatically — inferred edges removed first, then lexicographically last explicit edge. A `WARN: cycle_broken` is emitted for each resolution.
+
+**Artifacts:** `artifacts/task-dag-<timestamp>.json`, `artifacts/task-dag-<timestamp>.md` (Mermaid), symlink `artifacts/task-dag-latest.json`
+
+**Schema reference:** `docs/task-dag-schema.md`
 
 ### 4. Clean Code Review
 
@@ -295,6 +334,59 @@ feature-planning                   │
 **Artifacts:** `artifacts/rtm-<timestamp>.md`, `artifacts/rtm-<timestamp>.json`, symlink `artifacts/rtm-latest.json`
 
 **Schema reference:** `docs/rtm-schema.md`
+
+### 33c. Cross-Artifact Consistency (SKL-114) — FEATURE-010
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-114 |
+| Domain | `governance` |
+| File | `.opencode/skills/cross-artifact-consistency/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Guard: check structural consistency across REQs, modules, tasks, and tests. Block on violations. |
+| Consumes from | `requirement-analyzer`, `architecture-design`, `feature-planning`, `test-generator` |
+| Produces for | `code-generator` (gated) |
+| Pipeline phase | `phase-7b-consistency` (after phase-7a-rtm) |
+| Verdict | `pass` / `warn` (override) / `block` |
+
+**Four checks (always run):**
+1. **REQ_NO_TEST** (error): Every requirement must have ≥1 test case
+2. **MODULE_NO_TASK** (error): Every architecture module must have ≥1 task
+3. **TASK_ORPHANED** (warning): Every task must reference a requirement or module
+4. **TEST_UNKNOWN_REQ** (error): Every test's `coverage_target` must be a known requirement
+
+**Override:** `verdict: block` triggers HITL gate. User can reply `OVERRIDE <reason>` to downgrade to `warn` and proceed. Override event is logged in `artifacts/consistency-overrides.log`.
+
+**Key outputs:** `verdict`, `consistency_violations[]`, `error_count`, `warning_count`, `override_event`
+
+### 33d. Drift Detector (SKL-115) — FEATURE-015
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-115 |
+| Domain | `quality` |
+| File | `.opencode/skills/drift-detector/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Detect structural drift between spec-latest.md (FEATURE-007) and current working tree |
+| Consumes from | `orchestrator` (spec-latest.md), `state-manager` (working_tree_map, optional) |
+| Produces for | CI pipeline (advisory) |
+| Pipeline phase | `phase-8b-drift` (after phase-8b-audit) |
+| Drift threshold | 70 (configurable via `pipeline_config.drift_threshold`) |
+
+**Three drift categories:**
+- **Additions** (warning, −2pts each): code with no spec entry
+- **Gaps** (error, −5pts each): spec modules with no implementation evidence
+- **Signature changes** (error, −5pts each): spec interface differs from code
+
+**Drift score formula:** `100 − (error_count × 5) − (warning_count × 2)`, clamped to [0, 100]
+
+**CI template:** Daily scheduled check available. Fails CI if `drift_score < drift_threshold`.
+
+**Key outputs:** `drift_score`, `drift_status` (`pass`/`fail`), `additions[]`, `gaps[]`, `signature_changes[]`, `md_artifact_path`, `json_artifact_path`
+
+**Artifacts:** `artifacts/drift-report-<timestamp>.md`, `artifacts/drift-report-<timestamp>.json`, symlink `artifacts/drift-report-latest.json`
+
+**Requires:** `artifacts/spec-latest.md` from FEATURE-007 (full pipeline run required first)
 
 ## Guard Skills (v2.0.0)
 

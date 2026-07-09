@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.5.0",
-  "description": "Full idea-to-production pipeline (v3.5.0): requirements → clarify (HITL) [→ optional spec-debate] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → RTM → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.6.0",
+  "description": "Full idea-to-production pipeline (v3.6.0): requirements → clarify (HITL) [→ optional spec-debate] [→ optional research artifact] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → task DAG → code generation → guard layer → quality + testing → cross-artifact consistency → RTM → completeness audit → drift detection → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -36,6 +36,19 @@
       "skills": [
         {
           "name": "debate-synthesizer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-1d-research",
+      "label": "Technology Research (optional)",
+      "condition": "pipeline_config.research_enabled === true || state.technology_research_needed === true",
+      "note": "FEATURE-009: Generates structured alternatives/pros-cons/rationale artifact before architect makes technology choices. Enable with pipeline_config.research_enabled: true or when requirement-analyzer emits technology_research_needed: true.",
+      "skills": [
+        {
+          "name": "research-artifact",
           "version": "^1.0.0",
           "max_retries": 1
         }
@@ -118,6 +131,18 @@
       ]
     },
     {
+      "id": "phase-4b-task-dag",
+      "label": "Task Dependency DAG",
+      "note": "FEATURE-016: Analyzes feature-planning task breakdown, builds execution DAG, identifies parallel-safe groups and critical path. Writes artifacts/task-dag-<timestamp>.json and Mermaid .md.",
+      "skills": [
+        {
+          "name": "task-dag",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
       "id": "phase-5-impact",
       "label": "Impact Analysis",
       "skills": [
@@ -179,6 +204,18 @@
       ]
     },
     {
+      "id": "phase-7b-consistency",
+      "label": "Cross-Artifact Consistency Guard",
+      "note": "FEATURE-010: Verifies structural consistency across REQs, modules, tasks, and tests. Blocks pipeline if any REQ has no test, any module has no task, or any task is orphaned. HITL override with reason allowed.",
+      "skills": [
+        {
+          "name": "cross-artifact-consistency",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
       "id": "phase-7b-guards",
       "label": "Guard Layer",
       "parallel": true,
@@ -235,6 +272,18 @@
           "name": "implementation-completeness-auditor",
           "version": "^1.0.0",
           "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-8b-drift",
+      "label": "Drift Detection",
+      "note": "FEATURE-015: Compares spec-latest.md (FEATURE-007) against working tree. Produces drift score (0–100); warns if < 70 (configurable). Writes artifacts/drift-report-<timestamp>.md. Does not block pipeline — advisory only.",
+      "skills": [
+        {
+          "name": "drift-detector",
+          "version": "^1.0.0",
+          "max_retries": 1
         }
       ]
     },
@@ -347,6 +396,13 @@
       "timeout": 3600
     },
     {
+      "after_phase": "phase-1d-research",
+      "type": "human_approval",
+      "condition": "pipeline_config.research_enabled === true || state.technology_research_needed === true",
+      "label": "Review technology research recommendations before architecture begins",
+      "timeout": 1800
+    },
+    {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
       "label": "Sign off on architecture before design layer",
@@ -382,6 +438,13 @@
       "type": "condition",
       "label": "Warn if RTM overall_rtm_score < 60 — low coverage before guards",
       "condition": "phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score >= 60"
+    },
+    {
+      "after_phase": "phase-7b-consistency",
+      "type": "human_approval",
+      "condition": "phase_outputs['phase-7b-consistency'].verdict === 'block'",
+      "label": "Consistency violations found — review and reply OVERRIDE <reason> to proceed, or fix violations and re-run",
+      "timeout": 3600
     },
     {
       "after_phase": "phase-7b-guards",

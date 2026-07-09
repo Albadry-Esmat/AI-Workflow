@@ -1,5 +1,5 @@
 meta:
-  version: 3.6.0
+  version: 3.7.0
   schema: skills/schema/skill-schema.yaml
   last_updated: '2026-07-09'
   description: Central skills index for the AI Workflow system
@@ -3178,3 +3178,125 @@ skills:
     phase-8b-audit. Produces the RTM JSON consumed by implementation-completeness-auditor.'
   do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Do not invoke before test-generator
     has run — test_cases[] input is required.'
+- id: SKL-112
+  name: Research Artifact
+  short_description: Generates a structured technology research artifact (alternatives, pros/cons matrix, references, decision
+    rationale) before architecture decisions. Writes artifacts/research-<timestamp>.md and .json.
+  reference_path: .opencode/skills/research-artifact/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/research-artifact/SKILL.md
+  tags:
+  - requirements
+  - research
+  - technology-evaluation
+  - build-vs-buy
+  - artifacts
+  - feature-009
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-109
+  related_skills:
+  - SKL-002
+  - SKL-110
+  mastery_level: intermediate
+  use_when: 'When pipeline_config.research_enabled is true OR requirement-analyzer emits technology_research_needed: true.
+    Use for features involving novel technologies, unfamiliar domains, or material build-vs-buy choices. Runs before
+    architecture-design and provides technology selection rationale to the architect.'
+  do_not_use_when: 'Requirements reference only established, well-understood technology stacks with no open technology
+    decisions. Do not use in quick-review, pre-deploy, or requirements-only pipelines.'
+- id: SKL-113
+  name: Task DAG
+  short_description: Analyzes task breakdown from feature-planning and produces a dependency DAG with parallel-safe groups,
+    critical path, and Mermaid diagram. Writes artifacts/task-dag-<timestamp>.json and .md.
+  reference_path: .opencode/skills/task-dag/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/task-dag/SKILL.md
+  tags:
+  - planning
+  - dag
+  - parallel
+  - critical-path
+  - artifacts
+  - feature-016
+  version: 1.0.0
+  depends_on:
+  - SKL-003
+  related_skills:
+  - SKL-004
+  - SKL-010
+  mastery_level: intermediate
+  use_when: 'After feature-planning (SKL-003) in the full pipeline. Automatically inserted as phase-3b-task-dag. Use to
+    identify parallel-safe task groups and reduce perceived delivery time by suggesting concurrent execution.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Not useful when the task breakdown
+    has fewer than 5 tasks (no meaningful parallelism to identify).'
+- id: SKL-114
+  name: Cross-Artifact Consistency
+  short_description: Guard skill that checks structural consistency across REQs, modules, tasks, and tests. Blocks pipeline
+    when any REQ has no test, any module has no task, or any task is orphaned. HITL override with reason allowed.
+  reference_path: .opencode/skills/cross-artifact-consistency/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/cross-artifact-consistency/SKILL.md
+  tags:
+  - governance
+  - guard
+  - consistency
+  - quality
+  - cross-artifact
+  - feature-010
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-028
+  related_skills:
+  - SKL-111
+  - SKL-033
+  mastery_level: intermediate
+  use_when: 'After test-generator (SKL-028) in the full pipeline, before code-generator. Runs as phase-7b-consistency
+    between phase-7a-rtm and phase-7b-guards. Blocks on any structural linkage violation across REQs, modules,
+    tasks, and tests.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Do not use before all four
+    upstream artifacts (requirements, architecture, tasks, test_cases) are available.'
+- id: SKL-115
+  name: Drift Detector
+  short_description: Detects structural drift between the living spec artifact (artifacts/spec-latest.md, FEATURE-007) and
+    the current working tree. Produces a drift score (0–100) and writes artifacts/drift-report-<timestamp>.md.
+    Fails if score < 70 (configurable). Also usable as a scheduled CI check.
+  reference_path: .opencode/skills/drift-detector/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/drift-detector/SKILL.md
+  tags:
+  - quality
+  - drift
+  - living-spec
+  - ci
+  - artifacts
+  - feature-015
+  version: 1.0.0
+  depends_on:
+  - SKL-007
+  - SKL-021
+  related_skills:
+  - SKL-111
+  - SKL-033
+  - SKL-010
+  mastery_level: intermediate
+  use_when: 'At the end of the full pipeline (after implementation-completeness-auditor) or as a scheduled CI check.
+    Requires artifacts/spec-latest.md (FEATURE-007). Use to detect when the codebase has drifted from the spec
+    after pipeline runs and iterative development.'
+  do_not_use_when: 'Before artifacts/spec-latest.md exists. Do not run in quick-review or pre-deploy pipelines.
+    Not meaningful as a first-run check — requires at least one full pipeline run to have produced a spec artifact.'

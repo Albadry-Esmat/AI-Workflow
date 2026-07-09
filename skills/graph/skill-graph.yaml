@@ -1,8 +1,8 @@
 meta:
-  version: 3.0.0
-  last_updated: '2026-06-24'
-  total_nodes: 105
-  total_edges: 328
+  version: 3.1.0
+  last_updated: '2026-07-09'
+  total_nodes: 109
+  total_edges: 342
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
@@ -735,6 +735,34 @@ nodes:
   layer: requirements
 - id: SKL-111
   name: traceability-matrix
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: quality
+- id: SKL-112
+  name: research-artifact
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: requirements
+- id: SKL-113
+  name: task-dag
+  domain: planning
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: planning
+- id: SKL-114
+  name: cross-artifact-consistency
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-115
+  name: drift-detector
   domain: quality
   mastery_level: intermediate
   version: 1.0.0
@@ -2116,3 +2144,59 @@ edges:
   to: SKL-033
   type: composition
   label: traceability-matrix rtm-latest.json consumed by implementation-completeness-auditor
+- from: SKL-001
+  to: SKL-112
+  type: dependency
+  label: requirement-analyzer requirements[] scanned by research-artifact to identify technology research targets
+- from: SKL-109
+  to: SKL-112
+  type: dependency
+  label: clarify updated_requirements consumed by research-artifact
+- from: SKL-112
+  to: SKL-002
+  type: composition
+  label: research-artifact json_artifact_path passed to architecture-design as research_artifact_path context
+- from: SKL-003
+  to: SKL-113
+  type: dependency
+  label: feature-planning tasks[] (with depends_on[], estimated_hours) is primary input to task-dag
+- from: SKL-113
+  to: SKL-004
+  type: composition
+  label: task-dag parallel_groups and critical_path passed to impact-analyzer for scheduling context
+- from: SKL-113
+  to: SKL-010
+  type: composition
+  label: task-dag parallel_groups consumed by orchestrator to suggest parallel execution groups to user
+- from: SKL-001
+  to: SKL-114
+  type: dependency
+  label: requirement-analyzer requirements[] consumed by cross-artifact-consistency for REQ→TEST check
+- from: SKL-002
+  to: SKL-114
+  type: dependency
+  label: architecture-design modules[] consumed by cross-artifact-consistency for MODULE→TASK check
+- from: SKL-003
+  to: SKL-114
+  type: dependency
+  label: feature-planning tasks[] (req_ids[], module_refs[]) consumed by cross-artifact-consistency
+- from: SKL-028
+  to: SKL-114
+  type: dependency
+  label: test-generator test_cases[] (coverage_target) consumed by cross-artifact-consistency for TEST→REQ validation
+- from: SKL-114
+  to: SKL-006
+  type: composition
+  label: cross-artifact-consistency verdict gates code-generator (block on error violations)
+- from: SKL-007
+  to: SKL-115
+  type: dependency
+  label: spec-artifact (FEATURE-007) artifacts/spec-latest.md is the primary input to drift-detector
+- from: SKL-021
+  to: SKL-115
+  type: dependency
+  label: state-manager working_tree_map (optional) provides code structure for drift comparison
+- from: SKL-033
+  to: SKL-115
+  type: composition
+  label: drift-detector runs after implementation-completeness-auditor as the terminal pipeline skill
