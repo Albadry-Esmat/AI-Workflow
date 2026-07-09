@@ -1,7 +1,7 @@
 meta:
   version: 3.0.0
   last_updated: '2026-06-24'
-  total_nodes: 103
+  total_nodes: 105
   total_edges: 328
   schema: skills/graph/graph-schema.yaml
 nodes:
@@ -72,7 +72,7 @@ nodes:
   name: orchestration
   domain: system
   mastery_level: advanced
-  version: 2.4.0
+  version: 2.5.0
   status: active
   layer: meta
 - id: SKL-011
@@ -726,6 +726,20 @@ nodes:
   version: 1.0.0
   status: active
   layer: requirements
+- id: SKL-110
+  name: debate-synthesizer
+  domain: requirements
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: requirements
+- id: SKL-111
+  name: traceability-matrix
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: quality
 edges:
 - from: SKL-001
   to: SKL-002
@@ -2070,3 +2084,35 @@ edges:
   to: SKL-002
   type: composition
   label: clarify updated_requirements consumed by architecture-design
+- from: SKL-109
+  to: SKL-110
+  type: dependency
+  label: clarify updated_requirements passed to debate-synthesizer when debate_requirements enabled
+- from: SKL-001
+  to: SKL-110
+  type: dependency
+  label: requirement-analyzer provides both advocate and skeptic inputs to debate-synthesizer
+- from: SKL-110
+  to: SKL-002
+  type: composition
+  label: debate-synthesizer unified_requirements consumed by architecture-design
+- from: SKL-028
+  to: SKL-111
+  type: dependency
+  label: test-generator test_cases[] is primary input to traceability-matrix
+- from: SKL-001
+  to: SKL-111
+  type: dependency
+  label: requirement-analyzer requirements[] consumed by traceability-matrix for RTM rows
+- from: SKL-002
+  to: SKL-111
+  type: dependency
+  label: architecture-design adrs[] and modules[] consumed by traceability-matrix for REQ→ADR links
+- from: SKL-003
+  to: SKL-111
+  type: dependency
+  label: feature-planning tasks[] consumed by traceability-matrix for REQ→TASK links
+- from: SKL-111
+  to: SKL-033
+  type: composition
+  label: traceability-matrix rtm-latest.json consumed by implementation-completeness-auditor

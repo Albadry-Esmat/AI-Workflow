@@ -1,5 +1,5 @@
 meta:
-  version: 3.5.0
+  version: 3.6.0
   schema: skills/schema/skill-schema.yaml
   last_updated: '2026-07-09'
   description: Central skills index for the AI Workflow system
@@ -265,7 +265,7 @@ skills:
   - meta-skill
   - retry
   - feedback-loop
-  version: 2.4.0
+  version: 2.5.0
   max_output_tokens: 6000
   depends_on:
   - SKL-001
@@ -3113,3 +3113,68 @@ skills:
     skip_clarify: true for CI/non-interactive runs.'
   do_not_use_when: 'Requirements are already fully specified with no open questions. Do not invoke more than once per
     pipeline run. Do not use in quick-review or requirements-only pipelines.'
+- id: SKL-110
+  name: Debate Synthesizer
+  short_description: Synthesizes two adversarial requirement analyses (advocate + skeptic) into a single debate-hardened
+    unified requirements set; flags and resolves conflicts via HITL gate
+  reference_path: .opencode/skills/debate-synthesizer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/debate-synthesizer/SKILL.md
+  tags:
+  - requirements
+  - multi-agent
+  - debate
+  - adversarial
+  - synthesis
+  - hitl
+  - feature-013
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-109
+  related_skills:
+  - SKL-001
+  - SKL-109
+  - SKL-002
+  - SKL-108
+  mastery_level: advanced
+  use_when: 'When pipeline_config.debate_requirements: true. Use for complex, high-stakes features where a single-pass
+    requirement analysis may miss edge cases or produce biased interpretations. Runs two instances of requirement-analyzer
+    (advocate + skeptic) in parallel and synthesizes their outputs.'
+  do_not_use_when: 'pipeline_config.debate_requirements is false or not set. Do not use on simple, well-understood features
+    where single-pass analysis is sufficient. Do not use in quick-review or requirements-only pipelines.'
+- id: SKL-111
+  name: Traceability Matrix
+  short_description: Auto-generates a bidirectional RTM linking REQ → ADR → TEST → TASK; flags UNCOVERED and UNIMPLEMENTED
+    requirements; writes artifacts/rtm-<timestamp>.md and .json for auditor consumption
+  reference_path: .opencode/skills/traceability-matrix/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/traceability-matrix/SKILL.md
+  tags:
+  - quality
+  - traceability
+  - rtm
+  - requirements
+  - coverage
+  - completeness
+  - feature-014
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-028
+  related_skills:
+  - SKL-033
+  - SKL-037
+  mastery_level: intermediate
+  use_when: 'After test-generator (SKL-028) runs in the full pipeline. Automatically inserted between phase-7-quality and
+    phase-8b-audit. Produces the RTM JSON consumed by implementation-completeness-auditor.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Do not invoke before test-generator
+    has run — test_cases[] input is required.'

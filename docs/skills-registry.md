@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 5.4.0 | **Last updated:** 2026-07-09
+**Version:** 5.5.0 | **Last updated:** 2026-07-09
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 109 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 105 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `.opencode/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
 
@@ -41,6 +41,24 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | CI bypass | `skip_clarify: true` |
 
 **Key outputs:** `clarifications_needed`, `updated_requirements`, `questions`, `unresolved_items`
+
+### 1c. Debate Synthesizer (SKL-110)
+
+| Property | Value |
+|----------|-------|
+| Domain | `requirements` |
+| File | `.opencode/skills/debate-synthesizer/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Run advocate + skeptic requirement analyses in parallel and synthesize a debate-hardened unified requirements set |
+| Consumes from | `requirement-analyzer`, `clarify` |
+| Produces for | `architecture-design` |
+| Opt-in | `pipeline_config.debate_requirements: true` |
+| HITL gate | Yes — review spec debate transcript before architecture begins |
+
+**Key outputs:** `unified_requirements`, `debate_transcript`, `conflicts_resolved`, `skeptic_issues`
+
+**When to enable:** Complex or high-stakes features where a single-pass analysis may miss edge cases
+or produce biased interpretations. Not needed for simple, well-understood features.
 
 ### 2. Architecture Design
 
@@ -246,10 +264,37 @@ feature-planning                   │
 | File | `.opencode/skills/implementation-completeness-auditor/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Cross-check all requirements against code, tests, UI, DB, and docs; produce readiness score |
-| Consumes from | `requirement-analyzer`, `feature-planning`, `code-generator`, `state-manager` |
+| Consumes from | `requirement-analyzer`, `feature-planning`, `code-generator`, `state-manager`, `traceability-matrix` (optional) |
 | Produces for | `implementation-completeness-guard` |
 
 **Key outputs:** `readiness_score` (0–100), `readiness_level`, `gap_summary`, `gaps`, `traceability_matrix`
+
+**Optional input:** `rtm_artifact_path` — path to `artifacts/rtm-latest.json` from `traceability-matrix` (SKL-111). When provided, pre-computed REQ→TEST and REQ→TASK coverage is used directly, improving accuracy and reducing token cost.
+
+### 33b. Traceability Matrix (SKL-111) — FEATURE-014
+
+| Property | Value |
+|----------|-------|
+| ID | SKL-111 |
+| Domain | `quality` |
+| File | `.opencode/skills/traceability-matrix/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Auto-generate bidirectional RTM linking REQ → ADR → TEST → TASK; flag UNCOVERED and UNIMPLEMENTED requirements |
+| Consumes from | `requirement-analyzer`, `architecture-design`, `feature-planning`, `test-generator` |
+| Produces for | `implementation-completeness-auditor` |
+| Pipeline phase | `phase-7a-rtm` (between phase-7-quality and phase-7b-guards) |
+
+**Key outputs:** `rtm[]`, `coverage_scores`, `uncovered_reqs`, `unimplemented_reqs`, `md_artifact_path`, `json_artifact_path`
+
+**Coverage scoring formula:**
+- `overall_rtm_score = (test_coverage_pct × 0.5) + (task_coverage_pct × 0.4) + (adr_coverage_pct × 0.1)`
+- Score < 60 → `WARN: low_rtm_coverage` + backpropagate to `test-generator`
+- > 20% UNCOVERED → backpropagate to `test-generator`
+- > 20% UNIMPLEMENTED → backpropagate to `feature-planning`
+
+**Artifacts:** `artifacts/rtm-<timestamp>.md`, `artifacts/rtm-<timestamp>.json`, symlink `artifacts/rtm-latest.json`
+
+**Schema reference:** `docs/rtm-schema.md`
 
 ## Guard Skills (v2.0.0)
 

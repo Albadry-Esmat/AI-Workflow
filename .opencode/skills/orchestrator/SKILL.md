@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 2.4.0
+version: 2.5.0
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -31,6 +31,10 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `cache_control_strategy` | `string` | No | `"auto"` \| `"explicit"` \| `"disabled"`. Default `"auto"`. Controls Anthropic prompt-cache breakpoint placement per skill invocation (TASK-0067). |
 | `budget_forcing_enabled` | `boolean` | No | Default `true`. When `true`, an explicit output-length instruction is prepended to each skill invocation (TASK-0068). Set `false` to disable. |
 | `project_context` | `object` | No | Injected automatically from `CONSTITUTION.md` (FEATURE-006). If provided explicitly, overrides the file-based read. |
+| `converge` | `boolean` | No | Default `false`. When `true`, enables Converge Mode (FEATURE-008): the pipeline re-runs up to `converge_config.max_iterations` times until output stability ≥ threshold. |
+| `converge_config` | `object` | No | Converge Mode configuration. Default: `{ "max_iterations": 3, "threshold": 0.95 }`. Only used when `converge: true`. |
+| `converge_config.max_iterations` | `integer` | No | Maximum re-run iterations before stopping regardless of stability score. Default: `3`. Max: `5`. |
+| `converge_config.threshold` | `float` | No | Stability score (0.0–1.0) required to stop iterating. Default: `0.95`. Min: `0.5`. |
 
 **Pipeline Config Schema:**
 
@@ -574,6 +578,52 @@ Step 7 — Assemble final result + session summary
     If artifacts/ directory does not exist: create it silently.
     Emit INFO: spec_artifact_written { path: "artifacts/spec-<spec_ts>.md", size_bytes: <N> }.
 
+  [FEATURE-008] Converge Mode loop:
+    IF converge = true:
+      converge_config = { max_iterations: 3, threshold: 0.95, ...overrides from input }
+      Initialize session_context.converge_state if not present:
+        { iteration: 1, history: [], stable: false }
+      
+      Compute stability_score vs. previous iteration (skip for iteration 1 — no prior):
+        req_match    = intersection(current_req_ids, prior_req_ids).length / max(current, prior).length
+        module_match = intersection(current_module_names, prior_module_names).length / max(current, prior).length
+        task_match   = intersection(current_task_ids, prior_task_ids).length / max(current, prior).length
+        stability_score = (req_match × 0.4) + (module_match × 0.4) + (task_match × 0.2)
+      
+      Record iteration in history:
+        { iteration_n, req_count, module_count, task_count, stability_score, timestamp }
+      
+      IF iteration == 1 OR stability_score < converge_config.threshold:
+        IF iteration >= converge_config.max_iterations:
+          Set stable = false.
+          Emit WARN: converge_max_iterations_reached { iterations: N, final_score: stability_score }.
+          Proceed to artifact write.
+        ELSE:
+          Increment iteration.
+          Store current pipeline_result as prior_context.
+          Re-run pipeline from Step -1 with:
+            initial_payload.converge_prior_context = current pipeline_result summary
+          (requirement-analyzer Step 0a injects converge_prior_context as additional analysis context)
+          Return — the new iteration replaces the current result.
+      ELSE (stability_score >= threshold):
+        Set stable = true.
+        Emit INFO: converge_stable { score: stability_score, iterations: N }.
+      
+      Write artifacts/converge-report-<spec_ts>.md:
+        # Converge Report — <run_id>
+        **Pipeline:** <pipeline_name>
+        **Status:** stable | max_iterations_reached
+        **Iterations run:** <N> / <max_iterations>
+        **Final stability score:** <score> (threshold: <threshold>)
+
+        | Iteration | Req Count | Module Count | Task Count | Stability Score |
+        |-----------|-----------|-------------|------------|-----------------|
+        | 1         | <N>       | <N>          | <N>        | — (baseline)   |
+        | 2         | <N>       | <N>          | <N>        | <score>         |
+        …
+      
+      Emit INFO: converge_report_written { path, iterations, stable }.
+
   Output: complete pipeline result
 ```
 
@@ -732,6 +782,7 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - **Budget forcing exemptions are fixed (TASK-0068):** The `budget_forcing_exempt_skills` list (code-generator, design-system-generator, test-generator, mutation-test-generator, documentation-generator, adr-generator) MUST NOT be modified at runtime. These skills produce artifacts whose token length is inherent to their output — truncating them produces broken artifacts.
 - **Batch routing is non-blocking and non-gating (TASK-0070):** Skills submitted to the Batch API MUST NOT appear in any `gates` dependency chain. If a pipeline config lists a batch-eligible skill as a gate dependency, the orchestrator MUST override `batch_policy.mode` to `sync_override` for that invocation and emit a warning: `{"warning": "BATCH_GATE_CONFLICT", "skill": "<name>", "overriding_to": "sync"}`.
 - **Artifact externalization is disk-backed (TASK-0069):** Externalized artifacts MUST be written atomically to `.opencode/state/artifacts/<artifact_id>.json` before the in-context payload stub is written. If the write fails, the full payload MUST remain in-context (do not stub without a successful write).
+- **Converge mode token cost warning (FEATURE-008):** Before starting a converge loop, emit a warning: "Converge mode enabled — this pipeline may run up to <max_iterations> times. Estimated token cost: <N>× single-pass." Do NOT start the loop without surfacing this cost warning to the user. If `skip_cost_check: true` is set, emit the warning but proceed immediately.
 
 ## 8. Security Considerations
 

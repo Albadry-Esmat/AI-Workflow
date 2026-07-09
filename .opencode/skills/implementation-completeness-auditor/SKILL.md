@@ -21,6 +21,7 @@ Cross-check the delivered implementation against every validated requirement and
 | `screen_inventory` | `array[object]` | No | Screen inventory from frontend-ux-architect (SKL-031) |
 | `db_entities` | `array[object]` | No | Entity list from database-architect (SKL-032) |
 | `release_threshold` | `integer` | No | Minimum readiness score required for release gate (default: 85) |
+| `rtm_artifact_path` | `string` | No | Path to `artifacts/rtm-<timestamp>.json` from `traceability-matrix` (SKL-111, FEATURE-014). When provided, pre-computed REQ→TEST and REQ→TASK coverage from the RTM is used directly, bypassing the internal linkage scan for those fields. Increases accuracy and reduces token cost. |
 
 **Input Schema:**
 

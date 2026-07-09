@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.4.0",
-  "description": "Full idea-to-production pipeline (v3.4.0): requirements → clarify (HITL) → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.5.0",
+  "description": "Full idea-to-production pipeline (v3.5.0): requirements → clarify (HITL) [→ optional spec-debate] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → RTM → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -23,6 +23,19 @@
       "skills": [
         {
           "name": "clarify",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-1c-spec-debate",
+      "label": "Spec Debate (optional)",
+      "condition": "pipeline_config.debate_requirements === true",
+      "note": "FEATURE-013: Runs advocate+skeptic analyzer instances in parallel, then synthesizes a debate-hardened requirements set. Enable with pipeline_config.debate_requirements: true.",
+      "skills": [
+        {
+          "name": "debate-synthesizer",
           "version": "^1.0.0",
           "max_retries": 1
         }
@@ -148,6 +161,18 @@
         },
         {
           "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-7a-rtm",
+      "label": "Requirements Traceability Matrix",
+      "note": "FEATURE-014: Builds RTM linking REQ → ADR → TEST → TASK. Writes artifacts/rtm-<timestamp>.md and .json for implementation-completeness-auditor consumption.",
+      "skills": [
+        {
+          "name": "traceability-matrix",
           "version": "^1.0.0",
           "max_retries": 2
         }
@@ -315,6 +340,13 @@
       "condition": "true"
     },
     {
+      "after_phase": "phase-1c-spec-debate",
+      "type": "human_approval",
+      "condition": "pipeline_config.debate_requirements === true",
+      "label": "Review spec debate transcript and approve unified requirements before architecture begins",
+      "timeout": 3600
+    },
+    {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
       "label": "Sign off on architecture before design layer",
@@ -340,16 +372,16 @@
       "timeout": 3600
     },
     {
-      "after_phase": "phase-4-planning",
+      "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Approve roadmap and impact surface before implementation",
+      "label": "Approve security posture and coverage before RTM and audit",
       "timeout": 3600
     },
     {
-      "after_phase": "phase-5-impact",
+      "after_phase": "phase-7a-rtm",
       "type": "condition",
-      "label": "Block if impact_severity=critical",
-      "condition": "change_impact.impact_severity !== 'critical'"
+      "label": "Warn if RTM overall_rtm_score < 60 — low coverage before guards",
+      "condition": "phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score >= 60"
     },
     {
       "after_phase": "phase-7b-guards",
