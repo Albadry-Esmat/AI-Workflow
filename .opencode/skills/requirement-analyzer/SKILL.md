@@ -38,10 +38,21 @@ Transform unstructured or semi-structured requirement input into a normalized, u
 - Must have system glossary if `domain_hints` is absent and domain vocabulary is used.
 - Prior requirement-analyzer output if this is a refinement pass.
 - **Graphify retrieval-first:** Before analysis, run `graphify query "existing requirements and domain entities"` if `graphify-out/graph.json` exists. Use retrieved nodes to: align domain vocabulary in normalization (Step 2), avoid generating duplicate REQ IDs, and pre-seed `domain_hints` with entity names already present in the codebase. Fall back to raw parsing if graph unavailable.
+- **Project Constitution:** If `CONSTITUTION.md` exists at the project root, it is read in Step 0a (below) and merged into `context` before analysis begins. The parsed `project_context` is available to all steps.
 
 ## Execution Logic
 
 ```
+Step 0a — Read Project Constitution (FEATURE-006)
+  If CONSTITUTION.md exists at the project root:
+    Parse it into project_context (see docs/constitution.md for schema).
+    Merge project_context.tech_stack and project_context.team_conventions into context.
+    Inject project_context.architectural_constraints as mandatory constraints for Step 7.
+    If CONSTITUTION.md exceeds 2000 tokens: truncate from §6 downward; emit WARN: constitution_truncated.
+  If CONSTITUTION.md does not exist:
+    Emit WARN: constitution_absent — pipeline continues without persistent project context.
+  Output: project_context (or null if absent)
+
 Step 0 — Retrieve domain context (graphify)
   If graphify-out/graph.json exists: run graphify query "domain entities and existing requirements".
   Use retrieved nodes to: align domain vocabulary before normalization, surface existing REQ IDs to

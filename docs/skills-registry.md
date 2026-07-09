@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 5.3.0 | **Last updated:** 2026-06-24
+**Version:** 5.4.0 | **Last updated:** 2026-07-09
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -8,7 +8,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 
 | Layer | File(s) | Purpose |
 |-------|---------|---------|
-| Index | `skills/index.yaml` | Lightweight entries for all 102 skills — IDs, tags, dependencies, mastery levels |
+| Index | `skills/index.yaml` | Lightweight entries for all 109 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
 | Execution | `.opencode/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
 
@@ -26,6 +26,21 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Produces for | `architecture-design` |
 
 **Key outputs:** `requirements`, `open_questions`, `assumptions`, `risks`
+
+### 1b. Clarify (SKL-109)
+
+| Property | Value |
+|----------|-------|
+| Domain | `requirements` |
+| File | `.opencode/skills/clarify/SKILL.md` |
+| Version | 1.0.0 |
+| Purpose | Identify ambiguous requirements and resolve them via HITL before architecture begins |
+| Consumes from | `requirement-analyzer` |
+| Produces for | `architecture-design` |
+| Auto-advance | Yes — if no ambiguities found, pipeline continues without interruption |
+| CI bypass | `skip_clarify: true` |
+
+**Key outputs:** `clarifications_needed`, `updated_requirements`, `questions`, `unresolved_items`
 
 ### 2. Architecture Design
 

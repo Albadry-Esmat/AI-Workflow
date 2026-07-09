@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.3.0",
-  "description": "Full idea-to-production pipeline (v3.3.0): requirements → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.4.0",
+  "description": "Full idea-to-production pipeline (v3.4.0): requirements → clarify (HITL) → architecture [→ optional multi-agent debate] → UX/DB design → design system ∥ dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -13,6 +13,18 @@
           "name": "requirement-analyzer",
           "version": "^1.1.0",
           "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-1b-clarify",
+      "label": "Clarification (HITL)",
+      "note": "FEATURE-012: Identifies ambiguous requirements and suspends for user input. Auto-advances when no ambiguities found. Set skip_clarify:true to bypass in CI.",
+      "skills": [
+        {
+          "name": "clarify",
+          "version": "^1.0.0",
+          "max_retries": 1
         }
       ]
     },
@@ -295,6 +307,12 @@
       "type": "human_approval",
       "label": "Validate requirements scope with stakeholder",
       "timeout": 3600
+    },
+    {
+      "after_phase": "phase-1b-clarify",
+      "type": "condition",
+      "label": "Auto-advance if no clarifications needed; otherwise HITL gate already handled inside clarify skill",
+      "condition": "true"
     },
     {
       "after_phase": "phase-2-architecture",

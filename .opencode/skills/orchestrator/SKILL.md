@@ -30,6 +30,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 | `query_async_jobs.status_filter` | `string` | No | One of: `all`, `running`, `completed`, `failed`, `retrying`. Default: `all`. |
 | `cache_control_strategy` | `string` | No | `"auto"` \| `"explicit"` \| `"disabled"`. Default `"auto"`. Controls Anthropic prompt-cache breakpoint placement per skill invocation (TASK-0067). |
 | `budget_forcing_enabled` | `boolean` | No | Default `true`. When `true`, an explicit output-length instruction is prepended to each skill invocation (TASK-0068). Set `false` to disable. |
+| `project_context` | `object` | No | Injected automatically from `CONSTITUTION.md` (FEATURE-006). If provided explicitly, overrides the file-based read. |
 
 **Pipeline Config Schema:**
 
@@ -87,7 +88,7 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 
 | Pipeline File | Purpose | Entry Skills |
 |---------------|---------|--------------|
-| `skills/pipelines/full-pipeline.json` v3.3.0 | Full idea-to-production delivery | requirement-analyzer → … → deployment-strategy |
+| `skills/pipelines/full-pipeline.json` v3.4.0 | Full idea-to-production delivery | requirement-analyzer → clarify → … → deployment-strategy |
 | `skills/pipelines/requirements-only.json` | Requirements extraction only | requirement-analyzer |
 | `skills/pipelines/architecture-only.json` | Architecture design only | requirement-analyzer → architecture-design |
 | `skills/pipelines/quick-review.json` | Code/security review | clean-code-review / security-review |
@@ -99,6 +100,16 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
 ## Execution Logic
 
 ```
+Step -1 — Load Project Constitution (FEATURE-006)
+  If CONSTITUTION.md exists at project root:
+    Parse into project_context object (see docs/constitution.md for schema).
+    Store project_context in session_context.project_context.
+    Emit INFO: constitution_loaded { token_count: <N> }.
+  If CONSTITUTION.md absent:
+    Set project_context = null.
+    Emit WARN: constitution_absent — pipeline continues without persistent context.
+  Output: project_context (injected into every downstream skill via Step 3b)
+
 Step 0 — Normalize prompt via prompt-normalizer (SKL-040)
   Pass initial_payload.raw_input to prompt-normalizer.
   If action = "ask_clarification": emit clarification request and HALT — do not begin pipeline.
@@ -241,6 +252,9 @@ Step 3 — Execute skills (mode-dependent)
   Hybrid mode: execute per parallel_groups definition.
   Per skill:
     a) Compress input (strip non-essential fields per skill's Token Optimization section)
+       [FEATURE-006] Inject project_context: if session_context.project_context is not null,
+         prepend project_context as a read-only field to the skill input before compression.
+         Skills MUST NOT modify project_context — it is injected fresh on every invocation.
     b) [TASK-0051] Project output of prior skill before passing as input (output-field pruning):
          i)  Load target skill's input schema (required + optional fields only).
          ii) Project prior skill's output to include ONLY fields present in target schema.
@@ -540,6 +554,25 @@ Step 7 — Assemble final result + session summary
     Persist final batch_registry state to session file.
     All batch reconciliation is non-blocking — pipeline result is returned regardless
     of in_flight batch status.
+
+  [FEATURE-007] Write Spec Artifact on Disk:
+    Generate ISO timestamp: spec_ts = new Date().toISOString().replace(/[:.]/g, '-')
+    Assemble spec artifact from pipeline_result:
+      {
+        "run_id":        session_id,
+        "timestamp":     <ISO8601>,
+        "pipeline":      pipeline_config.name,
+        "requirements":  phase_outputs["phase-1-requirements"].requirements,
+        "architecture":  phase_outputs["phase-2-architecture"],
+        "tasks":         phase_outputs["phase-4-planning"].tasks,
+        "test_plan":     phase_outputs["phase-7-quality"].test_plan,
+        "constitution":  session_context.project_context
+      }
+    Write to: artifacts/spec-<spec_ts>.md (Markdown-formatted)
+    Update symlink: artifacts/spec-latest.md → artifacts/spec-<spec_ts>.md
+    If pipeline did not reach phase-1-requirements: write artifacts/spec-<spec_ts>-partial.md instead.
+    If artifacts/ directory does not exist: create it silently.
+    Emit INFO: spec_artifact_written { path: "artifacts/spec-<spec_ts>.md", size_bytes: <N> }.
 
   Output: complete pipeline result
 ```

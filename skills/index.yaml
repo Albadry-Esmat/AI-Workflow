@@ -1,7 +1,7 @@
 meta:
-  version: 3.4.0
+  version: 3.5.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: '2026-06-24'
+  last_updated: '2026-07-09'
   description: Central skills index for the AI Workflow system
 skills:
 - id: SKL-001
@@ -3084,3 +3084,32 @@ skills:
   do_not_use_when: 'pipeline_config.debate_architecture is false or not set. Do not invoke for quick single-pass architecture
     review — use clean-code-review or security-review instead. Do not use on time-constrained pipelines where debate overhead
     is unacceptable.'
+- id: SKL-109
+  name: Clarify
+  short_description: Identifies ambiguous requirements after requirement-analyzer runs, generates ≤5 targeted questions,
+    and suspends the pipeline at a HITL gate until answered — advancing automatically when no ambiguities are found
+  reference_path: .opencode/skills/clarify/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/clarify/SKILL.md
+  tags:
+  - requirements
+  - clarification
+  - ambiguity
+  - hitl
+  - pipeline-entry
+  - feature-012
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  related_skills:
+  - SKL-001
+  - SKL-002
+  mastery_level: intermediate
+  use_when: 'After requirement-analyzer (SKL-001) when requirements contain vague terms, missing quantifiers, or undefined
+    actors. Automatically inserted between requirement-analyzer and architecture-design in full-pipeline. Skip with
+    skip_clarify: true for CI/non-interactive runs.'
+  do_not_use_when: 'Requirements are already fully specified with no open questions. Do not invoke more than once per
+    pipeline run. Do not use in quick-review or requirements-only pipelines.'

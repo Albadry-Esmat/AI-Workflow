@@ -1,7 +1,7 @@
 meta:
   version: 3.0.0
   last_updated: '2026-06-24'
-  total_nodes: 102
+  total_nodes: 103
   total_edges: 328
   schema: skills/graph/graph-schema.yaml
 nodes:
@@ -719,6 +719,13 @@ nodes:
   version: 1.0.0
   status: active
   layer: architecture
+- id: SKL-109
+  name: clarify
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: requirements
 edges:
 - from: SKL-001
   to: SKL-002
@@ -2055,3 +2062,11 @@ edges:
   to: SKL-032
   type: composition
   label: multi-agent-debate hardened architecture consumed by database-architect
+- from: SKL-001
+  to: SKL-109
+  type: dependency
+  label: requirement-analyzer output (requirements, open_questions, assumptions) is the primary input to clarify
+- from: SKL-109
+  to: SKL-002
+  type: composition
+  label: clarify updated_requirements consumed by architecture-design
