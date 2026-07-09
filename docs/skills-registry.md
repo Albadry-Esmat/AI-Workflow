@@ -629,7 +629,7 @@ Transforms internal work item records from `work-items/` into export-ready forma
 
 **Supported formats:** Jira Bulk Import JSON, JSON Lines, Markdown
 
-**ADR:** ADR-0002 (`docs/adr/ADR-0002-work-item-export-contract.md` — to be created)
+**ADR:** [ADR-0002](adr/ADR-0002-work-item-export-contract.md)
 
 ---
 
@@ -650,4 +650,4 @@ Enforces the work item lifecycle state machine from `docs/work-item-foundation.m
 
 **Governance layer:** Layer 2 (Guard Skills)
 
-**ADR:** ADR-0001 (`docs/adr/ADR-0001-work-lifecycle-persistence-model.md` — to be created)
+**ADR:** [ADR-0001](adr/ADR-0001-work-lifecycle-persistence-model.md)
