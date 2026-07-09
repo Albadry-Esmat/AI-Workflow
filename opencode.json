@@ -27,7 +27,7 @@
     "fetch": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
-      "enabled": true
+      "enabled": false
     },
 
     "context7": {

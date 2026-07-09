@@ -13,6 +13,14 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.3.1] — 2026-07-09
+
+### Fixed
+
+- **`opencode.json`**: Disabled `fetch` MCP server (`enabled: false`). `@modelcontextprotocol/server-fetch` does not exist on npm (404). The only similarly-named package on npm (`mcp-server-fetch@0.0.2`) is an explicitly labelled security-research canary / npx-confusion attack — must not be used. The entry is kept as a placeholder for when the official Node.js fetch server is published.
+
+---
+
 ## [3.3.0] — 2026-07-05
 
 ### Fixed (Production-Readiness Pass — Second Round)
