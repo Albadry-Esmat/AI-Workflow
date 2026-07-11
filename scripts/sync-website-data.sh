@@ -15,6 +15,7 @@
 #   docs/changelog.md              → website/data/docs/changelog.md
 #   opencode.json                  → website/data/opencode.json
 #   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
+#   website/data/site-content.json → (already in website/data/, synced via rsync)
 #
 # Flags:
 #   --dry-run    Show what would be synced without writing anything
@@ -222,11 +223,9 @@ Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
       echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"
       echo -e "  Live site will rebuild automatically: ${CYAN}https://ase-os.vercel.app${NC}"
       echo ""
-      echo -e "  ${YELLOW}Note:${NC} this sync only covers data files (skills, pipelines, registry, docs)."
-      echo -e "  If you changed CLI commands, setup steps, or agent descriptions,"
-      echo -e "  also update the website source in ASE-OS-Website:"
-      echo -e "    ${CYAN}src/components/getting-started/GettingStartedSteps.tsx${NC}"
-      echo -e "    ${CYAN}src/components/how-it-works/InstallationSection.tsx${NC}"
+      echo -e "  ${YELLOW}Note:${NC} this sync covers all data files including site-content.json."
+      echo -e "  All website prose, features, agents, pipeline phases, and section content"
+      echo -e "  are driven from ${CYAN}website/data/site-content.json${NC}."
     else
       fail "Push failed — check your GITHUB_TOKEN has write access to ASE-OS-Website."
       exit 1
