@@ -52,7 +52,7 @@ Skills in `skills/registry.json` declare their version:
 }
 ```
 
-See [Versioning Governance](../skills/governance/versioning.md) for the full skill versioning rules including backward compatibility matrix and deprecation policy.
+See [Versioning Skill](../.opencode/skills/versioning/SKILL.md) for the full skill versioning rules including backward compatibility matrix and deprecation policy.
 
 ## Changelog Rules
 

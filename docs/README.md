@@ -79,7 +79,7 @@ All files follow this structure:
 
 ## Section
 
-Content with cross-references to other files: [link](file.md#section).
+Content with cross-references to other files: `[link](file.md#section)` (example — replace with real path).
 
 - Bullet lists for enumerations
 - `code` for filenames, schemas, IDs
