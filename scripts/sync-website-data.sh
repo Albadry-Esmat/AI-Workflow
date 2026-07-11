@@ -219,8 +219,14 @@ Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
     if git push origin main --quiet; then
       ok "Pushed $CHANGED file(s) to ASE-OS-Website"
       echo ""
-      echo -e "  ${GREEN}${BOLD}ASE-OS-Website is now up to date.${NC}"
+      echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"
       echo -e "  Live site will rebuild automatically: ${CYAN}https://ase-os.vercel.app${NC}"
+      echo ""
+      echo -e "  ${YELLOW}Note:${NC} this sync only covers data files (skills, pipelines, registry, docs)."
+      echo -e "  If you changed CLI commands, setup steps, or agent descriptions,"
+      echo -e "  also update the website source in ASE-OS-Website:"
+      echo -e "    ${CYAN}src/components/getting-started/GettingStartedSteps.tsx${NC}"
+      echo -e "    ${CYAN}src/components/how-it-works/InstallationSection.tsx${NC}"
     else
       fail "Push failed — check your GITHUB_TOKEN has write access to ASE-OS-Website."
       exit 1
