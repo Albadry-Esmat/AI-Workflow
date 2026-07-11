@@ -27,6 +27,26 @@ That's it. Type `aiw help` for the full list of available commands.
 
 ---
 
+## Use It on Your Own Project
+
+AI Workflow is a tool you run **on top of your existing codebase** — not inside it. After setup, point it at any project on your machine:
+
+```bash
+# Option A — run it on another project right now (no copying needed)
+aiw start /path/to/your-project
+
+# Option B — install the full workflow into another project permanently
+aiw init /path/to/your-project
+cd /path/to/your-project
+opencode   # all 113 skills + 19 agents, fully self-contained
+```
+
+**Option A** keeps AI Workflow in its own folder. Your project's files are what the agents read and edit.
+
+**Option B** copies `opencode.json`, `.opencode/` (all skills + agents), and `.env` into your project. After that it works standalone — no dependency on the AI-Workflow folder.
+
+---
+
 ## What It Does
 
 You describe what you want to build. The pipeline does the rest:
@@ -74,7 +94,9 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 |---------|-------------|
 | `aiw setup` | **Start here** — install deps, create `.env`, validate environment |
 | `aiw health` | Check tools, `.env`, and configuration — prints PASS/WARN/FAIL |
-| `aiw start` | Launch the AI Workflow (opens an opencode session) |
+| `aiw start` | Launch the AI Workflow on **this** repo |
+| `aiw start <path>` | Launch on **any project** on your machine |
+| `aiw init <path>` | Copy the full workflow into another project (makes it standalone) |
 
 ### Validation
 

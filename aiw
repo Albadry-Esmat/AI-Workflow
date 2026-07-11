@@ -38,9 +38,11 @@ show_help() {
   echo "    aiw <command> [options]"
   echo ""
   echo -e "  ${BOLD}GETTING STARTED${NC}"
-  echo -e "    ${CYAN}setup${NC}              Install dependencies, create .env, validate environment"
-  echo -e "    ${CYAN}health${NC}             Check tools, .env, and configuration"
-  echo -e "    ${CYAN}start${NC}              Launch the AI Workflow (opens opencode session)"
+  echo -e "    ${CYAN}setup${NC}                        Install dependencies, create .env, validate environment"
+  echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
+  echo -e "    ${CYAN}start${NC}                        Launch AI Workflow on this repo"
+  echo -e "    ${CYAN}start${NC} ${DIM}<path>${NC}               Launch AI Workflow on any project on your machine"
+  echo -e "    ${CYAN}init${NC}  ${DIM}<path>${NC}               Copy workflow into another project (makes it standalone)"
   echo ""
   echo -e "  ${BOLD}VALIDATION${NC}"
   echo -e "    ${CYAN}validate${NC}           Run the full 11-check skill validation suite"
@@ -110,10 +112,19 @@ cmd_start() {
     cd "$ROOT"
     opencode "$TARGET"
   else
-    echo -e "${GREEN}Starting AI Workflow...${NC}"
-    echo -e "${DIM}Working directory: $ROOT${NC}"
-    echo -e "${DIM}Type a request to begin. Example: \"build this feature: user authentication\"${NC}"
-    echo -e "${DIM}Tip: run 'aiw start /path/to/project' to work on another project.${NC}"
+    echo ""
+    echo -e "  ${BOLD}AI Workflow${NC} — ready."
+    echo ""
+    echo -e "  ${CYAN}Working on this repo?${NC}"
+    echo -e "  Just start typing — the agents will read and edit files here."
+    echo ""
+    echo -e "  ${CYAN}Working on a different project?${NC}"
+    echo -e "  ${BOLD}aiw start /path/to/your-project${NC}   ← agents work on that project's files"
+    echo -e "  ${BOLD}aiw init  /path/to/your-project${NC}   ← install workflow into that project permanently"
+    echo ""
+    echo -e "  ${DIM}Examples:${NC}"
+    echo -e "  ${DIM}  aiw start ~/Projects/my-app${NC}"
+    echo -e "  ${DIM}  aiw start .  (current directory, same as no argument)${NC}"
     echo ""
     cd "$ROOT"
     opencode
@@ -376,6 +387,7 @@ case "$COMMAND" in
   setup)            cmd_setup "$@" ;;
   health)           cmd_health "$@" ;;
   start|run)        cmd_start "$@" ;;
+  init)             cmd_init "$@" ;;
   validate)         cmd_validate "$@" ;;
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;

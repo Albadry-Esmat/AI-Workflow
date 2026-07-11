@@ -31,8 +31,34 @@ Verify the environment:
 
 ```bash
 aiw health      # prints PASS/WARN/FAIL per check
-aiw start       # start the AI workflow
+aiw start       # start the AI workflow on this repo
 ```
+
+---
+
+### Use It on Your Own Project
+
+AI Workflow is a tool you run **on top of your codebase** — not inside it. After setup you have two options:
+
+**Option A — Point it at any project (no copying needed):**
+
+```bash
+aiw start /path/to/your-project
+```
+
+Agents and skills load from the AI-Workflow folder. The files your agents read and edit are inside your project.
+
+**Option B — Install it into your project permanently:**
+
+```bash
+aiw init /path/to/your-project
+cd /path/to/your-project
+opencode
+```
+
+This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your `.env` tokens into the target project. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
+
+---
 
 ### Available Commands
 
@@ -40,7 +66,9 @@ aiw start       # start the AI workflow
 |---------|-------------|
 | `aiw setup` | Install deps, create `.env`, validate environment |
 | `aiw health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
-| `aiw start` | Launch the AI Workflow (opens opencode session) |
+| `aiw start` | Launch the AI Workflow on this repo |
+| `aiw start <path>` | Launch on any project on your machine |
+| `aiw init <path>` | Copy the full workflow into another project (standalone) |
 | `aiw validate` | Run all 11 skill validation checks |
 | `aiw lint` | Quick YAML + schema syntax check |
 | `aiw doctor` | Full diagnostic: health + validation + git |
