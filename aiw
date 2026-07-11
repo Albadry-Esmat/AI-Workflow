@@ -9,13 +9,22 @@
 
 set -euo pipefail
 
-# Resolve project root (works whether invoked from PATH or directly)
-if [[ -L "${BASH_SOURCE[0]}" ]]; then
-  SCRIPT_PATH="$(readlink "${BASH_SOURCE[0]}")"
-else
-  SCRIPT_PATH="${BASH_SOURCE[0]}"
-fi
-ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+# Resolve project root — handles symlinks, relative paths, and macOS readlink
+_resolve_script_path() {
+  local src="${BASH_SOURCE[0]}"
+  # Follow symlinks until we reach the real file
+  while [[ -L "$src" ]]; do
+    local link
+    link="$(readlink "$src")"
+    if [[ "$link" = /* ]]; then
+      src="$link"
+    else
+      src="$(cd "$(dirname "$src")" && pwd)/$link"
+    fi
+  done
+  echo "$(cd "$(dirname "$src")" && pwd)"
+}
+ROOT="$(_resolve_script_path)"
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 BOLD="\033[1m"
