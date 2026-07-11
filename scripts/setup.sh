@@ -141,13 +141,25 @@ AIW_BIN="$ROOT/aiw"
 if [[ -x "$AIW_BIN" ]]; then
   if [[ -w /usr/local/bin ]]; then
     ln -sf "$AIW_BIN" /usr/local/bin/aiw
-    _ok "aiw CLI installed to /usr/local/bin/aiw"
-  elif command -v sudo &>/dev/null; then
-    sudo ln -sf "$AIW_BIN" /usr/local/bin/aiw 2>/dev/null && \
-      _ok "aiw CLI installed to /usr/local/bin/aiw (via sudo)" || \
-      _warn "Could not install aiw to PATH — use ./aiw from project root"
+    _ok "aiw installed → /usr/local/bin/aiw"
   else
-    _warn "Cannot write to /usr/local/bin — use ./aiw from project root"
+    # Try ~/.local/bin (always writable, no sudo needed)
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$AIW_BIN" "$HOME/.local/bin/aiw"
+    _ok "aiw installed → $HOME/.local/bin/aiw"
+
+    # Warn if ~/.local/bin is not on PATH
+    if ! echo "$PATH" | tr ':' '\n' | grep -q "$HOME/.local/bin"; then
+      echo
+      warn "~/.local/bin is not on your PATH yet."
+      echo "  Add this line to your shell profile (~/.zshrc or ~/.bashrc):"
+      echo
+      echo '    export PATH="$HOME/.local/bin:$PATH"'
+      echo
+      echo "  Then reload: source ~/.zshrc"
+      echo "  Or for this session only: export PATH=\"\$HOME/.local/bin:\$PATH\""
+      echo
+    fi
   fi
 else
   _fail "aiw script not found at $AIW_BIN"
@@ -199,13 +211,16 @@ echo -e "${BOLD}═════════════════════�
 echo
 echo -e "${BOLD}Next steps:${NC}"
 echo "  1. Edit .env and set GITHUB_TOKEN (and any other keys you want)"
-echo "  2. Run: aiw health     — verify your configuration"
-echo "  3. Run: aiw start      — launch the AI workflow"
-echo
+echo "     Get one at: https://github.com/settings/tokens"
+echo "     Classic token, no expiration, scopes: repo + read:org"
+echo ""
+echo "  2. aiw health                      — verify your configuration"
+echo "  3. aiw start /path/to/your-project — launch on your project"
+echo "     aiw start                       — or launch here (this repo)"
+echo ""
 echo "  Quick reference:"
-echo "    aiw validate         — validate all skills before committing"
-echo "    aiw sync             — sync website/data/ after changing skills"
-echo "    aiw graph            — update the knowledge graph"
-echo "    aiw doctor           — full diagnostic (health + validation + git)"
-echo "    aiw help             — list all available commands"
+echo "    aiw init /path/to/project  — copy workflow into another project"
+echo "    aiw validate               — validate all skills"
+echo "    aiw doctor                 — full diagnostic"
+echo "    aiw help                   — all available commands"
 echo

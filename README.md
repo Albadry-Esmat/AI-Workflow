@@ -11,16 +11,16 @@ AI Workflow provides a structured skill system — 113 skills, 19 agents, and 22
 ```bash
 git clone https://github.com/Albadry-Esmat/AI-Workflow.git
 cd AI-Workflow
-make setup
+./aiw setup
 ```
 
-`make setup` installs the `aiw` CLI, checks prerequisites, installs dependencies, creates your `.env` from the template, and validates the environment. Then:
+`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs dependencies, creates your `.env`, and adds `aiw` to your PATH. Then:
 
 ```bash
 # Edit .env and set your GITHUB_TOKEN
-# (get one at https://github.com/settings/tokens — scopes: repo, read:org)
-aiw health      # verify everything is configured
-aiw start       # launch the AI Workflow
+# (get one at https://github.com/settings/tokens — classic token, no expiration, scopes: repo + read:org)
+aiw health                       # verify everything is configured
+aiw start /path/to/your-project  # launch on your project
 ```
 
 That's it. Type `aiw help` for the full list of available commands.
@@ -92,7 +92,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 | Command | What it does |
 |---------|-------------|
-| `aiw setup` | **Start here** — install deps, create `.env`, validate environment |
+| `./aiw setup` | **Start here** — install deps, create `.env`, add `aiw` to PATH |
 | `aiw health` | Check tools, `.env`, and configuration — prints PASS/WARN/FAIL |
 | `aiw start` | Launch the AI Workflow on **this** repo |
 | `aiw start <path>` | Launch on **any project** on your machine |

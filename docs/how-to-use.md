@@ -8,15 +8,15 @@
 
 ### Setup
 
-Clone the repository and run the single setup command:
+Clone the repository and run setup directly — no install needed first:
 
 ```bash
 git clone https://github.com/Albadry-Esmat/AI-Workflow.git
 cd AI-Workflow
-make setup
+./aiw setup
 ```
 
-This installs the `aiw` CLI and configures your environment. Then open `.env` and fill in your credentials:
+`./aiw` runs straight from the repo before anything is installed. Setup will add `aiw` to your PATH so you can use it globally from that point on. Then open `.env` and fill in your credentials:
 
 ```bash
 # Minimum required
@@ -30,8 +30,9 @@ BRAVE_API_KEY=...              # https://api.search.brave.com/app/keys
 Verify the environment:
 
 ```bash
-aiw health      # prints PASS/WARN/FAIL per check
-aiw start       # start the AI workflow on this repo
+aiw health                       # prints PASS/WARN/FAIL per check
+aiw start /path/to/your-project  # launch on your project
+aiw start                        # or launch here (this repo)
 ```
 
 ---
@@ -64,7 +65,7 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 
 | Command | What it does |
 |---------|-------------|
-| `aiw setup` | Install deps, create `.env`, validate environment |
+| `./aiw setup` | **First run only** — install deps, create `.env`, add `aiw` to PATH |
 | `aiw health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
 | `aiw start` | Launch the AI Workflow on this repo |
 | `aiw start <path>` | Launch on any project on your machine |
