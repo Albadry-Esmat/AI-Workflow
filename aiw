@@ -318,14 +318,27 @@ cmd_website() {
   local subcmd="${1:-start}"
   case "$subcmd" in
     start|"")
-      bash "$ROOT/rebuild.sh"
+      echo ""
+      echo -e "  ${BOLD}ASE-OS Website${NC}"
+      echo -e "  The website source lives in a separate repository."
+      echo ""
+      echo -e "  ${CYAN}Repo:${NC}      https://github.com/Albadry-Esmat/ASE-OS-Website"
+      echo -e "  ${CYAN}Live site:${NC} https://ase-os.vercel.app"
+      echo ""
+      echo -e "  To run locally:"
+      echo -e "    git clone https://github.com/Albadry-Esmat/ASE-OS-Website.git"
+      echo -e "    cd ASE-OS-Website && npm install && npm run dev"
+      echo ""
+      echo -e "  To update the data mirror after changing skills or pipelines:"
+      echo -e "    aiw sync"
+      echo ""
       ;;
     sync)
       bash "$ROOT/scripts/sync-website-data.sh"
       ;;
     *)
       echo -e "${RED}Unknown website subcommand:${NC} $subcmd"
-      echo "  Usage: aiw website [start|sync]"
+      echo "  Usage: aiw website [sync]"
       exit 1
       ;;
   esac

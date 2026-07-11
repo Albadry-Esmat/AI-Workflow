@@ -324,7 +324,21 @@ Every SKILL.md directory under `.opencode/skills/` must have a corresponding `- 
 Run: `aiw update`.
 
 ### Website won't start (`website/package.json not found`)
-The website source lives in a separate companion repository. The `website/` directory in this repo contains only the data mirror. Run `aiw website sync` to update that mirror, then deploy via Vercel.
+The website source lives in a separate repository: [ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website). The `website/` directory in this repo contains only the data mirror (`website/data/`). To work on the website locally:
+
+```bash
+git clone https://github.com/Albadry-Esmat/ASE-OS-Website.git
+cd ASE-OS-Website
+npm install
+npm run dev
+```
+
+To update the data mirror after changing skills or pipelines:
+```bash
+aiw sync   # updates website/data/ in this repo
+```
+
+The live site is at **https://ase-os.vercel.app**.
 
 ---
 

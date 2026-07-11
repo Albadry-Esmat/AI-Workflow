@@ -57,9 +57,14 @@ fi
 
 # ── Guard: website/data must exist ────────────────────────────────────────────
 if [[ ! -d "$DATA_DIR" ]]; then
-  warn "website/data/ not found — skipping sync (website may be in a separate repo)"
+  warn "website/data/ not found — skipping sync"
   echo "  Expected path: $DATA_DIR"
-  echo "  This is normal if the website source is not present locally."
+  echo "  This directory is the data mirror for the ASE-OS Website."
+  echo "  It should already exist in the repo. If it was deleted, restore it with:"
+  echo "    git checkout HEAD -- website/data/"
+  echo ""
+  echo "  Website source repo: https://github.com/Albadry-Esmat/ASE-OS-Website"
+  echo "  Live site:           https://ase-os.vercel.app"
   exit 0
 fi
 
