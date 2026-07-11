@@ -13,6 +13,34 @@ _Add upcoming changes here before they ship._
 
 ---
 
+## [3.4.0] — 2026-07-11
+
+### Added
+
+- **`aiw` CLI** — branded entry point with 18 commands (`start`, `run`, `doctor`, `validate`, `lint`, `status`, `init`, `backup`, `reset`, `sync`, `graph`, `logs`, `version`, `help`, and more). Replaces raw `make` commands with a discoverable CLI.
+- **`aiw start <path>`** — run the AI Workflow while targeting a different project directory. Agents and skills load from the AI-Workflow folder; file reads/writes go to the target project.
+- **`aiw init <path>`** — copy the full AI Workflow config (`opencode.json`, `.opencode/`, `.env`) into any project, making it self-contained.
+- **`.nvmrc`** — pins Node.js 20 LTS for all contributors and CI.
+- **`package-lock.json`** — root lockfile with 0 vulnerabilities.
+- **`.github/dependabot.yml`** — weekly automated dependency updates for `github-actions` and `npm`.
+- **`Production-Readiness-Checklist.md`** — 139-item, 14-category audit checklist.
+- **`Production-Readiness-Action-Plan.md`** — step-by-step remediation plan for all audit findings.
+
+### Fixed
+
+- **`scripts/validate-skills.sh`** — syntax error on line 417 (`"else` on same line as string literal).
+- **`AGENTS.md`** — all 22 pipelines now have routing entries (was 6/22 reachable).
+- **`skills/schema/system-state-schema.json`** — added 10 missing pipeline names to the `pipeline_name` enum.
+- **`scripts/reset.sh`** — removed `.env` deletion; tokens are always preserved on reset.
+- **`docs/README.md`** — escaped placeholder link example to prevent broken-link CI failure.
+- **`docs/versioning.md`** — fixed dead link to `skills/governance/versioning.md` → correct `.opencode/skills/versioning/SKILL.md` path.
+- **`.github/workflows/validate-skills.yml`** — added `permissions: contents: read` and pinned all action versions.
+- **README, CONTRIBUTING, docs/how-to-use.md** — replaced `your-org` placeholder git URLs with `Albadry-Esmat/AI-Workflow`; updated commands to use `aiw`.
+- **`.env.example`** — updated token instructions: classic PAT, no expiration.
+- **`docs/github-export.md`** — removed 90-day expiry recommendation; classic PAT with no expiration is now the documented default.
+
+---
+
 ## [3.3.1] — 2026-07-09
 
 ### Fixed
