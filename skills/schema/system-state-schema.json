@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request", "gap-to-skill"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request", "gap-to-skill", "api-first", "ai-agent-system", "cloud-migration", "compliance-first", "data-engineering", "iot-embedded", "microservices-platform", "ml-platform", "mobile-app", "saas-platform"]
     },
 
     "created_at": {

@@ -1,0 +1,398 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────────────────────
+# aiw — AI Workflow CLI
+#
+# The single entry point for all AI Workflow operations.
+# Install: make setup (installs this CLI to your PATH)
+# Usage:   aiw <command> [options]
+# ─────────────────────────────────────────────────────────────────────────────
+
+set -euo pipefail
+
+# Resolve project root (works whether invoked from PATH or directly)
+if [[ -L "${BASH_SOURCE[0]}" ]]; then
+  SCRIPT_PATH="$(readlink "${BASH_SOURCE[0]}")"
+else
+  SCRIPT_PATH="${BASH_SOURCE[0]}"
+fi
+ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+BOLD="\033[1m"
+NC="\033[0m"
+CYAN="\033[36m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+RED="\033[31m"
+DIM="\033[2m"
+
+# ── Version ───────────────────────────────────────────────────────────────────
+VERSION="1.0.0"
+
+# ── Help ──────────────────────────────────────────────────────────────────────
+show_help() {
+  echo ""
+  echo -e "  ${BOLD}aiw${NC} — AI Workflow CLI v${VERSION}"
+  echo ""
+  echo -e "  ${BOLD}USAGE${NC}"
+  echo "    aiw <command> [options]"
+  echo ""
+  echo -e "  ${BOLD}GETTING STARTED${NC}"
+  echo -e "    ${CYAN}setup${NC}              Install dependencies, create .env, validate environment"
+  echo -e "    ${CYAN}health${NC}             Check tools, .env, and configuration"
+  echo -e "    ${CYAN}start${NC}              Launch the AI Workflow (opens opencode session)"
+  echo ""
+  echo -e "  ${BOLD}VALIDATION${NC}"
+  echo -e "    ${CYAN}validate${NC}           Run the full 11-check skill validation suite"
+  echo -e "    ${CYAN}lint${NC}               Quick YAML + schema syntax check (checks 0-1 only)"
+  echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
+  echo ""
+  echo -e "  ${BOLD}DEVELOPMENT${NC}"
+  echo -e "    ${CYAN}sync${NC}              Sync website/data/ from source files"
+  echo -e "    ${CYAN}graph${NC}             Rebuild the knowledge graph after code changes"
+  echo -e "    ${CYAN}update${NC}            Update .opencode/ plugin dependencies"
+  echo ""
+  echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
+  echo -e "    ${CYAN}sessions${NC}           Show expired session files (dry-run)"
+  echo -e "    ${CYAN}sessions delete${NC}    Delete expired session files"
+  echo -e "    ${CYAN}sessions backup${NC}    Backup current state before cleanup"
+  echo ""
+  echo -e "  ${BOLD}MAINTENANCE${NC}"
+  echo -e "    ${CYAN}clean${NC}              Remove build artifacts and cache files (safe)"
+  echo -e "    ${CYAN}reset${NC}              Reset sessions, cache, and artifacts — preserves .env ⚠️"
+  echo -e "    ${CYAN}backup${NC}             Backup .opencode/state/ to backups/"
+  echo ""
+  echo -e "  ${BOLD}WEBSITE${NC}"
+  echo -e "    ${CYAN}website${NC}            Build and start the website locally"
+  echo -e "    ${CYAN}website sync${NC}       Sync website data without starting server"
+  echo ""
+  echo -e "  ${BOLD}INFO${NC}"
+  echo -e "    ${CYAN}help${NC}               Show this help message"
+  echo -e "    ${CYAN}version${NC}            Print version"
+  echo -e "    ${CYAN}status${NC}             Show project status (git, sessions, health)"
+  echo ""
+  echo -e "  ${DIM}All commands must be run from the AI Workflow project root.${NC}"
+  echo ""
+}
+
+# ── Commands ──────────────────────────────────────────────────────────────────
+
+cmd_setup() {
+  bash "$ROOT/scripts/setup.sh"
+}
+
+cmd_health() {
+  bash "$ROOT/scripts/health-check.sh"
+}
+
+cmd_start() {
+  if ! command -v opencode &>/dev/null; then
+    echo -e "${RED}Error:${NC} opencode is not installed."
+    echo "  Install it from: https://opencode.ai"
+    exit 1
+  fi
+
+  # Optional: path to a target project
+  local TARGET="${1:-}"
+  if [[ -n "$TARGET" ]]; then
+    # Resolve to absolute path
+    TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
+      echo -e "${RED}Error:${NC} directory not found: $1"
+      exit 1
+    }
+    echo -e "${GREEN}Starting AI Workflow...${NC}"
+    echo -e "${DIM}Target project: $TARGET${NC}"
+    echo -e "${DIM}Agents + skills from: $ROOT${NC}"
+    echo -e "${DIM}Type a request to begin. Example: \"review code in src/\"${NC}"
+    echo ""
+    # Must run from ROOT so opencode.json and .opencode/ are found,
+    # but pass the target project path so opencode's file tools use it.
+    cd "$ROOT"
+    opencode "$TARGET"
+  else
+    echo -e "${GREEN}Starting AI Workflow...${NC}"
+    echo -e "${DIM}Working directory: $ROOT${NC}"
+    echo -e "${DIM}Type a request to begin. Example: \"build this feature: user authentication\"${NC}"
+    echo -e "${DIM}Tip: run 'aiw start /path/to/project' to work on another project.${NC}"
+    echo ""
+    cd "$ROOT"
+    opencode
+  fi
+}
+
+cmd_validate() {
+  bash "$ROOT/scripts/validate-skills.sh" "$@"
+}
+
+cmd_lint() {
+  echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
+  echo ""
+  # Run only checks 0 and 1 from validate
+  python3 -c "
+import yaml, sys
+try:
+    with open('$ROOT/skills/index.yaml') as f:
+        yaml.safe_load(f)
+    print('  PASS: skills/index.yaml is valid YAML')
+except Exception as e:
+    print(f'  FAIL: {e}')
+    sys.exit(1)
+"
+  echo ""
+  # Pipeline schema validation
+  for f in "$ROOT"/skills/pipelines/*.json; do
+    if ajv validate -s "$ROOT/skills/schema/pipeline-schema.json" -d "$f" --spec=draft7 -c ajv-formats 2>/dev/null; then
+      echo -e "  ${GREEN}PASS${NC} $(basename "$f")"
+    else
+      echo -e "  ${RED}FAIL${NC} $(basename "$f")"
+    fi
+  done
+}
+
+cmd_doctor() {
+  echo -e "${BOLD}╔══════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}║   AI Workflow — Full Diagnostic      ║${NC}"
+  echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
+  echo ""
+  echo -e "${BOLD}Step 1: Health Check${NC}"
+  echo ""
+  bash "$ROOT/scripts/health-check.sh" || true
+  echo ""
+  echo -e "${BOLD}Step 2: Skill Validation${NC}"
+  echo ""
+  bash "$ROOT/scripts/validate-skills.sh" || true
+  echo ""
+  echo -e "${BOLD}Step 3: Git Status${NC}"
+  echo ""
+  cd "$ROOT"
+  echo "  Branch: $(git branch --show-current 2>/dev/null || echo 'N/A')"
+  echo "  Commit: $(git log --oneline -1 2>/dev/null || echo 'N/A')"
+  echo "  Status: $(git status --short 2>/dev/null | wc -l | tr -d ' ') changed file(s)"
+  echo ""
+}
+
+cmd_init() {
+  local TARGET="${1:-}"
+  if [[ -z "$TARGET" ]]; then
+    echo -e "${RED}Error:${NC} specify a target project directory."
+    echo "  Usage: aiw init /path/to/your-project"
+    exit 1
+  fi
+
+  TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
+    echo -e "${RED}Error:${NC} directory not found: $1"
+    exit 1
+  }
+
+  echo ""
+  echo -e "  ${BOLD}AI Workflow — Init into project${NC}"
+  echo -e "  Target: ${CYAN}$TARGET${NC}"
+  echo ""
+
+  # Guard: don't init into itself
+  if [[ "$TARGET" == "$ROOT" ]]; then
+    echo -e "${RED}Error:${NC} target cannot be the AI Workflow directory itself."
+    exit 1
+  fi
+
+  # Guard: warn if opencode.json already exists
+  if [[ -f "$TARGET/opencode.json" ]]; then
+    echo -e "${YELLOW}Warning:${NC} $TARGET/opencode.json already exists."
+    read -r -p "  Overwrite? [y/N] " REPLY
+    echo
+    [[ "$REPLY" =~ ^[Yy]$ ]] || { echo "  Aborted."; exit 0; }
+  fi
+
+  # Copy the three required pieces
+  echo "  Copying opencode.json..."
+  cp "$ROOT/opencode.json" "$TARGET/opencode.json"
+
+  echo "  Copying .opencode/ (agents + skills)..."
+  rsync -a --exclude='node_modules' --exclude='state' --exclude='registry-cache' \
+    "$ROOT/.opencode/" "$TARGET/.opencode/" 2>/dev/null || \
+    cp -R "$ROOT/.opencode" "$TARGET/.opencode"
+
+  # Install plugin deps in the target
+  if [[ -f "$TARGET/.opencode/package.json" ]]; then
+    echo "  Installing .opencode/ plugin dependencies..."
+    npm install --prefix "$TARGET/.opencode" --silent
+  fi
+
+  # Copy .env if target doesn't have one
+  if [[ ! -f "$TARGET/.env" ]] && [[ -f "$ROOT/.env" ]]; then
+    cp "$ROOT/.env" "$TARGET/.env"
+    echo "  Copied .env (tokens included)."
+  elif [[ ! -f "$TARGET/.env" ]]; then
+    cp "$ROOT/.env.example" "$TARGET/.env"
+    echo -e "  ${YELLOW}Created .env from template — remember to set GITHUB_TOKEN.${NC}"
+  else
+    echo "  .env already exists in target — skipped."
+  fi
+
+  echo ""
+  echo -e "  ${GREEN}Done!${NC} AI Workflow is ready in:"
+  echo -e "  ${CYAN}$TARGET${NC}"
+  echo ""
+  echo "  To use it:"
+  echo "    cd $TARGET"
+  echo "    opencode"
+  echo ""
+  echo "  Or from anywhere:"
+  echo "    aiw start $TARGET"
+  echo ""
+}
+
+cmd_sync() {
+  bash "$ROOT/scripts/sync-website-data.sh"
+}
+
+cmd_graph() {
+  if command -v graphify &>/dev/null; then
+    cd "$ROOT"
+    graphify update .
+  else
+    echo -e "${YELLOW}SKIP:${NC} graphify is not installed"
+    echo "  Install from: https://graphify.ai"
+  fi
+}
+
+cmd_update() {
+  echo "→ Updating .opencode/ dependencies..."
+  npm install --prefix "$ROOT/.opencode"
+  echo ""
+  echo "  Done. To update opencode CLI itself:"
+  echo "  https://opencode.ai/docs/installation"
+}
+
+cmd_sessions() {
+  local subcmd="${1:-list}"
+  case "$subcmd" in
+    list|"")
+      bash "$ROOT/scripts/cleanup-sessions.sh"
+      ;;
+    delete)
+      bash "$ROOT/scripts/cleanup-sessions.sh" --delete
+      ;;
+    backup)
+      cmd_backup
+      ;;
+    *)
+      echo -e "${RED}Unknown sessions subcommand:${NC} $subcmd"
+      echo "  Usage: aiw sessions [list|delete|backup]"
+      exit 1
+      ;;
+  esac
+}
+
+cmd_clean() {
+  bash "$ROOT/scripts/clean.sh"
+}
+
+cmd_reset() {
+  bash "$ROOT/scripts/reset.sh"
+}
+
+cmd_backup() {
+  local BACKUP_DIR="$ROOT/backups/state-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$BACKUP_DIR"
+  if [[ -d "$ROOT/.opencode/state" ]]; then
+    cp -R "$ROOT/.opencode/state/" "$BACKUP_DIR/"
+    echo -e "${GREEN}State backed up to:${NC} $BACKUP_DIR"
+  else
+    echo -e "${YELLOW}No state directory found — nothing to backup.${NC}"
+  fi
+}
+
+cmd_website() {
+  local subcmd="${1:-start}"
+  case "$subcmd" in
+    start|"")
+      bash "$ROOT/rebuild.sh"
+      ;;
+    sync)
+      bash "$ROOT/scripts/sync-website-data.sh"
+      ;;
+    *)
+      echo -e "${RED}Unknown website subcommand:${NC} $subcmd"
+      echo "  Usage: aiw website [start|sync]"
+      exit 1
+      ;;
+  esac
+}
+
+cmd_version() {
+  echo "aiw v${VERSION} (AI Workflow CLI)"
+}
+
+cmd_status() {
+  echo ""
+  echo -e "  ${BOLD}AI Workflow — Status${NC}"
+  echo ""
+  cd "$ROOT"
+  
+  # Git
+  echo -e "  ${CYAN}Git${NC}"
+  echo "    Branch:  $(git branch --show-current 2>/dev/null || echo 'N/A')"
+  echo "    Commit:  $(git log --oneline -1 2>/dev/null || echo 'N/A')"
+  echo "    Changes: $(git status --short 2>/dev/null | wc -l | tr -d ' ') file(s)"
+  echo ""
+  
+  # Skills
+  local skill_count
+  skill_count=$(find "$ROOT/.opencode/skills" -maxdepth 1 -type d | wc -l | tr -d ' ')
+  skill_count=$((skill_count - 1))
+  echo -e "  ${CYAN}Skills${NC}"
+  echo "    Registered: ${skill_count}"
+  echo "    Pipelines:  $(ls "$ROOT/skills/pipelines/"*.json 2>/dev/null | wc -l | tr -d ' ')"
+  echo ""
+  
+  # Sessions
+  local session_count
+  session_count=$(find "$ROOT/.opencode/state/sessions" -name "*.json" -not -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+  echo -e "  ${CYAN}Sessions${NC}"
+  echo "    Active: ${session_count}"
+  echo ""
+  
+  # Health (quick)
+  echo -e "  ${CYAN}Environment${NC}"
+  if [[ -f "$ROOT/.env" ]]; then
+    echo -e "    .env: ${GREEN}present${NC}"
+  else
+    echo -e "    .env: ${RED}missing${NC}"
+  fi
+  if command -v opencode &>/dev/null; then
+    echo -e "    opencode: ${GREEN}installed${NC}"
+  else
+    echo -e "    opencode: ${RED}not found${NC}"
+  fi
+  echo ""
+}
+
+# ── Router ────────────────────────────────────────────────────────────────────
+COMMAND="${1:-help}"
+shift || true
+
+case "$COMMAND" in
+  setup)            cmd_setup "$@" ;;
+  health)           cmd_health "$@" ;;
+  start|run)        cmd_start "$@" ;;
+  validate)         cmd_validate "$@" ;;
+  lint)             cmd_lint "$@" ;;
+  doctor|diagnose)  cmd_doctor "$@" ;;
+  sync)             cmd_sync "$@" ;;
+  graph)            cmd_graph "$@" ;;
+  update)           cmd_update "$@" ;;
+  sessions|session) cmd_sessions "$@" ;;
+  clean)            cmd_clean "$@" ;;
+  reset)            cmd_reset "$@" ;;
+  backup)           cmd_backup "$@" ;;
+  website|web)      cmd_website "$@" ;;
+  version|--version|-v) cmd_version ;;
+  status)           cmd_status "$@" ;;
+  help|--help|-h)   show_help ;;
+  *)
+    echo -e "${RED}Unknown command:${NC} $COMMAND"
+    echo "  Run 'aiw help' for available commands."
+    exit 1
+    ;;
+esac

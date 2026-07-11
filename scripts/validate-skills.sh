@@ -414,7 +414,8 @@ fi
 echo
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 if [[ "$FAIL" -eq 0 ]]; then
-  echo -e "  ${GREEN}${BOLD}All checks passed${NC} — $PASS passed, 0 failed"else
+  echo -e "  ${GREEN}${BOLD}All checks passed${NC} — $PASS passed, 0 failed"
+else
   echo -e "  ${RED}${BOLD}Validation failed${NC} — $PASS passed, $FAIL failed"
   echo
   echo "  Review the FAIL lines above. Each failure includes a Fix: hint."

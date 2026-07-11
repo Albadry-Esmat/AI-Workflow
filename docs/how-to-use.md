@@ -11,12 +11,12 @@
 Clone the repository and run the single setup command:
 
 ```bash
-git clone https://github.com/your-org/ai-workflow.git
-cd ai-workflow
+git clone https://github.com/Albadry-Esmat/AI-Workflow.git
+cd AI-Workflow
 make setup
 ```
 
-Then open `.env` and fill in your credentials:
+This installs the `aiw` CLI and configures your environment. Then open `.env` and fill in your credentials:
 
 ```bash
 # Minimum required
@@ -30,24 +30,31 @@ BRAVE_API_KEY=...              # https://api.search.brave.com/app/keys
 Verify the environment:
 
 ```bash
-make health     # prints PASS/WARN/FAIL per check
-opencode        # start the AI workflow
+aiw health      # prints PASS/WARN/FAIL per check
+aiw start       # start the AI workflow
 ```
 
 ### Available Commands
 
 | Command | What it does |
 |---------|-------------|
-| `make setup` | Install deps, create `.env`, validate environment |
-| `make health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
-| `make validate` | Run all 9 skill validation checks |
-| `make sync` | Sync `website/data/` from source files |
-| `make graph` | Rebuild the knowledge graph |
-| `make clean` | Remove build artifacts |
-| `make reset` | Reset to clean state (removes `.env`, sessions) |
-| `make update` | Update `.opencode/` plugin dependencies |
-| `make sessions` | Show expired session files (dry-run) |
-| `make sessions-delete` | Delete expired session files |
+| `aiw setup` | Install deps, create `.env`, validate environment |
+| `aiw health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
+| `aiw start` | Launch the AI Workflow (opens opencode session) |
+| `aiw validate` | Run all 11 skill validation checks |
+| `aiw lint` | Quick YAML + schema syntax check |
+| `aiw doctor` | Full diagnostic: health + validation + git |
+| `aiw sync` | Sync `website/data/` from source files |
+| `aiw graph` | Rebuild the knowledge graph |
+| `aiw status` | Show project status (git, sessions, skills) |
+| `aiw clean` | Remove build artifacts |
+| `aiw reset` | Reset to clean state (removes `.env`, sessions) |
+| `aiw update` | Update `.opencode/` plugin dependencies |
+| `aiw backup` | Backup `.opencode/state/` to backups/ |
+| `aiw sessions` | Show expired session files (dry-run) |
+| `aiw sessions delete` | Delete expired session files |
+| `aiw website` | Build and start the website locally |
+| `aiw help` | Show all available commands |
 
 ### How to Add a New Feature
 

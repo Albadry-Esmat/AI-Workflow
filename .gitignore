@@ -37,6 +37,9 @@ graphify-out/wiki/
 # Logs
 *.log
 
+# ─── State backups (created by `aiw backup`) ─────────────────────────────────
+backups/
+
 # ─── Work-item runtime content (project-specific, not part of the framework) ─
 # The work-items/ directory structure and README are framework; the actual
 # tasks/features/bugs you create are yours and should never go to main.

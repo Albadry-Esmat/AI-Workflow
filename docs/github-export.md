@@ -15,9 +15,9 @@ behaviour, and troubleshooting.
 ### 1. Generate a Personal Access Token
 
 1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
-2. Click **Generate new token (classic)**
+2. Click **Generate new token (classic)** ← use classic, NOT fine-grained
 3. Select scopes: ✅ `repo` (Full control of private repositories)
-4. Set an expiration (recommended: 90 days)
+4. Expiration: **No expiration** ← avoids repeated rotation; this is a local dev tool
 5. Click **Generate token** and copy the token immediately
 
 ### 2. Set the Environment Variable

@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # scripts/reset.sh — Reset the workspace to a clean state.
 #
-# Run from the project root:  make reset  OR  bash scripts/reset.sh
+# Run from the project root:  aiw reset  OR  bash scripts/reset.sh
 #
 # ⚠️  DESTRUCTIVE — this script removes:
-#   - .env                        Your secrets (you will need to re-enter them)
 #   - .opencode/state/sessions/   All session history
 #   - exports/                    All exported work items
 #   - website/.next/              Build artifacts
 #   - graphify-out/cache/         Graphify cache
 #   - graphify-out/YYYY-MM-DD/    Graphify dated snapshots
+#
+# NOTE: .env is intentionally NOT deleted. Your tokens are preserved.
+#       Use 'aiw backup' before reset if you want a state snapshot.
 #
 # Prompts for confirmation before deleting anything.
 # Pass --yes to skip the confirmation prompt (useful in CI / scripted flows).
@@ -32,12 +34,14 @@ done
 
 # ── Confirm ───────────────────────────────────────────────────────────────────
 echo -e "${BOLD}${RED}WARNING: This will delete:${NC}"
-echo "  - .env                   (your secrets — you will need to re-enter them)"
 echo "  - .opencode/state/       (all session history)"
 echo "  - exports/               (all exported work items)"
 echo "  - website/.next/         (build cache)"
 echo "  - graphify-out/cache/    (graphify parse cache)"
 echo "  - graphify-out/YYYY-MM-DD/ (graphify snapshots)"
+echo
+echo -e "  ${GREEN}NOT deleted:${NC} .env — your tokens are always preserved."
+echo "  (To also clear .env, delete it manually: rm .env)"
 echo
 
 if [[ "$SKIP_CONFIRM" == "false" ]]; then
@@ -67,9 +71,9 @@ _remove_dir() {
   fi
 }
 
-# ── Remove .env ───────────────────────────────────────────────────────────────
-header "Secrets"
-_remove_file "$ROOT/.env"
+# ── .env is intentionally NOT touched ────────────────────────────────────────
+# Tokens and secrets in .env are never deleted by reset.
+# This was the #1 cause of repeated token rotation — fixed.
 
 # ── Remove session state ──────────────────────────────────────────────────────
 header "Session state"
@@ -99,6 +103,7 @@ ok "Runtime directories restored"
 echo
 echo -e "${GREEN}${BOLD}Reset complete${NC} — $REMOVED item(s) removed."
 echo
-echo "  Run 'make setup' to restore your environment:"
-echo "  $ make setup"
+echo "  Your .env is intact — no need to re-enter tokens."
+echo "  Run 'aiw health' to confirm environment is still valid."
+echo "  Run 'aiw start' to launch the AI workflow."
 echo

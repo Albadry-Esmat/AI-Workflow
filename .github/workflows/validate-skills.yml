@@ -16,8 +16,11 @@ on:
       - "docs/**"
       - "scripts/**"
 
+permissions:
+  contents: read
+
 jobs:
-  # ── Job 1: Full skill validation suite (10 checks) ──────────────────────────
+  # ── Job 1: Full skill validation suite (11 checks) ──────────────────────────
   validate:
     name: Skill Validation
     runs-on: ubuntu-latest
@@ -37,10 +40,10 @@ jobs:
           python-version: "3.11"
 
       - name: Install PyYAML
-        run: pip install pyyaml --quiet
+        run: pip install pyyaml==6.0.2 --quiet
 
       - name: Install ajv-cli
-        run: npm install -g ajv-cli ajv-formats
+        run: npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
       # ── Check 0 ─────────────────────────────────────────────────────────────
       - name: "0/10 — YAML syntax check (skills/index.yaml)"

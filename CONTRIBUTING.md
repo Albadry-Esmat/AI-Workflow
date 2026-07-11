@@ -22,20 +22,20 @@ Thank you for contributing! This guide covers everything you need to add a skill
 Clone the repo and run the single setup command:
 
 ```bash
-git clone https://github.com/your-org/ai-workflow.git
-cd ai-workflow
+git clone https://github.com/Albadry-Esmat/AI-Workflow.git
+cd AI-Workflow
 make setup
 ```
 
-Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
+This installs the `aiw` CLI and configures your environment. Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
 
 ```bash
-make health     # verify your environment
-make validate   # run the full skill validation suite
-opencode        # start the AI workflow
+aiw health      # verify your environment
+aiw validate    # run the full skill validation suite
+aiw start       # start the AI workflow
 ```
 
-See `make help` for a full list of available commands.
+Type `aiw help` for a full list of available commands.
 
 ---
 
@@ -124,13 +124,13 @@ Add an entry to the `[Unreleased]` section.
 ### 7 — Sync website data
 
 ```bash
-make sync
+aiw sync
 ```
 
 ### 8 — Validate
 
 ```bash
-make validate
+aiw validate
 ```
 
 Expected: `All checks passed — N passed, 0 failed`.
@@ -198,8 +198,8 @@ Use only verified model IDs from `opencode models`. Current assignments:
 ## Validating your changes
 
 ```bash
-# Run the full 9-check validation suite (required before any PR)
-make validate
+# Run the full 11-check validation suite (required before any PR)
+aiw validate
 ```
 
 Expected: `All checks passed — N passed, 0 failed`.
@@ -207,7 +207,7 @@ Expected: `All checks passed — N passed, 0 failed`.
 If `website/data/` exists locally, also sync it:
 
 ```bash
-make sync
+aiw sync
 ```
 
 ---
@@ -217,7 +217,7 @@ make sync
 The website source lives in a separate companion repository. The `website/` directory in this repo contains only the data mirror used at build time. To update it:
 
 ```bash
-make sync     # syncs website/data/ from skills/, docs/, .opencode/skills/, opencode.json
+aiw website sync   # syncs website/data/ from skills/, docs/, .opencode/skills/, opencode.json
 ```
 
 Then deploy through Vercel or clone the companion repo into `website/` to run locally.
@@ -228,8 +228,8 @@ Then deploy through Vercel or clone the companion repo into `website/` to run lo
 
 Before opening a pull request, verify:
 
-- [ ] `make validate` → `All checks passed`
-- [ ] `make sync` run and `website/data/` changes committed (if skills/docs changed)
+- [ ] `aiw validate` → `All checks passed`
+- [ ] `aiw sync` run and `website/data/` changes committed (if skills/docs changed)
 - [ ] New skill has all 12 required sections in `SKILL.md`
 - [ ] New skill has entries in both `skills/index.yaml` AND `skills/registry.json`
 - [ ] `skills/graph/skill-graph.yaml` `total_nodes` updated if skill added/removed
