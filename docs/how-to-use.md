@@ -74,6 +74,7 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 | `aiw lint` | Quick YAML + schema syntax check |
 | `aiw doctor` | Full diagnostic: health + validation + git |
 | `aiw sync` | Sync `website/data/` from source files |
+| `aiw sync --website` | Sync + push directly to ASE-OS-Website repo |
 | `aiw graph` | Rebuild the knowledge graph |
 | `aiw status` | Show project status (git, sessions, skills) |
 | `aiw clean` | Remove build artifacts |

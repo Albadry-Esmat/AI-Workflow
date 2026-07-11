@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # scripts/sync-website-data.sh — Sync website/data/ from authoritative source files.
 #
-# Run from the project root:  make sync  OR  bash scripts/sync-website-data.sh
+# Run from the project root:  aiw sync             (sync this repo's website/data/)
+#                             aiw sync --website   (sync + push to ASE-OS-Website repo)
 #
 # The website reads from website/data/ at build time. This script keeps that
 # directory in sync with the source-of-truth files in the project root.
@@ -15,8 +16,13 @@
 #   opencode.json                  → website/data/opencode.json
 #   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
 #
-# Pass --dry-run to see what would change without writing anything.
-# Pass --check  to exit with code 1 if any file is out of sync (useful in CI).
+# Flags:
+#   --dry-run    Show what would be synced without writing anything
+#   --check      Exit 1 if any file is out of sync (for CI use)
+#   --website    After syncing website/data/, also push to ASE-OS-Website repo
+
+WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
+WEBSITE_REPO_DIR=""   # set below if --website is passed
 
 set -euo pipefail
 
@@ -30,18 +36,21 @@ source "$ROOT/scripts/lib/common.sh"
 DATA_DIR="$ROOT/website/data"
 DRY_RUN=false
 CHECK_MODE=false
+PUSH_WEBSITE=false
 SYNCED=0
 UP_TO_DATE=0
 ERRORS=0
 
 for arg in "$@"; do
   case "$arg" in
-    --dry-run) DRY_RUN=true  ;;
-    --check)   CHECK_MODE=true ;;
+    --dry-run)  DRY_RUN=true       ;;
+    --check)    CHECK_MODE=true    ;;
+    --website)  PUSH_WEBSITE=true  ;;
     --help|-h)
-      echo "Usage: $0 [--dry-run] [--check]"
-      echo "  --dry-run   Show what would be synced without writing anything"
-      echo "  --check     Exit 1 if any file is out of sync (for CI use)"
+      echo "Usage: $0 [--dry-run] [--check] [--website]"
+      echo "  --dry-run    Show what would be synced without writing anything"
+      echo "  --check      Exit 1 if any file is out of sync (for CI use)"
+      echo "  --website    Sync website/data/ then push to ASE-OS-Website repo"
       exit 0
       ;;
   esac
@@ -168,5 +177,59 @@ else
 fi
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo
+
+# ── Push to ASE-OS-Website repo (--website flag) ──────────────────────────────
+if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY_RUN" == "false" ]]; then
+  header "Pushing to ASE-OS-Website"
+
+  # Clone into a temp dir
+  WEBSITE_REPO_DIR="$(mktemp -d)"
+  trap 'rm -rf "$WEBSITE_REPO_DIR"' EXIT
+
+  step "Cloning $WEBSITE_REPO ..."
+  if ! git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
+    fail "Could not clone ASE-OS-Website — check your GITHUB_TOKEN and network."
+    exit 1
+  fi
+  ok "Cloned into $WEBSITE_REPO_DIR"
+
+  # Mirror website/data/ → data/ in the website repo
+  step "Copying data files..."
+  rsync -a --delete "$DATA_DIR/" "$WEBSITE_REPO_DIR/data/"
+
+  # Check if anything actually changed
+  cd "$WEBSITE_REPO_DIR"
+  CHANGED=$(git status --short | wc -l | tr -d ' ')
+
+  if [[ "$CHANGED" -eq 0 ]]; then
+    ok "ASE-OS-Website is already up to date — nothing to push"
+  else
+    # Detect version from changelog for commit message
+    VERSION=$(grep -m1 '## \[' "$ROOT/docs/changelog.md" 2>/dev/null \
+              | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
+
+    step "Committing $CHANGED changed file(s)..."
+    git add data/
+    git commit -m "sync: update data/ from AI-Workflow v${VERSION}
+
+Automated sync from AI-Workflow repository.
+Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
+
+    step "Pushing to origin/main..."
+    if git push origin main --quiet; then
+      ok "Pushed $CHANGED file(s) to ASE-OS-Website"
+      echo ""
+      echo -e "  ${GREEN}${BOLD}ASE-OS-Website is now up to date.${NC}"
+      echo -e "  Live site will rebuild automatically: ${CYAN}https://ase-os.vercel.app${NC}"
+    else
+      fail "Push failed — check your GITHUB_TOKEN has write access to ASE-OS-Website."
+      exit 1
+    fi
+  fi
+
+  echo ""
+  echo -e "${BOLD}════════════════════════════════════════${NC}"
+  echo
+fi
 
 [[ "$ERRORS" -eq 0 ]]
