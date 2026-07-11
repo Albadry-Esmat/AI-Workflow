@@ -1,7 +1,7 @@
 meta:
-  version: 3.4.0
+  version: 3.7.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: '2026-06-24'
+  last_updated: '2026-07-09'
   description: Central skills index for the AI Workflow system
 skills:
 - id: SKL-001
@@ -73,7 +73,7 @@ skills:
   - agile
   - milestones
   - dependencies
-  version: 2.0.0
+  version: 2.2.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -265,7 +265,8 @@ skills:
   - meta-skill
   - retry
   - feedback-loop
-  version: 1.1.0
+  version: 2.5.0
+  max_output_tokens: 6000
   depends_on:
   - SKL-001
   - SKL-002
@@ -324,7 +325,7 @@ skills:
   - lifecycle
   - compiler
   - governance
-  version: 1.0.0
+  version: 1.2.0
   depends_on:
   - SKL-009
   - SKL-011
@@ -352,7 +353,7 @@ skills:
   - multi-turn
   - resumption
   - compression
-  version: 1.0.0
+  version: 2.0.0
   depends_on: []
   mastery_level: intermediate
   use_when: 'Managing state across multiple pipeline turns, resuming a halted pipeline session, or preventing context bleed
@@ -1352,7 +1353,8 @@ skills:
   - events
   - pipeline
   - monitoring
-  version: 1.0.0
+  version: 1.3.0
+  max_output_tokens: 2000
   depends_on:
   - SKL-014
   - SKL-021
@@ -1379,7 +1381,8 @@ skills:
   - performance
   - session
   - telemetry
-  version: 1.0.0
+  version: 1.3.0
+  max_output_tokens: 3000
   depends_on:
   - SKL-047
   mastery_level: intermediate
@@ -1405,7 +1408,7 @@ skills:
   - human-review
   - suggestions
   - read-only
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-048
   mastery_level: beginner
@@ -1431,7 +1434,7 @@ skills:
   - patterns
   - hitl-gated
   - suggestion-only
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-048
   - SKL-015
@@ -1638,8 +1641,8 @@ skills:
     scope or task graph.
 - id: SKL-057
   name: Work Item Exporter
-  short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — one-way outbound
-    export, async, runs at pipeline completion or on demand
+  short_description: Export all tracked work items to Jira Bulk Import JSON, JSON Lines, and Markdown formats — supports
+    bidirectional sync (pull Jira status back to local work items via HITL-gated proposals)
   reference_path: docs/work-item-foundation.md
   reference_sections:
   - '## 2. Jira-Compatible Base Schema'
@@ -1648,20 +1651,21 @@ skills:
   tags:
   - export
   - jira
+  - github
   - integration
   - work-items
   - async
   - outbound
   - jsonl
   - markdown
-  version: 1.0.0
+  version: 2.2.0
   depends_on:
   - SKL-021
   - SKL-055
   - SKL-056
   mastery_level: beginner
-  use_when: Work items need to be exported to Jira, a file, or a human-readable report. Runs async at pipeline completion.
-    Can also be triggered on demand.
+  use_when: Work items need to be exported to Jira, GitHub Issues, a file, or a human-readable report. Runs async at pipeline
+    completion. Can also be triggered on demand.
   do_not_use_when: No work items have been created in this session. This is a one-way export — do not use for bidirectional
     sync or importing external issues.
 - id: SKL-058
@@ -1847,7 +1851,7 @@ skills:
   version: 1.0.0
   depends_on:
   - SKL-002
-  - SKL-029
+  - SKL-027
   - SKL-023
   related_skills:
   - SKL-003
@@ -1987,7 +1991,7 @@ skills:
   version: 1.0.0
   depends_on:
   - SKL-028
-  - SKL-027
+  - SKL-026
   related_skills:
   - SKL-005
   mastery_level: advanced
@@ -3048,3 +3052,368 @@ skills:
     presence systems, live notification fan-out.'
   do_not_use_when: Polling-based refresh is sufficient. Batch processing systems. REST-only APIs without bidirectional streaming
     requirements.
+- id: SKL-108
+  name: Multi-Agent Debate
+  short_description: Runs an adversarial Architect vs. Reviewer debate loop to produce a critique-hardened architecture artifact
+    before feature planning begins
+  reference_path: .opencode/skills/multi-agent-debate/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/multi-agent-debate/SKILL.md
+  tags:
+  - multi-agent
+  - debate
+  - architecture
+  - adversarial
+  - consensus
+  - hitl
+  - phase-7
+  version: 1.0.0
+  depends_on:
+  - SKL-002
+  - SKL-003
+  related_skills:
+  - SKL-002
+  - SKL-003
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'Hardening an architecture proposal through adversarial Architect vs. Reviewer debate before feature planning begins.
+    Enabled by pipeline_config.debate_architecture: true. Use when architecture quality or security risk is high enough to warrant
+    multi-round critique.'
+  do_not_use_when: 'pipeline_config.debate_architecture is false or not set. Do not invoke for quick single-pass architecture
+    review — use clean-code-review or security-review instead. Do not use on time-constrained pipelines where debate overhead
+    is unacceptable.'
+- id: SKL-109
+  name: Clarify
+  short_description: Identifies ambiguous requirements after requirement-analyzer runs, generates ≤5 targeted questions,
+    and suspends the pipeline at a HITL gate until answered — advancing automatically when no ambiguities are found
+  reference_path: .opencode/skills/clarify/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/clarify/SKILL.md
+  tags:
+  - requirements
+  - clarification
+  - ambiguity
+  - hitl
+  - pipeline-entry
+  - feature-012
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  related_skills:
+  - SKL-001
+  - SKL-002
+  mastery_level: intermediate
+  use_when: 'After requirement-analyzer (SKL-001) when requirements contain vague terms, missing quantifiers, or undefined
+    actors. Automatically inserted between requirement-analyzer and architecture-design in full-pipeline. Skip with
+    skip_clarify: true for CI/non-interactive runs.'
+  do_not_use_when: 'Requirements are already fully specified with no open questions. Do not invoke more than once per
+    pipeline run. Do not use in quick-review or requirements-only pipelines.'
+- id: SKL-110
+  name: Debate Synthesizer
+  short_description: Synthesizes two adversarial requirement analyses (advocate + skeptic) into a single debate-hardened
+    unified requirements set; flags and resolves conflicts via HITL gate
+  reference_path: .opencode/skills/debate-synthesizer/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## 12. Human-in-the-Loop Gates'
+  executable_skill: .opencode/skills/debate-synthesizer/SKILL.md
+  tags:
+  - requirements
+  - multi-agent
+  - debate
+  - adversarial
+  - synthesis
+  - hitl
+  - feature-013
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-109
+  related_skills:
+  - SKL-001
+  - SKL-109
+  - SKL-002
+  - SKL-108
+  mastery_level: advanced
+  use_when: 'When pipeline_config.debate_requirements: true. Use for complex, high-stakes features where a single-pass
+    requirement analysis may miss edge cases or produce biased interpretations. Runs two instances of requirement-analyzer
+    (advocate + skeptic) in parallel and synthesizes their outputs.'
+  do_not_use_when: 'pipeline_config.debate_requirements is false or not set. Do not use on simple, well-understood features
+    where single-pass analysis is sufficient. Do not use in quick-review or requirements-only pipelines.'
+- id: SKL-111
+  name: Traceability Matrix
+  short_description: Auto-generates a bidirectional RTM linking REQ → ADR → TEST → TASK; flags UNCOVERED and UNIMPLEMENTED
+    requirements; writes artifacts/rtm-<timestamp>.md and .json for auditor consumption
+  reference_path: .opencode/skills/traceability-matrix/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/traceability-matrix/SKILL.md
+  tags:
+  - quality
+  - traceability
+  - rtm
+  - requirements
+  - coverage
+  - completeness
+  - feature-014
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-028
+  related_skills:
+  - SKL-033
+  - SKL-037
+  mastery_level: intermediate
+  use_when: 'After test-generator (SKL-028) runs in the full pipeline. Automatically inserted between phase-7-quality and
+    phase-8b-audit. Produces the RTM JSON consumed by implementation-completeness-auditor.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Do not invoke before test-generator
+    has run — test_cases[] input is required.'
+- id: SKL-112
+  name: Research Artifact
+  short_description: Generates a structured technology research artifact (alternatives, pros/cons matrix, references, decision
+    rationale) before architecture decisions. Writes artifacts/research-<timestamp>.md and .json.
+  reference_path: .opencode/skills/research-artifact/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/research-artifact/SKILL.md
+  tags:
+  - requirements
+  - research
+  - technology-evaluation
+  - build-vs-buy
+  - artifacts
+  - feature-009
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-109
+  related_skills:
+  - SKL-002
+  - SKL-110
+  mastery_level: intermediate
+  use_when: 'When pipeline_config.research_enabled is true OR requirement-analyzer emits technology_research_needed: true.
+    Use for features involving novel technologies, unfamiliar domains, or material build-vs-buy choices. Runs before
+    architecture-design and provides technology selection rationale to the architect.'
+  do_not_use_when: 'Requirements reference only established, well-understood technology stacks with no open technology
+    decisions. Do not use in quick-review, pre-deploy, or requirements-only pipelines.'
+- id: SKL-113
+  name: Task DAG
+  short_description: Analyzes task breakdown from feature-planning and produces a dependency DAG with parallel-safe groups,
+    critical path, and Mermaid diagram. Writes artifacts/task-dag-<timestamp>.json and .md.
+  reference_path: .opencode/skills/task-dag/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/task-dag/SKILL.md
+  tags:
+  - planning
+  - dag
+  - parallel
+  - critical-path
+  - artifacts
+  - feature-016
+  version: 1.0.0
+  depends_on:
+  - SKL-003
+  related_skills:
+  - SKL-024
+  - SKL-010
+  mastery_level: intermediate
+  use_when: 'After feature-planning (SKL-003) in the full pipeline. Automatically inserted as phase-4b-task-dag. Use to
+    identify parallel-safe task groups and reduce perceived delivery time by suggesting concurrent execution.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Not useful when the task breakdown
+    has fewer than 5 tasks (no meaningful parallelism to identify).'
+- id: SKL-114
+  name: Cross-Artifact Consistency
+  short_description: Guard skill that checks structural consistency across REQs, modules, tasks, and tests. Blocks pipeline
+    when any REQ has no test, any module has no task, or any task is orphaned. HITL override with reason allowed.
+  reference_path: .opencode/skills/cross-artifact-consistency/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/cross-artifact-consistency/SKILL.md
+  tags:
+  - governance
+  - guard
+  - consistency
+  - quality
+  - cross-artifact
+  - feature-010
+  version: 1.0.0
+  depends_on:
+  - SKL-001
+  - SKL-002
+  - SKL-003
+  - SKL-028
+  related_skills:
+  - SKL-111
+  - SKL-033
+  mastery_level: intermediate
+  use_when: 'After test-generator (SKL-028) in the full pipeline, before code-generator. Runs as phase-7b-consistency
+    between phase-7a-rtm and phase-7b-guards. Blocks on any structural linkage violation across REQs, modules,
+    tasks, and tests.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines. Do not use before all four
+    upstream artifacts (requirements, architecture, tasks, test_cases) are available.'
+- id: SKL-115
+  name: Drift Detector
+  short_description: Detects structural drift between the living spec artifact (artifacts/spec-latest.md, FEATURE-007) and
+    the current working tree. Produces a drift score (0–100) and writes artifacts/drift-report-<timestamp>.md.
+    Fails if score < 70 (configurable). Also usable as a scheduled CI check.
+  reference_path: .opencode/skills/drift-detector/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/drift-detector/SKILL.md
+  tags:
+  - quality
+  - drift
+  - living-spec
+  - ci
+  - artifacts
+  - feature-015
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  - SKL-021
+  related_skills:
+  - SKL-111
+  - SKL-033
+  - SKL-010
+  mastery_level: intermediate
+  use_when: 'At the end of the full pipeline (after implementation-completeness-auditor) or as a scheduled CI check.
+    Requires artifacts/spec-latest.md (FEATURE-007). Use to detect when the codebase has drifted from the spec
+    after pipeline runs and iterative development.'
+  do_not_use_when: 'Before artifacts/spec-latest.md exists. Do not run in quick-review or pre-deploy pipelines.
+    Not meaningful as a first-run check — requires at least one full pipeline run to have produced a spec artifact.'
+- id: SKL-116
+  name: Compliance Profiler
+  short_description: Collects applicable compliance frameworks (SOC 2 Type II, HIPAA, GDPR, ISO 27001, custom) via HITL and
+    emits a structured compliance_requirements artifact. Must run before any design skill in the compliance-first pipeline.
+  reference_path: .opencode/skills/compliance-profiler/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/compliance-profiler/SKILL.md
+  tags:
+  - governance
+  - compliance
+  - soc2
+  - hipaa
+  - gdpr
+  - iso27001
+  - feature-017
+  version: 1.0.0
+  depends_on: []
+  related_skills:
+  - SKL-117
+  - SKL-002
+  - SKL-003
+  mastery_level: intermediate
+  use_when: 'At the start of the compliance-first pipeline. Run before architecture-design when SOC 2, HIPAA, GDPR,
+    or ISO 27001 compliance is required. Also usable standalone to produce a compliance_requirements artifact.'
+  do_not_use_when: 'In quick-review, full-pipeline (standard), or any non-compliance pipeline. Do not use if compliance
+    is not a project requirement — the HITL gate will unnecessarily block pipeline start.'
+- id: SKL-117
+  name: Compliance Gate
+  short_description: Validates pipeline stage output against the compliance_requirements artifact from compliance-profiler.
+    Computes control coverage and blocks pipeline if must-control coverage is below threshold.
+  reference_path: .opencode/skills/compliance-gate/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/compliance-gate/SKILL.md
+  tags:
+  - governance
+  - guard
+  - compliance
+  - coverage
+  - soc2
+  - hipaa
+  - gdpr
+  - iso27001
+  - feature-017
+  version: 1.0.0
+  depends_on:
+  - SKL-116
+  related_skills:
+  - SKL-116
+  - SKL-043
+  mastery_level: intermediate
+  use_when: 'After architecture-design, after test-generator, and after deployment-strategy in the compliance-first
+    pipeline. Evaluates each stage output against compliance_requirements from compliance-profiler.'
+  do_not_use_when: 'Without compliance-profiler — requires compliance_requirements input. Do not use in standard
+    pipelines (full-pipeline, quick-review) unless compliance-profiler has already run.'
+- id: SKL-118
+  name: Cost Estimator
+  short_description: Pre-run token cost estimator. Computes estimated token count for a pipeline run using skill count and
+    historical multiplier. Presents cost band to user for approval before execution begins.
+  reference_path: .opencode/skills/cost-estimator/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/cost-estimator/SKILL.md
+  tags:
+  - utility
+  - cost
+  - tokens
+  - estimate
+  - pre-run
+  - feature-018
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  related_skills:
+  - SKL-010
+  mastery_level: beginner
+  use_when: 'As phase-0 of full-pipeline. Automatically invoked before any skill executes to estimate and confirm the
+    token cost of the run. Set skip_cost_check: true or ci_mode: true to bypass in CI.'
+  do_not_use_when: 'In quick-review, requirements-only, or architecture-only pipelines where cost is minimal.
+    Skip in CI mode by setting pipeline_config.ci_mode: true.'
+- id: SKL-119
+  name: Skill Registry Client
+  short_description: Client for the AI Workflow Community Skill Registry. Supports publish, install, search, and uninstall
+    commands. Verifies SHA-256 hash on install. Tags community skills with origin_metadata.source.
+  reference_path: .opencode/skills/skill-registry-client/SKILL.md
+  reference_sections:
+  - '## Purpose'
+  - '## Execution Logic'
+  - '## Outputs'
+  executable_skill: .opencode/skills/skill-registry-client/SKILL.md
+  tags:
+  - platform
+  - registry
+  - community
+  - install
+  - publish
+  - search
+  - feature-019
+  version: 1.0.0
+  depends_on:
+  - SKL-021
+  related_skills:
+  - SKL-021
+  - SKL-010
+  mastery_level: advanced
+  use_when: 'When you want to install a community skill, publish a skill to the registry, search for available
+    skills, or uninstall a previously installed community skill.'
+  do_not_use_when: 'For system skill management (use skill-authoring instead). Not part of any standard delivery
+    pipeline — invoked directly by the user.'

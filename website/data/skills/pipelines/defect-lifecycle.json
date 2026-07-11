@@ -2,70 +2,108 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "defect-lifecycle",
   "version": "1.1.0",
-  "description": "Defect intake → triage (HITL) → investigation → fix → regression test → fix review → validation → closure (HITL). Triggered by defect.created event or direct invocation.",
+  "description": "Defect intake \u2192 triage (HITL) \u2192 investigation \u2192 fix \u2192 regression test \u2192 fix review \u2192 validation \u2192 closure (HITL). Triggered by defect.created event or direct invocation.",
   "mode": "sequential",
   "phases": [
     {
       "id": "phase-1-intake",
       "label": "Defect Intake",
       "skills": [
-        { "name": "defect-manager", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "defect-manager",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-2-investigation",
       "label": "Root Cause Investigation",
       "skills": [
-        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-fix",
       "label": "Fix Implementation",
       "skills": [
-        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
       ]
     },
     {
       "id": "phase-4-lifecycle-guard",
       "label": "Lifecycle State Validation",
       "skills": [
-        { "name": "work-item-lifecycle-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "work-item-lifecycle-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-5-test",
       "label": "Regression Test Generation",
       "skills": [
-        { "name": "test-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-review",
       "label": "Fix Review",
       "skills": [
-        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "clean-code-review",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-7-validate",
       "label": "Completeness Validation",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-7b-completeness-guard",
       "label": "Completeness Readiness Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-7c-closure-write",
       "label": "Closure State Persist",
       "skills": [
-        { "name": "state-manager", "version": "^1.1.0", "max_retries": 1 }
+        {
+          "name": "state-manager",
+          "version": "^1.1.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -73,7 +111,11 @@
       "label": "Work Item Export",
       "async": true,
       "skills": [
-        { "name": "work-item-exporter", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "work-item-exporter",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -81,7 +123,11 @@
       "label": "Documentation Sync",
       "async": true,
       "skills": [
-        { "name": "doc-maintainer", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
@@ -101,7 +147,7 @@
     {
       "after_phase": "phase-7b-completeness-guard",
       "type": "human_approval",
-      "label": "Approve fix before closure — confirm regression tests pass, review is clean, and completeness threshold is met",
+      "label": "Approve fix before closure \u2014 confirm regression tests pass, review is clean, and completeness threshold is met",
       "timeout": 3600
     }
   ],
@@ -110,5 +156,29 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["work-item-exporter", "doc-maintainer"]
+  "async_skills": [
+    "work-item-exporter",
+    "doc-maintainer"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

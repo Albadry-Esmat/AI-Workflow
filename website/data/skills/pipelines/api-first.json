@@ -2,21 +2,29 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "api-first",
   "version": "1.0.0",
-  "description": "API-first design pipeline (v1.0.0): requirements → architecture → API contract design (REST/GraphQL/Events) → security review → code generation → testing → deployment. Use for API-centric products where contract-first design is mandated.",
+  "description": "API-first design pipeline (v1.0.0): requirements \u2192 architecture \u2192 API contract design (REST/GraphQL/Events) \u2192 security review \u2192 code generation \u2192 testing \u2192 deployment. Use for API-centric products where contract-first design is mandated.",
   "mode": "hybrid",
   "phases": [
     {
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Architecture",
       "skills": [
-        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "architecture-design",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -24,38 +32,70 @@
       "label": "API Contract Design",
       "parallel": true,
       "skills": [
-        { "name": "api-design-architect",  "version": "^1.0.0", "max_retries": 2 },
-        { "name": "graphql-architect",     "version": "^1.0.0", "max_retries": 2 },
-        { "name": "event-schema-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "api-design-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "graphql-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "event-schema-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-threat-model",
       "label": "Threat Modeling",
       "skills": [
-        { "name": "threat-model-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "threat-model-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-5-security",
       "label": "Security Review",
       "skills": [
-        { "name": "security-review", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^2.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-7-code",
       "label": "Code Generation",
       "skills": [
-        { "name": "code-generator",  "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",  "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -63,15 +103,29 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-9-deploy",
       "label": "Deployment",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -79,15 +133,35 @@
       "label": "API Documentation",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 },
-        { "name": "adr-generator",           "version": "^1.0.0", "max_retries": 1, "async": true }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["api-design-architect", "graphql-architect", "event-schema-designer"],
-    ["security-guard", "performance-guard"]
+    [
+      "api-design-architect",
+      "graphql-architect",
+      "event-schema-designer"
+    ],
+    [
+      "security-guard",
+      "performance-guard"
+    ]
   ],
   "gates": [
     {
@@ -99,7 +173,7 @@
     {
       "after_phase": "phase-3-api-contracts",
       "type": "human_approval",
-      "label": "Approve API contracts before security review — contracts are the binding interface",
+      "label": "Approve API contracts before security review \u2014 contracts are the binding interface",
       "timeout": 3600
     },
     {
@@ -117,7 +191,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -127,5 +201,30 @@
     "max_repair_iterations": 2,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+  "async_skills": [
+    "documentation-generator",
+    "doc-maintainer",
+    "adr-generator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

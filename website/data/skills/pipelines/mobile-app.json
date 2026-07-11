@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "mobile-app",
   "version": "1.0.0",
-  "description": "End-to-end pipeline for iOS, Android, React Native, Flutter, and MAUI mobile applications: requirements → architecture + mobile domain constraints → DB design → UX design → planning → code generation → mobile safety guard layer → quality + platform testing → completeness audit → deployment + CI scaffold → docs",
+  "description": "End-to-end pipeline for iOS, Android, React Native, Flutter, and MAUI mobile applications: requirements \u2192 architecture + mobile domain constraints \u2192 DB design \u2192 UX design \u2192 planning \u2192 code generation \u2192 mobile safety guard layer \u2192 quality + platform testing \u2192 completeness audit \u2192 deployment + CI scaffold \u2192 docs",
   "mode": "hybrid",
   "domain": "mobile",
   "phases": [
@@ -10,15 +10,28 @@
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Architecture (first pass)",
       "skills": [
-        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2 },
-        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+        {
+          "name": "architecture-design",
+          "version": "^1.3.0",
+          "max_retries": 2
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        }
       ]
     },
     {
@@ -26,16 +39,30 @@
       "label": "Mobile Platform Domain Specialist",
       "note": "Injects technology stack selection, offline strategy, push notification architecture, App Store compliance, mobile security controls, and device matrix into domain_constraints.",
       "skills": [
-        { "name": "mobile-platform-specialist", "version": "^1.0.0", "max_retries": 2,
-          "config": { "domain_context": { "domain_primary": "mobile" } } }
+        {
+          "name": "mobile-platform-specialist",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "domain_context": {
+              "domain_primary": "mobile"
+            }
+          }
+        }
       ]
     },
     {
       "id": "phase-2d-architecture-refine",
-      "label": "Architecture (second pass — mobile-constrained)",
+      "label": "Architecture (second pass \u2014 mobile-constrained)",
       "skills": [
-        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2,
-          "input_overrides": { "domain_constraints": "$phase-2c-domain.domain_constraints" } }
+        {
+          "name": "architecture-design",
+          "version": "^1.3.0",
+          "max_retries": 2,
+          "input_overrides": {
+            "domain_constraints": "$phase-2c-domain.domain_constraints"
+          }
+        }
       ]
     },
     {
@@ -44,37 +71,63 @@
       "parallel": true,
       "note": "frontend-ux-architect produces mobile-first responsive design; database-architect produces local + remote schema.",
       "skills": [
-        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2,
-          "config": { "platform_hint": "mobile" } },
-        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "frontend-ux-architect",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "platform_hint": "mobile"
+          }
+        },
+        {
+          "name": "database-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-graph",
       "label": "Dependency Graph",
       "skills": [
-        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "dependency-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-5-impact",
       "label": "Impact Analysis",
       "skills": [
-        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-execution",
       "label": "Code Generation",
       "skills": [
-        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -82,11 +135,36 @@
       "label": "Quality + Testing",
       "parallel": true,
       "skills": [
-        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2,
-          "config": { "domain_hints": ["device_matrix", "xctest", "espresso", "detox", "appium", "accessibility_voiceover_talkback"] } },
-        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "clean-code-review",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "config": {
+            "domain_hints": [
+              "device_matrix",
+              "xctest",
+              "espresso",
+              "detox",
+              "appium",
+              "accessibility_voiceover_talkback"
+            ]
+          }
+        },
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -94,13 +172,41 @@
       "label": "Guard Layer (Mobile Security)",
       "parallel": true,
       "skills": [
-        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check",
-          "config": { "domain": "mobile" },
-          "note": "Flags missing certificate pinning and API keys in binary as high-severity blocks." },
-        { "name": "database-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check",
-          "config": { "mobile_budgets": { "cold_start_ms": 2000, "frame_time_ms": 16.67, "memory_mb": 150 } } },
-        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "domain": "mobile"
+          },
+          "note": "Flags missing certificate pinning and API keys in binary as high-severity blocks."
+        },
+        {
+          "name": "database-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "mobile_budgets": {
+              "cold_start_ms": 2000,
+              "frame_time_ms": 16.67,
+              "memory_mb": 150
+            }
+          }
+        },
+        {
+          "name": "ui-ux-compliance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -108,21 +214,34 @@
       "label": "Repair (conditional)",
       "condition": "test.failed OR build.broken",
       "skills": [
-        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
       ]
     },
     {
       "id": "phase-8b-audit",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-8c-release-guard",
       "label": "Release Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -130,10 +249,33 @@
       "label": "Deployment + CI Scaffold",
       "parallel": true,
       "skills": [
-        { "name": "deployment-strategy",   "version": "^1.1.0", "max_retries": 2,
-          "config": { "platform_hints": ["app_store", "play_store", "fastlane", "testflight", "firebase_distribution"] } },
-        { "name": "ci-pipeline-generator", "version": "^1.0.0", "max_retries": 2,
-          "config": { "secret_scan": true, "platform_hints": ["xcode_cloud", "github_actions_ios", "github_actions_android"] } }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "config": {
+            "platform_hints": [
+              "app_store",
+              "play_store",
+              "fastlane",
+              "testflight",
+              "firebase_distribution"
+            ]
+          }
+        },
+        {
+          "name": "ci-pipeline-generator",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "secret_scan": true,
+            "platform_hints": [
+              "xcode_cloud",
+              "github_actions_ios",
+              "github_actions_android"
+            ]
+          }
+        }
       ]
     },
     {
@@ -141,22 +283,46 @@
       "label": "Documentation",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["frontend-ux-architect", "database-architect"],
-    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["security-guard", "database-guard", "performance-guard", "ui-ux-compliance-guard"],
-    ["deployment-strategy", "ci-pipeline-generator"]
+    [
+      "frontend-ux-architect",
+      "database-architect"
+    ],
+    [
+      "clean-code-review",
+      "testing-strategy",
+      "security-review",
+      "test-generator"
+    ],
+    [
+      "security-guard",
+      "database-guard",
+      "performance-guard",
+      "ui-ux-compliance-guard"
+    ],
+    [
+      "deployment-strategy",
+      "ci-pipeline-generator"
+    ]
   ],
   "gates": [
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate mobile requirements — confirm target platforms, offline needs, monetization model, and compliance scope",
+      "label": "Validate mobile requirements \u2014 confirm target platforms, offline needs, monetization model, and compliance scope",
       "timeout": 3600
     },
     {
@@ -198,7 +364,7 @@
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
-      "label": "Block if any guard verdict is 'block' — certificate pinning and API key storage failures are non-bypassable",
+      "label": "Block if any guard verdict is 'block' \u2014 certificate pinning and API key storage failures are non-bypassable",
       "condition": "guards.every(g => g.verdict === 'pass')"
     },
     {
@@ -216,7 +382,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable. Confirm App Store / Play Store submission readiness.",
+      "label": "Mandatory deployment approval \u2014 non-bypassable. Confirm App Store / Play Store submission readiness.",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -226,5 +392,30 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+  "async_skills": [
+    "documentation-generator",
+    "doc-maintainer",
+    "adr-generator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

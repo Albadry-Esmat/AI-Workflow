@@ -2,35 +2,51 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "cloud-migration",
   "version": "1.0.0",
-  "description": "Cloud migration and modernisation pipeline (v1.0.0): requirements → Well-Architected review → threat model → secrets management → container orchestration (or serverless) → SLO design → security review → load testing → runbooks → deployment. Use for cloud lift-and-shift, re-platforming, or cloud-native rewrites.",
+  "description": "Cloud migration and modernisation pipeline (v1.0.0): requirements \u2192 Well-Architected review \u2192 threat model \u2192 secrets management \u2192 container orchestration (or serverless) \u2192 SLO design \u2192 security review \u2192 load testing \u2192 runbooks \u2192 deployment. Use for cloud lift-and-shift, re-platforming, or cloud-native rewrites.",
   "mode": "hybrid",
   "phases": [
     {
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Current + Target Architecture",
       "skills": [
-        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "architecture-design",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-cloud-review",
       "label": "Well-Architected Review",
       "skills": [
-        { "name": "cloud-architecture-reviewer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "cloud-architecture-reviewer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-threat-model",
       "label": "Threat Modeling",
       "skills": [
-        { "name": "threat-model-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "threat-model-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -38,16 +54,32 @@
       "label": "Infrastructure Design",
       "parallel": true,
       "skills": [
-        { "name": "container-orchestration-architect", "version": "^1.0.0", "max_retries": 2 },
-        { "name": "serverless-architect",              "version": "^1.0.0", "max_retries": 2 },
-        { "name": "secrets-management-architect",      "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "container-orchestration-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "serverless-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "secrets-management-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-caching",
       "label": "Caching Strategy",
       "skills": [
-        { "name": "caching-strategy-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "caching-strategy-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -55,15 +87,27 @@
       "label": "SLO Design + Security Review",
       "parallel": true,
       "skills": [
-        { "name": "slo-sla-designer", "version": "^1.0.0", "max_retries": 2 },
-        { "name": "security-review",  "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "slo-sla-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-8-devsecops",
       "label": "DevSecOps Pipeline Design",
       "skills": [
-        { "name": "devsecops-pipeline-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "devsecops-pipeline-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -71,36 +115,62 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-10-load-test",
       "label": "Load Test Design",
       "skills": [
-        { "name": "load-test-designer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "load-test-designer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-11-runbooks",
       "label": "Runbook Generation",
       "skills": [
-        { "name": "runbook-generator", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "runbook-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-12-ci-pipeline",
       "label": "CI/CD Pipeline Generation",
       "skills": [
-        { "name": "ci-pipeline-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "ci-pipeline-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-13-deploy",
       "label": "Deployment Strategy",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -108,16 +178,39 @@
       "label": "Documentation + ADR",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "adr-generator",           "version": "^1.0.0", "max_retries": 1, "async": true },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["container-orchestration-architect", "serverless-architect", "secrets-management-architect"],
-    ["slo-sla-designer", "security-review"],
-    ["security-guard", "performance-guard"]
+    [
+      "container-orchestration-architect",
+      "serverless-architect",
+      "secrets-management-architect"
+    ],
+    [
+      "slo-sla-designer",
+      "security-review"
+    ],
+    [
+      "security-guard",
+      "performance-guard"
+    ]
   ],
   "gates": [
     {
@@ -135,7 +228,7 @@
     {
       "after_phase": "phase-5-infra-design",
       "type": "human_approval",
-      "label": "Approve infrastructure topology — Kubernetes vs. serverless selection is binding",
+      "label": "Approve infrastructure topology \u2014 Kubernetes vs. serverless selection is binding",
       "timeout": 3600
     },
     {
@@ -153,7 +246,7 @@
     {
       "after_phase": "phase-13-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -163,5 +256,30 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "adr-generator", "doc-maintainer"]
+  "async_skills": [
+    "documentation-generator",
+    "adr-generator",
+    "doc-maintainer"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

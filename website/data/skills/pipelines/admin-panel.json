@@ -9,15 +9,28 @@
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Architecture",
       "skills": [
-        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+        {
+          "name": "architecture-design",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        }
       ]
     },
     {
@@ -25,36 +38,60 @@
       "label": "UI/UX + Database Design",
       "parallel": true,
       "skills": [
-        { "name": "frontend-ux-architect", "version": "^1.0.0", "max_retries": 2 },
-        { "name": "database-architect",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "frontend-ux-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "database-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-graph",
       "label": "Dependency Graph",
       "skills": [
-        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "dependency-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-5-impact",
       "label": "Impact Analysis",
       "skills": [
-        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-execution",
       "label": "Code Generation",
       "skills": [
-        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -62,10 +99,26 @@
       "label": "Quality + Testing",
       "parallel": true,
       "skills": [
-        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2 },
-        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "clean-code-review",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -73,9 +126,24 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "database-guard",         "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard",      "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "database-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "ui-ux-compliance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -83,28 +151,45 @@
       "label": "Repair (conditional)",
       "condition": "test.failed OR build.broken",
       "skills": [
-        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
       ]
     },
     {
       "id": "phase-8b-audit",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-8c-release-guard",
       "label": "Release Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-9-deploy",
       "label": "Deployment",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -112,27 +197,47 @@
       "label": "Documentation",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["frontend-ux-architect", "database-architect"],
-    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+    [
+      "frontend-ux-architect",
+      "database-architect"
+    ],
+    [
+      "clean-code-review",
+      "testing-strategy",
+      "security-review",
+      "test-generator"
+    ],
+    [
+      "database-guard",
+      "performance-guard",
+      "ui-ux-compliance-guard"
+    ]
   ],
   "gates": [
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate admin panel requirements — confirm RBAC model, privileged operations, and data access scope",
+      "label": "Validate admin panel requirements \u2014 confirm RBAC model, privileged operations, and data access scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
-      "label": "Sign off on architecture — confirm auth boundaries, role hierarchy, and privileged data access patterns",
+      "label": "Sign off on architecture \u2014 confirm auth boundaries, role hierarchy, and privileged data access patterns",
       "timeout": 3600
     },
     {
@@ -162,7 +267,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Mandatory security sign-off — admin panels have elevated risk; all security findings must be resolved",
+      "label": "Mandatory security sign-off \u2014 admin panels have elevated risk; all security findings must be resolved",
       "timeout": 7200
     },
     {
@@ -174,7 +279,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -184,5 +289,30 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+  "async_skills": [
+    "documentation-generator",
+    "doc-maintainer",
+    "adr-generator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

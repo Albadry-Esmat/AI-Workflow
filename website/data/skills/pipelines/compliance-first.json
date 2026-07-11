@@ -1,0 +1,342 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "compliance-first",
+  "version": "1.0.0",
+  "description": "Full delivery pipeline with SOC 2 / HIPAA / GDPR / ISO 27001 compliance gates at architecture, test, and deployment stages.",
+  "mode": "sequential",
+  "phases": [
+    {
+      "id": "phase-0-compliance",
+      "label": "Compliance Framework Collection",
+      "note": "FEATURE-017: Runs compliance-profiler to interactively collect applicable compliance frameworks and emit the compliance_requirements artifact. Set pipeline_config.ci_mode: true and pipeline_config.compliance_frameworks to skip HITL in CI environments.",
+      "skills": [
+        {
+          "name": "compliance-profiler",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "inputs": {
+            "frameworks": "pipeline_config.compliance_frameworks",
+            "skip_hitl": "pipeline_config.ci_mode",
+            "data_classification": "pipeline_config.data_classification",
+            "jurisdiction": "pipeline_config.jurisdiction"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-1b-clarify",
+      "label": "Clarification (HITL)",
+      "condition": "pipeline_config.clarify_enabled === true",
+      "note": "Optional clarification phase. Identifies ambiguous requirements and suspends for user input. Enable with pipeline_config.clarify_enabled: true.",
+      "skills": [
+        {
+          "name": "clarify",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-2-architecture",
+      "label": "Architecture + UX + Database Design (parallel)",
+      "parallel": true,
+      "note": "Runs architecture-design, frontend-ux-architect, and database-architect concurrently. All three receive compliance_requirements as a mandatory constraint input from session_context.",
+      "skills": [
+        {
+          "name": "architecture-design",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        },
+        {
+          "name": "frontend-ux-architect",
+          "version": "^2.0.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        },
+        {
+          "name": "database-architect",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-2b-compliance-check",
+      "label": "Compliance Gate — Architecture",
+      "note": "FEATURE-017: Validates architecture stage output against compliance_requirements. Blocks pipeline if must-control coverage < threshold. Gate after this phase halts on block verdict.",
+      "skills": [
+        {
+          "name": "compliance-gate",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "inputs": {
+            "stage_name": "architecture",
+            "compliance_requirements": "session_context.compliance_requirements",
+            "stage_output": "phase_outputs['phase-2-architecture']"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4-planning",
+      "label": "Planning",
+      "note": "Phase numbering gap: phase-3 is intentionally reserved. Numbering skips to phase-4 to preserve roadmap compatibility with full-pipeline.",
+      "skills": [
+        {
+          "name": "feature-planning",
+          "version": "^2.2.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-5-impact",
+      "label": "Impact Analysis",
+      "skills": [
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-6-execution",
+      "label": "Code Generation",
+      "skills": [
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-6b-repair",
+      "label": "Repair (conditional)",
+      "condition": "test.failed OR build.broken",
+      "note": "Mirrors full-pipeline phase-8-repair. code-repair is only invoked when tests fail or the build is broken — not unconditionally after code generation.",
+      "skills": [
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
+      ]
+    },
+    {
+      "id": "phase-7-quality",
+      "label": "Quality + Testing",
+      "parallel": true,
+      "note": "testing-strategy and test-generator run concurrently. Both receive compliance_requirements to generate compliance-aware test coverage.",
+      "skills": [
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        },
+        {
+          "name": "test-generator",
+          "version": "^2.0.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-7b-compliance-check",
+      "label": "Compliance Gate — Test Suite",
+      "note": "FEATURE-017: Validates test-suite output against compliance_requirements. Verifies that compliance controls have corresponding test cases. Blocks if must-control coverage < threshold.",
+      "skills": [
+        {
+          "name": "compliance-gate",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "inputs": {
+            "stage_name": "test-suite",
+            "compliance_requirements": "session_context.compliance_requirements",
+            "stage_output": "phase_outputs['phase-7-quality']"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-8-audit",
+      "label": "Implementation Completeness Audit",
+      "skills": [
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-9-deploy",
+      "label": "Deployment",
+      "skills": [
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "inputs": {
+            "compliance_constraints": "session_context.compliance_requirements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-9b-compliance-check",
+      "label": "Compliance Gate — Deployment",
+      "note": "FEATURE-017: Final compliance check on the deployment configuration. Validates that deployment plan satisfies all applicable compliance controls. Gate after this phase requires non-bypassable human sign-off.",
+      "skills": [
+        {
+          "name": "compliance-gate",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "inputs": {
+            "stage_name": "deployment",
+            "compliance_requirements": "session_context.compliance_requirements",
+            "stage_output": "phase_outputs['phase-9-deploy']"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-10-docs",
+      "label": "Documentation + Work Item Export",
+      "parallel": true,
+      "async": true,
+      "note": "Documentation and work item export run asynchronously and do not block pipeline completion.",
+      "skills": [
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        },
+        {
+          "name": "work-item-exporter",
+          "version": "^2.0.0",
+          "max_retries": 1,
+          "async": true
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "after_phase": "phase-0-compliance",
+      "type": "human_approval",
+      "label": "Confirm compliance frameworks before pipeline begins",
+      "timeout": 300,
+      "note": "Human reviews selected frameworks, data_classification, and jurisdiction before any design or implementation work starts. Timeout defaults to soc2 + confidential if no response."
+    },
+    {
+      "after_phase": "phase-2b-compliance-check",
+      "type": "condition",
+      "condition": "phase_outputs['phase-2b-compliance-check'].verdict !== 'block'",
+      "label": "Block if architecture compliance verdict is block"
+    },
+    {
+      "after_phase": "phase-7b-compliance-check",
+      "type": "condition",
+      "condition": "phase_outputs['phase-7b-compliance-check'].verdict !== 'block'",
+      "label": "Block if test-suite compliance verdict is block"
+    },
+    {
+      "after_phase": "phase-8-audit",
+      "type": "condition",
+      "condition": "phase_outputs['phase-8-audit'].readiness_score >= 85",
+      "label": "Block if implementation completeness < 85%"
+    },
+    {
+      "after_phase": "phase-9-deploy",
+      "type": "human_approval",
+      "label": "Approve deployment",
+      "timeout": 3600,
+      "bypass_on_timeout": false
+    },
+    {
+      "after_phase": "phase-9b-compliance-check",
+      "type": "human_approval",
+      "label": "Final compliance sign-off before deployment",
+      "timeout": 3600,
+      "bypass_on_timeout": false,
+      "note": "Non-bypassable. Human must confirm all compliance gates passed and the deployment is cleared for production. Reply OVERRIDE <reason> only with explicit approval authority."
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 3,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": [
+    "doc-maintainer",
+    "work-item-exporter"
+  ],
+  "on_failure": "halt",
+  "resumable": true,
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "default_tier": "large",
+    "externalize_threshold": 8000,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  },
+  "batch_policy": {
+    "enabled": false,
+    "mode": "async",
+    "eligible_skills": [
+      "doc-maintainer",
+      "work-item-exporter"
+    ],
+    "comment": "Set enabled:true to route eligible non-blocking async skills through a batch endpoint. Never enable for skills in a gate dependency chain."
+  }
+}

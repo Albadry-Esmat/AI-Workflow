@@ -2,14 +2,18 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "insights-adaptation-pipeline",
   "version": "1.0.0",
-  "description": "Observability-to-adaptation pipeline (v1.0.0): telemetry collection → session insights + dashboard → adaptive proposals → HITL approval → adaptation application. Runs the full SKL-047→SKL-051 chain for continuous, human-supervised skill improvement.",
+  "description": "Observability-to-adaptation pipeline (v1.0.0): telemetry collection \u2192 session insights + dashboard \u2192 adaptive proposals \u2192 HITL approval \u2192 adaptation application. Runs the full SKL-047\u2192SKL-051 chain for continuous, human-supervised skill improvement.",
   "mode": "hybrid",
   "phases": [
     {
       "id": "phase-1-telemetry",
       "label": "Telemetry Collection",
       "skills": [
-        { "name": "behavioral-telemetry-collector", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "behavioral-telemetry-collector",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -17,22 +21,38 @@
       "label": "Insights + Dashboard",
       "parallel": true,
       "skills": [
-        { "name": "session-insights",      "version": "^1.0.0", "max_retries": 2 },
-        { "name": "enhancement-dashboard", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "session-insights",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "enhancement-dashboard",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-proposals",
       "label": "Adaptive Proposals",
       "skills": [
-        { "name": "adaptive-proposal-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "adaptive-proposal-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-apply",
       "label": "Adaptation Application",
       "skills": [
-        { "name": "adaptation-applicator", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "adaptation-applicator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -40,12 +60,19 @@
       "label": "Documentation Sync",
       "async": true,
       "skills": [
-        { "name": "doc-maintainer", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["session-insights", "enhancement-dashboard"]
+    [
+      "session-insights",
+      "enhancement-dashboard"
+    ]
   ],
   "gates": [
     {
@@ -57,7 +84,7 @@
     {
       "after_phase": "phase-3-proposals",
       "type": "human_approval",
-      "label": "Review and approve adaptation proposals before application — non-bypassable",
+      "label": "Review and approve adaptation proposals before application \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     },
@@ -68,10 +95,33 @@
       "condition": "adaptation.status === 'applied'"
     }
   ],
-  "async_skills": ["doc-maintainer"],
+  "async_skills": [
+    "doc-maintainer"
+  ],
   "recovery": {
     "on_critical_failure": "rollback-manager",
     "max_repair_iterations": 1,
     "rollback_scope": "pipeline_stage"
+  },
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
   }
 }

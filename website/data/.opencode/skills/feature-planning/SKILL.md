@@ -1,6 +1,6 @@
 ---
 name: feature-planning
-version: 2.0.0
+version: 2.2.0
 domain: planning
 description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
@@ -145,6 +145,55 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
     Update work-items/index.md.
   Assemble companion_tasks[] and work_item_summary output fields.
   Output: companion_tasks[], work_item_summary
+
+Step 7c — Feature folder materialization (always-on)
+  Runs for every plan regardless of companion_generation setting.
+  For each requirement in requirements[] (ordered: high priority first, then by requirement.id):
+    If work-items/features/ already contains a folder whose request.md front matter has req_id = requirement.id:
+      Skip creation. Emit info feedback: "Feature folder for {requirement.id} already exists — skipped."
+    Else:
+      Assign FEATURE identifier:
+        Read work_items.sequences.FEATURE from state (default: 0 if absent). Increment by 1.
+        Format: FEATURE-{NNN} (3-digit zero-padded, e.g. FEATURE-001).
+        Write updated sequence to state immediately (prevents ID collisions on partial runs).
+      Build slug from requirement.statement:
+        Take first 40 characters. Lowercase. Replace all non-alphanumeric characters with '-'.
+        Collapse consecutive hyphens to one. Strip leading and trailing hyphens.
+        Example: "User can register with email and password" → "user-can-register-with-email-and"
+      Resolve tasks: task_ids = req_task_map[requirement.id] (from Step 7). Filter tasks[] to matching IDs → task_rows.
+      Create directory: work-items/features/FEATURE-{NNN}-{slug}/
+      Write request.md (follows FEATURE-TEMPLATE/request.md structure):
+        ID = FEATURE-{NNN}; Title = requirement.statement (truncated to 80 chars)
+        Status = draft; Priority = requirement.priority; req_id = requirement.id
+        Problem Statement = requirement.statement (full)
+        Acceptance Criteria = requirement.acceptance_criteria[] rendered as "- [ ] {criterion}" lines
+          (If acceptance_criteria absent, derive one testable criterion from the statement)
+        Out of Scope = "(To be refined during review.)"
+      Write plan.md (follows FEATURE-TEMPLATE/plan.md structure):
+        Approach = 1-2 sentences derived from module names and task descriptions
+        Modules Affected = distinct modules from task_rows[].module
+        Tasks table = all task_rows (ID | Description | Complexity | Phase | Status)
+        Risks = risks[] entries whose description references a task or module in this feature scope; else "None identified."
+      Write tasks.md (follows FEATURE-TEMPLATE/tasks.md structure):
+        Tasks table = all task_rows (ID | Description | Status)
+      Write status.md (follows FEATURE-TEMPLATE/status.md structure):
+        Current status = draft; Last updated = today (ISO YYYY-MM-DD)
+        Note task count: "**Tasks:** {count} tasks ({task_ids joined by ', '})"
+        Progress checklist: all items unchecked (draft state)
+      Append to state work_items.items[]:
+        { id: FEATURE-{NNN}, type: FEATURE, title: requirement.statement|truncate(80),
+          status: draft, priority: requirement.priority, req_id: requirement.id,
+          file_path: "work-items/features/FEATURE-{NNN}-{slug}/request.md" }
+  After all requirements processed:
+    Rebuild work-items/indexes/features.md (idempotent read→merge→write):
+      1. Read existing rows: parse current features.md table → existing_rows[] keyed by FEATURE-NNN ID
+         (treat file as empty if absent, blank, or contains only the placeholder row "| — |")
+      2. Build new_rows[] for each feature created in this execution (not skipped ones)
+      3. Merge: union of existing_rows + new_rows, deduplicated by FEATURE-NNN ID, sorted ascending by ID
+      4. Write complete table (replaces entire file):
+           "# Feature Index\n\nAll active feature requests for this project.\n\n| ID | Title | Status | Priority |\n|----|-------|--------|----------|\n"
+           + one row per merged entry: "| {FEATURE-NNN} | {title|truncate(60)} | {status} | {priority} |"
+  Output: feature_folders[] (paths of created folders), feature_count (integer)
 ```
 
 ## Outputs
@@ -159,6 +208,8 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
 | `risks` | `array[object]` | Planning risks (description, impact, mitigation) |
 | `companion_tasks` | `array[object]` | Generated companion work items (REVIEW, TEST, VALIDATION, DOC) linked to implementation tasks. Empty array when `companion_generation.enabled = false`. |
 | `work_item_summary` | `object` | Summary counts: total_implementation_tasks, total_companion_tasks, total_work_items, type_breakdown. Null when companion generation disabled. |
+| `feature_folders` | `array[string]` | Paths of feature folders created in this execution (one per requirement). Empty array if all folders already existed. |
+| `feature_count` | `integer` | Count of feature folders created. 0 if all folders already existed. |
 | `metrics` | `object` | Execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array[object]` | Feedback loop entries for cross-skill communication |
 
@@ -267,10 +318,20 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
         }
       }
     },
+    "feature_folders": {
+      "type": "array",
+      "description": "Paths of feature folders created in this execution (one per requirement). Empty array if all already existed.",
+      "items": { "type": "string" }
+    },
+    "feature_count": {
+      "type": "integer",
+      "description": "Count of feature folders created. 0 if all already existed.",
+      "minimum": 0
+    },
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
   },
-  "required": ["tasks", "req_task_map", "dependency_map", "phases", "milestones", "risks", "companion_tasks", "work_item_summary", "metrics", "feedback"],
+  "required": ["tasks", "req_task_map", "dependency_map", "phases", "milestones", "risks", "companion_tasks", "work_item_summary", "feature_folders", "feature_count", "metrics", "feedback"],
   "$defs": {
     "metrics": {
       "type": "object",
@@ -313,6 +374,8 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
 - **Companion task cap:** Companion tasks do NOT count toward the 200-task implementation cap. The cap applies only to `tasks[]` (TASK-NNNN items).
 - **Companion tasks are draft on creation.** They advance to `ready` when their parent TASK advances to `in_progress`. They advance to `in_progress` when parent TASK advances to `review`. The orchestrator manages these transitions.
 - **No duplicate companions:** If a companion file `work-items/{TYPE}-{NNNN}.md` already exists (e.g., from a previous run), skip creation and emit an `info` feedback entry.
+- **Step 7c always runs.** Feature folder materialization is unconditional — not gated by `companion_generation` or any other flag. Every `feature-planning` execution creates at minimum one `work-items/features/FEATURE-{NNN}-{slug}/` folder per requirement. Existing folders (detected by `req_id` in `request.md` front matter) are skipped and emitted as `info` feedback entries — never overwritten.
+- **FEATURE ID format:** `FEATURE-{NNN}` — 3-digit zero-padded. Assigned from `work_items.sequences.FEATURE` in state; sequence written back immediately after assignment to prevent collisions on partial runs.
 
 ## Security Considerations
 
@@ -345,6 +408,12 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
 - [ ] Companion IDs share the same numeric suffix as parent TASK
 - [ ] Companion items have `parent_id` set to their TASK's id
 - [ ] Companion `.md` files written to `work-items/` when companion generation is enabled
+- [ ] `work-items/features/FEATURE-{NNN}-{slug}/` folder created for every requirement in input (or skip logged via `info` feedback)
+- [ ] `request.md`, `plan.md`, `tasks.md`, `status.md` written to each created feature folder
+- [ ] `work-items/indexes/features.md` reflects all created features (placeholder row removed)
+- [ ] `work_items.sequences.FEATURE` incremented correctly (one increment per new folder)
+- [ ] `work_items.items[]` state updated with FEATURE-type entries
+- [ ] Pre-existing feature folders emitted as `info` feedback entries (not overwritten)
 
 ## Failure Scenarios
 
@@ -361,7 +430,7 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
 |------|---------|---------|----------|
 | Roadmap approval | Total story points > 100 OR milestone count > 4 OR any task has `confidence: low` | 3600s | Pause, present task summary and critical path for stakeholder approval |
 
-- Gate presents: phase count, total complexity, critical path, risks.
+- Gate presents: phase count, total complexity, critical path, risks, **feature folders created** (`feature_folders[]` with path and work-item type for each entry).
 - If rejected: revise scope, re-run from Step 1.
 
 ## 13. Skill Composition
@@ -371,12 +440,12 @@ Step 7b — Companion task generation (opt-in; only when companion_generation.en
 ```yaml
   composes:
   - skill: feature-planning
-    version: "^2.0.0"
+    version: "^2.2.0"
     input_map: { "modules": "architecture_modules", "requirements": "requirements", "companion_generation": "companion_generation" }
-    output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones", "companion_tasks": "companion_tasks", "work_item_summary": "work_item_summary" }
+    output_map: { "tasks": "implementation_tasks", "req_task_map": "req_task_map", "milestones": "delivery_milestones", "companion_tasks": "companion_tasks", "work_item_summary": "work_item_summary", "feature_folders": "feature_folders", "feature_count": "feature_count" }
   - skill: state-manager
     version: "^1.1.0"
     role: state_read_write
     scopes: ["work_items"]
-    note: "Only accessed when companion_generation.enabled = true. Reads work_items.sequences for ID assignment; writes companion items to work_items.items[] and increments sequences/type_counts."
+    note: "Step 7b (companion generation, opt-in): reads work_items.sequences for ID assignment; writes companion items to work_items.items[]; increments sequences/type_counts. Step 7c (feature materialization, always-on): reads/writes work_items.sequences.FEATURE; appends FEATURE entries to work_items.items[]."
 ```

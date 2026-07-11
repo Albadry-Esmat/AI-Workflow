@@ -1,5 +1,6 @@
 ---
 name: validation-rules
+version: 1.0.0
 description: 'Use ONLY when validating or enforcing rules on entries in skills/index.yaml. Triggers on: "validate index entry", "check index.yaml", "does this index entry conform", "index validation", "skill index rules".'
 ---
 

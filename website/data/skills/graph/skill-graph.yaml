@@ -1,8 +1,8 @@
 meta:
-  version: 3.0.0
-  last_updated: '2026-06-24'
-  total_nodes: 102
-  total_edges: 328
+  version: 3.1.0
+  last_updated: '2026-07-09'
+  total_nodes: 113
+  total_edges: 366
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
@@ -23,7 +23,7 @@ nodes:
   name: feature-planning
   domain: planning
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.2.0
   status: active
   layer: pipeline-core
 - id: SKL-004
@@ -72,7 +72,7 @@ nodes:
   name: orchestration
   domain: system
   mastery_level: advanced
-  version: 2.4.0
+  version: 2.5.0
   status: active
   layer: meta
 - id: SKL-011
@@ -86,14 +86,14 @@ nodes:
   name: skill-authoring
   domain: meta
   mastery_level: advanced
-  version: 1.1.0
+  version: 1.2.0
   status: active
   layer: meta
 - id: SKL-013
   name: context-memory
   domain: system
   mastery_level: intermediate
-  version: 1.0.0
+  version: 2.0.0
   status: active
   layer: utility
 - id: SKL-014
@@ -345,7 +345,7 @@ nodes:
   name: enhancement-dashboard
   domain: system
   mastery_level: beginner
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: utility
 - id: SKL-050
@@ -401,7 +401,7 @@ nodes:
   name: work-item-exporter
   domain: integration
   mastery_level: beginner
-  version: 1.0.0
+  version: 2.1.0
   status: active
   layer: integration
 - id: SKL-058
@@ -416,301 +416,301 @@ nodes:
   domain: meta
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: meta
 - id: SKL-066
   name: semantic-diff-analyzer
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: analysis
 - id: SKL-067
   name: acceptance-criteria-generator
   domain: requirements
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: requirements
 - id: SKL-068
   name: technical-debt-tracker
   domain: quality
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: quality
 - id: SKL-069
   name: architecture-evolution-planner
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-070
   name: compliance-mapper
   domain: governance
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: governance
 - id: SKL-071
   name: api-deprecation-manager
   domain: architecture
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: lifecycle
 - id: SKL-072
   name: infrastructure-cost-estimator
   domain: deployment
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: deployment
 - id: SKL-073
   name: mutation-test-generator
   domain: testing
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-074
   name: skill-simulator
   domain: system
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: orchestration
 - id: SKL-075
   name: multi-repo-coordinator
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-076
   name: domain-knowledge-extractor
   domain: system
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: system
 - id: SKL-077
   name: pipeline-branching
   domain: orchestration
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: orchestration
 - id: SKL-078
   name: data-pipeline-architect
   domain: data
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-079
   name: data-quality-validator
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-080
   name: ml-pipeline-architect
   domain: data
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-081
   name: analytics-schema-designer
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-082
   name: data-contract-enforcer
   domain: data
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-083
   name: api-design-architect
   domain: api
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-084
   name: graphql-architect
   domain: api
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-085
   name: event-schema-designer
   domain: api
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: integration
 - id: SKL-086
   name: microservices-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-087
   name: event-sourcing-designer
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-088
   name: distributed-resilience-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-089
   name: cloud-architecture-reviewer
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-090
   name: serverless-architect
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-091
   name: container-orchestration-architect
   domain: cloud
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: infrastructure
 - id: SKL-092
   name: threat-model-designer
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-093
   name: secrets-management-architect
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-094
   name: devsecops-pipeline-designer
   domain: security
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: pipeline-safety
 - id: SKL-095
   name: load-test-designer
   domain: testing
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-096
   name: profiling-advisor
   domain: quality
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: quality
 - id: SKL-097
   name: slo-sla-designer
   domain: deployment
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: deployment
 - id: SKL-098
   name: runbook-generator
   domain: documentation
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-099
   name: chaos-engineering-designer
   domain: testing
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: testing
 - id: SKL-100
   name: state-management-architect
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-101
   name: micro-frontend-architect
   domain: design
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-102
   name: web-performance-optimizer
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-103
   name: ddd-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-104
   name: caching-strategy-designer
   domain: architecture
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-105
   name: localization-architect
   domain: design
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-106
   name: product-analytics-designer
   domain: planning
   mastery_level: intermediate
   version: 1.0.0
-  status: draft
+  status: active
   layer: domain
 - id: SKL-107
   name: realtime-system-architect
   domain: architecture
   mastery_level: advanced
   version: 1.0.0
-  status: draft
+  status: active
   layer: architecture
 - id: SKL-108
   name: multi-agent-debate
@@ -719,6 +719,83 @@ nodes:
   version: 1.0.0
   status: active
   layer: architecture
+- id: SKL-109
+  name: clarify
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: requirements
+- id: SKL-110
+  name: debate-synthesizer
+  domain: requirements
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: requirements
+- id: SKL-111
+  name: traceability-matrix
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: quality
+- id: SKL-112
+  name: research-artifact
+  domain: requirements
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: requirements
+- id: SKL-113
+  name: task-dag
+  domain: planning
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: planning
+- id: SKL-114
+  name: cross-artifact-consistency
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-115
+  name: drift-detector
+  domain: quality
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: quality
+- id: SKL-116
+  name: compliance-profiler
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-117
+  name: compliance-gate
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: governance
+- id: SKL-118
+  name: cost-estimator
+  domain: utility
+  mastery_level: beginner
+  version: 1.0.0
+  status: active
+  layer: utility
+- id: SKL-119
+  name: skill-registry-client
+  domain: platform
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: platform
 edges:
 - from: SKL-001
   to: SKL-002
@@ -1423,7 +1500,7 @@ edges:
   to: SKL-069
   type: dependency
   label: architecture-evolution-planner consumes current and target architecture from architecture-design
-- from: SKL-029
+- from: SKL-027
   to: SKL-069
   type: dependency
   label: architecture-evolution-planner uses adr-generator to produce ADR stubs per evolution phase
@@ -1436,7 +1513,7 @@ edges:
   type: dependency
   label: architecture-evolution-planner produces evolution phases fed into feature-planning as phased tasks
 - from: SKL-069
-  to: SKL-029
+  to: SKL-027
   type: composition
   label: architecture-evolution-planner triggers adr-generator for each significant evolution decision
 - from: SKL-001
@@ -1491,7 +1568,7 @@ edges:
   to: SKL-073
   type: dependency
   label: mutation-test-generator analyzes test suites produced by test-generator
-- from: SKL-027
+- from: SKL-026
   to: SKL-073
   type: dependency
   label: mutation-test-generator analyzes code artifacts produced by code-generator
@@ -2055,3 +2132,139 @@ edges:
   to: SKL-032
   type: composition
   label: multi-agent-debate hardened architecture consumed by database-architect
+- from: SKL-001
+  to: SKL-109
+  type: dependency
+  label: requirement-analyzer output (requirements, open_questions, assumptions) is the primary input to clarify
+- from: SKL-109
+  to: SKL-002
+  type: composition
+  label: clarify updated_requirements consumed by architecture-design
+- from: SKL-109
+  to: SKL-110
+  type: dependency
+  label: clarify updated_requirements passed to debate-synthesizer when debate_requirements enabled
+- from: SKL-001
+  to: SKL-110
+  type: dependency
+  label: requirement-analyzer provides both advocate and skeptic inputs to debate-synthesizer
+- from: SKL-110
+  to: SKL-002
+  type: composition
+  label: debate-synthesizer unified_requirements consumed by architecture-design
+- from: SKL-028
+  to: SKL-111
+  type: dependency
+  label: test-generator test_cases[] is primary input to traceability-matrix
+- from: SKL-001
+  to: SKL-111
+  type: dependency
+  label: requirement-analyzer requirements[] consumed by traceability-matrix for RTM rows
+- from: SKL-002
+  to: SKL-111
+  type: dependency
+  label: architecture-design adrs[] and modules[] consumed by traceability-matrix for REQ→ADR links
+- from: SKL-003
+  to: SKL-111
+  type: dependency
+  label: feature-planning tasks[] consumed by traceability-matrix for REQ→TASK links
+- from: SKL-111
+  to: SKL-033
+  type: composition
+  label: traceability-matrix rtm-latest.json consumed by implementation-completeness-auditor
+- from: SKL-001
+  to: SKL-112
+  type: dependency
+  label: requirement-analyzer requirements[] scanned by research-artifact to identify technology research targets
+- from: SKL-109
+  to: SKL-112
+  type: dependency
+  label: clarify updated_requirements consumed by research-artifact
+- from: SKL-112
+  to: SKL-002
+  type: composition
+  label: research-artifact json_artifact_path passed to architecture-design as research_artifact_path context
+- from: SKL-003
+  to: SKL-113
+  type: dependency
+  label: feature-planning tasks[] (with depends_on[], estimated_hours) is primary input to task-dag
+- from: SKL-113
+  to: SKL-024
+  type: composition
+  label: task-dag parallel_groups and critical_path passed to impact-analyzer for scheduling context
+- from: SKL-113
+  to: SKL-010
+  type: composition
+  label: task-dag parallel_groups consumed by orchestrator to suggest parallel execution groups to user
+- from: SKL-001
+  to: SKL-114
+  type: dependency
+  label: requirement-analyzer requirements[] consumed by cross-artifact-consistency for REQ→TEST check
+- from: SKL-002
+  to: SKL-114
+  type: dependency
+  label: architecture-design modules[] consumed by cross-artifact-consistency for MODULE→TASK check
+- from: SKL-003
+  to: SKL-114
+  type: dependency
+  label: feature-planning tasks[] (req_ids[], module_refs[]) consumed by cross-artifact-consistency
+- from: SKL-028
+  to: SKL-114
+  type: dependency
+  label: test-generator test_cases[] (coverage_target) consumed by cross-artifact-consistency for TEST→REQ validation
+- from: SKL-114
+  to: SKL-026
+  type: composition
+  label: cross-artifact-consistency verdict gates code-generator (block on error violations)
+- from: SKL-010
+  to: SKL-115
+  type: dependency
+  label: spec-artifact (FEATURE-007) artifacts/spec-latest.md is the primary input to drift-detector
+- from: SKL-021
+  to: SKL-115
+  type: dependency
+  label: state-manager working_tree_map (optional) provides code structure for drift comparison
+- from: SKL-033
+  to: SKL-115
+  type: composition
+  label: drift-detector runs after implementation-completeness-auditor as the terminal pipeline skill
+- from: SKL-116
+  to: SKL-117
+  type: composition
+  label: compliance-profiler compliance_requirements is primary input to compliance-gate
+- from: SKL-116
+  to: SKL-002
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to architecture-design
+- from: SKL-116
+  to: SKL-003
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to feature-planning
+- from: SKL-116
+  to: SKL-028
+  type: composition
+  label: compliance-profiler compliance_requirements passed as mandatory constraint to test-generator
+- from: SKL-002
+  to: SKL-117
+  type: dependency
+  label: architecture-design output consumed by compliance-gate for architecture compliance check
+- from: SKL-028
+  to: SKL-117
+  type: dependency
+  label: test-generator output consumed by compliance-gate for test-suite compliance check
+- from: SKL-010
+  to: SKL-118
+  type: dependency
+  label: orchestrator invokes cost-estimator at pipeline entry (phase-0-cost-estimate) before any skill executes
+- from: SKL-118
+  to: SKL-010
+  type: composition
+  label: cost-estimator approval_status gates orchestrator pipeline execution; rejection aborts pipeline
+- from: SKL-119
+  to: SKL-021
+  type: dependency
+  label: skill-registry-client reads and writes skills/index.yaml via state-manager on install/uninstall
+- from: SKL-119
+  to: SKL-010
+  type: dependency
+  label: skill-registry-client used by orchestrator for community skill management operations

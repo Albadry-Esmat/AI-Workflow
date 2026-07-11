@@ -1,6 +1,6 @@
 ---
 name: session-insights
-version: 1.1.0
+version: 1.3.0
 domain: system
 description: 'Use when generating per-skill performance insights from collected behavioral telemetry. Triggers on: "session insights", "skill performance report", "analyze telemetry", "pipeline performance", "HITL rejection ratio", "latency p95". Requires behavioral-telemetry-collector (SKL-047) to have run first. Read-only — does not modify behavioral_telemetry.events.'
 author: ASE-OS
@@ -159,6 +159,65 @@ Step 4 — Compute session-level aggregates
 
   Output: session_aggregates
 
+Step 4a — Compute token efficiency metrics (TASK-0066)
+  token_events = filtered_events where event_type == "skill.tokens_consumed"
+  IF token_events is empty:
+    token_efficiency = null
+  ELSE:
+    total_tokens_consumed = sum(event.tokens_total for event in token_events)
+    by_skill = [
+      {
+        skill: skill_name,
+        tokens: sum(tokens_total for events with this skill_name),
+        pct_of_total: (skill_tokens / total_tokens_consumed * 100).toFixed(1)
+      }
+      for each unique skill_name in token_events
+      sorted by tokens DESC
+    ]
+    cache_hits      = count(token_events where cache_hit == true)
+    cache_hit_rate  = cache_hits / count(token_events)  [0.0–1.0]
+    compression_events = count(filtered_events where event_type == "artifact.dispatched"
+                                                AND event.compressed == true)
+    tokens_p90      = p90 value of tokens_total across all token_events
+    outlier_skills  = [ skill for skill in by_skill where skill.tokens > tokens_p90 ]
+
+    Load pre-Phase-4 baseline token count from state-manager key
+    "behavioral_telemetry.baseline_tokens_per_session" if present; null otherwise.
+    vs_baseline = (total_tokens_consumed - baseline) / baseline  [negative = improvement]
+
+    token_efficiency = {
+      total_tokens_consumed:  total_tokens_consumed,
+      by_skill:               by_skill,
+      cache_hit_rate:         cache_hit_rate,
+      compression_events:     compression_events,
+      outlier_skills:         outlier_skills,
+      vs_baseline:            vs_baseline,   (null if no baseline)
+      prompt_cache_efficiency: (computed below — null if no api.cache_hit events)
+    }
+
+    [TASK-0067] Compute prompt_cache_efficiency sub-block:
+    cache_events = filtered_events where event_type == "api.cache_hit"
+    IF cache_events is empty:
+      prompt_cache_efficiency = null
+    ELSE:
+      pc_total_cache_hits      = count(cache_events where cache_read_tokens > 0)
+      pc_total_cache_misses    = count(cache_events where cache_read_tokens == 0)
+      pc_cache_creation_tokens = sum(event.cache_creation_tokens for event in cache_events)
+      pc_cache_read_tokens     = sum(event.cache_read_tokens     for event in cache_events)
+      // Cost model: cache reads cost 10% of base; cache writes cost 200% of base.
+      // Saving per read = 0.9 × read_tokens; extra cost per write = 1.0 × write_tokens.
+      net_saved_tokens = (pc_cache_read_tokens * 0.9) - (pc_cache_creation_tokens * 1.0)
+      estimated_savings_pct = max(0, net_saved_tokens / total_tokens_consumed * 100).toFixed(1)
+      prompt_cache_efficiency = {
+        total_cache_hits:       pc_total_cache_hits,
+        total_cache_misses:     pc_total_cache_misses,
+        cache_creation_tokens:  pc_cache_creation_tokens,
+        cache_read_tokens:      pc_cache_read_tokens,
+        estimated_savings_pct:  estimated_savings_pct
+      }
+
+  Output: token_efficiency
+
 Step 5 — Build session_summary object
   session_summary = {
     generated_at:          <now>,
@@ -171,6 +230,7 @@ Step 5 — Build session_summary object
     top_gap_domains:       session_aggregates.top_gap_domains,
     gap_ids:               session_aggregates.gap_ids,
     skill_performance:     per_skill_metrics[],
+    token_efficiency:      token_efficiency,    ← from Step 4a (null if no token events)
     anomalies: [
       { skill_name, flag, value }
       for each skill with high_failure_rate or high_rejection_ratio
@@ -256,6 +316,28 @@ Step 7 — Return result
               "flag":       { "type": "string" },
               "value":      { "type": "number" }
             }
+          }
+        },
+        "token_efficiency": {
+          "type": ["object", "null"],
+          "description": "Token consumption summary. null if no skill.tokens_consumed events recorded.",
+          "properties": {
+            "total_tokens_consumed": { "type": "integer", "minimum": 0 },
+            "by_skill": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "skill":         { "type": "string" },
+                  "tokens":        { "type": "integer" },
+                  "pct_of_total":  { "type": "number" }
+                }
+              }
+            },
+            "cache_hit_rate":      { "type": "number", "minimum": 0, "maximum": 1 },
+            "compression_events":  { "type": "integer", "minimum": 0 },
+            "outlier_skills":      { "type": "array", "items": { "type": "object" } },
+            "vs_baseline":         { "type": ["number", "null"], "description": "Negative = improvement vs. pre-Phase-4 baseline." }
           }
         }
       }
@@ -386,5 +468,7 @@ produces_for:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.3.0 | 2026-07-03 | TASK-0067: Added `prompt_cache_efficiency` sub-block to `token_efficiency` — computes `total_cache_hits`, `total_cache_misses`, `cache_creation_tokens`, `cache_read_tokens`, `estimated_savings_pct` from `api.cache_hit` events |
+| 1.2.0 | 2026-06-27 | TASK-0066: Added Step 4a token efficiency computation — `total_tokens_consumed`, `by_skill`, `cache_hit_rate`, `compression_events`, `outlier_skills`, `vs_baseline` |
 | 1.1.0 | 2026-06-24 | FEATURE-001: Added gap metrics — `total_capability_gaps`, `top_gap_domains`, `gap_ids` — to session_summary output |
 | 1.0.0 | 2026-06-20 | Initial version — per-skill invocation/success/failure/p95/HITL metrics, session aggregates, anomaly flags, state-manager integration |

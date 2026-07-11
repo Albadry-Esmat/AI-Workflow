@@ -1,6 +1,6 @@
 ---
 name: enhancement-dashboard
-version: 1.0.0
+version: 1.1.0
 domain: system
 description: 'Use when rendering a human-readable performance dashboard from session insights. Triggers on: "show dashboard", "performance dashboard", "skill performance report", "session insights report", "what are the insights". Read-only — never modifies system state. Requires session-insights (SKL-048) to have produced a session_summary first.'
 author: ASE-OS
@@ -149,6 +149,29 @@ Step 5 — Render anomalies section (if any)
       - **<skill_name>**: <flag> — observed value: <value * 100>%
     Note: Anomalies are informational only. No automatic action is taken.
 
+Step 5a — Render Token Efficiency tab (TASK-0066)
+  IF session_summary.token_efficiency is null or absent:
+    Render: "> No token consumption data available for this session."
+  ELSE:
+    ### Token Efficiency
+    **Total Tokens Consumed:** <total_tokens_consumed>
+    **Cache Hit Rate:** <cache_hit_rate as %> | **Compression Events:** <compression_events>
+    IF vs_baseline is not null:
+      **vs. Pre-Phase-4 Baseline:** <vs_baseline * 100>% (<positive = regression, negative = improvement>)
+    ELSE:
+      **vs. Baseline:** — (no baseline recorded yet)
+
+    Build Markdown bar chart (ASCII) — tokens per skill, descending:
+      | Skill | Tokens | % of Total | Outlier |
+      |-------|--------|------------|---------|
+      For each entry in by_skill (sorted DESC by tokens):
+        outlier_flag = "⚠️ p90 outlier" if skill is in outlier_skills ELSE "✅"
+        Append row.
+
+    IF outlier_skills is non-empty:
+      Render note: "⚠️ Skills above p90 token usage — consider model downgrade or output pruning.
+      See adaptive-proposal-generator for actionable suggestions."
+
 Step 6 — Render session health verdict
   ### Session Health
   IF pipeline_success == true AND anomaly_count == 0:
@@ -161,12 +184,12 @@ Step 6 — Render session health verdict
     Verdict: "— Pipeline outcome unknown."
 
 Step 7 — Assemble and return output
-  markdown_report = concatenate all rendered sections (Steps 2–6)
+  markdown_report = concatenate all rendered sections (Steps 2–5a, 6)
   json_report     = session_summary (verbatim, JSON formatted)
   IF render_format == "json_only":
     Return: { markdown_report: null, json_report, sections_rendered: 0 }
   ELSE:
-    Return: { markdown_report, json_report, sections_rendered: 5 }
+    Return: { markdown_report, json_report, sections_rendered: 6 }
 ```
 
 ---

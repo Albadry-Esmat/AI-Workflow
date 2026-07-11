@@ -1,6 +1,6 @@
 ---
 name: behavioral-telemetry-collector
-version: 1.1.0
+version: 1.3.0
 domain: system
 description: 'Use when collecting anonymized behavioral telemetry from pipeline sessions for later insight generation. Triggers on: "collect telemetry", "record session events", "behavioral telemetry", "pipeline behavior tracking". Always checks opt-out flag first — if set, exits immediately without collecting any data. Never collects PII, user inputs, code content, or credentials.'
 author: ASE-OS
@@ -41,7 +41,7 @@ author: ASE-OS
 This skill does **not** produce alerts, health status, or aggregations — that is the responsibility of `session-insights` (SKL-048). It is a passive collector only.
 
 **What it collects (enum-bound, numeric, or date-time fields only):**
-- `event_type` — one of 7 defined enum values
+- `event_type` — one of 10 defined enum values
 - `skill_name` — registered skill identifier (string, no user content)
 - `timestamp` — ISO 8601 date-time
 - `session_id` — UUID
@@ -63,7 +63,7 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `capability_gap` |
+| `event_type` | `string` | Yes | One of: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `capability_gap`, `skill.tokens_consumed`, `api.cache_hit`, `batch.submitted` |
 | `skill_name` | `string` | Yes | Registered skill identifier (e.g. `architecture-design`). Use `"orchestrator"` for `capability_gap` events. |
 | `session_id` | `string` | Yes | UUID v4 session identifier |
 | `pipeline_phase` | `string` | No | Current pipeline phase ID |
@@ -72,6 +72,17 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 | `hitl_verdict` | `string\|null` | No | One of: `approved`, `rejected`, `modified`, `timeout`, `null` (for gate events only) |
 | `detected_domain` | `string` | No | For `capability_gap` events only — the classified intent domain (enum-bound). One of: `testing`, `security`, `deployment`, `architecture`, `data`, `frontend`, `mobile`, `embedded`, `skill-management`, `unknown` |
 | `gap_id` | `string` | No | For `capability_gap` events only — UUID v4 of the logged gap (from `gap_context.gap_id`) |
+| `tokens_in` | `integer` | No | For `skill.tokens_consumed` events only — token count of all input artifacts for this invocation (sum of Artifact.token_count from TASK-0060). |
+| `tokens_out` | `integer` | No | For `skill.tokens_consumed` events only — token count of the skill's output artifact (from Artifact envelope `token_count`). |
+| `tokens_total` | `integer` | No | For `skill.tokens_consumed` events only — `tokens_in + tokens_out`. |
+| `model` | `string` | No | For `skill.tokens_consumed` events only — model ID used for this invocation (e.g. `claude-sonnet-4.6`). |
+| `cache_hit` | `boolean` | No | For `skill.tokens_consumed` events only — `true` if output was served from memoization cache (TASK-0057); `false` otherwise. |
+| `artifact_ids` | `array[string]` | No | For `skill.tokens_consumed` events only — `artifact_id` values of all output artifacts produced. |
+| `cache_creation_tokens` | `integer` | No | For `api.cache_hit` events only — tokens written to Anthropic prompt cache for this invocation (TASK-0067). |
+| `cache_read_tokens` | `integer` | No | For `api.cache_hit` events only — tokens read from Anthropic prompt cache (>0 means a cache hit occurred) (TASK-0067). |
+| `batch_id` | `string` | No | For `batch.submitted` events only — Anthropic Batch API batch ID returned by POST /v1/messages/batches (TASK-0070). |
+| `batch_custom_id` | `string` | No | For `batch.submitted` events only — `custom_id` used for result retrieval (TASK-0070). |
+| `estimated_saving_pct` | `integer` | No | For `batch.submitted` events only — estimated cost saving percentage vs. real-time API (default: 50) (TASK-0070). |
 | `current_state` | `object` | Yes | Scoped read of `behavioral_telemetry` from state-manager (to check opt_out flag) |
 
 **Input Schema:**
@@ -86,7 +97,9 @@ This skill does **not** produce alerts, health status, or aggregations — that 
     "event_type": {
       "type": "string",
       "enum": ["skill.started", "skill.completed", "skill.failed",
-               "gate.passed", "gate.blocked", "feedback.triggered", "capability_gap"]
+               "gate.passed", "gate.blocked", "feedback.triggered",
+               "capability_gap", "skill.tokens_consumed",
+               "api.cache_hit", "batch.submitted"]
     },
     "skill_name":      { "type": "string", "minLength": 1 },
     "session_id":      { "type": "string", "format": "uuid" },
@@ -110,6 +123,17 @@ This skill does **not** produce alerts, health status, or aggregations — that 
       "format": "uuid",
       "description": "For capability_gap events only."
     },
+    "tokens_in":    { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "tokens_out":   { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "tokens_total": { "type": "integer", "minimum": 0, "description": "For skill.tokens_consumed events only." },
+    "model":        { "type": "string",  "description": "For skill.tokens_consumed events only." },
+    "cache_hit":    { "type": "boolean", "description": "For skill.tokens_consumed events only." },
+    "artifact_ids": { "type": "array",   "items": { "type": "string" }, "description": "For skill.tokens_consumed events only." },
+    "cache_creation_tokens": { "type": "integer", "minimum": 0, "description": "For api.cache_hit events only." },
+    "cache_read_tokens":     { "type": "integer", "minimum": 0, "description": "For api.cache_hit events only." },
+    "batch_id":              { "type": "string",  "description": "For batch.submitted events only." },
+    "batch_custom_id":       { "type": "string",  "description": "For batch.submitted events only." },
+    "estimated_saving_pct":  { "type": "integer", "minimum": 0, "maximum": 100, "description": "For batch.submitted events only." },
     "current_state": {
       "type": "object",
       "description": "Scoped behavioral_telemetry slice from state-manager. May be null for first event in session."
@@ -139,10 +163,14 @@ Step 1 — Opt-out gate (UNCONDITIONAL FIRST CHECK)
   Output: opt_out_cleared = true
 
 Step 2 — Validate event inputs
-  Verify event_type is one of 7 known event types.
+  Verify event_type is one of 10 known event types (8 existing + api.cache_hit + batch.submitted).
   Verify session_id is a valid UUID v4.
   Reject path traversal patterns in session_id (../  /etc/  etc.).
   For capability_gap events: verify detected_domain is in the allowed enum; verify gap_id is a valid UUID v4.
+  For skill.tokens_consumed events: verify tokens_in, tokens_out, tokens_total are non-negative integers;
+    verify tokens_total == tokens_in + tokens_out (if all three provided); verify model is non-empty string.
+  For api.cache_hit events: verify cache_creation_tokens and cache_read_tokens are non-negative integers.
+  For batch.submitted events: verify batch_id is non-empty string; verify estimated_saving_pct is 0–100.
   IF validation fails: return { collected: false, reason: "invalid_input", events_written: 0 }
   Output: validated_event
 
@@ -156,6 +184,13 @@ Step 3 — PII scrub
     hitl_verdict: allow (enum / null)
     duration_ms: allow (integer)
     timestamp: generated internally — never from input
+    tokens_in, tokens_out, tokens_total: allow (integers — no user content)
+    model: allow (model identifier string — no user content)
+    cache_hit: allow (boolean)
+    artifact_ids: allow (artifact ID strings — no user content; each ID truncated at 64 chars)
+    cache_creation_tokens, cache_read_tokens: allow (integers — no user content)
+    batch_id, batch_custom_id: allow (API-generated identifiers — no user content; truncated at 128 chars)
+    estimated_saving_pct: allow (integer 0–100)
   Scrubber rules (applied in order):
     1. Replace any value matching credential patterns (Bearer .*, key=.*, password=.*) → "[REDACTED]"
     2. Replace any value matching email patterns → "[REDACTED_EMAIL]"
@@ -179,6 +214,26 @@ Step 4 — Construct anonymized event record
     {
       gap_domain:     <detected_domain enum value — not user text>,
       gap_id:         <validated UUID>
+    }
+  For skill.tokens_consumed events (TASK-0066), also include:
+    {
+      tokens_in:    <integer>,
+      tokens_out:   <integer>,
+      tokens_total: <integer>,
+      model:        <model identifier string>,
+      cache_hit:    <boolean>,
+      artifact_ids: <array of artifact ID strings>
+    }
+  For api.cache_hit events (TASK-0067), also include:
+    {
+      cache_creation_tokens: <integer>,
+      cache_read_tokens:     <integer>
+    }
+  For batch.submitted events (TASK-0070), also include:
+    {
+      batch_id:             <API-generated batch ID string>,
+      batch_custom_id:      <custom_id string>,
+      estimated_saving_pct: <integer 0–100>
     }
   Deduplication: capability_gap events with identical (session_id, gap_id) are silently dropped.
   Output: anonymized_event
@@ -390,5 +445,7 @@ collection_points:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.3.0 | 2026-07-03 | TASK-0067: Added `api.cache_hit` event type (9th event) with `cache_creation_tokens` + `cache_read_tokens` fields; TASK-0070: Added `batch.submitted` event type (10th event) with `batch_id`, `batch_custom_id`, `estimated_saving_pct` fields |
+| 1.2.0 | 2026-06-27 | TASK-0066: Added `skill.tokens_consumed` event type (8th event) with `tokens_in`, `tokens_out`, `tokens_total`, `model`, `cache_hit`, `artifact_ids` fields |
 | 1.1.0 | 2026-06-24 | FEATURE-001: Added `capability_gap` event type; added `detected_domain` + `gap_id` input fields; dedup rule for (session_id, gap_id) pairs |
 | 1.0.0 | 2026-06-20 | Initial version — opt-out gate, PII scrubber, ring-buffer event collection, state-manager integration |

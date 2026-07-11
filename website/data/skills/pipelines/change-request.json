@@ -2,14 +2,18 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "change-request",
   "version": "1.1.0",
-  "description": "Change request intake → impact analysis → HITL approval → re-planning → execution → completeness validation → closure. Triggered by change_request.created event or direct invocation.",
+  "description": "Change request intake \u2192 impact analysis \u2192 HITL approval \u2192 re-planning \u2192 execution \u2192 completeness validation \u2192 closure. Triggered by change_request.created event or direct invocation.",
   "mode": "sequential",
   "phases": [
     {
       "id": "phase-1-intake",
       "label": "Change Request Intake",
       "skills": [
-        { "name": "change-request-manager", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "change-request-manager",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -17,14 +21,23 @@
       "label": "Re-Planning",
       "condition": "cr.approval_status === 'approved'",
       "skills": [
-        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^2.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-lifecycle-guard",
       "label": "Lifecycle State Validation",
       "skills": [
-        { "name": "work-item-lifecycle-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "work-item-lifecycle-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -32,21 +45,34 @@
       "label": "Code Generation",
       "condition": "cr.task_delta.new_tasks.length > 0",
       "skills": [
-        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-validation",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6b-completeness-guard",
       "label": "Completeness Readiness Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -54,7 +80,11 @@
       "label": "Work Item Export",
       "async": true,
       "skills": [
-        { "name": "work-item-exporter", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "work-item-exporter",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -62,8 +92,16 @@
       "label": "Documentation Sync",
       "async": true,
       "skills": [
-        { "name": "doc-maintainer", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "adr-generator", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
@@ -78,7 +116,7 @@
       "after_phase": "phase-1-intake",
       "type": "human_approval",
       "condition": "cr.new_requirements.length > 0",
-      "label": "Confirm scope: new requirements identified by this CR — review and approve before re-planning begins",
+      "label": "Confirm scope: new requirements identified by this CR \u2014 review and approve before re-planning begins",
       "timeout": 3600
     },
     {
@@ -99,5 +137,30 @@
     "max_repair_iterations": 2,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["work-item-exporter", "doc-maintainer", "adr-generator"]
+  "async_skills": [
+    "work-item-exporter",
+    "doc-maintainer",
+    "adr-generator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

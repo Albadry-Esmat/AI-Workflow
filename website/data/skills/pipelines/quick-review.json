@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "quick-review",
   "version": "1.0.0",
-  "description": "Code quality and security audit on existing code. Runs clean-code-review and security-review in parallel — use for pull request reviews or periodic quality audits.",
+  "description": "Code quality and security audit on existing code. Runs clean-code-review and security-review in parallel \u2014 use for pull request reviews or periodic quality audits.",
   "mode": "parallel",
   "skills": [
     {
@@ -17,16 +17,41 @@
     }
   ],
   "parallel_groups": [
-    ["clean-code-review", "security-review"]
+    [
+      "clean-code-review",
+      "security-review"
+    ]
   ],
   "gates": [
     {
       "after_skill": "security-review",
-      "type": "condition",
+      "type": "human_approval",
       "condition": "output.vulnerabilities.filter(v => v.severity === 'critical').length > 0",
       "label": "Critical vulnerabilities detected — approval required before merge",
       "timeout": 3600
     }
   ],
-  "async_skills": []
+  "async_skills": [],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "default_tier": "standard",
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

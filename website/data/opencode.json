@@ -6,33 +6,33 @@
 
     "github": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github@2025.4.8"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" },
       "enabled": true
     },
 
     "brave-search": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search@0.6.2"],
       "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
       "enabled": true
     },
 
     "memory": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory@2026.7.4"],
       "enabled": true
     },
 
     "fetch": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
-      "enabled": true
+      "enabled": false
     },
 
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@latest"],
+      "command": ["npx", "-y", "@upstash/context7-mcp@3.2.2"],
       "env": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" },
       "enabled": true
     },
@@ -40,7 +40,7 @@
     "playwright": {
       "type": "local",
       "command": [
-        "npx", "-y", "@playwright/mcp@latest",
+        "npx", "-y", "@playwright/mcp@0.0.77",
         "--headless",
         "--isolated",
         "--browser", "chromium"
@@ -50,7 +50,7 @@
 
     "slack": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-slack"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-slack@2025.4.25"],
       "env": {
         "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
         "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
@@ -60,7 +60,7 @@
 
     "vercel": {
       "type": "local",
-      "command": ["npx", "-y", "vercel-mcp"],
+      "command": ["npx", "-y", "vercel-mcp@0.0.7"],
       "env": { "VERCEL_TOKEN": "${VERCEL_TOKEN}" },
       "enabled": false
     }
@@ -76,7 +76,7 @@
     },
     "analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
       "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
@@ -95,7 +95,7 @@
     "planner": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": { "edit": "ask", "bash": "deny" },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
       "skill": ".opencode/skills/feature-planning/SKILL.md"
     },
@@ -122,7 +122,6 @@
       "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
       "skills": [
         ".opencode/skills/testing-strategy/SKILL.md",
-        ".opencode/skills/test-generator/SKILL.md",
         ".opencode/skills/mutation-test-generator/SKILL.md"
       ]
     },
@@ -140,7 +139,7 @@
     },
     "impact-analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
@@ -164,7 +163,7 @@
     },
     "deployer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
       "skill": ".opencode/skills/deployment-strategy/SKILL.md"

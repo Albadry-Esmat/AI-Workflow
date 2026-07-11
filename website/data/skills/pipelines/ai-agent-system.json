@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "ai-agent-system",
   "version": "1.0.0",
-  "description": "End-to-end pipeline for LLM-powered applications, RAG pipelines, and multi-agent systems: requirements → architecture + AI domain constraints → DB design → planning → code generation → AI safety guard layer (prompt-injection non-bypassable) → quality + eval framework → completeness audit → deployment + CI scaffold → docs",
+  "description": "End-to-end pipeline for LLM-powered applications, RAG pipelines, and multi-agent systems: requirements \u2192 architecture + AI domain constraints \u2192 DB design \u2192 planning \u2192 code generation \u2192 AI safety guard layer (prompt-injection non-bypassable) \u2192 quality + eval framework \u2192 completeness audit \u2192 deployment + CI scaffold \u2192 docs",
   "mode": "hybrid",
   "domain": "ai_agent",
   "phases": [
@@ -10,15 +10,28 @@
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Architecture (first pass)",
       "skills": [
-        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2 },
-        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+        {
+          "name": "architecture-design",
+          "version": "^1.3.0",
+          "max_retries": 2
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        }
       ]
     },
     {
@@ -26,52 +39,86 @@
       "label": "AI Domain Specialist",
       "note": "Runs in parallel with architecture second pass. Outputs domain_constraints fed back into architecture-design.",
       "skills": [
-        { "name": "ai-agent-specialist", "version": "^1.0.0", "max_retries": 2,
-          "config": { "domain_context": { "domain_primary": "ai_agent" } } }
+        {
+          "name": "ai-agent-specialist",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "domain_context": {
+              "domain_primary": "ai_agent"
+            }
+          }
+        }
       ]
     },
     {
       "id": "phase-2d-architecture-refine",
-      "label": "Architecture (second pass — domain-constrained)",
+      "label": "Architecture (second pass \u2014 domain-constrained)",
       "note": "Re-invokes architecture-design with domain_constraints from phase-2c-domain injected as input.",
       "skills": [
-        { "name": "architecture-design", "version": "^1.3.0", "max_retries": 2,
-          "input_overrides": { "domain_constraints": "$phase-2c-domain.domain_constraints" } }
+        {
+          "name": "architecture-design",
+          "version": "^1.3.0",
+          "max_retries": 2,
+          "input_overrides": {
+            "domain_constraints": "$phase-2c-domain.domain_constraints"
+          }
+        }
       ]
     },
     {
       "id": "phase-2b-design",
       "label": "Database Design",
       "skills": [
-        { "name": "database-architect", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "database-architect",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-3-graph",
       "label": "Dependency Graph",
       "skills": [
-        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "dependency-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-planning",
       "label": "Planning",
       "skills": [
-        { "name": "feature-planning", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-5-impact",
       "label": "Impact Analysis",
       "skills": [
-        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-execution",
       "label": "Code Generation",
       "skills": [
-        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -79,23 +126,63 @@
       "label": "Quality + Testing",
       "parallel": true,
       "skills": [
-        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2,
-          "config": { "domain_hints": ["llm_eval", "prompt_regression", "tool_call_mocking", "hallucination_detection"] } },
-        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "clean-code-review",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2,
+          "config": {
+            "domain_hints": [
+              "llm_eval",
+              "prompt_regression",
+              "tool_call_mocking",
+              "hallucination_detection"
+            ]
+          }
+        },
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "test-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-7b-guards",
-      "label": "Guard Layer (AI Safety — prompt injection non-bypassable)",
+      "label": "Guard Layer (AI Safety \u2014 prompt injection non-bypassable)",
       "parallel": true,
       "skills": [
-        { "name": "security-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check",
-          "config": { "domain": "ai_agent" },
-          "note": "Prompt injection check is NON-BYPASSABLE for ai_agent domain. Pipeline cannot advance until remediated." },
-        { "name": "database-guard",    "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "domain": "ai_agent"
+          },
+          "note": "Prompt injection check is NON-BYPASSABLE for ai_agent domain. Pipeline cannot advance until remediated."
+        },
+        {
+          "name": "database-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -103,21 +190,34 @@
       "label": "Repair (conditional)",
       "condition": "test.failed OR build.broken",
       "skills": [
-        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
       ]
     },
     {
       "id": "phase-8b-audit",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-8c-release-guard",
       "label": "Release Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -125,9 +225,19 @@
       "label": "Deployment + CI Scaffold",
       "parallel": true,
       "skills": [
-        { "name": "deployment-strategy",   "version": "^1.1.0", "max_retries": 2 },
-        { "name": "ci-pipeline-generator", "version": "^1.0.0", "max_retries": 2,
-          "config": { "secret_scan": true } }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "ci-pipeline-generator",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "secret_scan": true
+          }
+        }
       ]
     },
     {
@@ -135,21 +245,41 @@
       "label": "Documentation",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["deployment-strategy", "ci-pipeline-generator"],
-    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["security-guard", "database-guard", "performance-guard"]
+    [
+      "deployment-strategy",
+      "ci-pipeline-generator"
+    ],
+    [
+      "clean-code-review",
+      "testing-strategy",
+      "security-review",
+      "test-generator"
+    ],
+    [
+      "security-guard",
+      "database-guard",
+      "performance-guard"
+    ]
   ],
   "gates": [
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate AI system requirements — confirm agent type, safety level, and compliance scope",
+      "label": "Validate AI system requirements \u2014 confirm agent type, safety level, and compliance scope",
       "timeout": 3600
     },
     {
@@ -161,7 +291,7 @@
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
-      "label": "Approve AI domain constraints: agent pattern, memory architecture, token budget, safety_level — critical for regulated domains",
+      "label": "Approve AI domain constraints: agent pattern, memory architecture, token budget, safety_level \u2014 critical for regulated domains",
       "timeout": 3600
     },
     {
@@ -185,7 +315,7 @@
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
-      "label": "Block if security-guard verdict is 'block' — prompt injection check is NON-BYPASSABLE",
+      "label": "Block if security-guard verdict is 'block' \u2014 prompt injection check is NON-BYPASSABLE",
       "condition": "guards.every(g => g.verdict === 'pass')",
       "note": "security-guard.verdict='block' with reason='prompt_injection_open' cannot be overridden. Code remediation required before pipeline can advance."
     },
@@ -204,7 +334,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -214,5 +344,30 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator"]
+  "async_skills": [
+    "documentation-generator",
+    "doc-maintainer",
+    "adr-generator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  }
 }

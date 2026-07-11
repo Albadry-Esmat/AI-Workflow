@@ -2,21 +2,29 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "pre-deploy",
   "version": "2.1.0",
-  "description": "Pre-deployment checklist (v2.1.0): testing strategy → security review → guard layer → completeness audit → release gate → deployment. Use before any release to staging or production.",
+  "description": "Pre-deployment checklist (v2.1.0): testing strategy \u2192 security review \u2192 guard layer \u2192 completeness audit \u2192 release gate \u2192 deployment. Use before any release to staging or production.",
   "mode": "sequential",
   "phases": [
     {
       "id": "phase-1-testing",
       "label": "Testing Strategy",
       "skills": [
-        { "name": "testing-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-2-security",
       "label": "Security Review",
       "skills": [
-        { "name": "security-review", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -24,35 +32,67 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "database-guard",           "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard",        "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard",   "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "database-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "ui-ux-compliance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-4-audit",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-5-release-guard",
       "label": "Release Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
       "id": "phase-6-deploy",
       "label": "Deployment",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard"]
+    [
+      "database-guard",
+      "performance-guard",
+      "ui-ux-compliance-guard"
+    ]
   ],
   "gates": [
     {
@@ -76,7 +116,7 @@
     {
       "after_phase": "phase-6-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -86,5 +126,26 @@
     "on_critical_failure": "rollback-manager",
     "max_repair_iterations": 2,
     "rollback_scope": "pipeline_stage"
+  },
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
   }
 }

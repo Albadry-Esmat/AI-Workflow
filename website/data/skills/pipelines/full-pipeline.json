@@ -1,23 +1,129 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.0.0",
-  "description": "Full idea-to-production pipeline (v3.0.0): requirements → architecture + UX/DB design → design system → dependency graph → impact analysis → code generation → guard layer → quality + testing → completeness audit → defect management (conditional) → deployment → export + docs",
+  "version": "3.8.0",
+  "description": "Full idea-to-production pipeline (v3.8.0): cost estimate (HITL) → requirements → clarify (HITL) [→ optional spec-debate] [→ optional research artifact] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → task DAG → code generation → guard layer → quality + testing → cross-artifact consistency → RTM → completeness audit → drift detection → defect management (conditional) → deployment → export + docs + post-run cost report",
   "mode": "hybrid",
   "phases": [
+    {
+      "id": "phase-0-cost-estimate",
+      "label": "Token Cost Estimate",
+      "note": "FEATURE-018: Pre-run token cost estimate with HITL approval. User approves (YES), rejects (NO — aborts cleanly), or reduces scope (REDUCE). Set pipeline_config.ci_mode: true to skip. Runs as the very first step before any other skill executes.",
+      "skills": [
+        {
+          "name": "cost-estimator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "skip_cost_check": "pipeline_config.ci_mode",
+            "mode": "pre_run"
+          }
+        }
+      ]
+    },
     {
       "id": "phase-1-requirements",
       "label": "Requirements",
       "skills": [
-        { "name": "requirement-analyzer", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-1b-clarify",
+      "label": "Clarification (HITL)",
+      "note": "FEATURE-012: Identifies ambiguous requirements and suspends for user input. Auto-advances when no ambiguities found. Set skip_clarify:true to bypass in CI.",
+      "skills": [
+        {
+          "name": "clarify",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-1ca-debate-prep",
+      "label": "Debate Preparation — Advocate + Skeptic (parallel)",
+      "condition": "pipeline_config.debate_requirements === true",
+      "parallel": true,
+      "note": "FEATURE-013: Runs two requirement-analyzer instances in parallel — one as advocate (finds opportunities and value) and one as skeptic (challenges assumptions and finds gaps) — to produce the two inputs required by debate-synthesizer. Only active when pipeline_config.debate_requirements: true.",
+      "skills": [
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.2.0",
+          "config": {
+            "instance": "advocate",
+            "system_prompt_prefix": "Analyze as an advocate: find opportunities and value in these requirements."
+          },
+          "max_retries": 2
+        },
+        {
+          "name": "requirement-analyzer",
+          "version": "^1.2.0",
+          "config": {
+            "instance": "skeptic",
+            "system_prompt_prefix": "Analyze as a skeptic: challenge assumptions, find gaps, and identify risks."
+          },
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-1c-spec-debate",
+      "label": "Spec Debate (optional)",
+      "condition": "pipeline_config.debate_requirements === true",
+      "note": "FEATURE-013: Runs advocate+skeptic analyzer instances in parallel, then synthesizes a debate-hardened requirements set. Enable with pipeline_config.debate_requirements: true.",
+      "skills": [
+        {
+          "name": "debate-synthesizer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-1d-research",
+      "label": "Technology Research (optional)",
+      "condition": "pipeline_config.research_enabled === true || state.technology_research_needed === true",
+      "note": "FEATURE-009: Generates structured alternatives/pros-cons/rationale artifact before architect makes technology choices. Enable with pipeline_config.research_enabled: true or when requirement-analyzer emits technology_research_needed: true.",
+      "skills": [
+        {
+          "name": "research-artifact",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-2-architecture",
       "label": "Architecture",
       "skills": [
-        { "name": "architecture-design", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "adr-generator",       "version": "^1.0.0", "max_retries": 1, "async": true }
+        {
+          "name": "architecture-design",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "adr-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
+        }
+      ]
+    },
+    {
+      "id": "phase-2a-debate",
+      "label": "Architecture Debate (optional)",
+      "condition": "pipeline_config.debate_architecture === true",
+      "skills": [
+        {
+          "name": "multi-agent-debate",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -25,43 +131,80 @@
       "label": "UI/UX + Database Design",
       "parallel": true,
       "skills": [
-        { "name": "frontend-ux-architect", "version": "^2.0.0", "max_retries": 2 },
-        { "name": "database-architect",    "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "frontend-ux-architect",
+          "version": "^2.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "database-architect",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
-      "id": "phase-2c-design-system",
-      "label": "Design System Generation",
+      "id": "phase-2c-design-and-graph",
+      "label": "Design System + Dependency Graph",
+      "parallel": true,
+      "note": "TASK-0054: design-system-generator and dependency-analyzer have no data dependency on each other — run concurrently to save one sequential phase.",
       "skills": [
-        { "name": "design-system-generator", "version": "^2.0.0", "max_retries": 2 }
-      ]
-    },
-    {
-      "id": "phase-3-graph",
-      "label": "Dependency Graph",
-      "skills": [
-        { "name": "dependency-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "design-system-generator",
+          "version": "^2.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "dependency-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-4-planning",
       "label": "Planning",
+      "note": "Phase numbering gap: phase-3 is intentionally reserved. The design layer (phase-2b + phase-2c) occupies the logical phase-3 slot. Numbering skips to phase-4 to preserve roadmap compatibility.",
       "skills": [
-        { "name": "feature-planning", "version": "^2.0.0", "max_retries": 2 }
+        {
+          "name": "feature-planning",
+          "version": "^2.2.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-4b-task-dag",
+      "label": "Task Dependency DAG",
+      "note": "FEATURE-016: Analyzes feature-planning task breakdown, builds execution DAG, identifies parallel-safe groups and critical path. Writes artifacts/task-dag-<timestamp>.json and Mermaid .md.",
+      "skills": [
+        {
+          "name": "task-dag",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-5-impact",
       "label": "Impact Analysis",
       "skills": [
-        { "name": "change-impact-analyzer", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "change-impact-analyzer",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
       "id": "phase-6-execution",
       "label": "Code Generation",
       "skills": [
-        { "name": "code-generator", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "code-generator",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -69,10 +212,50 @@
       "label": "Quality + Testing",
       "parallel": true,
       "skills": [
-        { "name": "clean-code-review", "version": "^1.1.0", "max_retries": 2 },
-        { "name": "testing-strategy",  "version": "^1.1.0", "max_retries": 2 },
-        { "name": "security-review",   "version": "^1.0.0", "max_retries": 2 },
-        { "name": "test-generator",    "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "clean-code-review",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "testing-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        },
+        {
+          "name": "security-review",
+          "version": "^1.0.0",
+          "max_retries": 2
+        },
+        {
+          "name": "test-generator",
+          "version": "^2.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-7a-rtm",
+      "label": "Requirements Traceability Matrix",
+      "note": "FEATURE-014: Builds RTM linking REQ → ADR → TEST → TASK. Writes artifacts/rtm-<timestamp>.md and .json for implementation-completeness-auditor consumption.",
+      "skills": [
+        {
+          "name": "traceability-matrix",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-7b-consistency",
+      "label": "Cross-Artifact Consistency Guard",
+      "note": "FEATURE-010: Verifies structural consistency across REQs, modules, tasks, and tests. Blocks pipeline if any REQ has no test, any module has no task, or any task is orphaned. HITL override with reason allowed.",
+      "skills": [
+        {
+          "name": "cross-artifact-consistency",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -80,11 +263,36 @@
       "label": "Guard Layer",
       "parallel": true,
       "skills": [
-        { "name": "database-guard",             "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "performance-guard",          "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "ui-ux-compliance-guard",     "version": "^2.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "security-guard",             "version": "^1.0.0", "max_retries": 1, "type": "validation_check" },
-        { "name": "work-item-lifecycle-guard",  "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "database-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "ui-ux-compliance-guard",
+          "version": "^2.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "work-item-lifecycle-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -92,21 +300,46 @@
       "label": "Repair (conditional)",
       "condition": "test.failed OR build.broken",
       "skills": [
-        { "name": "code-repair", "version": "^1.0.0", "max_retries": 3 }
+        {
+          "name": "code-repair",
+          "version": "^1.0.0",
+          "max_retries": 3
+        }
       ]
     },
     {
       "id": "phase-8b-audit",
       "label": "Completeness Audit",
       "skills": [
-        { "name": "implementation-completeness-auditor", "version": "^1.0.0", "max_retries": 2 }
+        {
+          "name": "implementation-completeness-auditor",
+          "version": "^1.0.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-8b-drift",
+      "label": "Drift Detection",
+      "note": "FEATURE-015: Compares spec-latest.md (FEATURE-007) against working tree. Produces drift score (0–100); warns if < 70 (configurable). Writes artifacts/drift-report-<timestamp>.md. Does not block pipeline — advisory only.",
+      "skills": [
+        {
+          "name": "drift-detector",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-8c-release-guard",
       "label": "Release Gate",
       "skills": [
-        { "name": "implementation-completeness-guard", "version": "^1.0.0", "max_retries": 1, "type": "validation_check" }
+        {
+          "name": "implementation-completeness-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        }
       ]
     },
     {
@@ -114,14 +347,22 @@
       "label": "Defect Management (conditional)",
       "condition": "defects_detected === true OR missings_count > 0",
       "skills": [
-        { "name": "defect-manager", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "defect-manager",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
       "id": "phase-9-deploy",
       "label": "Deployment",
       "skills": [
-        { "name": "deployment-strategy", "version": "^1.1.0", "max_retries": 2 }
+        {
+          "name": "deployment-strategy",
+          "version": "^1.1.0",
+          "max_retries": 2
+        }
       ]
     },
     {
@@ -129,8 +370,16 @@
       "label": "Documentation",
       "async": true,
       "skills": [
-        { "name": "documentation-generator", "version": "^1.0.0", "max_retries": 1 },
-        { "name": "doc-maintainer",          "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "documentation-generator",
+          "version": "^1.0.0",
+          "max_retries": 1
+        },
+        {
+          "name": "doc-maintainer",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
       ]
     },
     {
@@ -138,16 +387,65 @@
       "label": "Work Item Export",
       "async": true,
       "skills": [
-        { "name": "work-item-exporter", "version": "^1.0.0", "max_retries": 1 }
+        {
+          "name": "work-item-exporter",
+          "version": "^2.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-10c-cost-report",
+      "label": "Post-Run Cost Report",
+      "async": true,
+      "note": "FEATURE-018: Invokes cost-estimator in post_run mode to emit an actual vs. estimated token usage report. Runs asynchronously after all pipeline phases complete — does not block pipeline result.",
+      "skills": [
+        {
+          "name": "cost-estimator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true,
+          "config": {
+            "mode": "post_run"
+          }
+        }
       ]
     }
   ],
   "parallel_groups": [
-    ["frontend-ux-architect", "database-architect"],
-    ["clean-code-review", "testing-strategy", "security-review", "test-generator"],
-    ["database-guard", "performance-guard", "ui-ux-compliance-guard", "security-guard", "work-item-lifecycle-guard"]
+    [
+      "requirement-analyzer:advocate",
+      "requirement-analyzer:skeptic"
+    ],
+    [
+      "frontend-ux-architect",
+      "database-architect"
+    ],
+    [
+      "design-system-generator",
+      "dependency-analyzer"
+    ],
+    [
+      "clean-code-review",
+      "testing-strategy",
+      "security-review",
+      "test-generator"
+    ],
+    [
+      "database-guard",
+      "performance-guard",
+      "ui-ux-compliance-guard",
+      "security-guard",
+      "work-item-lifecycle-guard"
+    ]
   ],
   "gates": [
+    {
+      "after_phase": "phase-0-cost-estimate",
+      "type": "condition",
+      "condition": "phase_outputs['phase-0-cost-estimate'].approval_status !== 'rejected'",
+      "label": "Abort pipeline if user rejected the cost estimate"
+    },
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
@@ -155,9 +453,35 @@
       "timeout": 3600
     },
     {
+      "after_phase": "phase-1b-clarify",
+      "type": "condition",
+      "label": "Auto-advance if no clarifications needed; otherwise HITL gate already handled inside clarify skill",
+      "condition": "true"
+    },
+    {
+      "after_phase": "phase-1c-spec-debate",
+      "type": "human_approval",
+      "condition": "pipeline_config.debate_requirements === true",
+      "label": "Review spec debate transcript and approve unified requirements before architecture begins",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-1d-research",
+      "type": "condition",
+      "condition": "true",
+      "label": "Auto-advance — research-artifact skill manages its own HITL review gate internally"
+    },
+    {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
       "label": "Sign off on architecture before design layer",
+      "timeout": 3600
+    },
+    {
+      "after_phase": "phase-2a-debate",
+      "type": "human_approval",
+      "condition": "pipeline_config.debate_architecture === true",
+      "label": "Review debate transcript and approve hardened architecture before design layer",
       "timeout": 3600
     },
     {
@@ -167,34 +491,41 @@
       "timeout": 3600
     },
     {
-      "after_phase": "phase-2c-design-system",
+      "after_phase": "phase-2c-design-and-graph",
       "type": "human_approval",
-      "label": "Approve design system token files and component stubs before planning",
+      "label": "Approve design system token files and dependency graph before planning",
       "timeout": 3600
     },
     {
-      "after_phase": "phase-4-planning",
+      "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Approve roadmap and impact surface before implementation",
+      "label": "Approve security posture and coverage before RTM and audit",
       "timeout": 3600
     },
     {
-      "after_phase": "phase-5-impact",
+      "after_phase": "phase-7a-rtm",
       "type": "condition",
-      "label": "Block if impact_severity=critical",
-      "condition": "change_impact.impact_severity !== 'critical'"
+      "label": "Block if RTM overall_rtm_score < 60 — insufficient REQ coverage before guards",
+      "condition": "phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score >= 60"
+    },
+    {
+      "after_phase": "phase-7b-consistency",
+      "type": "human_approval",
+      "condition": "phase_outputs['phase-7b-consistency'].verdict === 'block'",
+      "label": "Consistency violations found — review and reply OVERRIDE <reason> to proceed, or fix violations and re-run",
+      "timeout": 3600,
+      "bypass_on_timeout": false,
+      "re_invoke_on_pattern": {
+        "pattern": "^OVERRIDE\\s+(.+)$",
+        "skill": "cross-artifact-consistency",
+        "inject": { "override_approved": true, "override_reason": "$1" }
+      }
     },
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
       "label": "Block if any guard verdict is 'block'",
       "condition": "guards.every(g => g.verdict === 'pass')"
-    },
-    {
-      "after_phase": "phase-7-quality",
-      "type": "human_approval",
-      "label": "Approve security posture and coverage before audit",
-      "timeout": 3600
     },
     {
       "after_phase": "phase-8c-release-guard",
@@ -206,13 +537,13 @@
       "after_phase": "phase-8d-defect-management",
       "type": "human_approval",
       "condition": "defects_detected === true OR missings_count > 0",
-      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional — only when defects or missings detected)",
+      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional \u2014 only when defects or missings detected)",
       "timeout": 3600
     },
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval — non-bypassable",
+      "label": "Mandatory deployment approval \u2014 non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -222,5 +553,46 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": ["documentation-generator", "doc-maintainer", "adr-generator", "work-item-exporter"]
+  "async_skills": [
+    "documentation-generator",
+    "doc-maintainer",
+    "adr-generator",
+    "work-item-exporter",
+    "cost-estimator"
+  ],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "default_tier": "large",
+    "externalize_threshold": 8000,
+    "budget_tiers": [
+      {
+        "name": "standard",
+        "ceiling": 16000,
+        "cascade_mode": "single_pass"
+      },
+      {
+        "name": "large",
+        "ceiling": 32000,
+        "cascade_mode": "cascade"
+      },
+      {
+        "name": "xl",
+        "ceiling": 48000,
+        "cascade_mode": "cascade"
+      }
+    ]
+  },
+  "batch_policy": {
+    "enabled": false,
+    "mode": "async",
+    "eligible_skills": [
+      "documentation-generator",
+      "doc-maintainer",
+      "adr-generator",
+      "work-item-exporter",
+      "behavioral-telemetry-collector"
+    ],
+    "comment": "Set enabled:true to route eligible non-blocking skills through an async batch endpoint. NOTE: The github-copilot/claude-sonnet-4.6 model does not expose a batch API — this policy is reserved for future use when the runtime supports async batch processing. Never enable for skills in a gate dependency chain — orchestrator Step 3k enforces this and overrides to sync_override with a warning."
+  }
 }

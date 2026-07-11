@@ -1,5 +1,6 @@
 ---
 name: trigger-engineering
+version: 1.0.0
 description: 'Use ONLY when defining or improving trigger conditions for a skill — positive, negative, and edge-case activation scenarios. Triggers on: "define triggers for this skill", "improve skill triggers", "when should this skill activate", "trigger conditions", "skill routing".'
 ---
 

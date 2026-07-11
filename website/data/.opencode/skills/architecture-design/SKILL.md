@@ -18,6 +18,7 @@ Translate a validated requirements document into a concrete system architecture.
 | `constraints` | `array[object]` | No | Technology, budget, or time constraints (field: description, type: "must"\|"must_not"\|"prefer") |
 | `existing_architecture` | `object` | No | Description of existing system if this is an extension |
 | `domain_constraints` | `object` | No | **NEW v1.3.0.** Domain-specific constraints from a domain specialist (ai-agent-specialist, mobile-platform-specialist, saas-enterprise-architect, systems-specialist). When present, overrides generic defaults for affected modules. |
+| `research_artifact_path` | `string` | No | Path to `artifacts/research-<timestamp>.json` from `research-artifact` (SKL-112, FEATURE-009). When provided, technology decisions in Step 6 are anchored to the research artifact's evaluated alternatives and recommended options. Reduces redundant technology re-evaluation and provides an auditable decision trail. |
 
 **Input Schema:**
 
@@ -67,6 +68,10 @@ Translate a validated requirements document into a concrete system architecture.
         "technology_mandates": { "type": "array", "items": { "type": "string" } },
         "technology_exclusions": { "type": "array", "items": { "type": "string" } }
       }
+    },
+    "research_artifact_path": {
+      "type": "string",
+      "description": "Relative path to artifacts/research-<timestamp>.json from research-artifact (SKL-112, FEATURE-009). When present, Step 6 anchors technology decisions to the research artifact's recommended_option values, overriding generic defaults for covered topics."
     }
   },
   "required": ["requirements"]
@@ -77,6 +82,7 @@ Translate a validated requirements document into a concrete system architecture.
 
 - Requirements document from `requirement-analyzer` (or equivalent structured input).
 - Constraint list if available (technology stack, budget, timeline).
+- **Research artifact** (optional): when `research_artifact_path` is provided, load the JSON before Step 6 to anchor technology decisions to the evaluated alternatives produced by `research-artifact` (SKL-112). Skip redundant technology re-evaluation for topics already covered.
 - **Graphify retrieval-first:** Before design, run `graphify query "existing modules and architectural patterns"` if `graphify-out/graph.json` exists. Use retrieved module nodes to discover established boundaries and avoid architectural drift — do not recreate modules that already exist with a stable boundary. Fall back to full derivation from requirements if graph unavailable.
 
 ## Execution Logic
@@ -134,6 +140,12 @@ Step 5 — Apply patterns and scalability strategy
 Step 6 — Make technology decisions
   For each module, propose technology stack with rationale.
   Reference constraints and non-functional requirements.
+  If research_artifact_path is provided:
+    Load the JSON at research_artifact_path. For each research_result entry whose topic
+    overlaps with a module's responsibility, apply recommended_option as the default
+    technology selection for that module. Record source: "research_artifact" on each such
+    decision. Override generic pattern defaults only where the research result covers the
+    same topic. Do not apply recommendations for topics unrelated to the module.
   Output: technology decisions with alternatives considered
 
 Step 7 — Assemble architecture document
@@ -311,6 +323,6 @@ Step 7 — Assemble architecture document
 composes:
   - skill: architecture-design
     version: "^1.2.0"
-    input_map: { "requirements": "validated_requirements" }
+    input_map: { "requirements": "validated_requirements", "research_artifact_path": "research_artifact_path" }
     output_map: { "modules": "system_modules", "data_flow": "data_flow" }
 ```
