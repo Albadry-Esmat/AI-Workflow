@@ -79,7 +79,7 @@ All files follow this structure:
 
 ## Section
 
-Content with cross-references to other files (example syntax: `[Title](path/to/file.md)`; replace with the real path).
+Content with cross-references to other files (use standard Markdown link syntax; replace `path/to/file.md` with the real relative path).
 
 - Bullet lists for enumerations
 - `code` for filenames, schemas, IDs
