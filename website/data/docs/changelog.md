@@ -9,11 +9,61 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-_Add upcoming changes here before they ship._
+### Added
+
+- **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.
+- **Delegate skill (SKL-120)** — formal protocol for intra-pipeline task delegation with scoped context, success criteria, turn limits, and audit trail. Prevents ad-hoc agent-to-agent handoff sprawl.
 
 ---
 
-## [3.4.0] — 2026-07-11
+## [4.0.0] — 2026-07-14
+
+### Breaking Changes
+
+- **Pipeline mode switch** — `full-pipeline.json` now supports `pipeline_config.pipeline_mode: "specialized_review"` (new default path) and `"legacy_dual_planner"` (v3.9.x behaviour). Set `legacy_dual_planner` to preserve previous behaviour.
+- **HITL gates reduced from 18 to 4 mandatory** — `hitl_preset: "full"` restores all 18 legacy gates.
+
+### Added
+
+- **Phase 9 review pipeline optimization (TASK-0071–TASK-0080)** — complete overhaul of the planning-to-implementation path:
+  - **TASK-0071** — 4 specialized parallel reviewers (`architecture-reviewer`, `security-reviewer`, `performance-reviewer`, `maintainability-reviewer`) replace dual-planner consensus. Reviewers run in parallel after planning; each produces typed `ReviewFinding[]` objects. Guardrail: reviewers cannot emit a replacement plan — orchestrator strips `proposed_plan` fields and logs violations.
+  - **TASK-0072** — `ReviewFinding` schema (`skills/schema/review-finding.schema.json`): typed findings with `finding_id` (pattern `RVW-{REVIEWER}-{NNNN}`), `issue_fingerprint` (sha256 dedup key), severity, category, typed evidence, confidence score. `proposed_plan` field is schema-forbidden.
+  - **TASK-0073** — Deterministic validation checklist engine replaces consensus scoring: 7 hard checks (fail = REJECTED) + 6 soft checks (fail = CONDITIONALLY_APPROVED). Max 3 revision cycles before HITL escalation (GATE-ESC-001).
+  - **TASK-0074** — Conditional scoped debate: debate is only triggered per section when `confidence < 0.5`, ≥2 reviewers have contradictory findings, or unresolved critical findings exist. All other sessions emit `debate_skipped` event — eliminating unnecessary debate overhead.
+  - **TASK-0075** — Research moved before reviewer dispatch: `phase-4b-research` triggers on planner uncertainty markers (`TBD`, `UNVERIFIED`, `ASSUMPTION`, etc.) and new external dependencies. Research appendix injected into all reviewer contexts.
+  - **TASK-0076** — Implementation contract freeze (`phase-4i-contract-freeze`): generates an immutable `ImplementationContract` (UUID, SHA-256 hashes using RFC 8785 canonical form, per-section content hashes, 72h expiry, implementation rules derived from findings). Stored at `artifacts/contracts/contract-{uuid}.json`.
+  - **TASK-0077** — Change request workflow (`change-request-handler`): implementation agents can submit a `ChangeRequest` against a frozen contract. Only affected streams are paused. Targeted reviewer dispatch runs for affected sections only. Approved CRs increment the contract version. Maximum 3 CRs per contract.
+  - **TASK-0078** — HITL gate rationalization: 18 gates reduced to 4 mandatory + conditional set: GATE-001 (cost estimate), GATE-002 (architecture/validation, conditional on critical findings or hard check failures), GATE-003 (release readiness), GATE-004 (production deployment, non-bypassable). `hitl_preset: "full"` restores legacy 18-gate config.
+  - **TASK-0079** — Section-level confidence reporting: `confidence = 1.0 - sum(penalties)` per section. Penalties: critical=0.30, high=0.15, medium=0.05, low=0.02. `plan_confidence = min(non-outlier section confidences)`. Sections < 0.7 flagged `needs_attention`; sections < 0.3 flagged as blocking.
+  - **TASK-0080** — Decision log schema (`skills/schema/decision-entry.schema.json`): planner records `DecisionEntry` objects for all technology, architecture, data store, protocol, security, and deployment choices. Append-only. Entries include ≥2 options with pros/cons, rationale, evidence, and `supersedes` chain.
+- **New schemas**: `review-finding.schema.json`, `decision-entry.schema.json`, `implementation-contract.schema.json`, `change-request.schema.json`, `confidence-report.schema.json`, `validation-result.schema.json`, `feature-planning-output.schema.json`, `research-appendix.schema.json`, `debate-skipped-event.schema.json`
+- **New SKILL.md files**: `confidence-scorer`, `finding-aggregator`, `validation-checklist-engine`, `contract-freezer` (all deterministic, no LLM call)
+
+### Changed
+
+- `full-pipeline.json` bumped to **v4.0.0** with 8 new phases: `phase-4b-research`, `phase-4c-reviewer-dispatch`, `phase-4d-confidence-scoring`, `phase-4e-conditional-debate`, `phase-4f-finding-aggregation`, `phase-4g-change-requests`, `phase-4h-validation`, `phase-4i-contract-freeze`
+- `phase-8-repair` and `phase-8d-defect-management` conditions fixed (`OR` → `||`)
+- `review-finding.schema.json`: `reviewer_type` enum now correctly includes `architecture` and `maintainability` (was: `ux` and `clean_code`); `finding_id` pattern widened to `[A-Z]{3,6}` (was `[A-Z]{3}`)
+- `implementation-contract.schema.json`: added `status`, `version`, `sections`, `expiry`, `approved_at`, `supersedes_contract_id`, `change_requests`, `implementation_rules` fields; language enum expanded to include `javascript`, `kotlin`, `swift`, `dart`, `csharp`, `cpp`
+
+---
+
+## [3.9.0] — 2026-07-14
+
+### Added
+
+- **Plan → Review → Implement enforcement** — `full-pipeline.json` now has a mandatory `human_approval` gate after `phase-5-impact` (impact analysis) and before `phase-6-execution` (code generation). Gate is `bypass_on_timeout: false` (fail-closed). CI bypass requires both `ci_mode: true` AND a valid `pre_approved_plan_ref` (sha256 signed, run-scoped, TTL 72h).
+- **Dual-model planning debate** (`pipeline_config.debate_plan: true`) — two `feature-planning` instances run in parallel (Model A: Strategic Planner, Model B: Pragmatist Planner) with context isolation enforced by `orchestrator_context_isolation`. After both complete, `plan-debate` skill runs symmetric cross-review across 10 planning criteria, max 3 rounds, consensus threshold 0.80. Research escalation on per-criterion stalemate (one call per unique stale criterion). HITL gate fires when consensus not reached.
+- **`plan-debate` SKILL.md** — 461-line specification with full execution logic, pass-sticky rule, early-exit on consensus, per-round 120s timeout, research queue abandonment, MERGE option (human-authored with re-entry into scoring), and CI bypass contract.
+- **`phase-4-planning-b`** — second independent planning phase with Pragmatist persona and context isolation audit log.
+- **`phase-4b-plan-debate`** — plan consensus phase producing `consensus_plan` artifact.
+
+### Changed
+
+- `full-pipeline.json` bumped to **v3.9.0**
+- `parallel_groups` updated: added `["phase-4-planning", "phase-4-planning-b"]` and `["architecture-reviewer", "security-reviewer", "performance-reviewer", "maintainability-reviewer"]`
+
+
 
 ### Added
 

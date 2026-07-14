@@ -3417,3 +3417,29 @@ skills:
     skills, or uninstall a previously installed community skill.'
   do_not_use_when: 'For system skill management (use skill-authoring instead). Not part of any standard delivery
     pipeline — invoked directly by the user.'
+- id: SKL-120
+  name: Delegate
+  short_description: Formally delegates a scoped sub-task to a named agent with success criteria and handback protocol
+  reference_path: skills/knowledge/delegate.md
+  reference_sections:
+  - '## Protocol'
+  - '## Best Practices'
+  - '## Anti-Patterns'
+  executable_skill: .opencode/skills/delegate/SKILL.md
+  tags:
+  - orchestration
+  - delegation
+  - sub-task
+  - agent-routing
+  - handoff
+  version: 1.0.0
+  depends_on:
+  - SKL-010
+  related_skills:
+  - SKL-010
+  - SKL-021
+  mastery_level: intermediate
+  use_when: 'When an agent needs to hand off a focused sub-task to another specialist agent within a pipeline
+    phase, with clear success criteria and bounded execution.'
+  do_not_use_when: 'When the task is large enough for a full pipeline phase, when a direct skill invocation
+    would suffice, or when depth would exceed 1 (no re-delegation).'

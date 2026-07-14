@@ -1,7 +1,7 @@
 meta:
   version: 3.1.0
   last_updated: '2026-07-09'
-  total_nodes: 113
+  total_nodes: 114
   total_edges: 366
   schema: skills/graph/graph-schema.yaml
 nodes:
@@ -796,6 +796,13 @@ nodes:
   version: 1.0.0
   status: active
   layer: platform
+- id: SKL-120
+  name: delegate
+  domain: orchestration
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: orchestration
 edges:
 - from: SKL-001
   to: SKL-002
@@ -2268,3 +2275,11 @@ edges:
   to: SKL-010
   type: dependency
   label: skill-registry-client used by orchestrator for community skill management operations
+- from: SKL-120
+  to: SKL-010
+  type: composition
+  label: delegate skill is invoked by orchestrator to dispatch sub-tasks to specialist agents
+- from: SKL-010
+  to: SKL-120
+  type: dependency
+  label: orchestrator uses delegate for intra-phase sub-task handoff to named agents

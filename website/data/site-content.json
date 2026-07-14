@@ -1,36 +1,57 @@
 {
   "$schema": "site-content-schema",
-  "$version": "1.0.0",
-  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`.",
-
+  "$version": "4.0.0",
+  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 120 skills, 19 agents, 22 pipelines, 37 phases.",
   "meta": {
     "title": "ASE-OS — AI Software Engineering Operating System",
     "titleTemplate": "%s — ASE-OS",
-    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously.",
+    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. 120 skills · 19 agents · 22 pipeline templates · v4.0.0.",
     "openGraph": {
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift.",
+      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. 120 skills, 19 agents, 22 pipeline templates.",
       "siteName": "ASE-OS"
     },
     "twitter": {
       "card": "summary_large_image",
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically."
+      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v4.0.0 — 120 skills, 19 agents."
     }
   },
-
   "hero": {
-    "headline": ["AI Software", "Engineering OS"],
-    "subheadline": "A unified, skill-driven system that takes your idea all the way from requirements to deployed software — automatically, with no manual wiring and no documentation drift.",
-    "badge": "Skill System",
-    "ctaButtons": [
-      { "label": "Get Started", "href": "/getting-started", "style": "primary" },
-      { "label": "See How It Works →", "href": "/how-it-works", "style": "secondary" },
-      { "label": "Star on GitHub", "href": "REPO_URL", "style": "github" }
+    "headline": [
+      "AI Software",
+      "Engineering OS"
     ],
-    "statsLabels": ["Skills", "Pipeline Phases", "Agents"]
+    "subheadline": "A unified, skill-driven system that takes your idea all the way from requirements to deployed software — automatically, with no manual wiring and no documentation drift.",
+    "badge": "v4.0.0 — Skill System",
+    "ctaButtons": [
+      {
+        "label": "Get Started",
+        "href": "/getting-started",
+        "style": "primary"
+      },
+      {
+        "label": "See How It Works →",
+        "href": "/how-it-works",
+        "style": "secondary"
+      },
+      {
+        "label": "Star on GitHub",
+        "href": "REPO_URL",
+        "style": "github"
+      }
+    ],
+    "statsLabels": [
+      "Skills",
+      "Pipeline Phases",
+      "Agents"
+    ],
+    "statsValues": [
+      "120",
+      "37",
+      "19"
+    ]
   },
-
   "features": {
     "sectionTitle": "What ASE-OS Does For You",
     "sectionSubtitle": "Every capability is built-in, automatic, and non-bypassable — not a plugin or an option.",
@@ -220,10 +241,211 @@
         "title": "MCP Tool Integration",
         "description": "Six live MCP servers give every agent access to GitHub, real-time web search, persistent memory, URL fetching, up-to-date library docs (Context7), and headless browser automation — all without bash permissions.",
         "color": "teal"
+      },
+      {
+        "icon": "Users",
+        "title": "Dual-Model Planning Consensus",
+        "description": "When enabled, two AI planners independently generate the implementation plan in parallel — a Strategic Planner and a Pragmatist Planner — with full context isolation. They then cross-review each other's plan across 10 criteria. Disagreements trigger automatic research escalation. Code generation doesn't start until both models reach consensus (threshold: 80%).",
+        "color": "violet"
+      },
+      {
+        "icon": "ClipboardCheck",
+        "title": "Deterministic Plan Validation",
+        "description": "Before any code is written, the plan passes 7 hard checks (requirement coverage, interface completeness, dependency resolution, no open critical security findings, test strategy, rollback strategy, full traceability) and 6 soft checks. Fail any hard check and the plan returns to the planner — not to you. Max 3 revision cycles before HITL escalation.",
+        "color": "emerald"
+      },
+      {
+        "icon": "FileCheck",
+        "title": "Immutable Implementation Contracts",
+        "description": "Once the plan passes validation and you approve it, the system freezes an immutable ImplementationContract with SHA-256 content hashes (RFC 8785 canonical form), per-section integrity hashes, and a 72-hour expiry. Every implementation agent validates the contract before generating a single line of code. Deviations are submitted as formal change requests.",
+        "color": "blue"
+      },
+      {
+        "icon": "GitPullRequest",
+        "title": "Formal Change Request Workflow",
+        "description": "When implementation discovers the plan is incorrect or incomplete, agents submit a formal ChangeRequest against the frozen contract. Only the affected work streams are paused — everything else continues. Targeted reviewers run only for the changed sections. Approved changes increment the contract version. Maximum 3 change requests per contract.",
+        "color": "orange"
+      },
+      {
+        "icon": "SlidersHorizontal",
+        "title": "4-Gate Streamlined HITL",
+        "description": "Human approval reduced from 18 gates to 4 mandatory decision points: cost estimate, architecture/validation (conditional on critical findings), final plan approval, and production deployment. Every gate is fail-closed — bypass on timeout is disabled. The full 18-gate legacy config is available via hitl_preset: 'full'.",
+        "color": "rose"
+      },
+      {
+        "icon": "BarChart3",
+        "title": "Section-Level Plan Confidence",
+        "description": "After the 4 specialized reviewers run, every plan section gets a deterministic confidence score (1.0 minus severity-weighted penalties). The plan's overall confidence is the weakest section. Sections below 0.7 are flagged for attention; sections below 0.3 block the contract freeze. Scores feed the conditional debate trigger automatically.",
+        "color": "amber"
+      },
+      {
+        "icon": "Search",
+        "title": "Specialized Plan Reviewers",
+        "description": "Four domain-specialist reviewers run in parallel against every plan: Architecture Reviewer (module boundaries, interface completeness, dependency cycles), Security Reviewer (auth flows, secrets, OWASP Top 10), Performance Reviewer (SLOs, N+1 patterns, caching strategy), and Maintainability Reviewer (test coverage, rollback procedures, documentation gaps). Reviewers cannot emit replacement plans — a guardrail enforces this.",
+        "color": "cyan"
       }
     ]
   },
-
+  "pipelineTemplates": {
+    "sectionTitle": "22 Pipeline Templates",
+    "sectionSubtitle": "Ready-to-use pipeline configurations for every engineering scenario. Each pipeline is a JSON file wiring skills, phases, gates, and agents in the optimal sequence for that domain.",
+    "templates": [
+      {
+        "id": "full-pipeline",
+        "name": "Full Pipeline",
+        "description": "Complete idea-to-production flow: requirements → architecture → planning → dual-model review → contract freeze → code generation → testing → deployment. 37 phases, 5 gates. The master template for any new feature.",
+        "trigger": "full pipeline, new feature, build this, idea to production",
+        "color": "violet"
+      },
+      {
+        "id": "quick-review",
+        "name": "Quick Review",
+        "description": "Code quality, security, and SOLID review of existing code. Entry point is the reviewer agent. Produces findings, severity ratings, and remediation recommendations.",
+        "trigger": "review code, code quality, SOLID, refactor, anti-patterns",
+        "color": "amber"
+      },
+      {
+        "id": "requirements-only",
+        "name": "Requirements Only",
+        "description": "Extract, normalize, and validate requirements from raw input. Produces a structured requirements artifact with open questions, assumptions, and risks.",
+        "trigger": "analyze requirements, what are the requirements, extract requirements",
+        "color": "blue"
+      },
+      {
+        "id": "architecture-only",
+        "name": "Architecture Only",
+        "description": "Design system modules, boundaries, data flow, and integration contracts from validated requirements. Outputs module definitions and ADRs.",
+        "trigger": "design the architecture, system design, what tech stack",
+        "color": "cyan"
+      },
+      {
+        "id": "pre-deploy",
+        "name": "Pre-Deploy",
+        "description": "Full pre-deployment check: completeness audit, RTM score, security guard, release readiness, defect review. Produces a deployment strategy and go/no-go recommendation.",
+        "trigger": "deploy, release, pre-deploy check, CI/CD, rollback",
+        "color": "orange"
+      },
+      {
+        "id": "defect-lifecycle",
+        "name": "Defect Lifecycle",
+        "description": "Full defect tracking from report to resolution: defect capture → root cause analysis → fix planning → implementation → verification. Links defect to requirement.",
+        "trigger": "defect, bug lifecycle, bug fix pipeline, defect management",
+        "color": "red"
+      },
+      {
+        "id": "change-request",
+        "name": "Change Request",
+        "description": "Manages scope changes and requirement modifications: impact analysis → re-planning → implementation → validation. Preserves traceability across the change.",
+        "trigger": "change request, change management, RFC, propose a change",
+        "color": "yellow"
+      },
+      {
+        "id": "compliance-first",
+        "name": "Compliance-First",
+        "description": "GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 compliance mapping at design time. Produces a traceability matrix, gap report, and audit evidence checklist before any code is written.",
+        "trigger": "compliance, SOC 2, HIPAA, GDPR, ISO 27001",
+        "color": "emerald"
+      },
+      {
+        "id": "saas-platform",
+        "name": "SaaS Platform",
+        "description": "Multi-tenant B2B SaaS architecture: tenant isolation, subscription billing, SSO/SAML, white-labeling, SOC 2 compliance. Tailored for enterprise sales and compliance certification.",
+        "trigger": "SaaS, multi-tenant, B2B, enterprise software, subscription",
+        "color": "purple"
+      },
+      {
+        "id": "mobile-app",
+        "name": "Mobile App",
+        "description": "iOS, Android, React Native, and Flutter pipelines: offline-first state, deep links, push notifications, app store submission, platform-specific UX patterns.",
+        "trigger": "mobile app, iOS, Android, React Native, Flutter",
+        "color": "pink"
+      },
+      {
+        "id": "ai-agent-system",
+        "name": "AI Agent System",
+        "description": "Design, build, and review AI agent systems: LLM orchestration, RAG pipelines, vector databases, multi-agent coordination, prompt engineering frameworks.",
+        "trigger": "AI agent, LLM system, agentic, multi-agent, RAG pipeline",
+        "color": "indigo"
+      },
+      {
+        "id": "api-first",
+        "name": "API-First",
+        "description": "API contract design before code: OpenAPI 3.1 specs with versioning and rate limiting, GraphQL schemas with federation, AsyncAPI event catalogs. Schema-first development.",
+        "trigger": "API first, REST API, API design, build an API",
+        "color": "teal"
+      },
+      {
+        "id": "microservices-platform",
+        "name": "Microservices Platform",
+        "description": "DDD bounded context mapping, service decomposition with Conway's Law analysis, CQRS/event sourcing, resilience patterns (circuit breakers, sagas), service mesh design.",
+        "trigger": "microservices, service mesh, distributed system",
+        "color": "cyan"
+      },
+      {
+        "id": "data-engineering",
+        "name": "Data Engineering",
+        "description": "Batch ETL and streaming pipeline design, dbt data quality rules, ML feature store and serving, dimensional analytics schemas, data contract enforcement.",
+        "trigger": "data pipeline, ETL, data engineering, data warehouse, data lake",
+        "color": "lime"
+      },
+      {
+        "id": "ml-platform",
+        "name": "ML Platform",
+        "description": "End-to-end MLOps: feature store design, training infrastructure, model registry, serving architecture, drift detection, A/B testing. Production ML pipeline design.",
+        "trigger": "ML platform, machine learning, model training, MLOps",
+        "color": "sky"
+      },
+      {
+        "id": "cloud-migration",
+        "name": "Cloud Migration",
+        "description": "Lift-and-shift to cloud-native: Well-Architected Framework review, service decomposition for cloud, IaC scaffold, cost estimation, rollback strategy.",
+        "trigger": "cloud migration, migrate to cloud, lift and shift, cloud-native",
+        "color": "blue"
+      },
+      {
+        "id": "admin-panel",
+        "name": "Admin Panel",
+        "description": "Back-office and internal tool pipeline: RBAC design, audit logging, bulk operations, dashboard architecture, operator UX patterns.",
+        "trigger": "admin panel, back office, internal tool, dashboard admin",
+        "color": "slate"
+      },
+      {
+        "id": "consumer-website",
+        "name": "Consumer Website",
+        "description": "Marketing and content-first site pipeline: SEO optimization, Core Web Vitals budget, Open Graph, sitemap, structured data, landing page architecture.",
+        "trigger": "consumer website, marketing site, landing page, public website",
+        "color": "rose"
+      },
+      {
+        "id": "developer-portal",
+        "name": "Developer Portal",
+        "description": "API portal and developer documentation: OpenAPI explorer, SDK generation guides, authentication flows, rate limit documentation, developer onboarding.",
+        "trigger": "developer portal, dev portal, API portal, developer docs",
+        "color": "amber"
+      },
+      {
+        "id": "iot-embedded",
+        "name": "IoT & Embedded",
+        "description": "Embedded systems and firmware pipeline: RTOS task design, hardware abstraction layers, device provisioning, OTA update strategy, power management.",
+        "trigger": "IoT, embedded system, firmware, hardware integration",
+        "color": "green"
+      },
+      {
+        "id": "gap-to-skill",
+        "name": "Gap-to-Skill",
+        "description": "When a capability gap is detected, this pipeline drafts a new skill: gap capture → skill spec authoring → quality scoring → HITL approval → registry registration.",
+        "trigger": "gap to skill, create skill from gap, missing skill, skill gap",
+        "color": "fuchsia"
+      },
+      {
+        "id": "insights-adaptation-pipeline",
+        "name": "Insights & Adaptation",
+        "description": "Continuous improvement pipeline: telemetry analysis → session insights → ranked improvement proposals → HITL approval → adaptation application. All proposals require your explicit approval.",
+        "trigger": "insights, adaptation, continuous improvement, feedback loop",
+        "color": "yellow"
+      }
+    ]
+  },
   "principles": {
     "sectionTitle": "Three Non-Negotiable Principles",
     "sectionSubtitle": "Every decision in ASE-OS traces back to one of these three foundations.",
@@ -233,53 +455,150 @@
         "title": "Skill-Driven Execution",
         "color": "cyan",
         "description": "Every action the system takes runs through a named, versioned Skill — not a freeform prompt. Skills have fixed inputs, fixed outputs, and defined rules. If a capability doesn't have a Skill, it doesn't exist in the system.",
-        "tags": ["Versioned", "Composable", "Schema-validated"]
+        "tags": [
+          "Versioned",
+          "Composable",
+          "Schema-validated"
+        ]
       },
       {
         "number": "02",
         "title": "Event-Driven Architecture",
         "color": "violet",
         "description": "When something changes — code, architecture, tests, or docs — the system automatically emits an event and triggers all the right follow-up actions. You never have to manually kick off downstream work.",
-        "tags": ["Automatic propagation", "Deduplication", "Audit log"]
+        "tags": [
+          "Automatic propagation",
+          "Deduplication",
+          "Audit log"
+        ]
       },
       {
         "number": "03",
         "title": "State-Centric Control",
         "color": "pink",
         "description": "Everything the system knows lives in one structured state file. Agents can read it, but only the state-manager can write to it. Every change is tracked, versioned, and fully reversible.",
-        "tags": ["Snapshots", "Rollback", "Single writer"]
+        "tags": [
+          "Snapshots",
+          "Rollback",
+          "Single writer"
+        ]
       }
     ]
   },
-
   "orchestration": {
     "sectionTitle": "Skill & Agent Orchestration",
     "sectionSubtitle": "The orchestrator decomposes the pipeline into phases, resolves the correct skill and agent for each phase, validates inputs, and dispatches agents in the right order — automatically.",
     "stepLabel": "Step 4",
     "agentGridTitle": "13 Agents — Exact bindings from opencode.json",
     "agents": [
-      { "id": "analyzer",        "label": "Analyzer",        "color": "violet",  "skill": "requirement-analyzer",    "extraSkills": 0 },
-      { "id": "architect",       "label": "Architect",       "color": "cyan",    "skill": "architecture-design",     "extraSkills": 2 },
-      { "id": "planner",         "label": "Planner",         "color": "blue",    "skill": "feature-planning",        "extraSkills": 0 },
-      { "id": "reviewer",        "label": "Reviewer",        "color": "amber",   "skill": "clean-code-review",       "extraSkills": 7 },
-      { "id": "tester",          "label": "Tester",          "color": "green",   "skill": "testing-strategy",        "extraSkills": 0 },
-      { "id": "builder",         "label": "Builder",         "color": "teal",    "skill": "code-generator",          "extraSkills": 3 },
-      { "id": "impact-analyzer", "label": "Impact Analyzer", "color": "indigo",  "skill": "change-impact-analyzer",  "extraSkills": 1 },
-      { "id": "test-generator",  "label": "Test Generator",  "color": "lime",    "skill": "test-generator",          "extraSkills": 0 },
-      { "id": "deployer",        "label": "Deployer",        "color": "orange",  "skill": "deployment-strategy",     "extraSkills": 0 },
-      { "id": "recovery",        "label": "Recovery",        "color": "rose",    "skill": "rollback-manager",        "extraSkills": 0 },
-      { "id": "documenter",      "label": "Documenter",      "color": "pink",    "skill": "documentation-generator", "extraSkills": 0 },
-      { "id": "doc-maintainer",  "label": "Doc Maintainer",  "color": "fuchsia", "skill": "doc-maintainer",          "extraSkills": 0 }
+      {
+        "id": "analyzer",
+        "label": "Analyzer",
+        "color": "violet",
+        "skill": "requirement-analyzer",
+        "extraSkills": 0
+      },
+      {
+        "id": "architect",
+        "label": "Architect",
+        "color": "cyan",
+        "skill": "architecture-design",
+        "extraSkills": 2
+      },
+      {
+        "id": "planner",
+        "label": "Planner",
+        "color": "blue",
+        "skill": "feature-planning",
+        "extraSkills": 0
+      },
+      {
+        "id": "reviewer",
+        "label": "Reviewer",
+        "color": "amber",
+        "skill": "clean-code-review",
+        "extraSkills": 7
+      },
+      {
+        "id": "tester",
+        "label": "Tester",
+        "color": "green",
+        "skill": "testing-strategy",
+        "extraSkills": 0
+      },
+      {
+        "id": "builder",
+        "label": "Builder",
+        "color": "teal",
+        "skill": "code-generator",
+        "extraSkills": 3
+      },
+      {
+        "id": "impact-analyzer",
+        "label": "Impact Analyzer",
+        "color": "indigo",
+        "skill": "change-impact-analyzer",
+        "extraSkills": 1
+      },
+      {
+        "id": "test-generator",
+        "label": "Test Generator",
+        "color": "lime",
+        "skill": "test-generator",
+        "extraSkills": 0
+      },
+      {
+        "id": "deployer",
+        "label": "Deployer",
+        "color": "orange",
+        "skill": "deployment-strategy",
+        "extraSkills": 0
+      },
+      {
+        "id": "recovery",
+        "label": "Recovery",
+        "color": "rose",
+        "skill": "rollback-manager",
+        "extraSkills": 0
+      },
+      {
+        "id": "documenter",
+        "label": "Documenter",
+        "color": "pink",
+        "skill": "documentation-generator",
+        "extraSkills": 0
+      },
+      {
+        "id": "doc-maintainer",
+        "label": "Doc Maintainer",
+        "color": "fuchsia",
+        "skill": "doc-maintainer",
+        "extraSkills": 0
+      }
     ],
     "decompositionSteps": [
-      { "label": "Phase identified",     "desc": "Orchestrator maps the prompt to a pipeline phase" },
-      { "label": "Skill resolved",       "desc": "Registry lookup returns the correct SKILL.md" },
-      { "label": "Agent assigned",       "desc": "Agent with matching skill binding is selected" },
-      { "label": "Inputs validated",     "desc": "Schema check: required inputs present and typed" },
-      { "label": "Agent dispatched",     "desc": "Agent invoked with scoped context + skill spec" }
+      {
+        "label": "Phase identified",
+        "desc": "Orchestrator maps the prompt to a pipeline phase"
+      },
+      {
+        "label": "Skill resolved",
+        "desc": "Registry lookup returns the correct SKILL.md"
+      },
+      {
+        "label": "Agent assigned",
+        "desc": "Agent with matching skill binding is selected"
+      },
+      {
+        "label": "Inputs validated",
+        "desc": "Schema check: required inputs present and typed"
+      },
+      {
+        "label": "Agent dispatched",
+        "desc": "Agent invoked with scoped context + skill spec"
+      }
     ]
   },
-
   "aiExecution": {
     "sectionTitle": "AI Execution Flow",
     "sectionSubtitle": "Each phase produces structured artifacts that become the inputs for the next. Complex reasoning agents use the standard model tier; high-volume utility tasks use a lightweight model to minimise cost. Every assignment is a single-line config change.",
@@ -335,14 +654,33 @@
       }
     ],
     "outputTypes": [
-      { "label": "Requirement Objects",    "icon": "FileText",  "color": "violet" },
-      { "label": "Architecture ADRs",      "icon": "Brain",     "color": "cyan" },
-      { "label": "Implementation Code",    "icon": "FileText",  "color": "teal" },
-      { "label": "Test Suites",            "icon": "RefreshCw", "color": "green" },
-      { "label": "Session State Snapshot", "icon": "HardDrive", "color": "zinc" }
+      {
+        "label": "Requirement Objects",
+        "icon": "FileText",
+        "color": "violet"
+      },
+      {
+        "label": "Architecture ADRs",
+        "icon": "Brain",
+        "color": "cyan"
+      },
+      {
+        "label": "Implementation Code",
+        "icon": "FileText",
+        "color": "teal"
+      },
+      {
+        "label": "Test Suites",
+        "icon": "RefreshCw",
+        "color": "green"
+      },
+      {
+        "label": "Session State Snapshot",
+        "icon": "HardDrive",
+        "color": "zinc"
+      }
     ]
   },
-
   "backgroundProcessing": {
     "sectionTitle": "Background Processing",
     "sectionSubtitle": "Before any agent acts, the orchestrator assembles a targeted context window — pulling only the relevant slice of project knowledge using a four-layer memory architecture.",
@@ -378,13 +716,28 @@
       }
     ],
     "discoverySteps": [
-      { "step": "1", "label": "Check session state", "desc": "Load session_state.json if a prior session exists for this feature" },
-      { "step": "2", "label": "Query the graph",    "desc": "Run `graphify query \"<feature>\"` — returns a scoped subgraph, not the entire codebase" },
-      { "step": "3", "label": "Load skill specs",   "desc": "Mount required SKILL.md files for this pipeline into context" },
-      { "step": "4", "label": "Evaluate pressure",  "desc": "If token budget > 80%, trigger context-compressor before proceeding" }
+      {
+        "step": "1",
+        "label": "Check session state",
+        "desc": "Load session_state.json if a prior session exists for this feature"
+      },
+      {
+        "step": "2",
+        "label": "Query the graph",
+        "desc": "Run `graphify query \"<feature>\"` — returns a scoped subgraph, not the entire codebase"
+      },
+      {
+        "step": "3",
+        "label": "Load skill specs",
+        "desc": "Mount required SKILL.md files for this pipeline into context"
+      },
+      {
+        "step": "4",
+        "label": "Evaluate pressure",
+        "desc": "If token budget > 80%, trigger context-compressor before proceeding"
+      }
     ]
   },
-
   "qualityAssurance": {
     "sectionTitle": "Quality Assurance & Validation",
     "sectionSubtitle": "Four overlapping QA layers run before any artifact is considered done. The release guard is the final non-bypassable threshold check — there is no override path.",
@@ -428,13 +781,28 @@
       }
     ],
     "thresholds": [
-      { "label": "Min Quality Score", "value": "85 / 100", "color": "amber" },
-      { "label": "Min Test Coverage",  "value": "≥ 80%",    "color": "green" },
-      { "label": "Security Findings",  "value": "0 critical","color": "red" },
-      { "label": "Guard Verdict",      "value": "pass",      "color": "orange" }
+      {
+        "label": "Min Quality Score",
+        "value": "85 / 100",
+        "color": "amber"
+      },
+      {
+        "label": "Min Test Coverage",
+        "value": "≥ 80%",
+        "color": "green"
+      },
+      {
+        "label": "Security Findings",
+        "value": "0 critical",
+        "color": "red"
+      },
+      {
+        "label": "Guard Verdict",
+        "value": "pass",
+        "color": "orange"
+      }
     ]
   },
-
   "outputDelivery": {
     "sectionTitle": "Final Output & Delivery",
     "sectionSubtitle": "When all gates pass, the pipeline produces five categories of deliverable — and a full human approval trail shows every decision point that was reviewed before deployment.",
@@ -472,18 +840,53 @@
       }
     ],
     "approvalGates": [
-      { "label": "Requirements validated",          "phase": "After Phase 1",  "type": "human" },
-      { "label": "Architecture approved",           "phase": "After Phase 2",  "type": "human" },
-      { "label": "UX & database design approved",   "phase": "After Phase 2b", "type": "human" },
-      { "label": "Design system approved",          "phase": "After Phase 2c", "type": "human" },
-      { "label": "Roadmap approved",               "phase": "After Phase 4",  "type": "human" },
-      { "label": "Security posture approved",       "phase": "After Phase 7",  "type": "human" },
-      { "label": "Release guard passed",            "phase": "After Phase 8c", "type": "auto" },
-      { "label": "Defect triage (conditional)",     "phase": "After Phase 8d", "type": "human" },
-      { "label": "Final deploy approval",           "phase": "After Phase 9",  "type": "human" }
+      {
+        "label": "Requirements validated",
+        "phase": "After Phase 1",
+        "type": "human"
+      },
+      {
+        "label": "Architecture approved",
+        "phase": "After Phase 2",
+        "type": "human"
+      },
+      {
+        "label": "UX & database design approved",
+        "phase": "After Phase 2b",
+        "type": "human"
+      },
+      {
+        "label": "Design system approved",
+        "phase": "After Phase 2c",
+        "type": "human"
+      },
+      {
+        "label": "Roadmap approved",
+        "phase": "After Phase 4",
+        "type": "human"
+      },
+      {
+        "label": "Security posture approved",
+        "phase": "After Phase 7",
+        "type": "human"
+      },
+      {
+        "label": "Release guard passed",
+        "phase": "After Phase 8c",
+        "type": "auto"
+      },
+      {
+        "label": "Defect triage (conditional)",
+        "phase": "After Phase 8d",
+        "type": "human"
+      },
+      {
+        "label": "Final deploy approval",
+        "phase": "After Phase 9",
+        "type": "human"
+      }
     ]
   },
-
   "promptSubmission": {
     "sectionTitle": "Prompt Submission",
     "sectionSubtitle": "You describe what you want in plain language. The orchestrator normalizes your input, detects intent, and dispatches the right pipeline — before any AI agent does any work.",
@@ -515,14 +918,29 @@
       }
     ],
     "normalizerSteps": [
-      { "icon": "MessageSquare", "label": "Prompt received",    "detail": "Raw natural language input from user" },
-      { "icon": "AlertCircle",   "label": "Ambiguity check",    "detail": "prompt-normalizer validates intent clarity" },
-      { "icon": "Route",         "label": "Intent routing",     "detail": "Matched against routing table → pipeline selected" },
-      { "icon": "CheckCircle2",  "label": "Pipeline dispatched","detail": "Entry agent initialized with correct skill binding" }
+      {
+        "icon": "MessageSquare",
+        "label": "Prompt received",
+        "detail": "Raw natural language input from user"
+      },
+      {
+        "icon": "AlertCircle",
+        "label": "Ambiguity check",
+        "detail": "prompt-normalizer validates intent clarity"
+      },
+      {
+        "icon": "Route",
+        "label": "Intent routing",
+        "detail": "Matched against routing table → pipeline selected"
+      },
+      {
+        "icon": "CheckCircle2",
+        "label": "Pipeline dispatched",
+        "detail": "Entry agent initialized with correct skill binding"
+      }
     ],
     "ambiguityWarning": "If intent is ambiguous, the pipeline halts here and asks the user to clarify before proceeding."
   },
-
   "phaseDescriptions": {
     "phase-1-requirements": "The requirement-analyzer reads your raw input and turns it into structured requirement objects — each with acceptance criteria and flagged open questions. A human approval gate follows before any design work begins.",
     "phase-2-architecture": "The architect designs module boundaries, data flow, and integration contracts. The ADR generator runs in the background to capture every major technical decision as a permanent, immutable record.",
@@ -542,237 +960,679 @@
     "phase-10-docs": "Documentation-generator and doc-maintainer run asynchronously to sync all docs with the current system state. This phase never blocks the pipeline — documentation catches up in the background.",
     "phase-10b-export": "The work-item-exporter exports the complete task graph to external project management systems as structured work items. This phase runs asynchronously alongside documentation and never blocks the pipeline."
   },
-
   "events": [
-    { "type": "code.changed",            "source": "Builder",         "handlers": ["clean-code-review", "dependency-analyzer", "change-impact-analyzer"], "color": "teal" },
-    { "type": "architecture.changed",    "source": "Architect",       "handlers": ["architecture-design", "dependency-analyzer", "change-impact-analyzer"], "color": "cyan" },
-    { "type": "test.failed",             "source": "Test Runner",     "handlers": ["code-repair"], "color": "red" },
-    { "type": "security.finding",        "source": "Security Review", "handlers": ["security-review"], "color": "orange" },
-    { "type": "file.written",            "source": "Any skill",       "handlers": ["doc-maintainer"], "color": "pink" },
-    { "type": "context.pressure_high",   "source": "Orchestrator",    "handlers": ["context-compressor"], "color": "indigo" },
-    { "type": "defect.created",          "source": "Reviewer",        "handlers": ["defect-manager", "work-item-lifecycle-guard"], "color": "rose" },
-    { "type": "change_request.created",  "source": "User / Planner",  "handlers": ["change-request-manager", "feature-planning"], "color": "amber" },
-    { "type": "capability.gap.detected", "source": "Orchestrator",    "handlers": ["gap-to-skill"], "color": "violet" }
+    {
+      "type": "code.changed",
+      "source": "Builder",
+      "handlers": [
+        "clean-code-review",
+        "dependency-analyzer",
+        "change-impact-analyzer"
+      ],
+      "color": "teal"
+    },
+    {
+      "type": "architecture.changed",
+      "source": "Architect",
+      "handlers": [
+        "architecture-design",
+        "dependency-analyzer",
+        "change-impact-analyzer"
+      ],
+      "color": "cyan"
+    },
+    {
+      "type": "test.failed",
+      "source": "Test Runner",
+      "handlers": [
+        "code-repair"
+      ],
+      "color": "red"
+    },
+    {
+      "type": "security.finding",
+      "source": "Security Review",
+      "handlers": [
+        "security-review"
+      ],
+      "color": "orange"
+    },
+    {
+      "type": "file.written",
+      "source": "Any skill",
+      "handlers": [
+        "doc-maintainer"
+      ],
+      "color": "pink"
+    },
+    {
+      "type": "context.pressure_high",
+      "source": "Orchestrator",
+      "handlers": [
+        "context-compressor"
+      ],
+      "color": "indigo"
+    },
+    {
+      "type": "defect.created",
+      "source": "Reviewer",
+      "handlers": [
+        "defect-manager",
+        "work-item-lifecycle-guard"
+      ],
+      "color": "rose"
+    },
+    {
+      "type": "change_request.created",
+      "source": "User / Planner",
+      "handlers": [
+        "change-request-manager",
+        "feature-planning"
+      ],
+      "color": "amber"
+    },
+    {
+      "type": "capability.gap.detected",
+      "source": "Orchestrator",
+      "handlers": [
+        "gap-to-skill"
+      ],
+      "color": "violet"
+    }
   ],
-
   "stateScopes": [
-    { "key": "project_spec",         "label": "Project Spec",      "subtitle": "What you want to build",                    "color": "violet", "owner": "requirement-analyzer" },
-    { "key": "architecture",         "label": "Architecture",      "subtitle": "Module boundaries and data flow",           "color": "cyan",   "owner": "architecture-design" },
-    { "key": "dependency_graph",     "label": "Dependency Graph",  "subtitle": "Which skills depend on which",              "color": "blue",   "owner": "dependency-analyzer" },
-    { "key": "task_graph",           "label": "Task Graph",        "subtitle": "Ordered work items with estimates",         "color": "indigo", "owner": "feature-planning" },
-    { "key": "code_map",             "label": "Code Map",          "subtitle": "Generated files and their origins",         "color": "teal",   "owner": "code-generator" },
-    { "key": "test_state",           "label": "Test State",        "subtitle": "Coverage and pass/fail status",             "color": "green",  "owner": "test-generator" },
-    { "key": "security_state",       "label": "Security State",    "subtitle": "Findings and boundary violations",         "color": "red",    "owner": "security-review" },
-    { "key": "decision_log",         "label": "Decision Log",      "subtitle": "Immutable record of every ADR",            "color": "amber",  "owner": "adr-generator" },
-    { "key": "pipeline_state",       "label": "Pipeline State",    "subtitle": "Current phase and execution cursor",       "color": "orange", "owner": "orchestrator" },
-    { "key": "snapshots",            "label": "Snapshots",         "subtitle": "Pre-change state saves for rollback",      "color": "pink",   "owner": "state-manager" },
-    { "key": "behavioral_telemetry", "label": "Telemetry",         "subtitle": "PII-free session telemetry ring buffer",   "color": "yellow", "owner": "behavioral-telemetry-collector" },
-    { "key": "adaptation_proposals", "label": "Proposals",         "subtitle": "HITL-pending improvement proposals",       "color": "lime",   "owner": "adaptive-proposal-generator" },
-    { "key": "work_items",           "label": "Work Items",        "subtitle": "Live task, bug, and CR item states",       "color": "emerald","owner": "work-item-lifecycle-guard" }
+    {
+      "key": "project_spec",
+      "label": "Project Spec",
+      "subtitle": "What you want to build",
+      "color": "violet",
+      "owner": "requirement-analyzer"
+    },
+    {
+      "key": "architecture",
+      "label": "Architecture",
+      "subtitle": "Module boundaries and data flow",
+      "color": "cyan",
+      "owner": "architecture-design"
+    },
+    {
+      "key": "dependency_graph",
+      "label": "Dependency Graph",
+      "subtitle": "Which skills depend on which",
+      "color": "blue",
+      "owner": "dependency-analyzer"
+    },
+    {
+      "key": "task_graph",
+      "label": "Task Graph",
+      "subtitle": "Ordered work items with estimates",
+      "color": "indigo",
+      "owner": "feature-planning"
+    },
+    {
+      "key": "code_map",
+      "label": "Code Map",
+      "subtitle": "Generated files and their origins",
+      "color": "teal",
+      "owner": "code-generator"
+    },
+    {
+      "key": "test_state",
+      "label": "Test State",
+      "subtitle": "Coverage and pass/fail status",
+      "color": "green",
+      "owner": "test-generator"
+    },
+    {
+      "key": "security_state",
+      "label": "Security State",
+      "subtitle": "Findings and boundary violations",
+      "color": "red",
+      "owner": "security-review"
+    },
+    {
+      "key": "decision_log",
+      "label": "Decision Log",
+      "subtitle": "Immutable record of every ADR",
+      "color": "amber",
+      "owner": "adr-generator"
+    },
+    {
+      "key": "pipeline_state",
+      "label": "Pipeline State",
+      "subtitle": "Current phase and execution cursor",
+      "color": "orange",
+      "owner": "orchestrator"
+    },
+    {
+      "key": "snapshots",
+      "label": "Snapshots",
+      "subtitle": "Pre-change state saves for rollback",
+      "color": "pink",
+      "owner": "state-manager"
+    },
+    {
+      "key": "behavioral_telemetry",
+      "label": "Telemetry",
+      "subtitle": "PII-free session telemetry ring buffer",
+      "color": "yellow",
+      "owner": "behavioral-telemetry-collector"
+    },
+    {
+      "key": "adaptation_proposals",
+      "label": "Proposals",
+      "subtitle": "HITL-pending improvement proposals",
+      "color": "lime",
+      "owner": "adaptive-proposal-generator"
+    },
+    {
+      "key": "work_items",
+      "label": "Work Items",
+      "subtitle": "Live task, bug, and CR item states",
+      "color": "emerald",
+      "owner": "work-item-lifecycle-guard"
+    }
   ],
-
   "agentDiagram": {
     "sectionTitle": "Multi-Agent Layer",
     "sectionSubtitle": "Agents are thin executors — all the intelligence lives in their skills.",
     "agentDescriptions": {
-      "analyzer":          "Extracts and structures requirements from raw input.",
-      "architect":         "Designs module boundaries, data flow, and API contracts.",
-      "planner":           "Breaks architecture into a task graph with estimates and milestones.",
-      "reviewer":          "Reviews code quality, SOLID principles, and security boundaries.",
-      "tester":            "Defines test strategies, coverage targets, and edge cases.",
-      "builder":           "Generates implementation code, repairs failures, and creates design systems.",
-      "impact-analyzer":   "Calculates the blast radius before any change is made.",
-      "test-generator":    "Generates unit, integration, and edge-case test suites from code.",
-      "deployer":          "Defines environment promotion rules, rollback criteria, and feature flags.",
-      "documenter":        "Generates API docs, ADRs, READMEs, and onboarding guides.",
-      "doc-maintainer":    "Detects outdated docs after every system change and syncs them.",
-      "recovery":          "Reverts to a prior system snapshot when a critical failure occurs."
+      "analyzer": "Extracts and structures requirements from raw input.",
+      "architect": "Designs module boundaries, data flow, and API contracts.",
+      "planner": "Breaks architecture into a task graph with estimates and milestones.",
+      "reviewer": "Reviews code quality, SOLID principles, and security boundaries.",
+      "tester": "Defines test strategies, coverage targets, and edge cases.",
+      "builder": "Generates implementation code, repairs failures, and creates design systems.",
+      "impact-analyzer": "Calculates the blast radius before any change is made.",
+      "test-generator": "Generates unit, integration, and edge-case test suites from code.",
+      "deployer": "Defines environment promotion rules, rollback criteria, and feature flags.",
+      "documenter": "Generates API docs, ADRs, READMEs, and onboarding guides.",
+      "doc-maintainer": "Detects outdated docs after every system change and syncs them.",
+      "recovery": "Reverts to a prior system snapshot when a critical failure occurs."
     }
   },
-
   "workflowDiagram": {
     "sectionTitle": "Complete Workflow Diagram",
     "sectionSubtitle": "Every stage from installation to user review, showing how data flows through the system and where human decision points appear.",
     "nodes": [
-      { "id": "install",    "label": "Installation",      "sublabel": "Clone + ./aiw setup" },
-      { "id": "graph",      "label": "Context Discovery",  "sublabel": "Graphify builds AST graph" },
-      { "id": "prompt",     "label": "Prompt Submitted",   "sublabel": "User describes feature" },
-      { "id": "analysis",   "label": "Analysis",           "sublabel": "Normalizer + intent routing" },
-      { "id": "skills",     "label": "Skill Invocation",   "sublabel": "Agents dispatched per phase" },
-      { "id": "ai",         "label": "AI Processing",      "sublabel": "LLM generates artifacts" },
-      { "id": "validation", "label": "Validation",         "sublabel": "Review · Tests · Security · Guards" },
-      { "id": "output",     "label": "Output Ready",       "sublabel": "Code · Docs · Deploy artifacts" },
-      { "id": "review",     "label": "User Review",        "sublabel": "Human approval at every gate" }
+      {
+        "id": "install",
+        "label": "Installation",
+        "sublabel": "Clone + ./aiw setup"
+      },
+      {
+        "id": "graph",
+        "label": "Context Discovery",
+        "sublabel": "Graphify builds AST graph"
+      },
+      {
+        "id": "prompt",
+        "label": "Prompt Submitted",
+        "sublabel": "User describes feature"
+      },
+      {
+        "id": "analysis",
+        "label": "Analysis",
+        "sublabel": "Normalizer + intent routing"
+      },
+      {
+        "id": "skills",
+        "label": "Skill Invocation",
+        "sublabel": "Agents dispatched per phase"
+      },
+      {
+        "id": "ai",
+        "label": "AI Processing",
+        "sublabel": "LLM generates artifacts"
+      },
+      {
+        "id": "validation",
+        "label": "Validation",
+        "sublabel": "Review · Tests · Security · Guards"
+      },
+      {
+        "id": "output",
+        "label": "Output Ready",
+        "sublabel": "Code · Docs · Deploy artifacts"
+      },
+      {
+        "id": "review",
+        "label": "User Review",
+        "sublabel": "Human approval at every gate"
+      }
     ]
   },
-
   "useCaseHero": {
     "badge": "End-to-End Use Case Walkthrough",
-    "headline": ["From Idea ", "to Production", "in a Single Prompt"],
+    "headline": [
+      "From Idea ",
+      "to Production",
+      "in a Single Prompt"
+    ],
     "subheadline": "Walk through exactly what happens after you describe a feature inside ASE-OS — step by step, from the moment you press Enter to the moment tested, reviewed, and deployment-ready code lands in your hands.",
-    "breadcrumb": ["Installation", "Prompt", "Orchestration", "AI Execution", "Review & QA", "Delivery"],
+    "breadcrumb": [
+      "Installation",
+      "Prompt",
+      "Orchestration",
+      "AI Execution",
+      "Review & QA",
+      "Delivery"
+    ],
     "highlights": [
-      { "icon": "Layers",      "label": "Skills",              "desc": "Modular, composable AI skills" },
-      { "icon": "Zap",         "label": "Pipeline Phases",     "desc": "Fully automated lifecycle" },
-      { "icon": "ShieldCheck", "label": "Non-bypassable Gates","desc": "Human approval at every key decision" }
+      {
+        "icon": "Layers",
+        "label": "Skills",
+        "desc": "Modular, composable AI skills"
+      },
+      {
+        "icon": "Zap",
+        "label": "Pipeline Phases",
+        "desc": "Fully automated lifecycle"
+      },
+      {
+        "icon": "ShieldCheck",
+        "label": "Non-bypassable Gates",
+        "desc": "Human approval at every key decision"
+      }
     ]
   },
-
   "cta": {
     "title": "Ready to build with ASE-OS?",
-    "subtitle": "{totalSkills} skills, {totalPipelinePhases} pipeline phases, and a fully wired multi-agent layer — ready to run inside any agentic development environment.",
+    "subtitle": "{totalSkills} skills, {totalPipelinePhases} pipeline phases, {totalAgents} agents, and 22 ready-to-use pipeline templates — ready to run inside any agentic development environment.",
     "buttons": [
-      { "label": "Get Started",      "href": "/getting-started", "style": "primary" },
-      { "label": "Browse All Skills", "href": "/skills",          "style": "secondary" },
-      { "label": "See the Pipeline",  "href": "/how-it-works",    "style": "secondary" },
-      { "label": "View on GitHub",    "href": "REPO_URL",         "style": "github" }
+      {
+        "label": "Get Started",
+        "href": "/getting-started",
+        "style": "primary"
+      },
+      {
+        "label": "Browse All Skills",
+        "href": "/skills",
+        "style": "secondary"
+      },
+      {
+        "label": "See the Pipeline",
+        "href": "/how-it-works",
+        "style": "secondary"
+      },
+      {
+        "label": "View on GitHub",
+        "href": "REPO_URL",
+        "style": "github"
+      }
     ]
   },
-
   "gettingStarted": {
     "steps": [
       {
         "step": "01",
         "title": "Clone & Run Setup",
-        "description": "The full ASE-OS skill system lives in this repository. Clone it, then run setup — it installs the aiw CLI, checks prerequisites, and creates your .env in one step.",
+        "description": "The full ASE-OS skill system lives in this repository. Clone it, then run setup — it installs the aiw CLI, checks prerequisites (Node.js ≥ 20, Python ≥ 3.9, git, opencode), and creates your .env in one step. No manual configuration needed.",
         "code": "git clone {REPO_URL}\ncd {REPO_NAME}\n./aiw setup",
         "color": "cyan"
       },
       {
         "step": "02",
-        "title": "Set Your GitHub Token & Launch",
-        "description": "Add your GitHub token to .env (classic PAT, no expiration, scopes: repo + read:org), then point the workflow at your project.",
-        "code": "# Edit .env and set GITHUB_TOKEN=ghp_...\n# Get one at: github.com/settings/tokens\n\naiw start /path/to/your-project",
+        "title": "Set Your Token & Launch",
+        "description": "Add your GitHub token to .env (classic PAT, no expiration, scopes: repo + read:org). Optionally add Context7 and Brave Search API keys for richer research capabilities. Then point the workflow at your project.",
+        "code": "# Edit .env:\nGITHUB_TOKEN=ghp_...          # required\nCONTEXT7_API_KEY=...           # optional\nBRAVE_API_KEY=...              # optional\n\n# Launch on any project:\naiw start /path/to/your-project\n\n# Or install it permanently inside a project:\naiw init /path/to/your-project",
         "color": "violet"
       },
       {
         "step": "03",
         "title": "The Orchestrator Takes Over",
-        "description": "The primary agent reads opencode.json and loads all skill bindings automatically. All {totalAgents} agents — including the analyzer, architect, builder, and domain specialists — are initialized and ready.",
-        "code": "# opencode.json is the system entry point\n# All agents and skill bindings are declared there",
+        "description": "The primary agent reads opencode.json and loads all skill bindings automatically. All 19 agents — including the analyzer, architect, builder, and domain specialists (data-engineer, api-designer, distributed-systems, cloud-platform, security-specialist, sre) — are initialized and ready.",
+        "code": "# Verify everything is working:\naiw health\n\n# Run a full diagnostic:\naiw doctor",
         "color": "blue"
       },
       {
         "step": "04",
-        "title": "Start with Requirements",
-        "description": "Describe what you want to build. The orchestrator routes your input through the full pipeline: requirements → architecture → planning → impact analysis → code generation → review → deployment.",
-        "code": "# Example: describe your feature\n\"Build a user authentication system\nwith JWT tokens and role-based access\"",
+        "title": "Describe What to Build",
+        "description": "Type your feature description. The orchestrator routes through the full pipeline: requirements → architecture → planning → parallel review → contract freeze → code generation → testing → deployment. Human approval gates pause at every critical decision.",
+        "code": "# Example prompts that trigger the full pipeline:\n\"Build a user authentication system with JWT tokens\"\n\"Add role-based access control to the admin panel\"\n\"Create a REST API for user management\"",
         "color": "teal"
       },
       {
         "step": "05",
-        "title": "Approve Human Review Gates",
-        "description": "At critical points (after requirements, after architecture, before deployment), the pipeline pauses for your review and approval. You stay in control of every major decision.",
-        "code": "# Pipeline pauses at:\n# - Requirements validated       (phase 1)\n# - Architecture approved        (phase 2)\n# - UX & database design approved (phase 2b)\n# - Design system approved       (phase 2c)\n# - Roadmap approved             (phase 4)\n# - Security posture approved    (phase 7)\n# - Defect triage (conditional)  (phase 8d)\n# - Final deploy approval        (phase 9)",
+        "title": "Review at 4 Human Gates",
+        "description": "The pipeline pauses for your approval at 4 key points: (1) after cost estimate, (2) after architecture and plan validation — only if critical findings exist, (3) after contract freeze for final plan sign-off, and (4) before production deployment. Every gate is fail-closed with no timeout bypass.",
+        "code": "# The 4 mandatory HITL gates:\n# GATE-001 — cost estimate approval\n# GATE-002 — architecture/validation (conditional)\n# GATE-003 — final plan approval (always)\n# GATE-004 — production deployment (always, no timeout)\n\n# Restore all 18 legacy gates:\n# pipeline_config.hitl_preset: 'full'",
         "color": "amber"
       },
       {
         "step": "06",
-        "title": "Add New Skills",
-        "description": "To extend the system, add a new SKILL.md file, register it in the three registry files, and it becomes part of every future pipeline run. The website updates on next build.",
-        "code": "# New skill path:\n.opencode/skills/<name>/SKILL.md\n\n# Register in:\nskills/index.yaml\nskills/registry.json\nskills/graph/skill-graph.yaml",
+        "title": "Add & Remove Skills",
+        "description": "Extend the system by adding a new SKILL.md. Remove AI Workflow from a project with aiw uninstall — it reverses aiw init, cleans up graphify artifacts, and removes the workflow config. Your .env is never deleted.",
+        "code": "# Add a new skill:\n.opencode/skills/<name>/SKILL.md\n# Register in: skills/index.yaml, skills/registry.json\n\n# Remove from a project (reverses aiw init):\naiw uninstall /path/to/your-project\n# Flags: --force, --backup, --dry-run, --clean-graph",
         "color": "pink"
       }
     ]
   },
-
   "installation": {
-    "sectionTitle": "Project Installation",
-    "sectionSubtitle": "Four commands. The orchestrator, all {totalSkills} skills, the knowledge graph, and {totalAgents} agents are ready in under a minute.",
+    "sectionTitle": "Installation & Setup",
+    "sectionSubtitle": "Four commands to get running. The orchestrator, all 120 skills, the knowledge graph, and 19 agents are ready in under a minute.",
     "stepLabel": "Step 1",
+    "prerequisites": {
+      "title": "Prerequisites",
+      "items": [
+        {
+          "name": "opencode",
+          "required": true,
+          "purpose": "Runs the AI agent runtime — the execution engine for all skills and agents"
+        },
+        {
+          "name": "Node.js ≥ 20",
+          "required": true,
+          "purpose": "Pipeline schema validation + plugin runtime (pinned via .nvmrc)"
+        },
+        {
+          "name": "Python 3 ≥ 3.9",
+          "required": true,
+          "purpose": "SKILL.md version consistency checks and schema tooling"
+        },
+        {
+          "name": "Git",
+          "required": true,
+          "purpose": "Version control — required for snapshot and rollback features"
+        },
+        {
+          "name": "ajv-cli",
+          "required": false,
+          "purpose": "JSON Schema validation — auto-installed by aiw setup if missing"
+        },
+        {
+          "name": "graphify",
+          "required": false,
+          "purpose": "Codebase knowledge graph — enables long-term memory across sessions"
+        }
+      ],
+      "note": "A GitHub Copilot subscription (or another LLM provider supported by opencode) is also required."
+    },
     "steps": [
       {
         "num": "01",
         "icon": "GitBranch",
         "title": "Clone & Run Setup",
-        "desc": "Clone the repo and run ./aiw setup — it installs the aiw CLI, checks prerequisites, installs dependencies, and creates your .env in one step. No manual configuration needed.",
+        "desc": "Clone the repo and run ./aiw setup. It checks all prerequisites, installs ajv-cli if missing, installs .opencode/ npm plugin dependencies, and creates .env from .env.example. The aiw CLI is added to your PATH so you can use it globally.",
         "code": "git clone {REPO_URL}\ncd {REPO_NAME}\n./aiw setup",
         "color": "cyan"
       },
       {
         "num": "02",
         "icon": "FolderOpen",
-        "title": "Set Token & Launch on Your Project",
-        "desc": "Add your GitHub token to .env (classic PAT, no expiration), then point the workflow at any project on your machine — or install it permanently into a project with aiw init.",
-        "code": "# Edit .env — set GITHUB_TOKEN=ghp_...\n# Get one at: github.com/settings/tokens\n\naiw start /path/to/your-project\n\n# Or install into a project permanently:\naiw init /path/to/your-project",
+        "title": "Configure .env",
+        "desc": "Open .env and set your credentials. GITHUB_TOKEN is the only required field. All other keys are optional but unlock additional research and web capabilities.",
+        "code": "# Required:\nGITHUB_TOKEN=ghp_...      # github.com/settings/tokens\n                           # Classic PAT, repo + read:org scopes\n\n# Optional:\nCONTEXT7_API_KEY=...       # context7.com — library doc lookups\nBRAVE_API_KEY=...          # api.search.brave.com — web search",
         "color": "violet"
       },
       {
         "num": "03",
         "icon": "Settings",
-        "title": "Agents Auto-Initialize",
-        "desc": "The primary orchestrator reads opencode.json and auto-binds all {totalAgents} specialized subagents. No manual wiring — each agent's skill scope is declared in the config.",
-        "code": "// opencode.json — snippet\n{\n  \"agent\": {\n    \"primary\":   { \"skill\": \"orchestrator/SKILL.md\" },\n    \"analyzer\":  { \"skill\": \"requirement-analyzer/SKILL.md\" },\n    \"architect\": { \"skills\": [\"architecture-design/SKILL.md\", ...] },\n    // ... more agents\n  }\n}",
+        "title": "Launch on Your Project",
+        "desc": "Use aiw start to point the workflow at any project directory. Agents and skills load from the AI-Workflow folder. All reads and writes go to your target project. Or use aiw init to copy the full workflow into a project permanently.",
+        "code": "# Point at any project (no copy needed):\naiw start /path/to/your-project\n\n# Install permanently into a project:\naiw init /path/to/your-project\ncd /path/to/your-project\nopencode   # all 120 skills + 19 agents, standalone",
         "color": "blue"
       },
       {
         "num": "04",
         "icon": "Terminal",
-        "title": "Graph Index Built Automatically",
-        "desc": "Graphify scans the project AST and builds a knowledge graph used as long-term memory — no embeddings, no vector DB required.",
-        "code": "# Runs automatically on first open via plugin hook\n# graphify-out/ is populated with:\n#   graph.json         — full AST graph\n#   GRAPH_REPORT.md    — architecture summary\n#   wiki/index.md      — navigable docs\ngraphify update .",
+        "title": "Verify & Start Building",
+        "desc": "Run aiw health to verify configuration, then aiw doctor for a full diagnostic. The knowledge graph is built automatically on first open via the graphify plugin hook.",
+        "code": "aiw health          # PASS/WARN/FAIL per check\naiw doctor          # full diagnostic\naiw validate        # 11-check skill validation suite\naiw status          # git + sessions + skills overview",
         "color": "teal"
+      }
+    ],
+    "uninstall": {
+      "title": "Removing AI Workflow from a Project",
+      "description": "To remove AI Workflow from a project that was set up with aiw init, use the uninstall command. It reverses the init process completely and never deletes your .env file.",
+      "steps": [
+        {
+          "title": "Basic uninstall",
+          "code": "aiw uninstall /path/to/your-project",
+          "note": "Removes opencode.json, .opencode/, and graphify-out/ from the target project. Preserves .env."
+        },
+        {
+          "title": "Uninstall with backup first",
+          "code": "aiw uninstall /path/to/your-project --backup",
+          "note": "Creates a timestamped backup of .opencode/state/ before removing anything."
+        },
+        {
+          "title": "Dry run — preview what would be removed",
+          "code": "aiw uninstall /path/to/your-project --dry-run",
+          "note": "Shows exactly what would be deleted without making any changes."
+        },
+        {
+          "title": "Force uninstall (skip confirmation prompts)",
+          "code": "aiw uninstall /path/to/your-project --force",
+          "note": "Skips all confirmation prompts. Use with caution."
+        },
+        {
+          "title": "Also remove knowledge graph",
+          "code": "aiw uninstall /path/to/your-project --clean-graph",
+          "note": "Also removes graphify-out/ (the knowledge graph index). Use when cleaning up completely."
+        }
+      ]
+    },
+    "commands": {
+      "title": "All Available Commands",
+      "groups": [
+        {
+          "group": "Getting Started",
+          "items": [
+            {
+              "cmd": "./aiw setup",
+              "desc": "First run only — install deps, create .env, add aiw to PATH"
+            },
+            {
+              "cmd": "aiw health",
+              "desc": "Check tools, .env, and configuration — PASS/WARN/FAIL output"
+            },
+            {
+              "cmd": "aiw start",
+              "desc": "Launch AI Workflow on this repository"
+            },
+            {
+              "cmd": "aiw start <path>",
+              "desc": "Launch on any project directory on your machine"
+            },
+            {
+              "cmd": "aiw init <path>",
+              "desc": "Copy full workflow into another project (makes it standalone)"
+            },
+            {
+              "cmd": "aiw uninstall <path>",
+              "desc": "Remove AI Workflow from a project (reverses aiw init)"
+            }
+          ]
+        },
+        {
+          "group": "Validation & Diagnostics",
+          "items": [
+            {
+              "cmd": "aiw validate",
+              "desc": "Run full 11-check skill validation suite"
+            },
+            {
+              "cmd": "aiw lint",
+              "desc": "Quick YAML + schema syntax check"
+            },
+            {
+              "cmd": "aiw doctor",
+              "desc": "Comprehensive diagnostic: health + validation + git status"
+            },
+            {
+              "cmd": "aiw status",
+              "desc": "Show project status: git, sessions, skills overview"
+            }
+          ]
+        },
+        {
+          "group": "Development",
+          "items": [
+            {
+              "cmd": "aiw sync",
+              "desc": "Sync website/data/ from source files"
+            },
+            {
+              "cmd": "aiw sync --website",
+              "desc": "Sync + push directly to ASE-OS-Website repo on GitHub"
+            },
+            {
+              "cmd": "aiw graph",
+              "desc": "Rebuild the knowledge graph (AST-only, no API cost)"
+            },
+            {
+              "cmd": "aiw update",
+              "desc": "Update .opencode/ plugin dependencies"
+            }
+          ]
+        },
+        {
+          "group": "Session Management",
+          "items": [
+            {
+              "cmd": "aiw sessions",
+              "desc": "Show expired session files (dry-run)"
+            },
+            {
+              "cmd": "aiw sessions delete",
+              "desc": "Delete expired session files"
+            },
+            {
+              "cmd": "aiw sessions backup",
+              "desc": "Backup current session state"
+            }
+          ]
+        },
+        {
+          "group": "Maintenance",
+          "items": [
+            {
+              "cmd": "aiw clean",
+              "desc": "Remove build artifacts (safe, reversible)"
+            },
+            {
+              "cmd": "aiw reset",
+              "desc": "Reset to clean state — removes .env and sessions ⚠️"
+            },
+            {
+              "cmd": "aiw backup",
+              "desc": "Backup .opencode/state/ to backups/"
+            }
+          ]
+        },
+        {
+          "group": "Website",
+          "items": [
+            {
+              "cmd": "aiw website",
+              "desc": "Build and start the website locally"
+            },
+            {
+              "cmd": "aiw website sync",
+              "desc": "Sync website data without starting server"
+            }
+          ]
+        },
+        {
+          "group": "Info",
+          "items": [
+            {
+              "cmd": "aiw help",
+              "desc": "Show all available commands with descriptions"
+            },
+            {
+              "cmd": "aiw version",
+              "desc": "Print the CLI version"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "domainColors": {
+    "requirements": "violet",
+    "architecture": "cyan",
+    "planning": "blue",
+    "review": "amber",
+    "testing": "green",
+    "security": "red",
+    "deployment": "orange",
+    "documentation": "pink",
+    "meta": "slate",
+    "orchestration": "indigo",
+    "implementation": "teal",
+    "design": "fuchsia",
+    "database": "sky",
+    "quality": "lime",
+    "governance": "rose",
+    "system": "yellow",
+    "domain-specialist": "purple",
+    "data": "emerald",
+    "api": "blue",
+    "cloud": "sky",
+    "sre": "orange"
+  },
+  "masteryColors": {
+    "beginner": "green",
+    "intermediate": "amber",
+    "advanced": "red"
+  },
+  "layerLabels": {
+    "pipeline-entry": "Entry",
+    "pipeline-core": "Core",
+    "pipeline-quality": "Quality",
+    "pipeline-execution": "Execution",
+    "pipeline-safety": "Safety",
+    "infrastructure": "Infrastructure",
+    "meta": "Meta"
+  },
+  "navigation": {
+    "primary": [
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/how-it-works",
+        "label": "How It Works"
+      },
+      {
+        "href": "/skills",
+        "label": "Skills"
+      },
+      {
+        "href": "/pipelines",
+        "label": "Pipelines"
+      },
+      {
+        "href": "/architecture",
+        "label": "Architecture"
+      }
+    ],
+    "more": [
+      {
+        "href": "/agents",
+        "label": "Agents"
+      },
+      {
+        "href": "/getting-started",
+        "label": "Getting Started"
+      },
+      {
+        "href": "/reference",
+        "label": "Reference"
+      },
+      {
+        "href": "/changelog",
+        "label": "Changelog"
+      },
+      {
+        "href": "/about",
+        "label": "About"
       }
     ]
   },
-
-  "domainColors": {
-    "requirements":       "violet",
-    "architecture":       "cyan",
-    "planning":           "blue",
-    "review":             "amber",
-    "testing":            "green",
-    "security":           "red",
-    "deployment":         "orange",
-    "documentation":      "pink",
-    "meta":               "slate",
-    "orchestration":      "indigo",
-    "implementation":     "teal",
-    "design":             "fuchsia",
-    "database":           "sky",
-    "quality":            "lime",
-    "governance":         "rose",
-    "system":             "yellow",
-    "domain-specialist":  "purple",
-    "data":               "emerald",
-    "api":                "blue",
-    "cloud":              "sky",
-    "sre":                "orange"
-  },
-
-  "masteryColors": {
-    "beginner":     "green",
-    "intermediate": "amber",
-    "advanced":     "red"
-  },
-
-  "layerLabels": {
-    "pipeline-entry":     "Entry",
-    "pipeline-core":      "Core",
-    "pipeline-quality":   "Quality",
-    "pipeline-execution": "Execution",
-    "pipeline-safety":    "Safety",
-    "infrastructure":     "Infrastructure",
-    "meta":               "Meta"
-  },
-
-  "navigation": {
-    "primary": [
-      { "href": "/",             "label": "Home" },
-      { "href": "/how-it-works", "label": "How It Works" },
-      { "href": "/skills",       "label": "Skills" },
-      { "href": "/pipelines",    "label": "Pipelines" },
-      { "href": "/architecture", "label": "Architecture" }
-    ],
-    "more": [
-      { "href": "/agents",          "label": "Agents" },
-      { "href": "/getting-started", "label": "Getting Started" },
-      { "href": "/reference",       "label": "Reference" },
-      { "href": "/changelog",       "label": "Changelog" },
-      { "href": "/about",           "label": "About" }
-    ]
-  },
-
   "about": {
     "name": "Albadry Esmat",
     "initials": "AE",
@@ -827,7 +1687,6 @@
       }
     ]
   },
-
   "footer": {
     "tagline": "ASE-OS — AI Software Engineering Operating System",
     "builtBy": "Albadry Esmat"
