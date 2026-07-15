@@ -1,0 +1,214 @@
+name: Sync Website Data
+
+# ─── Triggers ────────────────────────────────────────────────────────────────
+# Runs automatically on every push to main that touches any data source file.
+# Can also be triggered manually from GitHub Actions UI (workflow_dispatch).
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "skills/index.yaml"
+      - "skills/registry.json"
+      - "skills/graph/**"
+      - "skills/pipelines/**"
+      - "docs/changelog.md"
+      - "opencode.json"
+      - ".opencode/skills/**/SKILL.md"
+      - "website/data/site-content.json"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force sync even if no data files changed"
+        required: false
+        default: "false"
+
+# ─── Concurrency ─────────────────────────────────────────────────────────────
+# Only one sync runs at a time — queue any extras, cancel stale ones.
+concurrency:
+  group: sync-website
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Job 1: Validate that source files are internally consistent ──────────────
+  preflight:
+    name: Pre-flight Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI-Workflow
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install pyyaml==6.0.2 --quiet
+
+      - name: Validate skills/index.yaml is valid YAML
+        run: |
+          python3 -c "
+          import yaml, sys
+          try:
+              with open('skills/index.yaml') as f:
+                  yaml.safe_load(f)
+              print('  PASS: skills/index.yaml is valid YAML')
+          except yaml.YAMLError as e:
+              print(f'  FAIL: {e}', file=sys.stderr)
+              sys.exit(1)
+          "
+
+      - name: Validate skills/registry.json is valid JSON
+        run: |
+          node -e "
+            const fs = require('fs');
+            try {
+              JSON.parse(fs.readFileSync('skills/registry.json', 'utf8'));
+              console.log('  PASS: skills/registry.json is valid JSON');
+            } catch (e) {
+              process.stderr.write('  FAIL: ' + e.message + '\n');
+              process.exit(1);
+            }
+          "
+
+      - name: Validate opencode.json is valid JSON
+        run: |
+          node -e "
+            const fs = require('fs');
+            try {
+              JSON.parse(fs.readFileSync('opencode.json', 'utf8'));
+              console.log('  PASS: opencode.json is valid JSON');
+            } catch (e) {
+              process.stderr.write('  FAIL: ' + e.message + '\n');
+              process.exit(1);
+            }
+          "
+
+  # ── Job 2: Sync data files to ASE-OS-Website repo ───────────────────────────
+  sync:
+    name: Sync → ASE-OS-Website
+    runs-on: ubuntu-latest
+    needs: preflight
+
+    steps:
+      - name: Checkout AI-Workflow
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout ASE-OS-Website
+        uses: actions/checkout@v4
+        with:
+          repository: Albadry-Esmat/ASE-OS-Website
+          token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
+          path: ase-os-website
+
+      # ── Mirror all data files ────────────────────────────────────────────────
+      - name: Sync skills/index.yaml
+        run: cp skills/index.yaml ase-os-website/data/skills/index.yaml
+
+      - name: Sync skills/registry.json
+        run: cp skills/registry.json ase-os-website/data/skills/registry.json
+
+      - name: Sync skills/graph/skill-graph.yaml
+        run: |
+          mkdir -p ase-os-website/data/skills/graph
+          cp skills/graph/skill-graph.yaml ase-os-website/data/skills/graph/skill-graph.yaml
+
+      - name: Sync skills/pipelines/ (all *.json)
+        run: |
+          mkdir -p ase-os-website/data/skills/pipelines
+          cp skills/pipelines/*.json ase-os-website/data/skills/pipelines/
+
+      - name: Sync docs/changelog.md
+        run: |
+          mkdir -p ase-os-website/data/docs
+          cp docs/changelog.md ase-os-website/data/docs/changelog.md
+
+      - name: Sync opencode.json
+        run: cp opencode.json ase-os-website/data/opencode.json
+
+      - name: Sync .opencode/skills/ SKILL.md files
+        run: |
+          mkdir -p ase-os-website/data/.opencode/skills
+          rsync -a --include="*/" --include="SKILL.md" --exclude="*" \
+            .opencode/skills/ ase-os-website/data/.opencode/skills/
+
+      - name: Sync website/data/site-content.json
+        run: |
+          if [ -f website/data/site-content.json ]; then
+            cp website/data/site-content.json ase-os-website/data/site-content.json
+          else
+            echo "  INFO: website/data/site-content.json not found — skipping"
+          fi
+
+      # ── Detect changes ───────────────────────────────────────────────────────
+      - name: Check for changes
+        id: changes
+        working-directory: ase-os-website
+        run: |
+          git diff --stat
+          CHANGED=$(git status --short | wc -l | tr -d ' ')
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+          if [ "$CHANGED" -gt 0 ]; then
+            echo "  → $CHANGED file(s) changed"
+          else
+            echo "  → Nothing changed — ASE-OS-Website data is already up to date"
+          fi
+
+      # ── Commit & push ────────────────────────────────────────────────────────
+      - name: Commit and push to ASE-OS-Website
+        if: steps.changes.outputs.changed != '0'
+        working-directory: ase-os-website
+        run: |
+          # Detect version from changelog for a meaningful commit message
+          VERSION=$(grep -m1 '## \[' ../docs/changelog.md 2>/dev/null \
+                    | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
+
+          # Detect which source files actually changed (for commit body)
+          CHANGED_FILES=$(git status --short | awk '{print $2}' | head -10 | tr '\n' ' ')
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/
+          git commit -m "sync: update data/ from AI-Workflow v${VERSION}
+
+Triggered by push to Albadry-Esmat/AI-Workflow@\${{ github.sha }}
+Changed: ${CHANGED_FILES}
+
+Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/\${{ github.sha }}"
+
+          git push origin main
+
+      - name: No changes — skip push
+        if: steps.changes.outputs.changed == '0'
+        run: echo "✅ ASE-OS-Website data is already up to date. Nothing to push."
+
+      # ── Summary ──────────────────────────────────────────────────────────────
+      - name: Job summary
+        if: always()
+        run: |
+          VERSION=$(grep -m1 '## \[' docs/changelog.md 2>/dev/null \
+                    | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
+          CHANGED="${{ steps.changes.outputs.changed }}"
+
+          echo "## 🔄 Website Sync Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| AI-Workflow version | \`v${VERSION}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Files changed | ${CHANGED} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Target repo | [Albadry-Esmat/ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Live site | [ase-os.vercel.app](https://ase-os.vercel.app) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$CHANGED" != "0" ]; then
+            echo "✅ **Data pushed.** Vercel will auto-deploy ASE-OS-Website shortly." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "✅ **Already in sync.** No push needed." >> "$GITHUB_STEP_SUMMARY"
+          fi

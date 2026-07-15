@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate clean reset sync website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -70,8 +70,11 @@ backup: ## Backup .opencode/state/ to backups/ directory
 	@./aiw backup
 
 # ── Data & Knowledge ─────────────────────────────────────────────────────────
-sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/)
+sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/) — CI does this automatically on push
 	@bash scripts/sync-website-data.sh
+
+sync-push: ## Sync website/data/ AND push the result to ASE-OS-Website repo
+	@bash scripts/sync-website-data.sh --website
 
 graph: ## Rebuild the knowledge graph after code changes (requires graphify — optional)
 	@./aiw graph
