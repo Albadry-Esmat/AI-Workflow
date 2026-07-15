@@ -185,12 +185,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add data/
-          git commit -m "sync: update data/ from AI-Workflow v${VERSION}
-
-Triggered by push to Albadry-Esmat/AI-Workflow@\${{ github.sha }}
-Changed: ${CHANGED_FILES}
-
-Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/\${{ github.sha }}"
+          git commit -m "sync: update data/ from AI-Workflow v${VERSION}" \
+            -m "Triggered by push to Albadry-Esmat/AI-Workflow@${{ github.sha }}" \
+            -m "Changed: ${CHANGED_FILES}" \
+            -m "Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/${{ github.sha }}"
 
           git push origin main
 
