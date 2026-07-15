@@ -112,9 +112,6 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install js-yaml for patch script
-        run: npm install --no-save js-yaml@4
-
       # ── Auto-patch site-content.json with live counts ─────────────────────────
       - name: Patch site-content.json (derive counts from source files)
         run: node scripts/patch-site-content.js
