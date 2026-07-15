@@ -65,6 +65,12 @@ elif [[ "$CHECK_MODE" == "true" ]]; then
   info "Check mode — will exit 1 if any file is out of sync"
 fi
 
+# ── Pre-sync: patch site-content.json with live-derived counts ────────────────
+if [[ "$DRY_RUN" != "true" ]] && command -v node &>/dev/null; then
+  header "Auto-patch site-content.json (live counts)"
+  node "$ROOT/scripts/patch-site-content.js" || true
+fi
+
 # ── Guard: website/data must exist ────────────────────────────────────────────
 if [[ ! -d "$DATA_DIR" ]]; then
   warn "website/data/ not found — skipping sync"

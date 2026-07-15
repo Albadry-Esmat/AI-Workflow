@@ -1,20 +1,20 @@
 {
   "$schema": "site-content-schema",
-  "$version": "4.0.0",
-  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 120 skills, 19 agents, 22 pipelines, 37 phases.",
+  "$version": "5.3.0",
+  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 114 skills, 19 agents, 22 pipelines, 37 phases.",
   "meta": {
     "title": "ASE-OS — AI Software Engineering Operating System",
     "titleTemplate": "%s — ASE-OS",
-    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. 120 skills · 19 agents · 22 pipeline templates · v4.0.0.",
+    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. 114 skills · 19 agents · 22 pipeline templates · v4.0.0.",
     "openGraph": {
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. 120 skills, 19 agents, 22 pipeline templates.",
+      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. 114 skills, 19 agents, 22 pipeline templates.",
       "siteName": "ASE-OS"
     },
     "twitter": {
       "card": "summary_large_image",
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v4.0.0 — 120 skills, 19 agents."
+      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v4.0.0 — 114 skills, 19 agents."
     }
   },
   "hero": {
@@ -46,11 +46,7 @@
       "Pipeline Phases",
       "Agents"
     ],
-    "statsValues": [
-      "120",
-      "37",
-      "19"
-    ]
+    "statsValues": ["114", "37", "19"]
   },
   "features": {
     "sectionTitle": "What ASE-OS Does For You",

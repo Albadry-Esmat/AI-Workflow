@@ -107,6 +107,18 @@ jobs:
           token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
           path: ase-os-website
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install js-yaml for patch script
+        run: npm install --no-save js-yaml@4
+
+      # ── Auto-patch site-content.json with live counts ─────────────────────────
+      - name: Patch site-content.json (derive counts from source files)
+        run: node scripts/patch-site-content.js
+
       # ── Mirror all data files ────────────────────────────────────────────────
       - name: Sync skills/index.yaml
         run: cp skills/index.yaml ase-os-website/data/skills/index.yaml
