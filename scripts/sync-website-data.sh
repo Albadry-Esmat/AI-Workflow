@@ -135,6 +135,35 @@ sync_dir() {
     dst_file="$dst_dir/$rel"
     sync_file "$src_file" "$dst_file"
   done < <(find "$src_dir" -name "$pattern" -type f -print0 2>/dev/null || true)
+
+  # Remove destination files that no longer exist in the authoritative source.
+  # This prevents deleted skills or pipelines from remaining in website/data/.
+  if [[ -d "$dst_dir" ]]; then
+    while IFS= read -r -d '' dst_file; do
+      rel="${dst_file#"$dst_dir/"}"
+      base="$(basename "$dst_file")"
+      case "$base" in
+        $pattern) ;;
+        *) continue ;;
+      esac
+      if [[ ! -f "$src_dir/$rel" ]]; then
+        if [[ "$CHECK_MODE" == "true" ]]; then
+          fail "Stale mirror file: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        elif [[ "$DRY_RUN" == "true" ]]; then
+          info "Would remove stale: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        else
+          rm -f "$dst_file"
+          ok "Removed stale: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        fi
+      fi
+    done < <(find "$dst_dir" -type f -print0 2>/dev/null || true)
+    if [[ "$CHECK_MODE" != "true" ]]; then
+      find "$dst_dir" -depth -type d -empty -delete 2>/dev/null || true
+    fi
+  fi
 }
 
 # ── Sync: skills/ root files ──────────────────────────────────────────────────
@@ -189,20 +218,22 @@ echo
 if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY_RUN" == "false" ]]; then
   header "Pushing to ASE-OS-Website"
 
-  # Clone into a temp dir
+  # Clone the Dev branch into a temp dir
   WEBSITE_REPO_DIR="$(mktemp -d)"
   trap 'rm -rf "$WEBSITE_REPO_DIR"' EXIT
 
   step "Cloning $WEBSITE_REPO ..."
-  if ! git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
+  if ! git clone --depth 1 --branch Dev "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
     fail "Could not clone ASE-OS-Website — check your GITHUB_TOKEN and network."
     exit 1
   fi
   ok "Cloned into $WEBSITE_REPO_DIR"
 
-  # Mirror website/data/ → data/ in the website repo
+  # Mirror website/data/ → data/ in the website repo exactly, including deletions
   step "Copying data files..."
-  rsync -a --delete "$DATA_DIR/" "$WEBSITE_REPO_DIR/data/"
+  rm -rf "$WEBSITE_REPO_DIR/data"
+  mkdir -p "$WEBSITE_REPO_DIR/data"
+  cp -a "$DATA_DIR/." "$WEBSITE_REPO_DIR/data/"
 
   # Check if anything actually changed
   cd "$WEBSITE_REPO_DIR"
@@ -222,8 +253,8 @@ if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY
 Automated sync from AI-Workflow repository.
 Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
 
-    step "Pushing to origin/main..."
-    if git push origin main --quiet; then
+    step "Pushing to origin/Dev..."
+    if git push origin Dev --quiet; then
       ok "Pushed $CHANGED file(s) to ASE-OS-Website"
       echo ""
       echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"

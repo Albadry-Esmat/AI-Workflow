@@ -1,12 +1,12 @@
 name: Sync Website Data
 
 # ─── Triggers ────────────────────────────────────────────────────────────────
-# Runs automatically on every push to main that touches any data source file.
+# Runs automatically on every push to Dev that touches any data source file.
 # Can also be triggered manually from GitHub Actions UI (workflow_dispatch).
 on:
   push:
     branches:
-      - main
+      - Dev
     paths:
       - "skills/index.yaml"
       - "skills/registry.json"
@@ -100,10 +100,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout ASE-OS-Website
+      - name: Checkout ASE-OS-Website Dev branch
         uses: actions/checkout@v4
         with:
           repository: Albadry-Esmat/ASE-OS-Website
+          ref: Dev
           token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
           path: ase-os-website
 
@@ -144,8 +145,8 @@ jobs:
       - name: Sync .opencode/skills/ SKILL.md files
         run: |
           mkdir -p ase-os-website/data/.opencode/skills
-          rsync -a --include="*/" --include="SKILL.md" --exclude="*" \
-            .opencode/skills/ ase-os-website/data/.opencode/skills/
+            rsync -a --delete --include="*/" --include="SKILL.md" --exclude="*" \
+              .opencode/skills/ ase-os-website/data/.opencode/skills/
 
       - name: Sync website/data/site-content.json
         run: |
@@ -190,7 +191,7 @@ jobs:
             -m "Changed: ${CHANGED_FILES}" \
             -m "Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/${{ github.sha }}"
 
-          git push origin main
+          git push origin Dev
 
       - name: No changes — skip push
         if: steps.changes.outputs.changed == '0'
