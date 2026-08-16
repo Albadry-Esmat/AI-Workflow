@@ -5,11 +5,11 @@
 # Usage:
 #   make setup      ← start here on a fresh clone (also installs `aiw` CLI)
 #   aiw health      ← verify environment after editing .env
-#   aiw validate    ← run the full skill validation suite
+#   aiw validate    ← run the full skill and execution-contract validation suites
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -47,8 +47,12 @@ start: ## Launch the AI Workflow (opens opencode session)
 health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per item
 	@bash scripts/health-check.sh
 
-validate: ## Run the full 11-check skill validation suite
+validate: ## Run the full skill and execution-contract validation suites
 	@bash scripts/validate-skills.sh
+	@$(MAKE) validate-contracts
+
+validate-contracts: ## Validate versioned execution contracts and fixtures
+	@python3 scripts/validate-execution-contracts.py
 
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint

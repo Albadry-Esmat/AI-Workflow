@@ -9,6 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Execution Contracts
+
+- Added the versioned `ai-workflow-execution` contract family for run manifests, step executions, artifact references, gate decisions, and policy decisions.
+- Added positive/negative fixtures, cross-contract relationship checks, version compatibility rules, and the `validate-contracts` developer command.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

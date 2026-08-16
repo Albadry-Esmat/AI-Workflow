@@ -120,7 +120,7 @@ jobs:
 
       - name: Install validation dependencies
         run: |
-          pip install pyyaml==6.0.2 --quiet
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 --quiet
           npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
       # ── Auto-patch and validate source data ───────────────────────────────────
@@ -129,6 +129,9 @@ jobs:
 
       - name: Run full source validation
         run: bash scripts/validate-skills.sh
+
+      - name: Validate execution contracts
+        run: python3 scripts/validate-execution-contracts.py
 
       - name: Run sync deletion regression test
         run: bash scripts/sync-website-data.sh --test-deletion

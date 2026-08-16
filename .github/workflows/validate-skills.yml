@@ -43,11 +43,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install PyYAML
-        run: pip install pyyaml==6.0.2 --quiet
+      - name: Install PyYAML and JSON Schema validator
+        run: pip install pyyaml==6.0.2 jsonschema==4.23.0 --quiet
 
       - name: Install ajv-cli
         run: npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
+
+      - name: Validate execution contracts
+        run: python3 scripts/validate-execution-contracts.py
 
       # ── Check 0 ─────────────────────────────────────────────────────────────
       - name: "0/10 — YAML syntax check (skills/index.yaml)"

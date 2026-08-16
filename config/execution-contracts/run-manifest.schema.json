@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/execution/run-manifest.schema.json",
+  "title": "AI-Workflow Run Manifest",
+  "description": "Durable identity and lifecycle contract for one pipeline run. This manifest contains references to steps, artifacts, gates, and policy decisions; it does not contain raw user content, source code, credentials, or model prompts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "contract_version",
+    "run_id",
+    "pipeline_template",
+    "pipeline_mode",
+    "source_commit",
+    "requested_by",
+    "started_at",
+    "status",
+    "step_ids",
+    "artifact_ids",
+    "gate_decision_ids",
+    "policy_decision_ids",
+    "pii_scrubbed",
+    "redaction_profile"
+  ],
+  "properties": {
+    "contract_type": { "type": "string", "const": "run-manifest" },
+    "contract_version": { "type": "string", "const": "1.0.0" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "pipeline_template": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "pipeline_mode": { "type": "string", "enum": ["standard", "specialized_review", "legacy_dual_planner", "dry_run"] },
+    "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "project_root": { "type": "string", "maxLength": 1024 },
+    "requested_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_id", "actor_type"],
+      "properties": {
+        "actor_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "actor_type": { "type": "string", "enum": ["human", "agent", "automation", "system"] }
+      }
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": ["string", "null"], "format": "date-time" },
+    "status": { "type": "string", "enum": ["created", "running", "completed", "failed", "cancelled", "blocked"] },
+    "step_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^STEP-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "artifact_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "gate_decision_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^GATE-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "policy_decision_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^POL-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "result_artifact_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "evidence_uri": { "type": "string", "pattern": "^(artifact|file|https?)://[^\\s]+$" },
+    "failure": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z0-9_.-]+$" },
+        "message": { "type": "string", "maxLength": 2000 },
+        "retryable": { "type": "boolean" },
+        "failed_step_id": { "type": "string", "pattern": "^STEP-[0-9a-f]{12}$" }
+      }
+    },
+    "pii_scrubbed": { "type": "boolean", "const": true },
+    "redaction_profile": { "type": "string", "enum": ["none", "standard-v1", "strict-v1"] },
+    "labels": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "maxLength": 200 },
+      "maxProperties": 20
+    }
+  }
+}

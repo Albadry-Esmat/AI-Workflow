@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/execution/artifact-reference.schema.json",
+  "title": "AI-Workflow Artifact Reference",
+  "description": "Metadata-only reference to a run artifact. Artifact content is stored separately and must not be embedded in execution records.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "contract_version",
+    "artifact_id",
+    "run_id",
+    "kind",
+    "uri",
+    "sha256",
+    "size_bytes",
+    "media_type",
+    "classification",
+    "contains_pii",
+    "retention_class",
+    "created_at",
+    "producer_step_id"
+  ],
+  "properties": {
+    "contract_type": { "type": "string", "const": "artifact-reference" },
+    "contract_version": { "type": "string", "const": "1.0.0" },
+    "artifact_id": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "kind": { "type": "string", "enum": ["file", "directory", "json", "markdown", "test-report", "diff", "binary", "external"] },
+    "uri": { "type": "string", "pattern": "^(artifact|file|https?)://[^\\s]+$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "size_bytes": { "type": "integer", "minimum": 0 },
+    "media_type": { "type": "string", "pattern": "^[a-z0-9][a-z0-9!#$&^_.+-]*/[a-z0-9][a-z0-9!#$&^_.+-]*$" },
+    "classification": { "type": "string", "enum": ["public", "internal", "confidential", "restricted"] },
+    "contains_pii": { "type": "boolean" },
+    "retention_class": { "type": "string", "enum": ["run", "release", "audit", "ephemeral"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "producer_step_id": { "type": "string", "pattern": "^STEP-[0-9a-f]{12}$" },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" },
+    "label": { "type": "string", "maxLength": 200 },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "maxLength": 500 },
+      "maxProperties": 30
+    }
+  }
+}

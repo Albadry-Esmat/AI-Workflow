@@ -1,0 +1,23 @@
+{
+  "contract_type": "run-manifest",
+  "contract_version": "1.0.0",
+  "run_id": "RUN-000000000001",
+  "pipeline_template": "quick-review",
+  "pipeline_mode": "specialized_review",
+  "source_commit": "58fc73398d97ae97d8494dd572fdba253c6b8f20",
+  "project_root": "file:///workspace/project",
+  "requested_by": { "actor_id": "user:primary", "actor_type": "human" },
+  "started_at": "2026-08-16T22:00:00Z",
+  "completed_at": "2026-08-16T22:02:00Z",
+  "status": "completed",
+  "step_ids": ["STEP-000000000001"],
+  "artifact_ids": ["ART-000000000001"],
+  "gate_decision_ids": ["GATE-000000000001"],
+  "policy_decision_ids": ["POL-000000000001"],
+  "result_artifact_ids": ["ART-000000000001"],
+  "evidence_uri": "artifact://RUN-000000000001/ART-000000000001",
+  "failure": null,
+  "pii_scrubbed": true,
+  "redaction_profile": "standard-v1",
+  "labels": { "environment": "dev", "batch": "3" }
+}

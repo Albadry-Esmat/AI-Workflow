@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/execution/step-execution.schema.json",
+  "title": "AI-Workflow Step Execution",
+  "description": "Append-only execution record for one skill or pipeline step. Large inputs and outputs are represented by artifact references rather than embedded content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "contract_version",
+    "step_id",
+    "run_id",
+    "skill_id",
+    "skill_version",
+    "phase",
+    "sequence",
+    "status",
+    "started_at",
+    "input_artifact_ids",
+    "output_artifact_ids",
+    "policy_decision_id",
+    "pii_scrubbed"
+  ],
+  "properties": {
+    "contract_type": { "type": "string", "const": "step-execution" },
+    "contract_version": { "type": "string", "const": "1.0.0" },
+    "step_id": { "type": "string", "pattern": "^STEP-[0-9a-f]{12}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "skill_id": { "type": "string", "pattern": "^(SKL-[0-9]{3,}|[a-z0-9][a-z0-9-]{1,100})$" },
+    "skill_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "phase": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "status": { "type": "string", "enum": ["queued", "running", "succeeded", "failed", "skipped", "blocked", "cancelled"] },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": ["string", "null"], "format": "date-time" },
+    "duration_ms": { "type": ["integer", "null"], "minimum": 0 },
+    "input_artifact_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "output_artifact_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "policy_decision_id": { "type": "string", "pattern": "^POL-[0-9a-f]{12}$" },
+    "gate_decision_id": { "type": ["string", "null"], "pattern": "^GATE-[0-9a-f]{12}$" },
+    "attempt": { "type": "integer", "minimum": 1, "default": 1 },
+    "retryable": { "type": "boolean" },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z0-9_.-]+$" },
+        "message": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "enum": ["validation", "authorization", "dependency", "timeout", "tool", "unknown"] }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens": { "type": "integer", "minimum": 0 },
+        "output_tokens": { "type": "integer", "minimum": 0 },
+        "tool_calls": { "type": "integer", "minimum": 0 },
+        "estimated_cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "pii_scrubbed": { "type": "boolean", "const": true }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "contract_type": "gate-decision",
+  "contract_version": "1.0.0",
+  "gate_id": "GATE-000000000001",
+  "run_id": "RUN-000000000001",
+  "gate_type": "deploy",
+  "subject": "production deployment",
+  "decision": "approved",
+  "requested_at": "2026-08-16T22:01:40Z",
+  "decided_at": "2026-08-16T22:01:45Z",
+  "actor_type": "automation",
+  "actor_id": "ci:bot",
+  "evidence_artifact_ids": [],
+  "policy_decision_ids": [],
+  "irreversible_action": true,
+  "reason": "Automated approval"
+}
