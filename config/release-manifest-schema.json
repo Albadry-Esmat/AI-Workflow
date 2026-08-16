@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/release-manifest.schema.json",
+  "title": "AI-Workflow Website Release Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "source_repository",
+    "source_branch",
+    "source_commit",
+    "website_repository",
+    "website_branch",
+    "website_commit",
+    "website_commit_role",
+    "data_hash",
+    "registry_version",
+    "source_validation",
+    "website_validation",
+    "generated_at"
+  ],
+  "properties": {
+    "manifest_version": { "type": "string", "const": "1.0.0" },
+    "source_repository": { "type": "string", "minLength": 1 },
+    "source_branch": { "type": "string", "const": "Dev" },
+    "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "website_repository": { "type": "string", "minLength": 1 },
+    "website_branch": { "type": "string", "const": "Dev" },
+    "website_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "website_commit_role": { "type": "string", "const": "sync-base" },
+    "data_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "registry_version": { "type": "string", "minLength": 1 },
+    "source_validation": { "type": "string", "enum": ["pass", "fail"] },
+    "website_validation": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+    "website_build": { "type": "string", "enum": ["pass", "fail", "not-run"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "trigger": { "type": "string", "minLength": 1 }
+  }
+}

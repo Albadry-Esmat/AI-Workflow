@@ -113,48 +113,51 @@ jobs:
         with:
           node-version: "20"
 
-      # ── Auto-patch site-content.json with live counts ─────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install validation dependencies
+        run: |
+          pip install pyyaml==6.0.2 --quiet
+          npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
+
+      # ── Auto-patch and validate source data ───────────────────────────────────
       - name: Patch site-content.json (derive counts from source files)
         run: node scripts/patch-site-content.js
 
-      # ── Mirror all data files ────────────────────────────────────────────────
-      - name: Sync skills/index.yaml
-        run: cp skills/index.yaml ase-os-website/data/skills/index.yaml
+      - name: Run full source validation
+        run: bash scripts/validate-skills.sh
 
-      - name: Sync skills/registry.json
-        run: cp skills/registry.json ase-os-website/data/skills/registry.json
+      - name: Run sync deletion regression test
+        run: bash scripts/sync-website-data.sh --test-deletion
 
-      - name: Sync skills/graph/skill-graph.yaml
+      # ── Exact delete-aware mirror ────────────────────────────────────────────
+      - name: Mirror website data exactly
         run: |
-          mkdir -p ase-os-website/data/skills/graph
-          cp skills/graph/skill-graph.yaml ase-os-website/data/skills/graph/skill-graph.yaml
+          rm -rf ase-os-website/data
+          mkdir -p ase-os-website/data
+          cp -a website/data/. ase-os-website/data/
 
-      - name: Sync skills/pipelines/ (all *.json)
+      - name: Verify exact mirror and compute data hash
         run: |
-          mkdir -p ase-os-website/data/skills/pipelines
-          cp skills/pipelines/*.json ase-os-website/data/skills/pipelines/
+          python3 scripts/data-integrity.py compare website/data ase-os-website/data --json
+          DATA_HASH=$(python3 scripts/data-integrity.py hash website/data)
+          echo "DATA_HASH=sha256:${DATA_HASH}" >> "$GITHUB_ENV"
+          echo "Data hash: sha256:${DATA_HASH}"
 
-      - name: Sync docs/changelog.md
+      - name: Generate and validate ReleaseManifest
         run: |
-          mkdir -p ase-os-website/data/docs
-          cp docs/changelog.md ase-os-website/data/docs/changelog.md
-
-      - name: Sync opencode.json
-        run: cp opencode.json ase-os-website/data/opencode.json
-
-      - name: Sync .opencode/skills/ SKILL.md files
-        run: |
-          mkdir -p ase-os-website/data/.opencode/skills
-            rsync -a --delete --include="*/" --include="SKILL.md" --exclude="*" \
-              .opencode/skills/ ase-os-website/data/.opencode/skills/
-
-      - name: Sync website/data/site-content.json
-        run: |
-          if [ -f website/data/site-content.json ]; then
-            cp website/data/site-content.json ase-os-website/data/site-content.json
-          else
-            echo "  INFO: website/data/site-content.json not found — skipping"
-          fi
+          python3 scripts/generate-release-manifest.py \\
+            --source-root . \\
+            --website-root ase-os-website \\
+            --data-hash "$DATA_HASH" \\
+            --source-validation pass \\
+            --website-validation not-run \\
+            --website-build not-run \\
+            --output ase-os-website/data/release-manifest.json \\
+            --validate
 
       # ── Detect changes ───────────────────────────────────────────────────────
       - name: Check for changes
@@ -212,6 +215,7 @@ jobs:
           echo "| AI-Workflow version | \`v${VERSION}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Commit | [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Files changed | ${CHANGED} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Data hash | `${DATA_HASH:-not-computed}` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Target repo | [Albadry-Esmat/ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website) |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Live site | [ase-os.vercel.app](https://ase-os.vercel.app) |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"

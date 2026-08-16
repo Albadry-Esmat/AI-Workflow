@@ -34,10 +34,11 @@ cd "$ROOT"
 # shellcheck source=scripts/lib/common.sh
 source "$ROOT/scripts/lib/common.sh"
 
-DATA_DIR="$ROOT/website/data"
+DATA_DIR="${AIW_SYNC_DATA_DIR:-$ROOT/website/data}"
 DRY_RUN=false
 CHECK_MODE=false
 PUSH_WEBSITE=false
+TEST_DELETION=false
 SYNCED=0
 UP_TO_DATE=0
 ERRORS=0
@@ -46,12 +47,14 @@ for arg in "$@"; do
   case "$arg" in
     --dry-run)  DRY_RUN=true       ;;
     --check)    CHECK_MODE=true    ;;
-    --website)  PUSH_WEBSITE=true  ;;
+    --website)       PUSH_WEBSITE=true  ;;
+    --test-deletion) TEST_DELETION=true  ;;
     --help|-h)
       echo "Usage: $0 [--dry-run] [--check] [--website]"
       echo "  --dry-run    Show what would be synced without writing anything"
       echo "  --check      Exit 1 if any file is out of sync (for CI use)"
-      echo "  --website    Sync website/data/ then push to ASE-OS-Website repo"
+      echo "  --website       Sync website/data/ then push to ASE-OS-Website repo"
+      echo "  --test-deletion Run an isolated stale-file deletion regression test"
       exit 0
       ;;
   esac
@@ -166,6 +169,49 @@ sync_dir() {
   fi
 }
 
+# ── Regression: deletion semantics ─────────────────────────────────────────────
+run_deletion_test() {
+  local test_root check_log sync_log
+  test_root="$(mktemp -d -t aiw-sync-test.XXXXXX)"
+  check_log="$(mktemp)"
+  sync_log="$(mktemp)"
+
+  cp -a "$DATA_DIR/." "$test_root/"
+  mkdir -p "$test_root/skills/pipelines"
+  printf '%s\n' '{"stale":true}' > "$test_root/skills/pipelines/__batch2_stale__.json"
+
+  if AIW_SYNC_DATA_DIR="$test_root" "$0" --check >"$check_log" 2>&1; then
+    cat "$check_log"
+    rm -rf "$test_root" "$check_log" "$sync_log"
+    fail "Deletion regression test did not detect the injected stale file"
+    return 1
+  fi
+
+  AIW_SYNC_DATA_DIR="$test_root" "$0" >"$sync_log" 2>&1
+  if [[ -e "$test_root/skills/pipelines/__batch2_stale__.json" ]]; then
+    cat "$sync_log"
+    rm -rf "$test_root" "$check_log" "$sync_log"
+    fail "Deletion regression test did not remove the injected stale file"
+    return 1
+  fi
+
+  if ! AIW_SYNC_DATA_DIR="$test_root" "$0" --check >"$check_log" 2>&1; then
+    cat "$check_log"
+    rm -rf "$test_root" "$check_log" "$sync_log"
+    fail "Deletion regression test left the temporary mirror out of sync"
+    return 1
+  fi
+
+  rm -rf "$test_root" "$check_log" "$sync_log"
+  ok "Deletion regression test: stale mirror files are detected and removed"
+}
+
+if [[ "$TEST_DELETION" == "true" ]]; then
+  header "Deletion regression test"
+  run_deletion_test
+  exit $?
+fi
+
 # ── Sync: skills/ root files ──────────────────────────────────────────────────
 header "Skills registry files"
 sync_file "$ROOT/skills/index.yaml"             "$DATA_DIR/skills/index.yaml"
@@ -234,6 +280,19 @@ if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY
   rm -rf "$WEBSITE_REPO_DIR/data"
   mkdir -p "$WEBSITE_REPO_DIR/data"
   cp -a "$DATA_DIR/." "$WEBSITE_REPO_DIR/data/"
+
+  # Generate a manifest over the exact mirrored data tree. The manifest itself
+  # is excluded from the data hash so it can safely record that hash.
+  DATA_HASH=$(python3 "$ROOT/scripts/data-integrity.py" hash "$DATA_DIR")
+  python3 "$ROOT/scripts/generate-release-manifest.py" \\
+    --source-root "$ROOT" \\
+    --website-root "$WEBSITE_REPO_DIR" \\
+    --data-hash "sha256:${DATA_HASH}" \\
+    --source-validation pass \\
+    --website-validation not-run \\
+    --website-build not-run \\
+    --output "$WEBSITE_REPO_DIR/data/release-manifest.json" \\
+    --validate
 
   # Check if anything actually changed
   cd "$WEBSITE_REPO_DIR"
