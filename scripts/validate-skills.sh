@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate-skills.sh — Full skill validation suite (10 checks).
+# validate-skills.sh — Full skill validation suite (11 checks).
 #
 # Run from the project root:  make validate  OR  bash scripts/validate-skills.sh
 #
@@ -15,8 +15,9 @@
 #   8. origin_metadata shape validation for v5.1.0+ skills
 #   9. index.yaml version field matches SKILL.md frontmatter version
 #   10. Community skill SHA-256 hash verification
+#   11. Credential guidance and canonical data ownership checks
 #
-# Requires: node (checks 5, 7, 8), python3 (checks 0, 9, 10)
+# Requires: node (checks 5, 7, 8), python3 (checks 0, 9, 10, 11)
 # Optional: ajv-cli (check 1) — install with: npm install -g ajv-cli ajv-formats
 
 set -euo pipefail
@@ -408,6 +409,95 @@ if [ $? -eq 0 ]; then
   _ok "Community skill SHA-256 verification"
 else
   _fail "Community skill SHA-256 verification — see FAIL lines above"
+fi
+
+# ── 11. Credential guidance and canonical data ownership ───────────────────────
+header "11/11 — Credential guidance and canonical data ownership"
+
+if command -v python3 &>/dev/null; then
+  python3 - <<'PYEOF' && _ok "Credential guidance and canonical data ownership" || _fail "Credential guidance or canonical data ownership check"
+import json
+import re
+import sys
+from pathlib import Path
+from glob import glob
+
+root = Path('.')
+errors = []
+
+# The historical changelog may mention superseded guidance as a record of what
+# changed; current onboarding and operational guidance must not repeat it.
+guidance_files = [
+    Path('.env.example'),
+    Path('docs/github-export.md'),
+    Path('docs/how-to-use.md'),
+    Path('docs/mcp.md'),
+    Path('docs/community-skill-registry.md'),
+    Path('scripts/setup.sh'),
+    Path('scripts/health-check.sh'),
+    Path('website/data/site-content.json'),
+]
+for path in guidance_files:
+    if not path.exists():
+        errors.append(f'{path}: guidance file missing')
+        continue
+    text = path.read_text(errors='replace')
+    forbidden = [
+        r'generate new token \(classic\)',
+        r'classic PAT',
+        r'non[- ]expiring',
+        r'no expiration',
+        r'no expiry',
+        r'repo \+ read:org',
+        r'full control of private repositories',
+        r'ghp_[A-Za-z0-9_.-]+',
+        r'required scopes:\s*repo',
+    ]
+    for pattern in forbidden:
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            errors.append(f'{path}: forbidden credential guidance matches /{pattern}/')
+    if path.suffix in {'.md', '.sh', '.example', '.json'} and not re.search(r'fine[- ]grained|short[- ]lived|rotate|expiry', text, flags=re.IGNORECASE):
+        errors.append(f'{path}: missing safe credential guidance marker')
+
+map_path = root / 'config' / 'canonical-data-map.json'
+try:
+    data = json.loads(map_path.read_text())
+    entries = data.get('entries', [])
+    if not entries:
+        errors.append('config/canonical-data-map.json: entries is empty')
+    ids = [entry.get('id') for entry in entries]
+    if len(ids) != len(set(ids)):
+        errors.append('config/canonical-data-map.json: duplicate entry IDs')
+    canonical_paths = [entry.get('canonical_path') for entry in entries]
+    if len(canonical_paths) != len(set(canonical_paths)):
+        errors.append('config/canonical-data-map.json: duplicate canonical paths')
+    required = {'id', 'canonical_path', 'field_scope', 'derived_paths', 'owner', 'edit_policy', 'sync_mode'}
+    for entry in entries:
+        missing = sorted(required - set(entry))
+        if missing:
+            errors.append(f"{entry.get('id', '?')}: missing fields {', '.join(missing)}")
+            continue
+        canonical = entry['canonical_path']
+        if not glob(canonical, recursive=True) and not canonical.startswith('ASE-OS-Website/'):
+            errors.append(f"{entry['id']}: canonical path has no match: {canonical}")
+        for derived in entry['derived_paths']:
+            if '*' in derived or '?' in derived or '[' in derived:
+                if not glob(derived, recursive=True):
+                    errors.append(f"{entry['id']}: derived path has no match: {derived}")
+            elif not Path(derived).exists() and not derived.startswith('ASE-OS-Website/'):
+                errors.append(f"{entry['id']}: derived path missing: {derived}")
+except Exception as exc:
+    errors.append(f'config/canonical-data-map.json: {exc}')
+
+if errors:
+    for error in errors:
+        print(f'  FAIL: {error}', file=sys.stderr)
+    sys.exit(1)
+
+print(f'  PASS: checked {len(guidance_files)} guidance files and {len(entries)} canonical ownership entries')
+PYEOF
+else
+  _skip "python3 not found — fix: https://python.org"
 fi
 
 # ── Results ───────────────────────────────────────────────────────────────────

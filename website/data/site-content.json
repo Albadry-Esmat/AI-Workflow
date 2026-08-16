@@ -1270,8 +1270,8 @@
       {
         "step": "02",
         "title": "Set Your Token & Launch",
-        "description": "Add your GitHub token to .env (classic PAT, no expiration, scopes: repo + read:org). Optionally add Context7 and Brave Search API keys for richer research capabilities. Then point the workflow at your project.",
-        "code": "# Edit .env:\nGITHUB_TOKEN=ghp_...          # required\nCONTEXT7_API_KEY=...           # optional\nBRAVE_API_KEY=...              # optional\n\n# Launch on any project:\naiw start /path/to/your-project\n\n# Or install it permanently inside a project:\naiw init /path/to/your-project",
+        "description": "Add a short-lived fine-grained GitHub token to the ignored .env, scoped only to the repositories and permissions you need. Optionally add Context7 and Brave Search API keys for richer research capabilities. Then point the workflow at your project.",
+        "code": "# Edit the ignored .env:\nGITHUB_TOKEN=github_fine_grained_token  # short-lived, least-privilege\nCONTEXT7_API_KEY=...                    # optional\nBRAVE_API_KEY=...                       # optional\n\n# Launch on any project:\naiw start /path/to/your-project\n\n# Or install it permanently inside a project:\naiw init /path/to/your-project",
         "color": "violet"
       },
       {
@@ -1357,8 +1357,8 @@
         "num": "02",
         "icon": "FolderOpen",
         "title": "Configure .env",
-        "desc": "Open .env and set your credentials. GITHUB_TOKEN is the only required field. All other keys are optional but unlock additional research and web capabilities.",
-        "code": "# Required:\nGITHUB_TOKEN=ghp_...      # github.com/settings/tokens\n                           # Classic PAT, repo + read:org scopes\n\n# Optional:\nCONTEXT7_API_KEY=...       # context7.com — library doc lookups\nBRAVE_API_KEY=...          # api.search.brave.com — web search",
+        "desc": "Open the ignored .env and set a short-lived, fine-grained GITHUB_TOKEN scoped to the repositories and permissions you need. All other keys are optional but unlock additional research and web capabilities.",
+        "code": "# Required:\nGITHUB_TOKEN=github_fine_grained_token  # short-lived, repo-scoped\n                                      # github.com/settings/personal-access-tokens/fine-grained\n\n# Optional:\nCONTEXT7_API_KEY=...                    # context7.com — library doc lookups\nBRAVE_API_KEY=...                       # api.search.brave.com — web search",
         "color": "violet"
       },
       {

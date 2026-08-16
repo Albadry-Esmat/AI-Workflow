@@ -108,8 +108,8 @@ else
     echo -e "  ${BOLD}${YELLOW}Action required:${NC} Open .env and set your GITHUB_TOKEN."
     echo "  The file is at: $ROOT/.env"
     echo
-    echo "  Create a GitHub token at: https://github.com/settings/tokens"
-    echo "  Required scopes: repo, read:org"
+    echo "  Create a short-lived fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
+    echo "  Restrict it to this repository and grant only the permissions you need."
     echo
   else
     _fail ".env.example not found — cannot create .env"
@@ -211,8 +211,8 @@ echo -e "${BOLD}═════════════════════�
 echo
 echo -e "${BOLD}Next steps:${NC}"
 echo "  1. Edit .env and set GITHUB_TOKEN (and any other keys you want)"
-echo "     Get one at: https://github.com/settings/tokens"
-echo "     Classic token, no expiration, scopes: repo + read:org"
+  echo "     Create a short-lived fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
+  echo "     Restrict it to the required repositories and rotate it regularly."
 echo ""
 echo "  2. aiw health                      — verify your configuration"
 echo "  3. aiw start /path/to/your-project — launch on your project"

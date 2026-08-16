@@ -4,7 +4,7 @@
 
 ## Overview
 
-ASE-OS integrates eight Model Context Protocol (MCP) servers that extend every agent in the pipeline with live external capabilities — GitHub, web search, persistent memory, documentation lookup, browser automation, and more. MCPs are configured in `opencode.json` under the `mcp` key and are available to all agents regardless of their `bash: deny` permission.
+ASE-OS integrates eight configured Model Context Protocol (MCP) servers that extend the pipeline with external capabilities such as GitHub, web search, persistent memory, documentation lookup, and browser automation. MCPs are configured in `opencode.json` under the `mcp` key. They are a separate capability channel from `bash` and `edit` permissions, so availability must not be treated as authorization; high-impact actions require an enforceable policy boundary and human approval.
 
 ## Enabled Servers
 
@@ -13,7 +13,7 @@ ASE-OS integrates eight Model Context Protocol (MCP) servers that extend every a
 | `github` | `@modelcontextprotocol/server-github` | ✅ enabled | `GITHUB_TOKEN` |
 | `brave-search` | `@modelcontextprotocol/server-brave-search` | ✅ enabled | `BRAVE_API_KEY` |
 | `memory` | `@modelcontextprotocol/server-memory` | ✅ enabled | none |
-| `fetch` | `@modelcontextprotocol/server-fetch` | ✅ enabled | none |
+| `fetch` | `@modelcontextprotocol/server-fetch` | ⏸ disabled | none |
 | `context7` | `@upstash/context7-mcp` | ✅ enabled | `CONTEXT7_API_KEY` |
 | `playwright` | `@playwright/mcp` | ✅ enabled | none |
 | `slack` | `@modelcontextprotocol/server-slack` | ⏸ disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
@@ -28,7 +28,7 @@ Disabled servers are pre-configured — set `"enabled": true` in `opencode.json`
 ### `github` — GitHub MCP
 **Package:** [`@modelcontextprotocol/server-github`](https://github.com/modelcontextprotocol/servers/tree/main/src/github)
 
-**Auth:** Add `GITHUB_TOKEN` to `.env`. Required scopes: `repo`, `read:org`, `issues:write`.
+**Auth:** Add a short-lived fine-grained `GITHUB_TOKEN` to the ignored `.env`, scoped only to the repositories required by the current task. Start with repository Metadata and Contents read access; add Issues or Pull requests permissions only for workflows that explicitly need them. Do not use a broad legacy token or an organization-wide credential.
 
 **Tools exposed:**
 - `create_issue`, `update_issue`, `list_issues` — bridges the `work-item-exporter`, `defect-manager`, and `change-request-manager` skills to real GitHub Issues
@@ -95,7 +95,7 @@ Disabled servers are pre-configured — set `"enabled": true` in `opencode.json`
 - `documenter` → `documentation-generator` fetches upstream changelogs for ADR context
 - `sre` → `runbook-generator` fetches cloud provider status pages as context
 
-**Note:** This gives subagents the same `webfetch` capability the primary agent already has. Subagents with `bash: deny` cannot use shell curl — `fetch` fills this gap.
+**Status:** Keep this server disabled until the package identity and security posture are verified. A disabled or unavailable fetch server must not be treated as a required pipeline dependency.
 
 ---
 
@@ -205,9 +205,9 @@ use library /vercel/next.js for Next.js 15 docs
 All MCP credentials are stored in `.env` (gitignored). See `.env` for the current state.
 
 ```bash
-# Already configured
-GITHUB_TOKEN=...        # GitHub MCP + gh CLI
-VERCEL_TOKEN=...        # Vercel MCP (when enabled) + Vercel CLI
+# Store short-lived, least-privilege credentials only in the ignored .env
+GITHUB_TOKEN=...        # Fine-grained GitHub MCP token, repository-scoped
+VERCEL_TOKEN=...        # Project-scoped Vercel token, only when enabled
 
 # Add these
 CONTEXT7_API_KEY=...    # Get at context7.com/dashboard (free)
@@ -236,11 +236,11 @@ In `opencode.json`, toggle any server:
 
 ## Security Model
 
-- MCP tools are available to **all agents** — they bypass `bash: deny` restrictions by design (MCP is a separate capability channel from bash)
-- The `playwright` MCP runs `--isolated` — no persistent browser profile is created between invocations
-- The `memory` MCP stores only structured JSON entities, never raw source code or user-inputted content
-- Slack and GitHub credentials are scoped to minimum required permissions (see auth notes above)
-- Vercel and GitHub tokens should be **rotated every 90 days** — add a calendar reminder
+- MCP tools are a separate capability channel from `bash` and `edit`; access must be reviewed and enforced separately, not assumed from agent permissions.
+- The `playwright` MCP runs `--isolated` — no persistent browser profile is created between invocations.
+- The `memory` MCP stores only structured JSON entities, never raw source code or user-inputted content.
+- GitHub, Slack, and Vercel credentials must be repository/project-scoped, short-lived, stored only in the ignored `.env` or CI secret store, and rotated before expiry.
+- High-impact MCP actions such as writes, deletes, merges, publishes, deploys, and credential changes require explicit approval and an auditable policy decision.
 
 ---
 

@@ -8,6 +8,8 @@ on:
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
+      - "config/**"
+      - "website/data/**"
   pull_request:
     paths:
       - "skills/**"
@@ -15,6 +17,8 @@ on:
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
+      - "config/**"
+      - "website/data/**"
 
 permissions:
   contents: read

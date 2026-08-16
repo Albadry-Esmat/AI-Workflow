@@ -100,9 +100,9 @@ if [[ -n "${GITHUB_TOKEN:-}" ]]; then
   _ok "GITHUB_TOKEN is set  ($MASKED)"
 else
   _fail "GITHUB_TOKEN is not set"
-  echo "       Add GITHUB_TOKEN=<your-token> to .env"
-  echo "       Create a token at: https://github.com/settings/tokens"
-  echo "       Required scopes: repo, read:org"
+    echo "       Add a short-lived fine-grained GITHUB_TOKEN to the ignored .env"
+    echo "       Create one at: https://github.com/settings/personal-access-tokens/fine-grained"
+    echo "       Restrict it to this repository and grant only required permissions"
 fi
 
 # ── 5. Optional env vars ──────────────────────────────────────────────────────

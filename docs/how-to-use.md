@@ -19,8 +19,8 @@ cd AI-Workflow
 `./aiw` runs straight from the repo before anything is installed. Setup will add `aiw` to your PATH so you can use it globally from that point on. Then open `.env` and fill in your credentials:
 
 ```bash
-# Minimum required
-GITHUB_TOKEN=ghp_...          # https://github.com/settings/tokens
+# Minimum required — use a short-lived fine-grained token scoped to this repo
+GITHUB_TOKEN=github_fine_grained_token  # https://github.com/settings/personal-access-tokens/fine-grained
 
 # Optional but recommended
 CONTEXT7_API_KEY=...           # https://context7.com
@@ -57,7 +57,7 @@ cd /path/to/your-project
 opencode
 ```
 
-This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your `.env` tokens into the target project. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
+This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your `.env` configuration into the target project. Review the target project’s `.env` separately and use short-lived, least-privilege credentials; do not copy personal tokens into a new project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
 
 ---
 
@@ -178,7 +178,7 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 | Skill not found | Registry not updated | Run `make validate` to find which entry is missing |
 | Agent permission denied | Incorrect agent config | Check permission in `opencode.json` |
 | `ajv: command not found` | ajv-cli not installed | Run `npm install -g ajv-cli ajv-formats` |
-| `GITHUB_TOKEN is not set` | Missing env var | Add `GITHUB_TOKEN=` to `.env` |
+| `GITHUB_TOKEN is not set` | Missing env var | Add a short-lived fine-grained token to the ignored `.env`; do not commit it |
 
 ---
 

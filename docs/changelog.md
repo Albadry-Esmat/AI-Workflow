@@ -9,6 +9,12 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.
+- Added `config/canonical-data-map.json` and validation coverage for canonical, generated, mirrored, and website-owned data boundaries.
+- Corrected MCP documentation to reflect that the fetch server is disabled until its package and security posture are verified.
+
 ### Added
 
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.

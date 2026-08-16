@@ -7,27 +7,28 @@ behaviour, and troubleshooting.
 ## Prerequisites
 
 - A GitHub repository where you have write access
-- A GitHub Personal Access Token (PAT) with **`repo` scope** (or `public_repo` for public repositories)
+- A GitHub fine-grained token scoped only to the target repository and required export permissions
 - The `GITHUB_TOKEN` environment variable set in your shell or CI environment
+- A short token expiry and a documented rotation owner
 
 ## Setting Up GITHUB_TOKEN
 
-### 1. Generate a Personal Access Token
+### 1. Generate a Fine-Grained Token
 
-1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
-2. Click **Generate new token (classic)** ← use classic, NOT fine-grained
-3. Select scopes: ✅ `repo` (Full control of private repositories)
-4. Expiration: **No expiration** ← avoids repeated rotation; this is a local dev tool
-5. Click **Generate token** and copy the token immediately
+1. Go to [GitHub fine-grained tokens](https://github.com/settings/personal-access-tokens/fine-grained).
+2. Create a token restricted to the target repository.
+3. Grant only the Issues and Metadata permissions required by the export mode; add Pull requests only when the workflow needs it.
+4. Set a short expiry and assign an owner responsible for rotation.
+5. Copy the token once and store it only in the environment or secret manager.
 
 ### 2. Set the Environment Variable
 
 **Local development:**
 ```bash
-export GITHUB_TOKEN="ghp_yourTokenHere"
+export GITHUB_TOKEN="github_fine_grained_token"
 ```
 
-Add to your shell profile (`.zshrc` / `.bashrc`) to persist across sessions.
+Prefer loading the token from a local ignored `.env` file or a secret manager. Do not add it to a shell profile unless your local security policy permits it, and never commit it.
 
 **CI/CD (GitHub Actions):**
 ```yaml
@@ -135,9 +136,9 @@ Example:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `warning: GITHUB_TOKEN env var not set` | Token not exported in shell | Run `export GITHUB_TOKEN="ghp_..."` |
-| `HTTP 401 Unauthorized` | Token expired or wrong scope | Regenerate token with `repo` scope |
-| `HTTP 403 Forbidden` | Token lacks `repo` write access | Ensure `repo` scope is selected when generating token |
+| `warning: GITHUB_TOKEN env var not set` | Token not exported in shell | Load a short-lived fine-grained token from the local secret store |
+| `HTTP 401 Unauthorized` | Token expired, revoked, or wrong repository | Rotate the fine-grained token and verify repository selection |
+| `HTTP 403 Forbidden` | Token lacks the operation-specific permission | Grant only the required Issues/Metadata permission on the target repository |
 | `HTTP 422 Unprocessable Entity` | Invalid field (e.g. bad label format) | Check `jira_labels[]` for special characters; the skill sanitises labels automatically |
 | Issues created without milestone | Milestone creation failed silently | Check `github_repo` write permissions; verify milestone title has no leading/trailing spaces |
 
