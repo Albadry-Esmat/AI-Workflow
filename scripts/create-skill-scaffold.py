@@ -9,7 +9,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from jsonschema import Draft7Validator, RefResolver
+from jsonschema import Draft7Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "skill-sdk-policy.json"
@@ -165,12 +165,8 @@ def main() -> int:
     }
     schema = json.loads((ROOT / "config/skill-scaffold-schema.json").read_text())
     metadata_schema = json.loads((ROOT / "config/skill-metadata-schema.json").read_text())
-    resolver = RefResolver.from_schema(schema, store={
-        metadata_schema["$id"]: metadata_schema,
-        "https://ase-os/schemas/skill-metadata-schema.json": metadata_schema,
-        "skill-metadata-schema.json": metadata_schema,
-    })
-    errors = sorted(Draft7Validator(schema, resolver=resolver).iter_errors(manifest), key=lambda error: list(error.path))
+    schema["properties"]["metadata"] = metadata_schema
+    errors = sorted(Draft7Validator(schema).iter_errors(manifest), key=lambda error: list(error.path))
     if errors:
         raise SystemExit("Generated scaffold manifest failed schema: " + "; ".join(error.message for error in errors))
     (destination / "SKILL.md").write_text(build_skill_md(name, args.version, args.domain, args.description, args.author))
