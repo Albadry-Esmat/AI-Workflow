@@ -284,14 +284,14 @@ if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY
   # Generate a manifest over the exact mirrored data tree. The manifest itself
   # is excluded from the data hash so it can safely record that hash.
   DATA_HASH=$(python3 "$ROOT/scripts/data-integrity.py" hash "$DATA_DIR")
-  python3 "$ROOT/scripts/generate-release-manifest.py" \\
-    --source-root "$ROOT" \\
-    --website-root "$WEBSITE_REPO_DIR" \\
-    --data-hash "sha256:${DATA_HASH}" \\
-    --source-validation pass \\
-    --website-validation not-run \\
-    --website-build not-run \\
-    --output "$WEBSITE_REPO_DIR/data/release-manifest.json" \\
+  python3 "$ROOT/scripts/generate-release-manifest.py" \
+    --source-root "$ROOT" \
+    --website-root "$WEBSITE_REPO_DIR" \
+    --data-hash "sha256:${DATA_HASH}" \
+    --source-validation pass \
+    --website-validation not-run \
+    --website-build not-run \
+    --output "$WEBSITE_REPO_DIR/data/release-manifest.json" \
     --validate
 
   # Check if anything actually changed
