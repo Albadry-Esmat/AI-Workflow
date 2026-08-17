@@ -53,7 +53,7 @@ All final source and website gates were run after the source commit and final De
 | Context preservation | **Pass** — five cases, 0 failures |
 | Quick-review evaluation | **Pass** — 20 total, 20 passed, 0 failed |
 | Quality vector | **Pass** — weighted score 100.0, no blockers, explicit Dev compatibility supplied |
-| Release compatibility | **Pass** — generated same-source-commit manifest and data hash matched |
+| Release compatibility | **Pass** — generated manifest source commit was compatible with the final source Dev tip and the data hash matched |
 | Internal website mirror | **Pass** — all 140 mirrored files current |
 | Workflow syntax | **Pass** — all GitHub Actions YAML files parsed successfully |
 | Website lint | **Pass** — `npm run lint` completed successfully |

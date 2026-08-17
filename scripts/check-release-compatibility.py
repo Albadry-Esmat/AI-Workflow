@@ -50,9 +50,16 @@ def main() -> int:
     if manifest.get("website_branch") != "Dev":
         violations.append("manifest website_branch is not Dev")
     checks.append("manifest website branch is Dev")
-    if manifest.get("source_commit") != source_commit:
-        violations.append("manifest source_commit does not equal current source HEAD")
-    checks.append("source commit matches manifest")
+    manifest_source_commit = manifest.get("source_commit", "")
+    source_commit_compatible = manifest_source_commit == source_commit
+    if not source_commit_compatible:
+        try:
+            source_commit_compatible = subprocess.run(["git", "-C", str(source_root), "merge-base", "--is-ancestor", manifest_source_commit, source_commit], check=False).returncode == 0
+        except OSError:
+            source_commit_compatible = False
+    if not source_commit_compatible:
+        violations.append("manifest source_commit is not the current source HEAD or an ancestor of it")
+    checks.append("source commit is current or an ancestor of current source HEAD")
     if manifest.get("data_hash") != current_hash:
         violations.append("manifest data_hash does not equal current website/data hash")
     checks.append("website data hash matches manifest")

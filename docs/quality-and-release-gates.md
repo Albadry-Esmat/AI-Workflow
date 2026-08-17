@@ -67,7 +67,7 @@ The nightly schedule is a policy declaration, not a new background service in th
 `config/release-compatibility-schema.json` and `scripts/check-release-compatibility.py` compare the current AI-Workflow/Dev source with the generated website ReleaseManifest. Compatibility requires:
 
 1. The source and manifest branches are `Dev`.
-2. The manifest source commit equals the current AI-Workflow source commit.
+2. The manifest source commit equals the current AI-Workflow source commit or is an ancestor of it, so later documentation-only commits do not create false incompatibility.
 3. The manifest data hash equals the current `website/data` hash.
 4. Source validation is `pass`.
 5. Release promotion additionally requires website validation and build status to be `pass`.
