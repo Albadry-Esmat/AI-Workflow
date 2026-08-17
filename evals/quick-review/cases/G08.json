@@ -4,18 +4,25 @@
     "tracked_file_secret_scan"
   ],
   "case_id": "G08",
-  "case_version": "1.0.0",
+  "case_version": "1.1.0",
   "evaluation_class": "golden",
   "execution_mode": "live",
   "expected": {
+    "approval_required": false,
+    "budget_exhausted_dimension": null,
+    "budget_status": "within",
+    "cancellation": false,
+    "enforcement_boundary": "local-adapter",
     "final_status": "completed",
     "first_failure": null,
     "gate_decision": "approved",
     "no_external_writes": true,
+    "policy_decision": "allow",
     "required_step_statuses": {
       "clean-code-review": "succeeded",
       "security-review": "succeeded"
     },
+    "retry_reason_codes": [],
     "security_scan": "pass"
   },
   "fixture": "data",
@@ -24,10 +31,13 @@
     "behavior",
     "security",
     "traceability",
-    "replay-safety"
+    "replay-safety",
+    "budget",
+    "retry",
+    "policy"
   ],
   "pipeline_template": "quick-review",
-  "policy_profile": "quick-review-read-only-v1",
+  "policy_profile": "quick-review-read-only-v2",
   "scenario": "success",
   "sensitivity_class": "internal",
   "task": "Review the data fixture for security and maintainability."

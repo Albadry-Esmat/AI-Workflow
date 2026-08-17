@@ -10,10 +10,10 @@
     "unknown_contract_version": "reject"
   },
   "contracts": [
-    { "contract_type": "run-manifest", "contract_version": "1.0.0", "schema": "run-manifest.schema.json", "stability": "experimental" },
-    { "contract_type": "step-execution", "contract_version": "1.0.0", "schema": "step-execution.schema.json", "stability": "experimental" },
+    { "contract_type": "run-manifest", "contract_version": "1.1.0", "schema": "run-manifest.schema.json", "stability": "experimental" },
+    { "contract_type": "step-execution", "contract_version": "1.1.0", "schema": "step-execution.schema.json", "stability": "experimental" },
     { "contract_type": "artifact-reference", "contract_version": "1.0.0", "schema": "artifact-reference.schema.json", "stability": "experimental" },
     { "contract_type": "gate-decision", "contract_version": "1.0.0", "schema": "gate-decision.schema.json", "stability": "experimental" },
-    { "contract_type": "policy-decision", "contract_version": "1.0.0", "schema": "policy-decision.schema.json", "stability": "experimental" }
+    { "contract_type": "policy-decision", "contract_version": "1.1.0", "schema": "policy-decision.schema.json", "stability": "experimental" }
   ]
 }

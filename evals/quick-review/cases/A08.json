@@ -3,29 +3,31 @@
     "git_diff_check",
     "tracked_file_secret_scan"
   ],
-  "case_id": "G04",
+  "case_id": "A08",
   "case_version": "1.1.0",
-  "evaluation_class": "golden",
+  "evaluation_class": "adversarial",
   "execution_mode": "live",
   "expected": {
     "approval_required": false,
-    "budget_exhausted_dimension": null,
-    "budget_status": "within",
-    "cancellation": false,
+    "budget_exhausted_dimension": "elapsed_ms",
+    "budget_status": "cancelled",
+    "cancellation": true,
     "enforcement_boundary": "local-adapter",
-    "final_status": "completed",
-    "first_failure": null,
-    "gate_decision": "approved",
+    "final_status": "cancelled",
+    "first_failure_code": "CANCELLED",
+    "gate_decision": "rejected",
     "no_external_writes": true,
     "policy_decision": "allow",
     "required_step_statuses": {
-      "clean-code-review": "succeeded",
-      "security-review": "succeeded"
+      "clean-code-review": "cancelled",
+      "security-review": "skipped"
     },
-    "retry_reason_codes": [],
-    "security_scan": "pass"
+    "retry_reason_codes": [
+      "cancelled"
+    ],
+    "security_scan": "not-required-after-first-failure"
   },
-  "fixture": "api",
+  "fixture": "data",
   "grader_set": [
     "structure",
     "behavior",
@@ -38,7 +40,7 @@
   ],
   "pipeline_template": "quick-review",
   "policy_profile": "quick-review-read-only-v2",
-  "scenario": "success",
+  "scenario": "cancelled",
   "sensitivity_class": "internal",
-  "task": "Review the API fixture for boundary and security issues."
+  "task": "Cancel a bounded run and verify downstream work is suppressed with terminal cancellation evidence."
 }

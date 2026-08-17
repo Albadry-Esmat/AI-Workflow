@@ -127,9 +127,9 @@ def grade_live_case(case: dict[str, Any], run_dir: Path, run_id: str, target: Pa
     expected = case["expected"]
     manifest = load_json(run_dir / "run-manifest.json")
     summary = load_json(run_dir / "terminal-summary.json")
-    gate_path = next(run_dir.glob("GATE-*.json"))
-    gate = load_json(gate_path)
+    gate = load_json(next(run_dir.glob("GATE-*.json")))
     steps = read_step_statuses(run_dir)
+    policies = [load_json(path) for path in sorted(run_dir.glob("POL-*.json"))]
     structure_ok, structure_errors = contract_grade(run_dir, run_id)
     expected_status_ok = manifest.get("status") == expected["final_status"] and summary.get("final_status") == expected["final_status"]
     expected_gate_ok = gate.get("decision") == expected["gate_decision"]
@@ -140,14 +140,33 @@ def grade_live_case(case: dict[str, Any], run_dir: Path, run_id: str, target: Pa
     behavior_ok = expected_status_ok and expected_gate_ok and first_failure_ok and steps_ok
     security_payload = "\n".join(path.read_text(errors="ignore") for path in run_dir.rglob("*.json"))
     security_ok = all(marker not in security_payload for marker in SECRET_MARKERS) and manifest.get("pii_scrubbed") is True and gate.get("irreversible_action") is False
-    traceability_ok = set(manifest.get("step_ids", [])) == {load_json(path)["step_id"] for path in run_dir.glob("STEP-*.json")} and set(manifest.get("artifact_ids", [])) == {load_json(path)["artifact_id"] for path in run_dir.glob("ART-*.reference.json")}
+    traceability_ok = (
+        set(manifest.get("step_ids", [])) == {load_json(path)["step_id"] for path in run_dir.glob("STEP-*.json")}
+        and set(manifest.get("artifact_ids", [])) == {load_json(path)["artifact_id"] for path in run_dir.glob("ART-*.reference.json")}
+        and set(manifest.get("policy_decision_ids", [])) == {policy["policy_decision_id"] for policy in policies}
+    )
     replay_safety_ok = before_status == after_status and not any(path.name.startswith("write") for path in target.rglob("*"))
+    budget = manifest.get("budget", {})
+    expected_budget_status = expected.get("budget_status", "within")
+    budget_status = "cancelled" if summary.get("final_status") == "cancelled" else "exhausted" if budget.get("exhausted") else "within"
+    budget_ok = budget_status == expected_budget_status and budget.get("exhausted_dimension") == expected.get("budget_exhausted_dimension")
+    retry_summary = summary.get("retry_summary", {})
+    retry_ok = sorted(retry_summary.get("reason_codes", [])) == sorted(expected.get("retry_reason_codes", []))
+    policy_decisions = {item.get("decision") for item in policies}
+    policy_ok = (
+        expected.get("policy_decision", "allow") in policy_decisions
+        and all(item.get("enforcement_boundary") == expected.get("enforcement_boundary", "local-adapter") for item in policies)
+        and any(bool(item.get("approval_required")) == expected.get("approval_required", False) for item in policies)
+    )
     components = {
         "structure": {"passed": structure_ok, "errors": structure_errors},
         "behavior": {"passed": behavior_ok, "errors": [] if behavior_ok else ["result did not match expected behavior"]},
         "security": {"passed": security_ok, "errors": [] if security_ok else ["evidence security invariant failed"]},
         "traceability": {"passed": traceability_ok, "errors": [] if traceability_ok else ["manifest references do not match evidence files"]},
         "replay-safety": {"passed": replay_safety_ok, "errors": [] if replay_safety_ok else ["target repository changed during read-only run"]},
+        "budget": {"passed": budget_ok, "errors": [] if budget_ok else ["budget status or exhaustion dimension did not match expected result"]},
+        "retry": {"passed": retry_ok, "errors": [] if retry_ok else ["retry reason taxonomy did not match expected result"]},
+        "policy": {"passed": policy_ok, "errors": [] if policy_ok else ["policy decision or enforcement boundary did not match expected result"]},
     }
     return {
         "case_id": case["case_id"],
@@ -161,6 +180,8 @@ def grade_live_case(case: dict[str, Any], run_dir: Path, run_id: str, target: Pa
         "first_failure_code": (summary.get("failure") or {}).get("code"),
         "final_status": summary.get("final_status"),
         "gate_decision": gate.get("decision"),
+        "budget_status": budget_status,
+        "policy_decisions": sorted(policy_decisions),
     }
 
 
@@ -180,12 +201,18 @@ def grade_replay_case(case: dict[str, Any]) -> dict[str, Any]:
     security_ok = "ghp_" not in response_text and "github_pat_" not in response_text and no_external_write
     traceability_ok = result.get("step_statuses") == expected["required_step_statuses"]
     replay_safety_ok = no_external_write and replay.get("replay_version") == "1.0.0"
+    budget_ok = result.get("budget_status", "within") == expected.get("budget_status", "within") and result.get("budget_exhausted_dimension") == expected.get("budget_exhausted_dimension")
+    retry_ok = sorted(result.get("retry_reason_codes", [])) == sorted(expected.get("retry_reason_codes", []))
+    policy_ok = result.get("policy_decision", "allow") == expected.get("policy_decision", "allow") and result.get("enforcement_boundary", "local-adapter") == expected.get("enforcement_boundary", "local-adapter")
     components = {
         "structure": {"passed": structure_ok, "errors": [] if structure_ok else ["invalid replay trace"]},
         "behavior": {"passed": behavior_ok, "errors": [] if behavior_ok else ["replay result did not match expected behavior"]},
         "security": {"passed": security_ok, "errors": [] if security_ok else ["replay contains unsafe or external-write evidence"]},
         "traceability": {"passed": traceability_ok, "errors": [] if traceability_ok else ["replay step statuses do not match expected result"]},
         "replay-safety": {"passed": replay_safety_ok, "errors": [] if replay_safety_ok else ["replay safety invariant failed"]},
+        "budget": {"passed": budget_ok, "errors": [] if budget_ok else ["replay budget result did not match expected result"]},
+        "retry": {"passed": retry_ok, "errors": [] if retry_ok else ["replay retry taxonomy did not match expected result"]},
+        "policy": {"passed": policy_ok, "errors": [] if policy_ok else ["replay policy result did not match expected result"]},
     }
     return {
         "case_id": case["case_id"],
@@ -199,6 +226,8 @@ def grade_replay_case(case: dict[str, Any]) -> dict[str, Any]:
         "first_failure_code": result.get("first_failure_code"),
         "final_status": result.get("final_status"),
         "gate_decision": result.get("gate_decision"),
+        "budget_status": result.get("budget_status", "within"),
+        "policy_decision": result.get("policy_decision", "allow"),
     }
 
 

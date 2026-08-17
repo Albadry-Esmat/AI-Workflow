@@ -63,8 +63,9 @@ show_help() {
   echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
   echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
-  echo -e "    ${CYAN}validate-evals${NC}               Validate Batch 5 evaluation definitions"
-  echo -e "    ${CYAN}eval-quick-review${NC}            Run Batch 5 golden/adversarial evaluation suite"
+  echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
+  echo -e "    ${CYAN}validate-evals${NC}               Validate Batch 5/6 evaluation definitions"
+  echo -e "    ${CYAN}eval-quick-review${NC}            Run Batch 5/6 golden/adversarial evaluation suite"
   echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
   echo ""
   echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
@@ -274,6 +275,10 @@ cmd_quick_review() {
   python3 "$ROOT/scripts/run-quick-review.py" "$@"
 }
 
+cmd_validate_batch6() {
+  python3 "$ROOT/scripts/validate-batch6-controls.py" "$@"
+}
+
 cmd_validate_evals() {
   python3 "$ROOT/scripts/validate-quick-review-evals.py" "$@"
 }
@@ -431,6 +436,7 @@ case "$COMMAND" in
   doctor|diagnose)  cmd_doctor "$@" ;;
   sync)             cmd_sync "$@" ;;
   quick-review|review) cmd_quick_review "$@" ;;
+  validate-batch6)  cmd_validate_batch6 "$@" ;;
   validate-evals)   cmd_validate_evals "$@" ;;
   eval-quick-review|evaluate) cmd_eval_quick_review "$@" ;;
   graph)            cmd_graph "$@" ;;

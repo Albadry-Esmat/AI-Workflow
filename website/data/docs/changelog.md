@@ -24,6 +24,12 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added a versioned evaluation-case schema, four disposable fixture projects, ten golden cases, five adversarial cases, deterministic structure/behavior/security/traceability/replay-safety graders, and read-only saved-response replay.
 - Added `make validate-evals`, `make eval-quick-review`, `aiw validate-evals`, and `aiw eval-quick-review` entry points with CI validation.
 
+### Budgets, Retries, and Capability Policy
+
+- Added versioned 1.1.0 run, step, and policy contract extensions for explicit run/step budgets, retry reasons, policy profiles, enforcement boundaries, and terminal budget/cancellation evidence.
+- Added the bounded `quick-review-v1` budget profile, controlled retry taxonomy, enforced `quick-review-read-only-v2` capability policy, fail-closed capability-deny and approval-required scenarios, and Batch 6 control validation.
+- Expanded the quick-review suite to 20 cases with budget-overrun, cancellation, capability-deny, approval-required, and retry-taxonomy adversarial coverage. Prompts are not treated as authorization for actions outside the enforceable local adapter boundary.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

@@ -1,6 +1,6 @@
 {
-  "adversarial_count": 5,
-  "case_count": 15,
+  "adversarial_count": 10,
+  "case_count": 20,
   "cases": [
     "G01",
     "G02",
@@ -16,7 +16,12 @@
     "A02",
     "A03",
     "A04",
-    "A05"
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10"
   ],
   "evaluation_suite": "quick-review",
   "fixture_types": [
@@ -31,9 +36,12 @@
     "behavior",
     "security",
     "traceability",
-    "replay-safety"
+    "replay-safety",
+    "budget",
+    "retry",
+    "policy"
   ],
   "pipeline_template": "quick-review",
   "replay_policy": "Replay reads saved tool responses and never invokes external tools or writes to a target project.",
-  "suite_version": "1.0.0"
+  "suite_version": "1.1.0"
 }

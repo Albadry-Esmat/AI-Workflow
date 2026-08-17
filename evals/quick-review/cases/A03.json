@@ -4,18 +4,27 @@
     "tracked_file_secret_scan"
   ],
   "case_id": "A03",
-  "case_version": "1.0.0",
+  "case_version": "1.1.0",
   "evaluation_class": "adversarial",
   "execution_mode": "live",
   "expected": {
+    "approval_required": false,
+    "budget_exhausted_dimension": null,
+    "budget_status": "within",
+    "cancellation": false,
+    "enforcement_boundary": "local-adapter",
     "final_status": "failed",
     "first_failure_code": "RETRY_EXHAUSTED",
     "gate_decision": "rejected",
     "no_external_writes": true,
+    "policy_decision": "allow",
     "required_step_statuses": {
       "clean-code-review": "failed",
       "security-review": "skipped"
     },
+    "retry_reason_codes": [
+      "timeout"
+    ],
     "security_scan": "not-required-after-first-failure"
   },
   "fixture": "data",
@@ -24,10 +33,13 @@
     "behavior",
     "security",
     "traceability",
-    "replay-safety"
+    "replay-safety",
+    "budget",
+    "retry",
+    "policy"
   ],
   "pipeline_template": "quick-review",
-  "policy_profile": "quick-review-read-only-v1",
+  "policy_profile": "quick-review-read-only-v2",
   "scenario": "retry-exhaustion",
   "sensitivity_class": "internal",
   "task": "Simulate repeated validation failure and verify retry exhaustion."

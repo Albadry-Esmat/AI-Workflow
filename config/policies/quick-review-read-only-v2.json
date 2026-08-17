@@ -1,0 +1,32 @@
+{
+  "profile_id": "quick-review-read-only-v2",
+  "profile_version": "2.0.0",
+  "pipeline_template": "quick-review",
+  "default_decision": "deny",
+  "enforcement_boundary": "local-adapter",
+  "enforced": true,
+  "resource_scope": "declared-project-root",
+  "action_tiers": {
+    "read": "low",
+    "execute": "medium",
+    "write": "medium",
+    "edit": "medium",
+    "delete": "high",
+    "commit": "high",
+    "push": "high",
+    "publish": "critical",
+    "deploy": "critical",
+    "credential-access": "critical",
+    "external-request": "critical"
+  },
+  "approval_required_tiers": ["high", "critical"],
+  "required_policy_actions": ["write", "delete", "commit", "push", "deploy", "publish", "credential-access"],
+  "allowed_actions": ["read", "execute"],
+  "allowed_capabilities": ["filesystem-read"],
+  "denied_capabilities": ["filesystem-write", "shell", "network", "browser", "github-read", "github-write", "deployment", "credential-use", "external-mcp"],
+  "notes": [
+    "This profile is enforced by the bounded local adapter only.",
+    "Actions outside the adapter boundary remain disabled; prompts cannot authorize them.",
+    "Every requested write, delete, commit, push, deploy, publish, or credential operation requires a policy decision and gate evidence."
+  ]
+}
