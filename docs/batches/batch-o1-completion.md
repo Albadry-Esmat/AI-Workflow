@@ -61,10 +61,10 @@ The final source and website audits both report zero vulnerabilities at the high
 
 | Repository | Implementation and remediation commits | Final completion-boundary commit |
 |---|---|---|
-| AI-Workflow | `b2f7da1a90ae1fbd08e84b97c8a1161ffaefb451` — deterministic O1 toolchain; `d71deae8518ed4e55bff13df58fb5ee1a0a7a183` — AJV security remediation and documentation alignment | To be added after this report is committed and pushed |
+| AI-Workflow | `b2f7da1a90ae1fbd08e84b97c8a1161ffaefb451` — deterministic O1 toolchain; `d71deae8518ed4e55bff13df58fb5ee1a0a7a183` — AJV security remediation and documentation alignment | `c03633286c995e183e1eb0c35064ac5f972e8dcc` — completion report |
 | ASE-OS-Website | `72da1c83e1491a13a07f396ac408d211d8ca88e4` — O1 Getting Started representation; `05b9cdbf500024719252075ee0f26837727a62f9` — final generated-data and manifest alignment | `05b9cdbf500024719252075ee0f26837727a62f9` |
 
-The current ReleaseManifest binds to source commit `d71deae8518ed4e55bff13df58fb5ee1a0a7a183`; the completion-report commit will be a documentation-only descendant and remains compatible under the existing ancestor-aware release gate.
+The current ReleaseManifest binds to source commit `d71deae8518ed4e55bff13df58fb5ee1a0a7a183`; the completion-report commit `c03633286c995e183e1eb0c35064ac5f972e8dcc` is a documentation-only descendant and remains compatible under the existing ancestor-aware release gate.
 
 ## Known limitations and explicit non-goals
 
