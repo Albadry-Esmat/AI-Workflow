@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "contract_version": "0.1.0",
+  "goal": "Make AI-Workflow installable and usable through multiple agent runtimes without coupling the core to any named agent.",
+  "lanes": [
+    {
+      "id": "native",
+      "name": "Native host installation",
+      "host_scope": "user-machine",
+      "core_requirements": ["git", "node", "python3", "core validation dependencies"],
+      "runtime_installation": "user-selected",
+      "credential_requirement": "none-for-demo",
+      "network_default": "allowed",
+      "reproducibility": "host-dependent",
+      "status": "specified"
+    },
+    {
+      "id": "project-local",
+      "name": "Project-local pinned installation",
+      "host_scope": "target-project",
+      "core_requirements": ["git", "project tool manifest", "pinned validation dependencies"],
+      "runtime_installation": "project-pinned",
+      "credential_requirement": "provider-on-demand",
+      "network_default": "allowed",
+      "reproducibility": "version-pinned",
+      "status": "specified"
+    },
+    {
+      "id": "dev-container",
+      "name": "Development container or Codespace",
+      "host_scope": "container-or-codespace",
+      "core_requirements": ["container runtime or Codespace", "repository devcontainer definition"],
+      "runtime_installation": "container-feature-or-user-selected",
+      "credential_requirement": "secret-injection-or-login",
+      "network_default": "optional",
+      "reproducibility": "image-defined",
+      "status": "specified"
+    }
+  ],
+  "command_contract": {
+    "commands": [
+      {"name": "aiw setup", "phase": "install", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw doctor", "phase": "diagnose", "mutates_machine": false, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw agent list", "phase": "detect", "mutates_machine": false, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw agent detect", "phase": "detect", "mutates_machine": false, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw agent use", "phase": "select", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw demo", "phase": "demo", "mutates_machine": false, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw auth status", "phase": "auth", "mutates_machine": false, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw auth login", "phase": "auth", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw auth logout", "phase": "auth", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw init", "phase": "init", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw start", "phase": "start", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"},
+      {"name": "aiw recover", "phase": "recover", "mutates_machine": true, "requires_auth": false, "runtime_neutral": true, "status": "planned"}
+    ],
+    "default_sequence": ["aiw setup", "aiw doctor", "aiw agent detect", "aiw agent use auto", "aiw demo", "aiw auth status", "aiw init", "aiw start"],
+    "no_secret_sequence": ["aiw setup --check-only", "aiw doctor", "aiw agent detect", "aiw demo"]
+  },
+  "authentication_boundaries": {
+    "aiw_secret_storage": "none",
+    "runtime_login_delegation": true,
+    "github_login_delegation": "gh-auth-login-or-approved-flow",
+    "no_secret_demo": true,
+    "scope_validation": true,
+    "log_redaction": true
+  },
+  "safety_invariants": [
+    "The core workflow must not require OpenCode or any other named runtime.",
+    "Explicit adapter selection must never silently fall back to another adapter.",
+    "Automatic adapter selection must be deterministic and recorded in evidence.",
+    "AI-Workflow must not install an agent runtime without explicit user consent.",
+    "AI-Workflow must not store raw runtime, provider, or GitHub secrets.",
+    "The no-secret demo must complete without provider authentication.",
+    "Unknown adapter capabilities must be reported as unknown and fail closed for claims.",
+    "Generic command support must not claim runtime-specific safety or evidence.",
+    "Target initialization must not copy secrets into the target project.",
+    "Target modifications must have a backup and rollback boundary before implementation.",
+    "The selected adapter ID must be included in run-manifest evidence.",
+    "Website adapter claims must be generated from source-owned catalog data."
+  ],
+  "baseline_metrics": [
+    {"id": "O0-TIME-TO-DEMO", "description": "Time from clean checkout to successful no-secret demo", "target": "Measure current path; future target under 10 minutes", "measurement": "Timed clean-checkout fixture with network and no-network variants", "gate": "baseline-only"},
+    {"id": "O0-SETUP-IDEMPOTENCE", "description": "Repeated setup produces no unexpected changes", "target": "Second run has zero unexpected mutations", "measurement": "Hash and worktree comparison across two consecutive setup runs", "gate": "hard"},
+    {"id": "O0-ADAPTER-DETECTION", "description": "Initial adapter catalog has deterministic detection definitions", "target": "Four catalog entries validate and each has a safe probe", "measurement": "Schema and catalog validator with fixture command environments", "gate": "hard"},
+    {"id": "O0-NO-SECRET", "description": "Core demo works without provider credentials", "target": "No-secret sequence completes with zero secret values", "measurement": "Environment scrub plus fixture execution and log scan", "gate": "hard"},
+    {"id": "O0-NO-FALLBACK", "description": "Explicit adapter selection cannot silently change runtime", "target": "All wrong/missing adapter fixtures fail closed", "measurement": "Selection policy fixture tests", "gate": "hard"},
+    {"id": "O0-SUPPORT-CLAIMS", "description": "Support levels match evidence maturity", "target": "First-class claims require verified fixtures; generic claims disclose limits", "measurement": "Catalog-policy consistency validation", "gate": "hard"},
+    {"id": "O0-AUTH-BOUNDARY", "description": "Authentication ownership and secret handling are explicit", "target": "AIW raw-secret handling is false for every adapter", "measurement": "Catalog and policy schema validation plus redaction fixture", "gate": "hard"},
+    {"id": "O0-ROLLBACK", "description": "O0 artifacts can be reverted without target-project changes", "target": "Catalog/policy/docs changes are source-revertible; no runtime installed", "measurement": "Git diff inventory and policy assertion", "gate": "hard"}
+  ],
+  "rollback": {
+    "source_changes_revertible": true,
+    "catalog_changes_revertible": true,
+    "target_init_backup_required": true,
+    "no_runtime_install_by_default": true,
+    "rollback_command": "git revert <O0-commit> on Dev, then rerun the source and website compatibility gates"
+  }
+}

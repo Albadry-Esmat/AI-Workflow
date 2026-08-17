@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -55,6 +55,7 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@$(MAKE) validate-batch7
 	@$(MAKE) validate-batch8
 	@$(MAKE) validate-batch9
+	@$(MAKE) validate-onboarding-o0
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -80,6 +81,9 @@ validate-batch8: ## Run Batch 8 operational evidence, SLO, privacy, incident, an
 
 validate-batch9: ## Run Batch 9 Skill SDK, feedback, consolidation, and autonomy controls
 	@python3 scripts/validate-batch9-controls.py
+
+validate-onboarding-o0: ## Validate agent-neutral onboarding and runtime-adapter O0 contracts
+	@python3 scripts/validate-onboarding-o0-controls.py
 
 skill-create: ## Create a draft skill scaffold without registry mutation
 	@python3 scripts/create-skill-scaffold.py $(ARGS)

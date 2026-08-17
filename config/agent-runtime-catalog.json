@@ -1,0 +1,296 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "0.1.0",
+  "adapters": [
+    {
+      "id": "opencode",
+      "display_name": "OpenCode",
+      "vendor": "Anomaly",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://opencode.ai/docs/",
+        "reviewed_at": "2026-08-17",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "opencode",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "native-installer", "name": "OpenCode installer", "user_action_required": true},
+          {"kind": "package-manager", "name": "npm/Homebrew/platform package", "user_action_required": true},
+          {"kind": "container", "name": "OpenCode container image", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["browser-device", "runtime-login", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": true,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "opencode <target>",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": true,
+        "supports_undo": true,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "native",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "native"
+      }
+    },
+    {
+      "id": "claude-code",
+      "display_name": "Claude Code",
+      "vendor": "Anthropic",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://code.claude.com/docs/en/quickstart",
+        "reviewed_at": "2026-08-17",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "claude",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "native-installer", "name": "Claude Code native installer", "user_action_required": true},
+          {"kind": "package-manager", "name": "Homebrew/apt/dnf/apk/WinGet", "user_action_required": true},
+          {"kind": "container", "name": "User-managed container setup", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["browser-device", "api-key-env", "enterprise-gateway"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "claude",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": true,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "native",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "codex",
+      "display_name": "Codex CLI",
+      "vendor": "OpenAI",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://github.com/openai/codex",
+        "reviewed_at": "2026-08-17",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "codex",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "native-installer", "name": "Codex standalone installer", "user_action_required": true},
+          {"kind": "package-manager", "name": "npm/Homebrew", "user_action_required": true},
+          {"kind": "binary", "name": "Codex release binary", "user_action_required": true},
+          {"kind": "container", "name": "User-managed container setup", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["browser-device", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "codex",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "unknown",
+        "approval_model": "unknown",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "unknown",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "generic-command",
+      "display_name": "Generic Agent Command",
+      "vendor": "User-managed",
+      "status": "planned",
+      "support_level": "generic",
+      "documentation": {
+        "official_url": "https://github.com/Albadry-Esmat/AI-Workflow",
+        "reviewed_at": "2026-08-17",
+        "verification_state": "documentation-reviewed"
+      },
+      "detection": {
+        "executable": "user-defined",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "user-managed", "name": "User-provided executable", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": false,
+        "modes": ["none"],
+        "credential_owner": "user",
+        "aiw_handles_secret_values": false,
+        "status_probe": "none"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "user",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "$AIW_AGENT_COMMAND",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "unknown",
+        "approval_model": "unknown",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "explicit-generic"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "started", "failed"],
+        "evidence_level": "none",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": false,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "unknown",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      }
+    }
+  ]
+}

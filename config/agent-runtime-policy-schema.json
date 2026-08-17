@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/agent-runtime-policy.json",
+  "title": "AgentRuntimePolicy",
+  "description": "Fail-closed policy for provider-neutral agent runtime selection and onboarding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "core_neutrality", "selection", "installation", "authentication", "support_claims", "evidence", "initial_adapters"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "core_neutrality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_runtime_is_adapter", "core_must_not_require_named_runtime", "runtime_config_is_adapter_owned"],
+      "properties": {
+        "agent_runtime_is_adapter": {"type": "boolean", "const": true},
+        "core_must_not_require_named_runtime": {"type": "boolean", "const": true},
+        "runtime_config_is_adapter_owned": {"type": "boolean", "const": true}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auto_selection_allowed", "auto_selection_deterministic", "explicit_selection_no_fallback", "selection_recorded_in_run_manifest"],
+      "properties": {
+        "auto_selection_allowed": {"type": "boolean", "const": true},
+        "auto_selection_deterministic": {"type": "boolean", "const": true},
+        "explicit_selection_no_fallback": {"type": "boolean", "const": true},
+        "selection_recorded_in_run_manifest": {"type": "boolean", "const": true}
+      }
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aiw_installs_runtime_by_default", "requires_explicit_consent", "supports_check_only", "supports_no_network"],
+      "properties": {
+        "aiw_installs_runtime_by_default": {"type": "boolean", "const": false},
+        "requires_explicit_consent": {"type": "boolean", "const": true},
+        "supports_check_only": {"type": "boolean", "const": true},
+        "supports_no_network": {"type": "boolean", "const": true}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["no_secret_demo_required", "aiw_must_not_store_raw_secrets", "runtime_auth_delegated", "scope_validation_required"],
+      "properties": {
+        "no_secret_demo_required": {"type": "boolean", "const": true},
+        "aiw_must_not_store_raw_secrets": {"type": "boolean", "const": true},
+        "runtime_auth_delegated": {"type": "boolean", "const": true},
+        "scope_validation_required": {"type": "boolean", "const": true}
+      }
+    },
+    "support_claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_class_requires_fixture", "compatible_must_declare_limits", "generic_must_not_claim_safety", "website_claims_source_owned"],
+      "properties": {
+        "first_class_requires_fixture": {"type": "boolean", "const": true},
+        "compatible_must_declare_limits": {"type": "boolean", "const": true},
+        "generic_must_not_claim_safety": {"type": "boolean", "const": true},
+        "website_claims_source_owned": {"type": "boolean", "const": true}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_id_required", "external_writes_default_false", "unknown_capabilities_fail_closed"],
+      "properties": {
+        "adapter_id_required": {"type": "boolean", "const": true},
+        "external_writes_default_false": {"type": "boolean", "const": true},
+        "unknown_capabilities_fail_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "initial_adapters": {
+      "type": "array",
+      "const": ["opencode", "claude-code", "codex", "generic-command"],
+      "items": {"type": "string"}
+    }
+  }
+}

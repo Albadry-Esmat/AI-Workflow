@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/onboarding-o0.json",
+  "title": "OnboardingO0Contract",
+  "description": "Agent-neutral installation and first-use contract for Onboarding Batch O0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "goal", "lanes", "command_contract", "authentication_boundaries", "safety_invariants", "baseline_metrics", "rollback"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "goal": {"type": "string", "minLength": 20},
+    "lanes": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "host_scope", "core_requirements", "runtime_installation", "credential_requirement", "network_default", "reproducibility", "status"],
+        "properties": {
+          "id": {"type": "string", "enum": ["native", "project-local", "dev-container"]},
+          "name": {"type": "string", "minLength": 1},
+          "host_scope": {"type": "string", "enum": ["user-machine", "target-project", "container-or-codespace"]},
+          "core_requirements": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "runtime_installation": {"type": "string", "enum": ["user-selected", "project-pinned", "container-feature-or-user-selected"]},
+          "credential_requirement": {"type": "string", "enum": ["none-for-demo", "provider-on-demand", "secret-injection-or-login"]},
+          "network_default": {"type": "string", "enum": ["allowed", "optional", "disabled"]},
+          "reproducibility": {"type": "string", "enum": ["host-dependent", "version-pinned", "image-defined"]},
+          "status": {"type": "string", "enum": ["specified", "planned", "active"]}
+        }
+      }
+    },
+    "command_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands", "default_sequence", "no_secret_sequence"],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "phase", "mutates_machine", "requires_auth", "runtime_neutral", "status"],
+            "properties": {
+              "name": {"type": "string", "pattern": "^aiw [a-z][a-z0-9 -]+$"},
+              "phase": {"type": "string", "enum": ["install", "diagnose", "detect", "select", "demo", "auth", "init", "start", "recover"]},
+              "mutates_machine": {"type": "boolean"},
+              "requires_auth": {"type": "boolean"},
+              "runtime_neutral": {"type": "boolean", "const": true},
+              "status": {"type": "string", "enum": ["specified", "planned", "implemented"]}
+            }
+          }
+        },
+        "default_sequence": {"type": "array", "minItems": 5, "items": {"type": "string"}},
+        "no_secret_sequence": {"type": "array", "minItems": 3, "items": {"type": "string"}}
+      }
+    },
+    "authentication_boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aiw_secret_storage", "runtime_login_delegation", "github_login_delegation", "no_secret_demo", "scope_validation", "log_redaction"],
+      "properties": {
+        "aiw_secret_storage": {"type": "string", "enum": ["none", "approved-secret-store-only"]},
+        "runtime_login_delegation": {"type": "boolean", "const": true},
+        "github_login_delegation": {"type": "string", "enum": ["gh-auth-login-or-approved-flow", "approved-flow-only"]},
+        "no_secret_demo": {"type": "boolean", "const": true},
+        "scope_validation": {"type": "boolean", "const": true},
+        "log_redaction": {"type": "boolean", "const": true}
+      }
+    },
+    "safety_invariants": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"type": "string", "minLength": 10}
+    },
+    "baseline_metrics": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "target", "measurement", "gate"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^O0-[A-Z0-9-]+$"},
+          "description": {"type": "string", "minLength": 10},
+          "target": {"type": "string", "minLength": 1},
+          "measurement": {"type": "string", "minLength": 10},
+          "gate": {"type": "string", "enum": ["hard", "soft", "baseline-only"]}
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_changes_revertible", "catalog_changes_revertible", "target_init_backup_required", "no_runtime_install_by_default", "rollback_command"],
+      "properties": {
+        "source_changes_revertible": {"type": "boolean", "const": true},
+        "catalog_changes_revertible": {"type": "boolean", "const": true},
+        "target_init_backup_required": {"type": "boolean", "const": true},
+        "no_runtime_install_by_default": {"type": "boolean", "const": true},
+        "rollback_command": {"type": "string", "minLength": 10}
+      }
+    }
+  }
+}

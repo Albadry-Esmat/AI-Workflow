@@ -14,6 +14,8 @@
 #   skills/pipelines/              → website/data/skills/pipelines/  (all *.json)
 #   docs/changelog.md              → website/data/docs/changelog.md
 #   opencode.json                  → website/data/opencode.json
+#   config/agent-runtime-catalog.json → website/data/agent-runtimes.json
+#   config/onboarding-o0-contract.json → website/data/onboarding-o0.json
 #   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
 #   website/data/site-content.json → (already in website/data/, synced via rsync)
 #
@@ -229,6 +231,11 @@ sync_file "$ROOT/docs/changelog.md" "$DATA_DIR/docs/changelog.md"
 # ── Sync: root opencode.json ──────────────────────────────────────────────────
 header "opencode.json"
 sync_file "$ROOT/opencode.json" "$DATA_DIR/opencode.json"
+
+# ── Sync: agent-neutral onboarding contracts ───────────────────────────────────
+header "Agent runtime and onboarding contracts"
+sync_file "$ROOT/config/agent-runtime-catalog.json" "$DATA_DIR/agent-runtimes.json"
+sync_file "$ROOT/config/onboarding-o0-contract.json" "$DATA_DIR/onboarding-o0.json"
 
 # ── Sync: .opencode/skills/ SKILL.md files ────────────────────────────────────
 header "Skill files (.opencode/skills/)"

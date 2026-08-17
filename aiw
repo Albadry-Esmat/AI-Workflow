@@ -67,6 +67,7 @@ show_help() {
   echo -e "    ${CYAN}validate-batch7${NC}              Validate quality, traceability, and context controls"
   echo -e "    ${CYAN}validate-batch8${NC}              Validate operational evidence, SLO, privacy, incident, and supply chain controls"
   echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
+  echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
   echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
   echo -e "    ${CYAN}skill apply${NC}                  Apply an explicitly approved scaffold with rollback"
   echo -e "    ${CYAN}feedback-to-eval${NC}             Ingest sanitized feedback with approval-gated eval promotion"
@@ -312,6 +313,10 @@ cmd_validate_batch9() {
   make -C "$ROOT" validate-batch9 "$@"
 }
 
+cmd_validate_onboarding_o0() {
+  make -C "$ROOT" validate-onboarding-o0 "$@"
+}
+
 cmd_skill() {
   local subcmd="${1:-help}"
   shift || true
@@ -543,6 +548,7 @@ case "$COMMAND" in
   validate-batch7)  cmd_validate_batch7 "$@" ;;
     validate-batch8) cmd_validate_batch8 "$@" ;;
   validate-batch9) cmd_validate_batch9 "$@" ;;
+  validate-onboarding-o0) cmd_validate_onboarding_o0 "$@" ;;
   skill)            cmd_skill "$@" ;;
   feedback-to-eval) cmd_feedback_to_eval "$@" ;;
   autonomy-experiments) cmd_autonomy_experiments "$@" ;;

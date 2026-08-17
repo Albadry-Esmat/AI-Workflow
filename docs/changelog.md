@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Agent-Neutral Onboarding Contract (Batch O0)
+
+- Added the provider-neutral runtime adapter schema and source-owned catalog for OpenCode, Claude Code, Codex CLI, and a generic user-managed command.
+- Added the O0 onboarding contract for native, project-local, and Dev Container/Codespace lanes, no-secret demo boundaries, delegated authentication, deterministic selection, support-claim maturity, baseline metrics, and rollback.
+- Added O0 validation fixtures and the `aiw validate-onboarding-o0` / `make validate-onboarding-o0` controls. Runtime installation, authentication flows, target mutation, and first-class adapter claims remain deferred to later gated batches.
+- Extended generated website data with the runtime catalog and onboarding contract, and added the catalog to the website Agents page as a source-owned representation.
+
 ### Execution Contracts
 
 - Added the versioned `ai-workflow-execution` contract family for run manifests, step executions, artifact references, gate decisions, and policy decisions.
