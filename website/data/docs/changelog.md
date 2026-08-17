@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Deterministic Toolchain (Onboarding Batch O1)
+
+- Added a source-owned deterministic toolchain manifest and policy for Git, Python, Node, npm, local dependency environments, adapter version boundaries, lockfile enforcement, and no-network check-only verification.
+- Added pinned `requirements-dev.txt`, project-local AJV dependencies in `package.json`/`package-lock.json`, and replaced global `pip`/npm installation behavior in setup and validation paths with `.venv`, `npm ci`, and local binaries.
+- Added `aiw toolchain-check`, `aiw validate-onboarding-o1`, `make toolchain-check`, and `make validate-onboarding-o1`; O1 fails closed on unknown versions, missing lockfiles, dependency drift, and missing local tooling.
+- Updated the generated website with the O1 toolchain manifest and a deterministic-installation section on Getting Started. Runtime detection, authentication, guided setup, and neutral launch remain deferred to O2.
+
 ### Agent-Neutral Onboarding Contract (Batch O0)
 
 - Added the provider-neutral runtime adapter schema and source-owned catalog for OpenCode, Claude Code, Codex CLI, and a generic user-managed command.

@@ -26,6 +26,15 @@ _resolve_script_path() {
 }
 ROOT="$(_resolve_script_path)"
 
+PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/node_modules/.bin/ajv}"
+if [[ ! -x "$AJV_BIN" ]]; then
+  AJV_BIN="$(command -v ajv || true)"
+fi
+
 # ── Colors ────────────────────────────────────────────────────────────────────
 BOLD="\033[1m"
 NC="\033[0m"
@@ -68,6 +77,8 @@ show_help() {
   echo -e "    ${CYAN}validate-batch8${NC}              Validate operational evidence, SLO, privacy, incident, and supply chain controls"
   echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
   echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
+  echo -e "    ${CYAN}validate-onboarding-o1${NC}       Validate deterministic core and adapter toolchain controls"
+  echo -e "    ${CYAN}toolchain-check${NC}               Run non-mutating no-network toolchain verification"
   echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
   echo -e "    ${CYAN}skill apply${NC}                  Apply an explicitly approved scaffold with rollback"
   echo -e "    ${CYAN}feedback-to-eval${NC}             Ingest sanitized feedback with approval-gated eval promotion"
@@ -173,7 +184,7 @@ cmd_lint() {
   echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
   echo ""
   # Run only checks 0 and 1 from validate
-  python3 -c "
+  "$PYTHON_BIN" -c "
 import yaml, sys
 try:
     with open('$ROOT/skills/index.yaml') as f:
@@ -186,7 +197,7 @@ except Exception as e:
   echo ""
   # Pipeline schema validation
   for f in "$ROOT"/skills/pipelines/*.json; do
-    if ajv validate -s "$ROOT/skills/schema/pipeline-schema.json" -d "$f" --spec=draft7 -c ajv-formats 2>/dev/null; then
+    if "$AJV_BIN" validate -s "$ROOT/skills/schema/pipeline-schema.json" -d "$f" --spec=draft7 -c ajv-formats 2>/dev/null; then
       echo -e "  ${GREEN}PASS${NC} $(basename "$f")"
     else
       echo -e "  ${RED}FAIL${NC} $(basename "$f")"
@@ -292,17 +303,17 @@ cmd_sync() {
 }
 
 cmd_quick_review() {
-  python3 "$ROOT/scripts/run-quick-review.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/run-quick-review.py" "$@"
 }
 
 cmd_validate_batch6() {
-  python3 "$ROOT/scripts/validate-batch6-controls.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-batch6-controls.py" "$@"
 }
 
 cmd_validate_batch7() {
-  python3 "$ROOT/scripts/validate-batch7-controls.py" "$@"
-  python3 "$ROOT/scripts/validate-traceability.py"
-  python3 "$ROOT/scripts/test-context-preservation.py"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-batch7-controls.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-traceability.py"
+  "$PYTHON_BIN" "$ROOT/scripts/test-context-preservation.py"
 }
 
 cmd_validate_batch8() {
@@ -317,12 +328,20 @@ cmd_validate_onboarding_o0() {
   make -C "$ROOT" validate-onboarding-o0 "$@"
 }
 
+cmd_validate_onboarding_o1() {
+  make -C "$ROOT" validate-onboarding-o1 "$@"
+}
+
+cmd_toolchain_check() {
+  make -C "$ROOT" toolchain-check "$@"
+}
+
 cmd_skill() {
   local subcmd="${1:-help}"
   shift || true
   case "$subcmd" in
-    create) python3 "$ROOT/scripts/create-skill-scaffold.py" "$@" ;;
-    apply) python3 "$ROOT/scripts/apply-skill-scaffold.py" "$@" ;;
+    create) "$PYTHON_BIN" "$ROOT/scripts/create-skill-scaffold.py" "$@" ;;
+    apply) "$PYTHON_BIN" "$ROOT/scripts/apply-skill-scaffold.py" "$@" ;;
     *)
       echo "Usage: aiw skill [create|apply]"
       exit 1
@@ -331,68 +350,68 @@ cmd_skill() {
 }
 
 cmd_feedback_to_eval() {
-  python3 "$ROOT/scripts/ingest-feedback-to-eval.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/ingest-feedback-to-eval.py" "$@"
 }
 
 cmd_autonomy_experiments() {
-  python3 "$ROOT/scripts/run-autonomy-experiments.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/run-autonomy-experiments.py" "$@"
 }
 
 cmd_consolidation_analysis() {
-  python3 "$ROOT/scripts/analyze-skill-consolidation.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/analyze-skill-consolidation.py" "$@"
 }
 
 cmd_operational_evidence() {
-  python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline full-pipeline "$@"
-  python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline insights-adaptation-pipeline "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/run-operational-evidence.py" --pipeline full-pipeline "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/run-operational-evidence.py" --pipeline insights-adaptation-pipeline "$@"
 }
 
 cmd_measure_slos() {
-  python3 "$ROOT/scripts/measure-slos.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/measure-slos.py" "$@"
 }
 
 cmd_evaluate_model_compatibility() {
-  python3 "$ROOT/scripts/evaluate-model-compatibility.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-model-compatibility.py" "$@"
 }
 
 cmd_test_telemetry_privacy() {
-  python3 "$ROOT/scripts/test-telemetry-privacy.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/test-telemetry-privacy.py" "$@"
 }
 
 cmd_simulate_incident_containment() {
-  python3 "$ROOT/scripts/simulate-incident-containment.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/simulate-incident-containment.py" "$@"
 }
 
 cmd_generate_sbom() {
-  python3 "$ROOT/scripts/generate-sbom.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/generate-sbom.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
 }
 
 cmd_scan_supply_chain() {
-  python3 "$ROOT/scripts/scan-supply-chain.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/scan-supply-chain.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
 }
 
 cmd_validate_traceability() {
-  python3 "$ROOT/scripts/validate-traceability.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-traceability.py" "$@"
 }
 
 cmd_test_context_preservation() {
-  python3 "$ROOT/scripts/test-context-preservation.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/test-context-preservation.py" "$@"
 }
 
 cmd_eval_quality_vector() {
-  python3 "$ROOT/scripts/evaluate-quality-vector.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-quality-vector.py" "$@"
 }
 
 cmd_check_release_compatibility() {
-  python3 "$ROOT/scripts/check-release-compatibility.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/check-release-compatibility.py" "$@"
 }
 
 cmd_validate_evals() {
-  python3 "$ROOT/scripts/validate-quick-review-evals.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-quick-review-evals.py" "$@"
 }
 
 cmd_eval_quick_review() {
-  python3 "$ROOT/scripts/evaluate-quick-review.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-quick-review.py" "$@"
 }
 
 cmd_graph() {
@@ -549,6 +568,8 @@ case "$COMMAND" in
     validate-batch8) cmd_validate_batch8 "$@" ;;
   validate-batch9) cmd_validate_batch9 "$@" ;;
   validate-onboarding-o0) cmd_validate_onboarding_o0 "$@" ;;
+  validate-onboarding-o1) cmd_validate_onboarding_o1 "$@" ;;
+  toolchain-check) cmd_toolchain_check "$@" ;;
   skill)            cmd_skill "$@" ;;
   feedback-to-eval) cmd_feedback_to_eval "$@" ;;
   autonomy-experiments) cmd_autonomy_experiments "$@" ;;

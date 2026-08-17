@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/toolchain-manifest.json",
+  "title": "ToolchainManifest",
+  "description": "Deterministic core and agent-adapter toolchain contract for Onboarding Batch O1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_version", "project", "core_tools", "python", "node", "adapters", "verification"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "manifest_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_of_truth"],
+      "properties": {
+        "id": {"type": "string", "const": "ai-workflow"},
+        "source_of_truth": {"type": "string", "const": "AI-Workflow/Dev"}
+      }
+    },
+    "core_tools": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "executable", "version_args", "supported_range", "required", "source", "safe_probe"],
+        "properties": {
+          "id": {"type": "string", "enum": ["git", "python", "node", "npm"]},
+          "executable": {"type": "string", "minLength": 1},
+          "version_args": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "supported_range": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean", "const": true},
+          "source": {"type": "string", "enum": ["host", "project", "lockfile", "container"]},
+          "safe_probe": {"type": "boolean", "const": true}
+        }
+      }
+    },
+    "python": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["venv_dir", "requirements_file", "install_command", "no_network_install_command", "system_install_forbidden", "recreate_supported"],
+      "properties": {
+        "venv_dir": {"type": "string", "const": ".venv"},
+        "requirements_file": {"type": "string", "const": "requirements-dev.txt"},
+        "install_command": {"type": "string", "const": ".venv/bin/python -m pip install --requirement requirements-dev.txt"},
+        "no_network_install_command": {"type": "string", "const": ".venv/bin/python -m pip install --no-index --requirement requirements-dev.txt"},
+        "system_install_forbidden": {"type": "boolean", "const": true},
+        "recreate_supported": {"type": "boolean", "const": true}
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_json", "lockfile", "package_manager", "install_command", "no_network_install_command", "local_bin_required", "global_install_forbidden"],
+      "properties": {
+        "package_json": {"type": "string", "const": "package.json"},
+        "lockfile": {"type": "string", "const": "package-lock.json"},
+        "package_manager": {"type": "string", "const": "npm"},
+        "install_command": {"type": "string", "const": "npm ci --ignore-scripts --no-audit --no-fund"},
+        "no_network_install_command": {"type": "string", "const": "npm ci --offline --ignore-scripts --no-audit --no-fund"},
+        "local_bin_required": {"type": "boolean", "const": true},
+        "global_install_forbidden": {"type": "boolean", "const": true}
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["adapter_id", "version_policy", "aiw_installs_runtime", "requires_explicit_consent", "version_probe", "supported_channels"],
+        "properties": {
+          "adapter_id": {"type": "string", "enum": ["opencode", "claude-code", "codex", "generic-command"]},
+          "version_policy": {"type": "string", "enum": ["user-selected-exact", "project-pinned", "container-pinned", "user-managed"]},
+          "aiw_installs_runtime": {"type": "boolean", "const": false},
+          "requires_explicit_consent": {"type": "boolean", "const": true},
+          "version_probe": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "supported_channels": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_only_mutates", "check_only_network", "lockfiles_required", "unknown_versions_fail_closed", "manifest_recorded"],
+      "properties": {
+        "check_only_mutates": {"type": "boolean", "const": false},
+        "check_only_network": {"type": "string", "enum": ["disabled", "optional", "allowed"]},
+        "lockfiles_required": {"type": "boolean", "const": true},
+        "unknown_versions_fail_closed": {"type": "boolean", "const": true},
+        "manifest_recorded": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

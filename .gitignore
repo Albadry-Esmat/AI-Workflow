@@ -78,3 +78,7 @@ artifacts/npm-audit-*.json
 !artifacts/README.md
 !artifacts/.gitkeep
 
+
+# ─── O1 project-local toolchain environment ────────────────────────────────────
+# Disposable Python environment; recreate from requirements-dev.txt.
+.venv/

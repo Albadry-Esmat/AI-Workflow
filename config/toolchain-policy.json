@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "core_dependencies": {
+    "python_must_be_project_local": true,
+    "node_must_be_project_local": true,
+    "global_python_install_forbidden": true,
+    "global_node_install_forbidden": true,
+    "runtime_installation_separate": true
+  },
+  "lockfiles": {
+    "node_lockfile_required": true,
+    "python_requirements_pinned": true,
+    "lockfile_drift_blocks": true,
+    "integrity_checked": true
+  },
+  "verification": {
+    "check_only_is_non_mutating": true,
+    "check_only_disables_network": true,
+    "unknown_version_blocks": true,
+    "report_paths_and_versions": true
+  },
+  "runtime_installation": {
+    "aiw_installs_by_default": false,
+    "explicit_consent_required": true,
+    "adapter_owned": true,
+    "unattended_install_forbidden": true
+  },
+  "recovery": {
+    "failed_install_leaves_previous_state": true,
+    "venv_recreatable": true,
+    "node_modules_recreatable": true,
+    "rollback_documented": true
+  }
+}

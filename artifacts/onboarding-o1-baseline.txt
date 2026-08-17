@@ -1,0 +1,85 @@
+=== O1 BASELINE ===
+2026-08-17T15:47:32Z
+
+=== REMOTE TIPS ===
+source=02aae0e40cedcb5561c1f7d7af6550699965ae14
+website=2b821b0b38120b1af8b3d7b6556870ee2b31d079
+
+=== SOURCE DEPENDENCY FILES ===
+/home/ubuntu/AI-Workflow/package-lock.json
+/home/ubuntu/AI-Workflow/package.json
+
+=== WEBSITE DEPENDENCY FILES ===
+/home/ubuntu/ASE-OS-Website/.next/package.json
+/home/ubuntu/ASE-OS-Website/package-lock.json
+/home/ubuntu/ASE-OS-Website/package.json
+
+=== CURRENT SETUP MUTATIONS ===
+10:#   2. Checks optional tools (opencode, ajv-cli) and installs ajv-cli if missing
+11:#   3. Installs .opencode/ npm plugin dependencies (skips if already done)
+14:#   6. Runs health-check.sh to validate the final state
+64:if command -v opencode &>/dev/null; then
+65:  _ok "opencode found ($(command -v opencode))"
+67:  _warn "opencode not found — install at: https://opencode.ai"
+68:  echo "       The workflow requires opencode to run. Scripts and validation"
+76:  if sudo pip3 install jsonschema==4.23.0 --quiet; then
+79:    _warn "jsonschema install failed — run manually: sudo pip3 install jsonschema==4.23.0"
+87:  if npm install -g ajv-cli ajv-formats --silent; then
+90:    _warn "ajv-cli install failed — run manually: npm install -g ajv-cli ajv-formats"
+94:# ── 3. .opencode/ npm plugin ──────────────────────────────────────────────────
+95:header "Setting up .opencode/ plugin dependencies"
+97:if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+98:  _ok ".opencode/node_modules already present — skipping install"
+100:  step "Installing .opencode/ npm packages..."
+101:  if npm install --prefix "$ROOT/.opencode" --silent; then
+102:    _ok ".opencode/ packages installed"
+104:    _warn ".opencode/ npm install failed — run: npm install --prefix .opencode"
+116:    cp "$ROOT/.env.example" "$ROOT/.env"
+134:  ".opencode/state/sessions"
+154:    ln -sf "$AIW_BIN" /usr/local/bin/aiw
+159:    ln -sf "$AIW_BIN" "$HOME/.local/bin/aiw"
+215:bash "$ROOT/scripts/health-check.sh" || true
+
+=== CURRENT ADAPTER INSTALLATION CHANNELS ===
+opencode candidate | native-installer:OpenCode installer; package-manager:npm/Homebrew/platform package; container:OpenCode container image; user-managed:Existing installation
+claude-code candidate | native-installer:Claude Code native installer; package-manager:Homebrew/apt/dnf/apk/WinGet; container:User-managed container setup; user-managed:Existing installation
+codex candidate | native-installer:Codex standalone installer; package-manager:npm/Homebrew; binary:Codex release binary; container:User-managed container setup; user-managed:Existing installation
+generic-command generic | user-managed:User-provided executable
+
+=== CURRENT WEBSITE PACKAGE VERSIONS ===
+/home/ubuntu/ASE-OS-Website/package.json {
+  "dependencies": {
+    "framer-motion": "^12.40.0",
+    "gray-matter": "^4.0.3",
+    "isomorphic-dompurify": "^2.25.0",
+    "js-yaml": "^4.2.0",
+    "lucide-react": "^1.20.0",
+    "marked": "^18.0.5",
+    "next": "16.3.1",
+    "next-themes": "^0.4.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/dompurify": "^3.0.5",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "happy-dom": "^20.10.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.9"
+  }
+}
+
+=== WORKTREES ===
+[31m??[m AI-Workflow-Comprehensive-Enhancement-Plan.md
+[31m??[m AI-Workflow-Enhanced-Implementation-Plan.md
+[31m??[m AI-Workflow-Enhancement-Research-Notes.md
+[31m??[m AI-Workflow-Gated-Batch-Implementation-Plan.md
+[31m??[m artifacts/onboarding-o1-baseline.txt

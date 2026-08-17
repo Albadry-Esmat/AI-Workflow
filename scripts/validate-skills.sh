@@ -17,8 +17,8 @@
 #   10. Community skill SHA-256 hash verification
 #   11. Credential guidance and canonical data ownership checks
 #
-# Requires: node (checks 5, 7, 8), python3 (checks 0, 9, 10, 11)
-# Optional: ajv-cli (check 1) — install with: npm install -g ajv-cli ajv-formats
+# Requires: node (checks 5, 7, 8), project-local Python (checks 0, 9, 10, 11)
+# Requires: project-local ajv-cli for pipeline schema validation.
 
 set -euo pipefail
 
@@ -28,6 +28,15 @@ cd "$ROOT"
 # Load shared utilities
 # shellcheck source=scripts/lib/common.sh
 source "$ROOT/scripts/lib/common.sh"
+
+PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/node_modules/.bin/ajv}"
+if [[ ! -x "$AJV_BIN" ]]; then
+  AJV_BIN="$(command -v ajv || true)"
+fi
 
 # Load .env (non-fatal — env vars are only informational here)
 load_env "$ROOT/.env" 2>/dev/null || true
@@ -41,8 +50,8 @@ _skip()   { info "SKIP: $1"; }
 
 # ── 0. YAML syntax check ───────────────────────────────────────────────────────
 header "0/10 — YAML syntax check (skills/index.yaml)"
-if command -v python3 &>/dev/null; then
-  python3 -c "
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" -c "
 import yaml, sys
 try:
     with open('skills/index.yaml') as f:
@@ -53,15 +62,15 @@ except yaml.YAMLError as e:
     sys.exit(1)
 " && _ok "skills/index.yaml is valid YAML" || { _fail "skills/index.yaml has YAML parse errors — run: python3 -c \"import yaml; yaml.safe_load(open('skills/index.yaml'))\" to debug"; }
 else
-  _skip "python3 not found — fix: https://python.org"
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── 1. Pipeline JSON schema validation ────────────────────────────────────────
 header "1/10 — Pipeline configs vs pipeline-schema.json"
-if command -v ajv &>/dev/null; then
+if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
   for f in skills/pipelines/*.json; do
     [[ -f "$f" ]] || continue   # guard: skip if glob did not expand (empty dir)
-    if ajv validate \
+    if "$AJV_BIN" validate \
         -s skills/schema/pipeline-schema.json \
         -d "$f" \
         --spec=draft7 \
@@ -72,7 +81,7 @@ if command -v ajv &>/dev/null; then
     fi
   done
 else
-  _skip "ajv-cli not found — fix: npm install -g ajv-cli ajv-formats"
+  _fail "project-local ajv-cli not found — run: make setup"
 fi
 
 # ── 2. SKILL.md required sections ─────────────────────────────────────────────
@@ -304,8 +313,8 @@ fi
 
 # ── 9. index.yaml version vs SKILL.md frontmatter ─────────────────────────────
 header "9/10 — index.yaml version vs SKILL.md frontmatter version"
-if command -v python3 &>/dev/null; then
-  python3 - <<'PYEOF' && PASS=$((PASS+1)) || { FAIL=$((FAIL+1)); echo "         Fix: sync the version field in the failing SKILL.md frontmatter to match index.yaml"; }
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" - <<'PYEOF' && PASS=$((PASS+1)) || { FAIL=$((FAIL+1)); echo "         Fix: sync the version field in the failing SKILL.md frontmatter to match index.yaml"; }
 import re, sys
 
 with open("skills/index.yaml") as f:
@@ -346,13 +355,13 @@ for m in mismatches:
 sys.exit(1 if mismatches else 0)
 PYEOF
 else
-  _skip "python3 not found — fix: https://python.org"
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── 10. Community skill SHA-256 hash verification ─────────────────────────────
 header "10/10 — Community skill SHA-256 hash verification"
 
-python3 - <<'PYEOF'
+"$PYTHON_BIN" - <<'PYEOF'
 import sys, hashlib, yaml
 from pathlib import Path
 
@@ -414,8 +423,8 @@ fi
 # ── 11. Credential guidance and canonical data ownership ───────────────────────
 header "11/11 — Credential guidance and canonical data ownership"
 
-if command -v python3 &>/dev/null; then
-  python3 - <<'PYEOF' && _ok "Credential guidance and canonical data ownership" || _fail "Credential guidance or canonical data ownership check"
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" - <<'PYEOF' && _ok "Credential guidance and canonical data ownership" || _fail "Credential guidance or canonical data ownership check"
 import json
 import re
 import sys
@@ -497,7 +506,7 @@ if errors:
 print(f'  PASS: checked {len(guidance_files)} guidance files and {len(entries)} canonical ownership entries')
 PYEOF
 else
-  _skip "python3 not found — fix: https://python.org"
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── Results ───────────────────────────────────────────────────────────────────

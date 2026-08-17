@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import py_compile
 import shutil
 import subprocess
@@ -25,7 +26,10 @@ def validate(path: Path, schema_path: Path) -> list[str]:
 
 
 def run(command: list[str], cwd: Path = ROOT, expect: int = 0) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(command, cwd=cwd, text=True, capture_output=True)
+    env = os.environ.copy()
+    env.setdefault("AIW_AJV_BIN", str(ROOT / "node_modules/.bin/ajv"))
+    env.setdefault("AIW_PYTHON_BIN", sys.executable)
+    result = subprocess.run(command, cwd=cwd, text=True, capture_output=True, env=env)
     if result.returncode != expect:
         raise AssertionError(f"command failed with {result.returncode}: {' '.join(command)}\nstdout={result.stdout}\nstderr={result.stderr}")
     return result

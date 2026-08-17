@@ -6,9 +6,10 @@
 #   bash scripts/setup.sh    ← direct invocation (works from any directory)
 #
 # What this script does:
-#   1. Checks required prerequisites (git, node, python3)
-#   2. Checks optional tools (opencode, ajv-cli) and installs ajv-cli if missing
-#   3. Installs .opencode/ npm plugin dependencies (skips if already done)
+#   1. Checks required prerequisites (git, node, npm, python3)
+#   2. Creates a project-local Python environment and installs pinned requirements
+#   3. Installs root Node dependencies from package-lock.json with npm ci
+#   4. Installs .opencode/ npm plugin dependencies in its local directory
 #   4. Creates .env from .env.example if .env does not yet exist
 #   5. Creates required runtime directories
 #   6. Runs health-check.sh to validate the final state
@@ -41,7 +42,7 @@ banner "Setup"
 # ── 1. Required prerequisites ─────────────────────────────────────────────────
 header "Checking required prerequisites"
 
-for tool in git node python3; do
+for tool in git node npm python3; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool found ($(command -v "$tool"))"
   else
@@ -58,50 +59,68 @@ if [[ "$FAIL" -gt 0 ]]; then
   exit 1
 fi
 
-# ── 2. Optional tools ─────────────────────────────────────────────────────────
-header "Checking optional tools"
+# ── 2. Project-local Python toolchain ─────────────────────────────────────────
+header "Setting up project-local Python environment"
 
-if command -v opencode &>/dev/null; then
-  _ok "opencode found ($(command -v opencode))"
+VENV="$ROOT/.venv"
+if [[ ! -x "$VENV/bin/python" ]]; then
+  step "Creating $VENV..."
+  python3 -m venv "$VENV"
+  _ok "Created disposable project-local Python environment"
 else
-  _warn "opencode not found — install at: https://opencode.ai"
-  echo "       The workflow requires opencode to run. Scripts and validation"
-  echo "       will work without it, but you cannot start the AI agents."
+  _ok "$VENV already exists"
 fi
 
-if python3 -c 'import jsonschema' &>/dev/null; then
-  _ok "jsonschema Python package found"
+if "$VENV/bin/python" -c 'import jsonschema, yaml' &>/dev/null; then
+  _ok "Pinned Python validation dependencies are available"
 else
-  step "Installing jsonschema (required for execution evidence)..."
-  if sudo pip3 install jsonschema==4.23.0 --quiet; then
-    _ok "jsonschema installed successfully"
+  step "Installing pinned Python requirements into $VENV..."
+  if "$VENV/bin/python" -m pip install --disable-pip-version-check --requirement "$ROOT/requirements-dev.txt" --quiet; then
+    _ok "Pinned Python requirements installed"
   else
-    _warn "jsonschema install failed — run manually: sudo pip3 install jsonschema==4.23.0"
+    _fail "Pinned Python requirements could not be installed"
+    echo "       Fix: $VENV/bin/python -m pip install --requirement requirements-dev.txt"
   fi
 fi
 
-if command -v ajv &>/dev/null; then
-  _ok "ajv-cli found"
-else
-  step "Installing ajv-cli (required for pipeline schema validation)..."
-  if npm install -g ajv-cli ajv-formats --silent; then
-    _ok "ajv-cli installed successfully"
+# ── 3. Project-local root Node toolchain ───────────────────────────────────────
+header "Setting up project-local Node dependencies"
+
+if [[ -f "$ROOT/package-lock.json" ]]; then
+  step "Installing root packages from package-lock.json with npm ci..."
+  if npm ci --ignore-scripts --no-audit --no-fund --silent; then
+    _ok "Root Node dependencies installed from the committed lockfile"
   else
-    _warn "ajv-cli install failed — run manually: npm install -g ajv-cli ajv-formats"
+    _fail "Root Node dependencies could not be installed from package-lock.json"
   fi
+else
+  _fail "package-lock.json not found — deterministic Node installation is unavailable"
 fi
 
-# ── 3. .opencode/ npm plugin ──────────────────────────────────────────────────
+if [[ -x "$ROOT/node_modules/.bin/ajv" ]]; then
+  _ok "Project-local ajv-cli found"
+else
+  _fail "Project-local ajv-cli not found after npm ci"
+fi
+
+# ── 4. .opencode/ npm plugin ──────────────────────────────────────────────────
 header "Setting up .opencode/ plugin dependencies"
 
-if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+if [[ ! -f "$ROOT/.opencode/package.json" ]]; then
+  _ok ".opencode has no plugin package manifest — no plugin dependency install required"
+elif [[ -d "$ROOT/.opencode/node_modules" ]]; then
   _ok ".opencode/node_modules already present — skipping install"
 else
   step "Installing .opencode/ npm packages..."
-  if npm install --prefix "$ROOT/.opencode" --silent; then
-    _ok ".opencode/ packages installed"
+  if [[ -f "$ROOT/.opencode/package-lock.json" ]]; then
+    install_cmd=(npm ci --prefix "$ROOT/.opencode" --ignore-scripts --no-audit --no-fund --silent)
   else
-    _warn ".opencode/ npm install failed — run: npm install --prefix .opencode"
+    install_cmd=(npm install --prefix "$ROOT/.opencode" --ignore-scripts --no-audit --no-fund --silent)
+  fi
+  if "${install_cmd[@]}"; then
+    _ok ".opencode/ packages installed locally"
+  else
+    _warn ".opencode/ npm packages could not be installed"
   fi
 fi
 
@@ -116,11 +135,9 @@ else
     cp "$ROOT/.env.example" "$ROOT/.env"
     _ok ".env created from .env.example"
     echo
-    echo -e "  ${BOLD}${YELLOW}Action required:${NC} Open .env and set your GITHUB_TOKEN."
-    echo "  The file is at: $ROOT/.env"
-    echo
-    echo "  Create a short-lived fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
-    echo "  Restrict it to this repository and grant only the permissions you need."
+    echo "  Optional: add provider or GitHub credentials later through the approved auth flow."
+    echo "  Prefer short-lived, fine-grained credentials and rotate them regularly."
+    echo "  The core no-secret demo and validation path do not require credentials."
     echo
   else
     _fail ".env.example not found — cannot create .env"
@@ -221,13 +238,10 @@ echo -e "  Setup complete: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${N
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo
 echo -e "${BOLD}Next steps:${NC}"
-echo "  1. Edit .env and set GITHUB_TOKEN (and any other keys you want)"
-  echo "     Create a short-lived fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
-  echo "     Restrict it to the required repositories and rotate it regularly."
-echo ""
-echo "  2. aiw health                      — verify your configuration"
-echo "  3. aiw start /path/to/your-project — launch on your project"
-echo "     aiw start                       — or launch here (this repo)"
+echo "  1. aiw health                      — verify the project-local toolchain"
+echo "  2. aiw validate-onboarding-o0      — verify the agent-neutral O0 contract"
+echo "  3. Select and authenticate an agent runtime only when you are ready"
+echo "  4. aiw start /path/to/your-project — launch behavior is runtime-adapter work"
 echo ""
 echo "  Quick reference:"
 echo "    aiw init /path/to/project  — copy workflow into another project"

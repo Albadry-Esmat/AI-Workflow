@@ -13,5 +13,9 @@
     "sessions:delete": "bash scripts/cleanup-sessions.sh --delete",
     "update": "npm install --prefix .opencode",
     "graph": "graphify update ."
+  },
+  "devDependencies": {
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^3.0.1"
   }
 }

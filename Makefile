@@ -9,10 +9,11 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
+PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 help: ## Show this help message
@@ -56,16 +57,17 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@$(MAKE) validate-batch8
 	@$(MAKE) validate-batch9
 	@$(MAKE) validate-onboarding-o0
+	@$(MAKE) validate-onboarding-o1
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
-	@python3 scripts/validate-execution-contracts.py
+	@$(PYTHON) scripts/validate-execution-contracts.py
 
 validate-batch6: ## Validate Batch 6 budget, retry, and capability-policy controls
-	@python3 scripts/validate-batch6-controls.py
+	@$(PYTHON) scripts/validate-batch6-controls.py
 
 validate-batch7: ## Validate Batch 7 quality, policy, traceability, and context controls
-	@python3 scripts/validate-batch7-controls.py
+	@$(PYTHON) scripts/validate-batch7-controls.py
 	@$(MAKE) validate-traceability
 	@$(MAKE) test-context-preservation
 
@@ -77,75 +79,81 @@ validate-batch8: ## Run Batch 8 operational evidence, SLO, privacy, incident, an
 	@$(MAKE) simulate-incident-containment
 	@$(MAKE) measure-slos
 	@$(MAKE) evaluate-model-compatibility
-	@python3 scripts/validate-batch8-controls.py
+	@$(PYTHON) scripts/validate-batch8-controls.py
 
 validate-batch9: ## Run Batch 9 Skill SDK, feedback, consolidation, and autonomy controls
-	@python3 scripts/validate-batch9-controls.py
+	@$(PYTHON) scripts/validate-batch9-controls.py
 
 validate-onboarding-o0: ## Validate agent-neutral onboarding and runtime-adapter O0 contracts
-	@python3 scripts/validate-onboarding-o0-controls.py
+	@$(PYTHON) scripts/validate-onboarding-o0-controls.py
+
+validate-onboarding-o1: ## Validate deterministic core and adapter toolchain controls
+	@$(PYTHON) scripts/validate-onboarding-o1-controls.py
+
+toolchain-check: ## Run non-mutating no-network toolchain verification
+	@$(PYTHON) scripts/check-toolchain.py --check-only --no-network --json-output artifacts/onboarding-o1-toolchain-evidence.json
 
 skill-create: ## Create a draft skill scaffold without registry mutation
-	@python3 scripts/create-skill-scaffold.py $(ARGS)
+	@$(PYTHON) scripts/create-skill-scaffold.py $(ARGS)
 
 skill-apply: ## Apply an explicitly approved skill scaffold with rollback safety
-	@python3 scripts/apply-skill-scaffold.py $(ARGS)
+	@$(PYTHON) scripts/apply-skill-scaffold.py $(ARGS)
 
 feedback-to-eval: ## Ingest sanitized feedback; active eval cases require explicit approval
-	@python3 scripts/ingest-feedback-to-eval.py $(ARGS)
+	@$(PYTHON) scripts/ingest-feedback-to-eval.py $(ARGS)
 
 autonomy-experiments: ## Run bounded zero-write autonomy experiments
-	@python3 scripts/run-autonomy-experiments.py $(ARGS)
+	@$(PYTHON) scripts/run-autonomy-experiments.py $(ARGS)
 
 consolidation-analysis: ## Recommend consolidation/deprecation without changing the registry
-	@python3 scripts/analyze-skill-consolidation.py $(ARGS)
+	@$(PYTHON) scripts/analyze-skill-consolidation.py $(ARGS)
 
 operational-evidence: ## Record generalized dry-run evidence for two additional pipeline classes
-	@python3 scripts/run-operational-evidence.py --pipeline full-pipeline
-	@python3 scripts/run-operational-evidence.py --pipeline insights-adaptation-pipeline
+	@$(PYTHON) scripts/run-operational-evidence.py --pipeline full-pipeline
+	@$(PYTHON) scripts/run-operational-evidence.py --pipeline insights-adaptation-pipeline
 
 generate-sbom: ## Generate the deterministic CycloneDX SBOM for both repositories
 	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
-	@python3 scripts/generate-sbom.py --website-root "$(WEBSITE_ROOT)"
+	@$(PYTHON) scripts/generate-sbom.py --website-root "$(WEBSITE_ROOT)"
 
 scan-supply-chain: ## Check both lockfiles and immutable supply-chain workflow pins
 	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
-	@python3 scripts/scan-supply-chain.py --website-root "$(WEBSITE_ROOT)"
-	@python3 scripts/validate-batch8-controls.py --supply-chain-only
+	@$(PYTHON) scripts/scan-supply-chain.py --website-root "$(WEBSITE_ROOT)"
+	@$(PYTHON) scripts/validate-batch8-controls.py --supply-chain-only
 
 test-telemetry-privacy: ## Test Batch 8 opt-out, redaction, allowlist, and retention invariants
-	@python3 scripts/test-telemetry-privacy.py
+	@$(PYTHON) scripts/test-telemetry-privacy.py
 
 simulate-incident-containment: ## Run contained runaway, prompt-injection, supply-chain, and credential fixtures
-	@python3 scripts/simulate-incident-containment.py
+	@$(PYTHON) scripts/simulate-incident-containment.py
 
 measure-slos: ## Measure Batch 8 SLOs from local evaluation and operational evidence
-	@python3 scripts/measure-slos.py
+	@$(PYTHON) scripts/measure-slos.py
 
 evaluate-model-compatibility: ## Evaluate model/provider compatibility and rollback behavior
-	@python3 scripts/evaluate-model-compatibility.py
+	@$(PYTHON) scripts/evaluate-model-compatibility.py
 
 validate-traceability: ## Validate requirement-to-deployment traceability fixtures
-	@python3 scripts/validate-traceability.py
+	@$(PYTHON) scripts/validate-traceability.py
 
 test-context-preservation: ## Run context compression/resume preservation tests
-	@python3 scripts/test-context-preservation.py
+	@$(PYTHON) scripts/test-context-preservation.py
 
 validate-evals: ## Validate Batch 5/6 evaluation definitions, fixtures, and replay traces
-	@python3 scripts/validate-quick-review-evals.py
+	@$(PYTHON) scripts/validate-quick-review-evals.py
 
 eval-quick-review: ## Run the Batch 5/6 golden, adversarial, budget, and policy evaluation suite
-	@python3 scripts/evaluate-quick-review.py $(if $(OUTPUT_ROOT),--output-root $(OUTPUT_ROOT),)
+	@$(PYTHON) scripts/evaluate-quick-review.py $(if $(OUTPUT_ROOT),--output-root $(OUTPUT_ROOT),)
 
 eval-quality-vector: ## Aggregate evaluation evidence into the Batch 7 quality vector
-	@python3 scripts/evaluate-quality-vector.py $(if $(MANIFEST),--manifest $(MANIFEST),)
+	@$(PYTHON) scripts/evaluate-quality-vector.py $(if $(MANIFEST),--manifest $(MANIFEST),)
 
 check-release-compatibility: ## Compare source Dev with a generated website ReleaseManifest
 	@test -n "$(MANIFEST)" || (echo "MANIFEST is required"; exit 2)
-	@python3 scripts/check-release-compatibility.py --manifest "$(MANIFEST)"
+	@$(PYTHON) scripts/check-release-compatibility.py --manifest "$(MANIFEST)"
 
 quick-review: ## Run bounded quick-review with local execution evidence
-	@python3 scripts/run-quick-review.py $(ARGS)
+	@$(PYTHON) scripts/run-quick-review.py $(ARGS)
 
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint
