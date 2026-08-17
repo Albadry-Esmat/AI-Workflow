@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/skill-metadata.json",
+  "title": "SkillMetadata",
+  "description": "Governance metadata required for newly scaffolded or migrated runtime registry entries.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ownership", "maturity", "eval_score", "security_class", "cost", "deprecation"],
+  "properties": {
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["team", "maintainer", "reviewers", "last_reviewed_at"],
+      "properties": {
+        "team": {"type": "string", "minLength": 1},
+        "maintainer": {"type": "string", "minLength": 1},
+        "reviewers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "last_reviewed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["experimental", "draft", "established", "mature", "deprecated", "retired"]
+    },
+    "eval_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "security_class": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["budget_profile", "estimated_tokens", "estimated_usd"],
+      "properties": {
+        "budget_profile": {"type": "string", "minLength": 1},
+        "estimated_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "estimated_usd": {"type": ["number", "null"], "minimum": 0}
+      }
+    },
+    "deprecation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deprecated", "replacement", "message", "sunset_at", "approved_by"],
+      "properties": {
+        "deprecated": {"type": "boolean"},
+        "replacement": {"type": ["string", "null"]},
+        "message": {"type": ["string", "null"]},
+        "sunset_at": {"type": ["string", "null"], "format": "date-time"},
+        "approved_by": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"deprecated": {"const": true}}},
+          "then": {
+            "required": ["replacement", "message", "sunset_at", "approved_by"],
+            "properties": {
+              "replacement": {"type": "string", "minLength": 1},
+              "message": {"type": "string", "minLength": 1},
+              "sunset_at": {"type": "string", "format": "date-time"},
+              "approved_by": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

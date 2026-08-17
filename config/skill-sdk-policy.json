@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "scaffold": {
+    "output_root": "artifacts/skill-scaffolds",
+    "auto_register": false,
+    "auto_promote": false,
+    "required_files": ["SKILL.md", "skill-manifest.json", "contract-tests/contract.json", "eval-fixtures/index.json"],
+    "required_sections": ["Purpose", "Inputs", "Required Context", "Execution Logic", "Outputs", "Rules", "Security", "Token Optim", "Quality Check", "Failure", "Human-in-the-Loop", "Skill Composition"]
+  },
+  "registration": {
+    "requires_explicit_apply": true,
+    "requires_reviewable_diff": true,
+    "requires_validation": true,
+    "allow_status_transition": ["draft->active", "active->deprecated", "deprecated->retired"]
+  },
+  "feedback_ingestion": {
+    "requires_human_approval": true,
+    "deduplicate_by": ["skill_name", "task_summary", "expected_properties", "sensitivity_class"],
+    "active_status": "approved",
+    "blocked_statuses": ["pending", "rejected", "duplicate", "invalid"]
+  },
+  "autonomy_experiments": {
+    "allowed_patterns": ["routing", "parallel-review", "evaluator-optimizer", "planner-executor-critic"],
+    "external_writes_allowed": false,
+    "max_duration_minutes": 120,
+    "required_report_fields": ["baseline", "experiment", "metrics", "risk_assessment", "override_evidence", "rollback", "approval", "external_writes"],
+    "promotion_requires_approval": true
+  },
+  "consolidation": {
+    "recommendation_only": true,
+    "deprecation_requires_replacement": true,
+    "minimum_retention_major_versions": 2,
+    "requires_approval": true
+  }
+}

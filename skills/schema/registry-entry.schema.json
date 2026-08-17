@@ -31,6 +31,10 @@
       "pattern": "^\\.opencode/skills/.+/SKILL\\.md$",
       "description": "Relative path to the SKILL.md file."
     },
+    "skill_metadata": {
+      "$ref": "../../config/skill-metadata-schema.json",
+      "description": "Batch 9 ownership, maturity, evaluation, security, cost, and deprecation metadata."
+    },
     "origin_metadata": {
       "type": "object",
       "description": "Provenance and approval metadata. Required for all skills registered after v5.1.0 (FEATURE-003). Pre-v5.1.0 skills without this field receive a WARN in validate-skills.sh (not an error).",

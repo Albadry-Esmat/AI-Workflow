@@ -1,0 +1,50 @@
+[
+  {
+    "experiment_id": "EXP-ROUTING-001",
+    "pattern": "routing",
+    "duration_minutes": 5,
+    "baseline": {"task_count": 20, "success_rate": 0.80, "latency_ms": 1000, "cost_units": 1.0},
+    "experiment": {"task_count": 20, "success_rate": 0.90, "latency_ms": 1050, "cost_units": 1.05},
+    "override_tested": true,
+    "stop_condition": "Stop after 20 fixture tasks or on any policy, traceability, or budget failure.",
+    "traceability": true,
+    "security": true,
+    "budget": true
+  },
+  {
+    "experiment_id": "EXP-PARALLEL-REVIEW-001",
+    "pattern": "parallel-review",
+    "duration_minutes": 8,
+    "baseline": {"task_count": 20, "success_rate": 0.75, "latency_ms": 1600, "cost_units": 1.0},
+    "experiment": {"task_count": 20, "success_rate": 0.85, "latency_ms": 1300, "cost_units": 1.15},
+    "override_tested": true,
+    "stop_condition": "Stop on disagreement without a critic resolution, missing evidence, or cost above 1.25x baseline.",
+    "traceability": true,
+    "security": true,
+    "budget": true
+  },
+  {
+    "experiment_id": "EXP-EVALUATOR-OPTIMIZER-001",
+    "pattern": "evaluator-optimizer",
+    "duration_minutes": 10,
+    "baseline": {"task_count": 20, "success_rate": 0.70, "latency_ms": 1800, "cost_units": 1.0},
+    "experiment": {"task_count": 20, "success_rate": 0.82, "latency_ms": 2100, "cost_units": 1.20},
+    "override_tested": true,
+    "stop_condition": "Stop after two optimization rounds, any score regression, or any untraceable evaluator decision.",
+    "traceability": true,
+    "security": true,
+    "budget": true
+  },
+  {
+    "experiment_id": "EXP-PLANNER-EXECUTOR-CRITIC-001",
+    "pattern": "planner-executor-critic",
+    "duration_minutes": 12,
+    "baseline": {"task_count": 20, "success_rate": 0.68, "latency_ms": 2200, "cost_units": 1.0},
+    "experiment": {"task_count": 20, "success_rate": 0.80, "latency_ms": 2600, "cost_units": 1.22},
+    "override_tested": true,
+    "stop_condition": "Stop after one plan revision, on critic disagreement, or if latency or budget thresholds are exceeded.",
+    "traceability": true,
+    "security": true,
+    "budget": true
+  }
+]

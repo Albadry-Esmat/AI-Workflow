@@ -50,6 +50,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added `make validate-batch8`, operational subtargets, corresponding `aiw` commands, primary/Dev/nightly gates, and a dedicated pinned supply-chain workflow.
 - Remediated the website Dev dependency audit by upgrading exact `next` from 16.2.9 to 16.3.1; the post-upgrade high-severity npm audit is clean.
 
+### Skill SDK and Controlled Autonomy
+
+- Added `aiw skill create` draft scaffolding for `SKILL.md`, skill manifests, contract-test placeholders, and eval-fixture placeholders without automatic registration or promotion.
+- Added explicit, rollback-safe scaffold application that generates reviewable index, registry, and graph updates only after an approver is supplied and the full skill validator passes.
+- Added governed ownership, maturity, evaluation score, security class, cost, and deprecation metadata with replacement and retention rules.
+- Added sanitized feedback-to-eval ingestion with deterministic deduplication, pending-by-default status, sensitive-field rejection, and human approval before active corpus writes.
+- Added bounded zero-write experiments for routing, parallel review, evaluator-optimizer, and planner-executor-critic patterns with baseline comparison, stop conditions, risk assessment, rollback, and approval evidence.
+- Added recommendation-only consolidation analysis that cannot mutate the registry and requires replacements for deprecation recommendations.
+- Added `make validate-batch9`, focused Make targets, corresponding `aiw` commands, schemas, fixtures, and `docs/skill-sdk-and-controlled-autonomy.md`.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

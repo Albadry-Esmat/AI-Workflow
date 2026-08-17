@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/consolidation-policy.json",
+  "title": "SkillConsolidationPolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recommendation_only", "minimum_similarity", "deprecation_rules", "approval_required"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "recommendation_only": {"type": "boolean", "const": true},
+    "minimum_similarity": {"type": "number", "minimum": 0, "maximum": 1},
+    "deprecation_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replacement_required", "retention_major_versions", "message_required"],
+      "properties": {
+        "replacement_required": {"type": "boolean", "const": true},
+        "retention_major_versions": {"type": "integer", "minimum": 1},
+        "message_required": {"type": "boolean", "const": true}
+      }
+    },
+    "approval_required": {"type": "boolean", "const": true}
+  }
+}

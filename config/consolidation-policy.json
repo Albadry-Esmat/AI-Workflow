@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "recommendation_only": true,
+  "minimum_similarity": 0.85,
+  "deprecation_rules": {
+    "replacement_required": true,
+    "retention_major_versions": 2,
+    "message_required": true
+  },
+  "approval_required": true
+}

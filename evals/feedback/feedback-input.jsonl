@@ -1,0 +1,2 @@
+{"feedback_id":"FB-BATCH9-001","skill_name":"requirement-analyzer","source":"human-feedback","task_summary":"The skill should preserve acceptance criteria when normalizing requirements.","expected_properties":["acceptance_criteria_preserved","requirements_traceable"],"sensitivity_class":"internal"}
+{"feedback_id":"FB-BATCH9-002","skill_name":"security-review","source":"evaluation-review","task_summary":"The skill should classify critical findings with a blocking decision.","expected_properties":["critical_findings_block","evidence_referenced"],"sensitivity_class":"internal"}

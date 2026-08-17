@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/skill-sdk-policy.json",
+  "title": "SkillSdkPolicy",
+  "description": "Fail-closed local policy for Batch 9 skill authoring and controlled autonomy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scaffold", "registration", "feedback_ingestion", "autonomy_experiments", "consolidation"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "scaffold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["output_root", "auto_register", "auto_promote", "required_files", "required_sections"],
+      "properties": {
+        "output_root": {"type": "string", "const": "artifacts/skill-scaffolds"},
+        "auto_register": {"type": "boolean", "const": false},
+        "auto_promote": {"type": "boolean", "const": false},
+        "required_files": {"type": "array", "const": ["SKILL.md", "skill-manifest.json", "contract-tests/contract.json", "eval-fixtures/index.json"], "items": {"type": "string"}},
+        "required_sections": {"type": "array", "const": ["Purpose", "Inputs", "Required Context", "Execution Logic", "Outputs", "Rules", "Security", "Token Optim", "Quality Check", "Failure", "Human-in-the-Loop", "Skill Composition"], "items": {"type": "string"}}
+      }
+    },
+    "registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_explicit_apply", "requires_reviewable_diff", "requires_validation", "allow_status_transition"],
+      "properties": {
+        "requires_explicit_apply": {"type": "boolean", "const": true},
+        "requires_reviewable_diff": {"type": "boolean", "const": true},
+        "requires_validation": {"type": "boolean", "const": true},
+        "allow_status_transition": {"type": "array", "items": {"type": "string", "enum": ["draft->active", "active->deprecated", "deprecated->retired"]}}
+      }
+    },
+    "feedback_ingestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_human_approval", "deduplicate_by", "active_status", "blocked_statuses"],
+      "properties": {
+        "requires_human_approval": {"type": "boolean", "const": true},
+        "deduplicate_by": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "active_status": {"type": "string", "const": "approved"},
+        "blocked_statuses": {"type": "array", "items": {"type": "string", "enum": ["pending", "rejected", "duplicate", "invalid"]}}
+      }
+    },
+    "autonomy_experiments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_patterns", "external_writes_allowed", "max_duration_minutes", "required_report_fields", "promotion_requires_approval"],
+      "properties": {
+        "allowed_patterns": {"type": "array", "minItems": 4, "items": {"type": "string", "enum": ["routing", "parallel-review", "evaluator-optimizer", "planner-executor-critic"]}},
+        "external_writes_allowed": {"type": "boolean", "const": false},
+        "max_duration_minutes": {"type": "integer", "minimum": 1, "maximum": 120},
+        "required_report_fields": {"type": "array", "minItems": 8, "items": {"type": "string"}},
+        "promotion_requires_approval": {"type": "boolean", "const": true}
+      }
+    },
+    "consolidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recommendation_only", "deprecation_requires_replacement", "minimum_retention_major_versions", "requires_approval"],
+      "properties": {
+        "recommendation_only": {"type": "boolean", "const": true},
+        "deprecation_requires_replacement": {"type": "boolean", "const": true},
+        "minimum_retention_major_versions": {"type": "integer", "minimum": 1},
+        "requires_approval": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

@@ -66,6 +66,12 @@ show_help() {
   echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
   echo -e "    ${CYAN}validate-batch7${NC}              Validate quality, traceability, and context controls"
   echo -e "    ${CYAN}validate-batch8${NC}              Validate operational evidence, SLO, privacy, incident, and supply chain controls"
+  echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
+  echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
+  echo -e "    ${CYAN}skill apply${NC}                  Apply an explicitly approved scaffold with rollback"
+  echo -e "    ${CYAN}feedback-to-eval${NC}             Ingest sanitized feedback with approval-gated eval promotion"
+  echo -e "    ${CYAN}autonomy-experiments${NC}         Run bounded zero-write autonomy experiments"
+  echo -e "    ${CYAN}consolidation-analysis${NC}       Recommend skill consolidation/deprecation without mutation"
   echo -e "    ${CYAN}operational-evidence${NC}         Record generalized evidence for additional pipelines"
   echo -e "    ${CYAN}measure-slos${NC}                 Measure local SLOs and error budgets"
   echo -e "    ${CYAN}evaluate-model-compatibility${NC} Evaluate model/provider compatibility and rollback"
@@ -302,6 +308,35 @@ cmd_validate_batch8() {
   make -C "$ROOT" validate-batch8 "$@"
 }
 
+cmd_validate_batch9() {
+  make -C "$ROOT" validate-batch9 "$@"
+}
+
+cmd_skill() {
+  local subcmd="${1:-help}"
+  shift || true
+  case "$subcmd" in
+    create) python3 "$ROOT/scripts/create-skill-scaffold.py" "$@" ;;
+    apply) python3 "$ROOT/scripts/apply-skill-scaffold.py" "$@" ;;
+    *)
+      echo "Usage: aiw skill [create|apply]"
+      exit 1
+      ;;
+  esac
+}
+
+cmd_feedback_to_eval() {
+  python3 "$ROOT/scripts/ingest-feedback-to-eval.py" "$@"
+}
+
+cmd_autonomy_experiments() {
+  python3 "$ROOT/scripts/run-autonomy-experiments.py" "$@"
+}
+
+cmd_consolidation_analysis() {
+  python3 "$ROOT/scripts/analyze-skill-consolidation.py" "$@"
+}
+
 cmd_operational_evidence() {
   python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline full-pipeline "$@"
   python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline insights-adaptation-pipeline "$@"
@@ -506,7 +541,12 @@ case "$COMMAND" in
   quick-review|review) cmd_quick_review "$@" ;;
   validate-batch6)  cmd_validate_batch6 "$@" ;;
   validate-batch7)  cmd_validate_batch7 "$@" ;;
-  validate-batch8)  cmd_validate_batch8 "$@" ;;
+    validate-batch8) cmd_validate_batch8 "$@" ;;
+  validate-batch9) cmd_validate_batch9 "$@" ;;
+  skill)            cmd_skill "$@" ;;
+  feedback-to-eval) cmd_feedback_to_eval "$@" ;;
+  autonomy-experiments) cmd_autonomy_experiments "$@" ;;
+  consolidation-analysis) cmd_consolidation_analysis "$@" ;;
   operational-evidence) cmd_operational_evidence "$@" ;;
   measure-slos) cmd_measure_slos "$@" ;;
   evaluate-model-compatibility) cmd_evaluate_model_compatibility "$@" ;;

@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -48,12 +48,13 @@ start: ## Launch the AI Workflow (opens opencode session)
 health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per item
 	@bash scripts/health-check.sh
 
-validate: ## Run the full skill, contract, Batch 6/7/8, evaluation, and operational validation suites
+validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operational validation suites
 	@bash scripts/validate-skills.sh
 	@$(MAKE) validate-contracts
 	@$(MAKE) validate-batch6
 	@$(MAKE) validate-batch7
 	@$(MAKE) validate-batch8
+	@$(MAKE) validate-batch9
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -76,6 +77,24 @@ validate-batch8: ## Run Batch 8 operational evidence, SLO, privacy, incident, an
 	@$(MAKE) measure-slos
 	@$(MAKE) evaluate-model-compatibility
 	@python3 scripts/validate-batch8-controls.py
+
+validate-batch9: ## Run Batch 9 Skill SDK, feedback, consolidation, and autonomy controls
+	@python3 scripts/validate-batch9-controls.py
+
+skill-create: ## Create a draft skill scaffold without registry mutation
+	@python3 scripts/create-skill-scaffold.py $(ARGS)
+
+skill-apply: ## Apply an explicitly approved skill scaffold with rollback safety
+	@python3 scripts/apply-skill-scaffold.py $(ARGS)
+
+feedback-to-eval: ## Ingest sanitized feedback; active eval cases require explicit approval
+	@python3 scripts/ingest-feedback-to-eval.py $(ARGS)
+
+autonomy-experiments: ## Run bounded zero-write autonomy experiments
+	@python3 scripts/run-autonomy-experiments.py $(ARGS)
+
+consolidation-analysis: ## Recommend consolidation/deprecation without changing the registry
+	@python3 scripts/analyze-skill-consolidation.py $(ARGS)
 
 operational-evidence: ## Record generalized dry-run evidence for two additional pipeline classes
 	@python3 scripts/run-operational-evidence.py --pipeline full-pipeline
