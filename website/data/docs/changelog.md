@@ -30,6 +30,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added the bounded `quick-review-v1` budget profile, controlled retry taxonomy, enforced `quick-review-read-only-v2` capability policy, fail-closed capability-deny and approval-required scenarios, and Batch 6 control validation.
 - Expanded the quick-review suite to 20 cases with budget-overrun, cancellation, capability-deny, approval-required, and retry-taxonomy adversarial coverage. Prompts are not treated as authorization for actions outside the enforceable local adapter boundary.
 
+### Quality, Traceability, Context, and Release Gates
+
+- Added the nine-dimension quality vector and score-independent hard blockers for security, execution contracts, critical requirement coverage, context loss, and source/website release incompatibility.
+- Added end-to-end requirement traceability fixtures and checks spanning architecture, tasks, code, tests, and deployment evidence; critical requirements without complete links block release.
+- Added five deterministic compression/resume, gate-pause, cross-session, and stale-artifact context-preservation cases protecting requirements, approvals, security findings, constraints, and artifact references.
+- Added commit, pull-request, Dev, nightly, and release evaluation policies, plus a deterministic ReleaseManifest compatibility checker requiring matching Dev source commit and website data hash.
+- Added `make validate-batch7`, `make validate-traceability`, `make test-context-preservation`, `make eval-quality-vector`, and corresponding `aiw` commands with CI and Dev synchronization gates.
+- Deferred a public website freshness indicator because the implementation plan makes it conditional on explicit website product-owner approval; the machine-readable ReleaseManifest remains the freshness source.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

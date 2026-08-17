@@ -1,0 +1,60 @@
+name: Nightly Evaluation
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nightly:
+    name: Nightly quality and regression evaluation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install validation dependencies
+        run: |
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 --quiet
+          npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
+
+      - name: Run full skill validation
+        run: bash scripts/validate-skills.sh
+
+      - name: Validate execution contracts
+        run: python3 scripts/validate-execution-contracts.py
+
+      - name: Validate Batch 6 controls
+        run: python3 scripts/validate-batch6-controls.py
+
+      - name: Validate Batch 7 controls
+        run: python3 scripts/validate-batch7-controls.py
+
+      - name: Validate traceability
+        run: python3 scripts/validate-traceability.py
+
+      - name: Test context preservation
+        run: python3 scripts/test-context-preservation.py
+
+      - name: Validate evaluation definitions
+        run: python3 scripts/validate-quick-review-evals.py
+
+      - name: Run quick-review evaluation
+        run: python3 scripts/evaluate-quick-review.py
+
+      - name: Evaluate quality vector
+        run: python3 scripts/evaluate-quality-vector.py

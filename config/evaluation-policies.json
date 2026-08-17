@@ -1,0 +1,50 @@
+{
+  "policy_version": "1.0.0",
+  "policies": [
+    {
+      "name": "commit",
+      "trigger": "push to any branch",
+      "required_checks": ["syntax", "validate-execution-contracts", "validate-batch6-controls", "validate-batch7-controls"],
+      "blocking": true,
+      "external_writes_allowed": false,
+      "schedule": null,
+      "promotion_requirements": []
+    },
+    {
+      "name": "pull-request",
+      "trigger": "pull request opened, synchronized, or reopened",
+      "required_checks": ["commit", "quick-review-evaluation", "traceability", "context-preservation", "quality-vector"],
+      "blocking": true,
+      "external_writes_allowed": false,
+      "schedule": null,
+      "promotion_requirements": ["all required checks pass", "no critical blocker"]
+    },
+    {
+      "name": "dev",
+      "trigger": "push to AI-Workflow/Dev or ASE-OS-Website/Dev",
+      "required_checks": ["pull-request", "website-data-sync-check", "release-compatibility"],
+      "blocking": true,
+      "external_writes_allowed": false,
+      "schedule": null,
+      "promotion_requirements": ["source branch is Dev", "website branch is Dev", "source commit and data hash are compatible"]
+    },
+    {
+      "name": "nightly",
+      "trigger": "scheduled nightly execution",
+      "required_checks": ["dev", "full-quick-review-evaluation", "context-preservation", "traceability", "quality-vector"],
+      "blocking": true,
+      "external_writes_allowed": false,
+      "schedule": "0 2 * * *",
+      "promotion_requirements": ["no regression against the stored baseline"]
+    },
+    {
+      "name": "release",
+      "trigger": "release candidate or production promotion request",
+      "required_checks": ["nightly", "release-compatibility", "website-lint", "website-tests", "website-build", "deployment-approval"],
+      "blocking": true,
+      "external_writes_allowed": false,
+      "schedule": null,
+      "promotion_requirements": ["weighted quality score meets policy", "no hard blocker", "critical requirements fully traced", "explicit human approval"]
+    }
+  ]
+}

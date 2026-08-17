@@ -1,0 +1,12 @@
+{
+  "suite": "context-preservation",
+  "suite_version": "1.0.0",
+  "case_count": 5,
+  "cases": [
+    "CTX-001",
+    "CTX-002",
+    "CTX-003",
+    "CTX-004",
+    "CTX-005"
+  ]
+}

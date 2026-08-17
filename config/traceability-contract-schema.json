@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/traceability-contract.schema.json",
+  "title": "AI-Workflow End-to-End Traceability Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "requirements", "links", "coverage", "verdict"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "priority", "statement"],
+        "properties": {
+          "requirement_id": { "type": "string", "pattern": "^REQ-[A-Z]+-\\d{3}$" },
+          "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "statement": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "architecture_refs", "task_refs", "code_refs", "test_refs", "deployment_refs"],
+        "properties": {
+          "requirement_id": { "type": "string", "pattern": "^REQ-[A-Z]+-\\d{3}$" },
+          "architecture_refs": { "type": "array", "items": { "type": "string", "pattern": "^ADR-\\d{3}$" } },
+          "task_refs": { "type": "array", "items": { "type": "string", "pattern": "^TASK-\\d{4}$" } },
+          "code_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "test_refs": { "type": "array", "items": { "type": "string", "pattern": "^TEST-\\d{3,4}$" } },
+          "deployment_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total_requirements", "critical_requirements", "critical_fully_linked", "coverage_percent"],
+      "properties": {
+        "total_requirements": { "type": "integer", "minimum": 1 },
+        "critical_requirements": { "type": "integer", "minimum": 0 },
+        "critical_fully_linked": { "type": "integer", "minimum": 0 },
+        "coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["pass", "block"] },
+    "violations": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "pass" } } },
+      "then": { "properties": { "violations": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "coverage": { "properties": { "critical_requirements": { "minimum": 1 } } } } },
+      "then": { "properties": { "coverage": { "required": ["critical_fully_linked"] } } }
+    }
+  ]
+}

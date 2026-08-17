@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/quality-policy.schema.json",
+  "title": "AI-Workflow Quality Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policy_version", "quality_vector_schema", "dimensions", "minimum_weighted_score", "hard_blockers", "verdict_rules"],
+  "properties": {
+    "policy_version": { "type": "string", "const": "1.0.0" },
+    "quality_vector_schema": { "type": "string", "const": "1.0.0" },
+    "dimensions": {
+      "type": "object",
+      "minProperties": 9,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["weight", "minimum_score"],
+        "properties": {
+          "weight": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+          "minimum_score": { "type": "number", "minimum": 0, "maximum": 100 }
+        }
+      }
+    },
+    "minimum_weighted_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "hard_blockers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "dimension", "description"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "dimension": { "type": "string" },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "verdict_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass", "block"],
+      "properties": {
+        "pass": { "type": "string", "minLength": 1 },
+        "block": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

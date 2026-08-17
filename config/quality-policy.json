@@ -1,0 +1,28 @@
+{
+  "policy_version": "1.0.0",
+  "quality_vector_schema": "1.0.0",
+  "dimensions": {
+    "structure": { "weight": 0.10, "minimum_score": 80 },
+    "behavior": { "weight": 0.15, "minimum_score": 80 },
+    "security": { "weight": 0.20, "minimum_score": 90 },
+    "traceability": { "weight": 0.15, "minimum_score": 85 },
+    "budget": { "weight": 0.08, "minimum_score": 80 },
+    "retry": { "weight": 0.07, "minimum_score": 80 },
+    "policy": { "weight": 0.10, "minimum_score": 90 },
+    "context": { "weight": 0.08, "minimum_score": 85 },
+    "release_compatibility": { "weight": 0.07, "minimum_score": 100 }
+  },
+  "minimum_weighted_score": 85,
+  "hard_blockers": [
+    { "code": "security_contract_violation", "dimension": "security", "description": "Any critical security finding or invalid security contract blocks regardless of weighted score." },
+    { "code": "execution_contract_invalid", "dimension": "structure", "description": "Any required execution contract validation failure blocks release." },
+    { "code": "critical_requirement_uncovered", "dimension": "traceability", "description": "A critical requirement without linked test evidence blocks release." },
+    { "code": "critical_requirement_unimplemented", "dimension": "traceability", "description": "A critical requirement without linked implementation evidence blocks release." },
+    { "code": "context_loss", "dimension": "context", "description": "Loss of an approval, security finding, constraint, requirement, or artifact reference across a supported transition blocks release." },
+    { "code": "release_incompatible", "dimension": "release_compatibility", "description": "Website source commit, data hash, branch, or validation status is incompatible with source Dev." }
+  ],
+  "verdict_rules": {
+    "pass": "weighted_score >= minimum_weighted_score and blockers is empty and every dimension status is not fail",
+    "block": "any hard blocker exists or weighted_score < minimum_weighted_score or any dimension status is fail"
+  }
+}

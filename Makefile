@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-evals eval-quick-review quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector check-release-compatibility quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -51,6 +51,7 @@ validate: ## Run the full skill, contract, and Batch 6 control validation suites
 	@bash scripts/validate-skills.sh
 	@$(MAKE) validate-contracts
 	@$(MAKE) validate-batch6
+	@$(MAKE) validate-batch7
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -59,11 +60,29 @@ validate-contracts: ## Validate versioned execution contracts and fixtures
 validate-batch6: ## Validate Batch 6 budget, retry, and capability-policy controls
 	@python3 scripts/validate-batch6-controls.py
 
+validate-batch7: ## Validate Batch 7 quality, policy, traceability, and context controls
+	@python3 scripts/validate-batch7-controls.py
+	@$(MAKE) validate-traceability
+	@$(MAKE) test-context-preservation
+
+validate-traceability: ## Validate requirement-to-deployment traceability fixtures
+	@python3 scripts/validate-traceability.py
+
+test-context-preservation: ## Run context compression/resume preservation tests
+	@python3 scripts/test-context-preservation.py
+
 validate-evals: ## Validate Batch 5/6 evaluation definitions, fixtures, and replay traces
 	@python3 scripts/validate-quick-review-evals.py
 
 eval-quick-review: ## Run the Batch 5/6 golden, adversarial, budget, and policy evaluation suite
 	@python3 scripts/evaluate-quick-review.py $(if $(OUTPUT_ROOT),--output-root $(OUTPUT_ROOT),)
+
+eval-quality-vector: ## Aggregate evaluation evidence into the Batch 7 quality vector
+	@python3 scripts/evaluate-quality-vector.py $(if $(MANIFEST),--manifest $(MANIFEST),)
+
+check-release-compatibility: ## Compare source Dev with a generated website ReleaseManifest
+	@test -n "$(MANIFEST)" || (echo "MANIFEST is required"; exit 2)
+	@python3 scripts/check-release-compatibility.py --manifest "$(MANIFEST)"
 
 quick-review: ## Run bounded quick-review with local execution evidence
 	@python3 scripts/run-quick-review.py $(ARGS)

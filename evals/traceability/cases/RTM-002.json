@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "requirements": [
+    {
+      "requirement_id": "REQ-SEC-001",
+      "priority": "critical",
+      "statement": "Credential guidance must be short-lived and scoped."
+    },
+    {
+      "requirement_id": "REQ-OPS-001",
+      "priority": "high",
+      "statement": "The deployment path must expose rollback evidence."
+    }
+  ],
+  "links": [
+    {
+      "requirement_id": "REQ-SEC-001",
+      "architecture_refs": [
+        "ADR-001"
+      ],
+      "task_refs": [
+        "TASK-0001"
+      ],
+      "code_refs": [
+        "config/policy.json"
+      ],
+      "test_refs": [],
+      "deployment_refs": [
+        "release-gate:security"
+      ]
+    },
+    {
+      "requirement_id": "REQ-OPS-001",
+      "architecture_refs": [
+        "ADR-002"
+      ],
+      "task_refs": [
+        "TASK-0002"
+      ],
+      "code_refs": [
+        "scripts/rollback.py"
+      ],
+      "test_refs": [
+        "TEST-002"
+      ],
+      "deployment_refs": [
+        "release-gate:rollback"
+      ]
+    }
+  ],
+  "coverage": {
+    "total_requirements": 2,
+    "critical_requirements": 1,
+    "critical_fully_linked": 0,
+    "coverage_percent": 50
+  },
+  "verdict": "block",
+  "violations": [
+    "critical_requirement_uncovered"
+  ]
+}

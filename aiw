@@ -64,8 +64,13 @@ show_help() {
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
   echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
   echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
+  echo -e "    ${CYAN}validate-batch7${NC}              Validate quality, traceability, and context controls"
+  echo -e "    ${CYAN}validate-traceability${NC}        Validate requirement-to-deployment links"
+  echo -e "    ${CYAN}test-context-preservation${NC}   Test compression/resume context preservation"
   echo -e "    ${CYAN}validate-evals${NC}               Validate Batch 5/6 evaluation definitions"
   echo -e "    ${CYAN}eval-quick-review${NC}            Run Batch 5/6 golden/adversarial evaluation suite"
+  echo -e "    ${CYAN}eval-quality-vector${NC}          Aggregate the Batch 7 weighted quality vector"
+  echo -e "    ${CYAN}check-release-compatibility${NC} Compare source Dev with a website manifest"
   echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
   echo ""
   echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
@@ -279,6 +284,28 @@ cmd_validate_batch6() {
   python3 "$ROOT/scripts/validate-batch6-controls.py" "$@"
 }
 
+cmd_validate_batch7() {
+  python3 "$ROOT/scripts/validate-batch7-controls.py" "$@"
+  python3 "$ROOT/scripts/validate-traceability.py"
+  python3 "$ROOT/scripts/test-context-preservation.py"
+}
+
+cmd_validate_traceability() {
+  python3 "$ROOT/scripts/validate-traceability.py" "$@"
+}
+
+cmd_test_context_preservation() {
+  python3 "$ROOT/scripts/test-context-preservation.py" "$@"
+}
+
+cmd_eval_quality_vector() {
+  python3 "$ROOT/scripts/evaluate-quality-vector.py" "$@"
+}
+
+cmd_check_release_compatibility() {
+  python3 "$ROOT/scripts/check-release-compatibility.py" "$@"
+}
+
 cmd_validate_evals() {
   python3 "$ROOT/scripts/validate-quick-review-evals.py" "$@"
 }
@@ -437,8 +464,13 @@ case "$COMMAND" in
   sync)             cmd_sync "$@" ;;
   quick-review|review) cmd_quick_review "$@" ;;
   validate-batch6)  cmd_validate_batch6 "$@" ;;
+  validate-batch7)  cmd_validate_batch7 "$@" ;;
+  validate-traceability) cmd_validate_traceability "$@" ;;
+  test-context-preservation) cmd_test_context_preservation "$@" ;;
   validate-evals)   cmd_validate_evals "$@" ;;
   eval-quick-review|evaluate) cmd_eval_quick_review "$@" ;;
+  eval-quality-vector|quality-vector) cmd_eval_quality_vector "$@" ;;
+  check-release-compatibility) cmd_check_release_compatibility "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;
   sessions|session) cmd_sessions "$@" ;;
