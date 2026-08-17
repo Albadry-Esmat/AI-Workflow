@@ -14,6 +14,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added the versioned `ai-workflow-execution` contract family for run manifests, step executions, artifact references, gate decisions, and policy decisions.
 - Added positive/negative fixtures, cross-contract relationship checks, version compatibility rules, and the `validate-contracts` developer command.
 
+### Observable Quick Review
+
+- Added a bounded local `quick-review` adapter that emits validated run, step, artifact, policy, gate, and terminal failure evidence without external writes.
+- Added success, schema-failure, tool-failure, and retry-exhaustion fixtures plus `aiw quick-review` and `make quick-review` entry points.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

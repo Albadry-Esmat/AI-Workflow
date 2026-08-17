@@ -62,6 +62,7 @@ show_help() {
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
   echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
+  echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
   echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
   echo ""
   echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
@@ -267,6 +268,10 @@ cmd_sync() {
   bash "$ROOT/scripts/sync-website-data.sh" "$@"
 }
 
+cmd_quick_review() {
+  python3 "$ROOT/scripts/run-quick-review.py" "$@"
+}
+
 cmd_graph() {
   if command -v graphify &>/dev/null; then
     cd "$ROOT"
@@ -415,6 +420,7 @@ case "$COMMAND" in
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;
   sync)             cmd_sync "$@" ;;
+  quick-review|review) cmd_quick_review "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;
   sessions|session) cmd_sessions "$@" ;;

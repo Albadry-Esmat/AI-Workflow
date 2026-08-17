@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -53,6 +53,9 @@ validate: ## Run the full skill and execution-contract validation suites
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
 	@python3 scripts/validate-execution-contracts.py
+
+quick-review: ## Run bounded quick-review with local execution evidence
+	@python3 scripts/run-quick-review.py $(ARGS)
 
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint

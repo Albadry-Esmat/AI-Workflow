@@ -69,6 +69,17 @@ else
   echo "       will work without it, but you cannot start the AI agents."
 fi
 
+if python3 -c 'import jsonschema' &>/dev/null; then
+  _ok "jsonschema Python package found"
+else
+  step "Installing jsonschema (required for execution evidence)..."
+  if sudo pip3 install jsonschema==4.23.0 --quiet; then
+    _ok "jsonschema installed successfully"
+  else
+    _warn "jsonschema install failed — run manually: sudo pip3 install jsonschema==4.23.0"
+  fi
+fi
+
 if command -v ajv &>/dev/null; then
   _ok "ajv-cli found"
 else
