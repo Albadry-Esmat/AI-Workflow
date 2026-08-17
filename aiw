@@ -65,6 +65,14 @@ show_help() {
   echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
   echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
   echo -e "    ${CYAN}validate-batch7${NC}              Validate quality, traceability, and context controls"
+  echo -e "    ${CYAN}validate-batch8${NC}              Validate operational evidence, SLO, privacy, incident, and supply chain controls"
+  echo -e "    ${CYAN}operational-evidence${NC}         Record generalized evidence for additional pipelines"
+  echo -e "    ${CYAN}measure-slos${NC}                 Measure local SLOs and error budgets"
+  echo -e "    ${CYAN}evaluate-model-compatibility${NC} Evaluate model/provider compatibility and rollback"
+  echo -e "    ${CYAN}test-telemetry-privacy${NC}       Test opt-out, redaction, allowlist, and retention"
+  echo -e "    ${CYAN}simulate-incident-containment${NC} Test kill-switch and quarantine fixtures"
+  echo -e "    ${CYAN}generate-sbom${NC}                Generate CycloneDX SBOM"
+  echo -e "    ${CYAN}scan-supply-chain${NC}            Check lockfiles and CI pins"
   echo -e "    ${CYAN}validate-traceability${NC}        Validate requirement-to-deployment links"
   echo -e "    ${CYAN}test-context-preservation${NC}   Test compression/resume context preservation"
   echo -e "    ${CYAN}validate-evals${NC}               Validate Batch 5/6 evaluation definitions"
@@ -290,6 +298,39 @@ cmd_validate_batch7() {
   python3 "$ROOT/scripts/test-context-preservation.py"
 }
 
+cmd_validate_batch8() {
+  make -C "$ROOT" validate-batch8 "$@"
+}
+
+cmd_operational_evidence() {
+  python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline full-pipeline "$@"
+  python3 "$ROOT/scripts/run-operational-evidence.py" --pipeline insights-adaptation-pipeline "$@"
+}
+
+cmd_measure_slos() {
+  python3 "$ROOT/scripts/measure-slos.py" "$@"
+}
+
+cmd_evaluate_model_compatibility() {
+  python3 "$ROOT/scripts/evaluate-model-compatibility.py" "$@"
+}
+
+cmd_test_telemetry_privacy() {
+  python3 "$ROOT/scripts/test-telemetry-privacy.py" "$@"
+}
+
+cmd_simulate_incident_containment() {
+  python3 "$ROOT/scripts/simulate-incident-containment.py" "$@"
+}
+
+cmd_generate_sbom() {
+  python3 "$ROOT/scripts/generate-sbom.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+}
+
+cmd_scan_supply_chain() {
+  python3 "$ROOT/scripts/scan-supply-chain.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+}
+
 cmd_validate_traceability() {
   python3 "$ROOT/scripts/validate-traceability.py" "$@"
 }
@@ -465,6 +506,14 @@ case "$COMMAND" in
   quick-review|review) cmd_quick_review "$@" ;;
   validate-batch6)  cmd_validate_batch6 "$@" ;;
   validate-batch7)  cmd_validate_batch7 "$@" ;;
+  validate-batch8)  cmd_validate_batch8 "$@" ;;
+  operational-evidence) cmd_operational_evidence "$@" ;;
+  measure-slos) cmd_measure_slos "$@" ;;
+  evaluate-model-compatibility) cmd_evaluate_model_compatibility "$@" ;;
+  test-telemetry-privacy) cmd_test_telemetry_privacy "$@" ;;
+  simulate-incident-containment) cmd_simulate_incident_containment "$@" ;;
+  generate-sbom) cmd_generate_sbom "$@" ;;
+  scan-supply-chain) cmd_scan_supply_chain "$@" ;;
   validate-traceability) cmd_validate_traceability "$@" ;;
   test-context-preservation) cmd_test_context_preservation "$@" ;;
   validate-evals)   cmd_validate_evals "$@" ;;

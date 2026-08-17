@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/telemetry-event.schema.json",
+  "title": "AI-Workflow Privacy-Safe Telemetry Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "event_type", "session_id", "run_id", "pipeline_template", "timestamp", "redaction_profile", "retention_class", "opt_out_checked", "pii_scrubbed", "fields"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "event_id": { "type": "string", "pattern": "^TEL-[0-9a-f]{12}$" },
+    "event_type": { "type": "string", "enum": ["run.started", "step.started", "step.completed", "step.failed", "run.completed", "slo.sampled", "incident.contained", "control.blocked"] },
+    "session_id": { "type": "string", "pattern": "^SES-[0-9a-f]{12}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "pipeline_template": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "redaction_profile": { "type": "string", "enum": ["standard-v1", "strict-v1"] },
+    "retention_class": { "type": "string", "enum": ["operational-30d", "aggregate-90d"] },
+    "opt_out_checked": { "type": "boolean", "const": true },
+    "pii_scrubbed": { "type": "boolean", "const": true },
+    "fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phase": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,119}$" },
+        "skill_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,100}$" },
+        "status": { "type": "string", "enum": ["queued", "running", "succeeded", "failed", "skipped", "blocked", "cancelled"] },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "input_tokens": { "type": "integer", "minimum": 0 },
+        "output_tokens": { "type": "integer", "minimum": 0 },
+        "tool_calls": { "type": "integer", "minimum": 0 },
+        "estimated_cost_usd": { "type": "number", "minimum": 0 },
+        "error_category": { "type": "string", "enum": ["validation", "authorization", "dependency", "timeout", "tool", "budget", "cancelled", "prompt_injection", "supply_chain", "unknown"] },
+        "slo_name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,100}$" },
+        "sli_value": { "type": "number", "minimum": 0 },
+        "incident_id": { "type": "string", "pattern": "^INC-[0-9a-f]{12}$" },
+        "containment_action": { "type": "string", "enum": ["kill_switch", "quarantine", "capability_disable", "credential_revoke", "rollback", "no_external_write"] }
+      }
+    }
+  }
+}

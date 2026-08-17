@@ -1,0 +1,38 @@
+{
+  "budget_id": "operational-dry-run-v1",
+  "budget_version": "1.0.0",
+  "pipeline_template": "operational",
+  "per_run": {
+    "max_steps": 200,
+    "max_retries": 0,
+    "max_tool_calls": 0,
+    "max_elapsed_ms": 120000,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_estimated_cost_usd": 0
+  },
+  "per_step": {
+    "max_attempts": 1,
+    "max_tool_calls": 0,
+    "max_elapsed_ms": 1000,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_estimated_cost_usd": 0
+  },
+  "retry_policy": {
+    "max_attempts": 1,
+    "retryable_categories": [],
+    "non_retryable_categories": ["validation", "authorization", "dependency", "timeout", "tool", "budget", "cancelled", "unknown"],
+    "backoff_ms": 0,
+    "jitter_ms": 0
+  },
+  "cancellation": {
+    "supported": true,
+    "trigger": "budget-exceeded",
+    "terminal_status": "cancelled"
+  },
+  "notes": [
+    "This profile records pipeline shape and metadata only; it invokes no tools and performs no external writes.",
+    "The profile is intentionally bounded for deterministic Batch 8 evidence fixtures."
+  ]
+}

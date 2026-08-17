@@ -39,6 +39,17 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added `make validate-batch7`, `make validate-traceability`, `make test-context-preservation`, `make eval-quality-vector`, and corresponding `aiw` commands with CI and Dev synchronization gates.
 - Deferred a public website freshness indicator because the implementation plan makes it conditional on explicit website product-owner approval; the machine-readable ReleaseManifest remains the freshness source.
 
+### Operational Expansion
+
+- Generalized metadata-only, contract-valid evidence recording to `full-pipeline` and `insights-adaptation-pipeline`, with run, step, artifact, policy, telemetry, redaction, retention, and zero-external-write controls.
+- Added measured availability, correctness, and latency SLOs with error budgets, four burn-rate windows, and deployment-pause policy; local fixtures currently meet every target.
+- Added model/provider compatibility fixtures with fail-closed promotion and last-known-good rollback evidence.
+- Added CycloneDX 1.5 SBOM generation, two-repository lockfile integrity checks, immutable CI action pin enforcement, and an explicit advisory-database limitation.
+- Added privacy-safe telemetry policies and tests for opt-out precedence, metadata allowlists, credential/email/path redaction, truncation, and 500-event retention caps.
+- Added contained incident fixtures for runaway loops, prompt injection, supply-chain findings, and credential exposure; all prove quarantine/kill-switch behavior with zero external writes.
+- Added `make validate-batch8`, operational subtargets, corresponding `aiw` commands, primary/Dev/nightly gates, and a dedicated pinned supply-chain workflow.
+- Remediated the website Dev dependency audit by upgrading exact `next` from 16.2.9 to 16.3.1; the post-upgrade high-severity npm audit is clean.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

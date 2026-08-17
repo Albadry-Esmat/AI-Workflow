@@ -70,6 +70,10 @@ evals/quality-vector.json
 # To always track artifacts: comment out the lines below.
 artifacts/*.md
 artifacts/*.json
+artifacts/operational/
+artifacts/incidents/
+artifacts/telemetry/
+artifacts/npm-audit-*.json
 # Always track the directory skeleton (README and .gitkeep are not runtime output)
 !artifacts/README.md
 !artifacts/.gitkeep

@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/model-compatibility-policy.schema.json",
+  "title": "AI-Workflow Model Compatibility Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policy_version", "required_capabilities", "models", "rollback_policy"],
+  "properties": {
+    "policy_version": { "type": "string", "const": "1.0.0" },
+    "required_capabilities": { "type": "array", "items": { "type": "string", "enum": ["execution-contracts-1.1", "budget-evidence", "privacy-redaction-v1", "telemetry-event-1.0"] }, "minItems": 4, "uniqueItems": true },
+    "models": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model_id", "provider", "expected", "contract_version", "capabilities"],
+        "properties": {
+          "model_id": { "type": "string", "minLength": 1 },
+          "provider": { "type": "string", "minLength": 1 },
+          "expected": { "type": "string", "enum": ["compatible", "incompatible"] },
+          "contract_version": { "type": "string", "enum": ["1.0.0", "1.1.0"] },
+          "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "failure_reason": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "rollback_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["on_incompatible", "last_known_good", "promotion_requires_pass"],
+      "properties": {
+        "on_incompatible": { "type": "string", "const": "rollback-to-last-known-good" },
+        "last_known_good": { "type": "string", "minLength": 1 },
+        "promotion_requires_pass": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}

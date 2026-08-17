@@ -9,9 +9,10 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector check-release-compatibility quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
+WEBSITE_ROOT ?= ../ASE-OS-Website
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 help: ## Show this help message
@@ -47,11 +48,12 @@ start: ## Launch the AI Workflow (opens opencode session)
 health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per item
 	@bash scripts/health-check.sh
 
-validate: ## Run the full skill, contract, and Batch 6 control validation suites
+validate: ## Run the full skill, contract, Batch 6/7/8, evaluation, and operational validation suites
 	@bash scripts/validate-skills.sh
 	@$(MAKE) validate-contracts
 	@$(MAKE) validate-batch6
 	@$(MAKE) validate-batch7
+	@$(MAKE) validate-batch8
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -64,6 +66,41 @@ validate-batch7: ## Validate Batch 7 quality, policy, traceability, and context 
 	@python3 scripts/validate-batch7-controls.py
 	@$(MAKE) validate-traceability
 	@$(MAKE) test-context-preservation
+
+validate-batch8: ## Run Batch 8 operational evidence, SLO, privacy, incident, and supply-chain controls
+	@$(MAKE) operational-evidence
+	@$(MAKE) generate-sbom
+	@$(MAKE) scan-supply-chain
+	@$(MAKE) test-telemetry-privacy
+	@$(MAKE) simulate-incident-containment
+	@$(MAKE) measure-slos
+	@$(MAKE) evaluate-model-compatibility
+	@python3 scripts/validate-batch8-controls.py
+
+operational-evidence: ## Record generalized dry-run evidence for two additional pipeline classes
+	@python3 scripts/run-operational-evidence.py --pipeline full-pipeline
+	@python3 scripts/run-operational-evidence.py --pipeline insights-adaptation-pipeline
+
+generate-sbom: ## Generate the deterministic CycloneDX SBOM for both repositories
+	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
+	@python3 scripts/generate-sbom.py --website-root "$(WEBSITE_ROOT)"
+
+scan-supply-chain: ## Check both lockfiles and immutable supply-chain workflow pins
+	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
+	@python3 scripts/scan-supply-chain.py --website-root "$(WEBSITE_ROOT)"
+	@python3 scripts/validate-batch8-controls.py --supply-chain-only
+
+test-telemetry-privacy: ## Test Batch 8 opt-out, redaction, allowlist, and retention invariants
+	@python3 scripts/test-telemetry-privacy.py
+
+simulate-incident-containment: ## Run contained runaway, prompt-injection, supply-chain, and credential fixtures
+	@python3 scripts/simulate-incident-containment.py
+
+measure-slos: ## Measure Batch 8 SLOs from local evaluation and operational evidence
+	@python3 scripts/measure-slos.py
+
+evaluate-model-compatibility: ## Evaluate model/provider compatibility and rollback behavior
+	@python3 scripts/evaluate-model-compatibility.py
 
 validate-traceability: ## Validate requirement-to-deployment traceability fixtures
 	@python3 scripts/validate-traceability.py

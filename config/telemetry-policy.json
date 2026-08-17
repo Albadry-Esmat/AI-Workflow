@@ -1,0 +1,25 @@
+{
+  "policy_version": "1.0.0",
+  "opt_out": {
+    "check_order": "first-and-unconditional",
+    "when_true": "write_zero_events",
+    "state_scope": "behavioral_telemetry"
+  },
+  "allowlisted_fields": [
+    "event_type", "event_id", "session_id", "run_id", "pipeline_template", "timestamp",
+    "phase", "skill_id", "status", "duration_ms", "input_tokens", "output_tokens",
+    "tool_calls", "estimated_cost_usd", "error_category", "slo_name", "sli_value",
+    "incident_id", "containment_action"
+  ],
+  "forbidden_fields": ["prompt", "response", "source_code", "user_input", "email", "token", "password", "api_key", "credential"],
+  "redaction_patterns": ["Bearer ", "key=", "password=", "token=", "../", "/etc/", "/home/", "email-address"],
+  "redaction_profile": "strict-v1",
+  "retention": {
+    "operational_events_days": 30,
+    "aggregate_metrics_days": 90,
+    "ring_buffer_max_events": 500,
+    "delete_on_opt_out": true
+  },
+  "privacy_failure_behavior": "block_telemetry_write_and_raise_incident",
+  "external_writes_allowed": false
+}
