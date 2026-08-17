@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow Onboarding O2 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "steps", "runtime_selection", "auth", "demo", "recovery", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^[a-f0-9]{16,64}$"},
+    "mode": {"type": "string", "enum": ["check-only", "apply", "resume", "recover"]},
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "attempts", "mutates_machine", "requires_auth"],
+        "properties": {
+          "id": {"type": "string", "enum": ["preflight", "core-toolchain", "project-config", "cli-link", "runtime-detect", "runtime-select", "no-secret-demo", "auth-status", "complete"]},
+          "status": {"type": "string", "enum": ["pending", "running", "passed", "warned", "failed", "skipped", "blocked"]},
+          "attempts": {"type": "integer", "minimum": 0},
+          "mutates_machine": {"type": "boolean"},
+          "requires_auth": {"type": "boolean"},
+          "started_at": {"type": ["string", "null"]},
+          "completed_at": {"type": ["string", "null"]},
+          "error_code": {"type": ["string", "null"], "pattern": "^[A-Z0-9_-]*$"},
+          "message": {"type": ["string", "null", "number", "boolean"]}
+        }
+      }
+    },
+    "runtime_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_id", "selection_mode", "availability", "evidence_recorded"],
+      "properties": {
+        "adapter_id": {"type": ["string", "null"]},
+        "selection_mode": {"type": "string", "enum": ["none", "explicit", "auto"]},
+        "availability": {"type": "string", "enum": ["unknown", "detected", "missing", "incompatible"]},
+        "version": {"type": ["string", "null"]},
+        "selected_at": {"type": ["string", "null"]},
+        "evidence_recorded": {"type": "boolean"}
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "secret_values_stored", "delegated"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-requested", "delegated", "authenticated", "unknown", "failed"]},
+        "adapter_id": {"type": ["string", "null"]},
+        "secret_values_stored": {"type": "boolean", "const": false},
+        "delegated": {"type": "boolean"},
+        "last_checked_at": {"type": ["string", "null"]},
+        "redacted_source": {"type": ["string", "null"]}
+      }
+    },
+    "demo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "external_writes", "secrets_seen"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-run", "passed", "failed"]},
+        "external_writes": {"type": "integer", "minimum": 0, "maximum": 0},
+        "secrets_seen": {"type": "boolean", "const": false},
+        "evidence_path": {"type": ["string", "null"]}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recoverable", "owned_paths", "rollback_required"],
+      "properties": {
+        "recoverable": {"type": "boolean"},
+        "owned_paths": {"type": "array", "items": {"type": "string"}},
+        "rollback_required": {"type": "boolean"},
+        "last_failure_step": {"type": ["string", "null"]}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

@@ -56,16 +56,17 @@ show_help() {
   echo "    aiw <command> [options]"
   echo ""
   echo -e "  ${BOLD}GETTING STARTED${NC}"
-  echo -e "    ${CYAN}setup${NC}                        Install dependencies, create .env, validate environment"
+  echo -e "    ${CYAN}setup${NC}                        Resumable project setup and onboarding state"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
+  echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
+  echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
   echo -e "    ${CYAN}start${NC}                        Launch AI Workflow on this repo"
   echo -e "    ${CYAN}start${NC} ${DIM}<path>${NC}               Launch AI Workflow on any project on your machine"
   echo -e "    ${CYAN}init${NC}  ${DIM}<path>${NC}               Copy workflow into another project (makes it standalone)"
   echo ""
   echo -e "  ${BOLD}VALIDATION${NC}"
-  echo -e "    ${CYAN}validate${NC}           Run the full 11-check skill validation suite"
+  echo -e "    ${CYAN}validate${NC}           Run the full skill validation suite"
   echo -e "    ${CYAN}lint${NC}               Quick YAML + schema syntax check (checks 0-1 only)"
-  echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
@@ -78,7 +79,13 @@ show_help() {
   echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
   echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
   echo -e "    ${CYAN}validate-onboarding-o1${NC}       Validate deterministic core and adapter toolchain controls"
+  echo -e "    ${CYAN}validate-onboarding-o2${NC}       Validate resumable agent-neutral onboarding controls"
   echo -e "    ${CYAN}toolchain-check${NC}               Run non-mutating no-network toolchain verification"
+  echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
+  echo -e "    ${CYAN}agent detect${NC}                  Detect installed adapters with safe version probes"
+  echo -e "    ${CYAN}agent use${NC} ${DIM}<id|auto>${NC}             Select a runtime without silent fallback"
+  echo -e "    ${CYAN}auth status${NC}                   Show delegated, redacted runtime auth status"
+  echo -e "    ${CYAN}recover${NC}                      Recover or reset O2-owned onboarding state"
   echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
   echo -e "    ${CYAN}skill apply${NC}                  Apply an explicitly approved scaffold with rollback"
   echo -e "    ${CYAN}feedback-to-eval${NC}             Ingest sanitized feedback with approval-gated eval promotion"
@@ -125,7 +132,7 @@ show_help() {
 # ── Commands ──────────────────────────────────────────────────────────────────
 
 cmd_setup() {
-  bash "$ROOT/scripts/setup.sh"
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" setup "$@"
 }
 
 cmd_health() {
@@ -206,6 +213,42 @@ except Exception as e:
 }
 
 cmd_doctor() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" doctor "$@"
+}
+
+cmd_demo() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" demo "$@"
+}
+
+cmd_agent() {
+  local subcmd="${1:-list}"
+  shift || true
+  case "$subcmd" in
+    list) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-list "$@" ;;
+    detect) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-detect "$@" ;;
+    use) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-use "$@" ;;
+    *) echo "Usage: aiw agent [list|detect|use <id|auto>]"; return 2 ;;
+  esac
+}
+
+cmd_auth() {
+  local subcmd="${1:-status}"
+  shift || true
+  case "$subcmd" in
+    status) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" auth-status "$@" ;;
+    login|logout)
+      echo "Authentication is runtime-owned; O2 does not automate login or logout."
+      return 2
+      ;;
+    *) echo "Usage: aiw auth [status|login|logout]"; return 2 ;;
+  esac
+}
+
+cmd_recover() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" recover "$@"
+}
+
+cmd_doctor_legacy() {
   echo -e "${BOLD}╔══════════════════════════════════════╗${NC}"
   echo -e "${BOLD}║   AI Workflow — Full Diagnostic      ║${NC}"
   echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
@@ -330,6 +373,10 @@ cmd_validate_onboarding_o0() {
 
 cmd_validate_onboarding_o1() {
   make -C "$ROOT" validate-onboarding-o1 "$@"
+}
+
+cmd_validate_onboarding_o2() {
+  make -C "$ROOT" validate-onboarding-o2 "$@"
 }
 
 cmd_toolchain_check() {
@@ -569,7 +616,12 @@ case "$COMMAND" in
   validate-batch9) cmd_validate_batch9 "$@" ;;
   validate-onboarding-o0) cmd_validate_onboarding_o0 "$@" ;;
   validate-onboarding-o1) cmd_validate_onboarding_o1 "$@" ;;
+  validate-onboarding-o2) cmd_validate_onboarding_o2 "$@" ;;
   toolchain-check) cmd_toolchain_check "$@" ;;
+  demo)             cmd_demo "$@" ;;
+  agent)            cmd_agent "$@" ;;
+  auth)             cmd_auth "$@" ;;
+  recover)          cmd_recover "$@" ;;
   skill)            cmd_skill "$@" ;;
   feedback-to-eval) cmd_feedback_to_eval "$@" ;;
   autonomy-experiments) cmd_autonomy_experiments "$@" ;;

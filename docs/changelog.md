@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Resumable Agent-Neutral Onboarding (Onboarding Batch O2)
+
+- Added a resumable, atomically persisted O2 onboarding state machine under `.aiw/onboarding-o2/` with redacted step status, structured evidence, deterministic recovery, and owned-path rollback.
+- Added `aiw doctor`, `aiw agent list`, `aiw agent detect`, `aiw agent use <id|auto>`, `aiw demo`, `aiw auth status`, and `aiw recover`; explicit selection fails closed and automatic selection records deterministic precedence.
+- Added the no-secret, zero-write demo and delegated authentication status boundary. O2 never installs a runtime, automates login, stores raw secrets, mutates target projects, or launches a provider-specific runtime.
+- Added O2 schemas, policy, contract, fixtures, and master validation controls; synchronized the source-owned O2 contract and policy for the companion website.
+
 ### Deterministic Toolchain (Onboarding Batch O1)
 
 - Added a source-owned deterministic toolchain manifest and policy for Git, Python, Node, npm, local dependency environments, adapter version boundaries, lockfile enforcement, and no-network check-only verification.

@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -58,6 +58,9 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@$(MAKE) validate-batch9
 	@$(MAKE) validate-onboarding-o0
 	@$(MAKE) validate-onboarding-o1
+
+	@$(MAKE) validate-onboarding-o2
+
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -89,6 +92,11 @@ validate-onboarding-o0: ## Validate agent-neutral onboarding and runtime-adapter
 
 validate-onboarding-o1: ## Validate deterministic core and adapter toolchain controls
 	@$(PYTHON) scripts/validate-onboarding-o1-controls.py
+
+validate-onboarding-o2: ## Validate resumable, agent-neutral onboarding controls
+	@$(PYTHON) scripts/validate-onboarding-o2-controls.py
+
+
 
 toolchain-check: ## Run non-mutating no-network toolchain verification
 	@$(PYTHON) scripts/check-toolchain.py --check-only --no-network --json-output artifacts/onboarding-o1-toolchain-evidence.json
