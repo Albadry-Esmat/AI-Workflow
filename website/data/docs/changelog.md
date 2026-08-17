@@ -19,6 +19,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added a bounded local `quick-review` adapter that emits validated run, step, artifact, policy, gate, and terminal failure evidence without external writes.
 - Added success, schema-failure, tool-failure, and retry-exhaustion fixtures plus `aiw quick-review` and `make quick-review` entry points.
 
+### Evaluation and Mock Replay
+
+- Added a versioned evaluation-case schema, four disposable fixture projects, ten golden cases, five adversarial cases, deterministic structure/behavior/security/traceability/replay-safety graders, and read-only saved-response replay.
+- Added `make validate-evals`, `make eval-quick-review`, `aiw validate-evals`, and `aiw eval-quick-review` entry points with CI validation.
+
 ### Security
 
 - Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.

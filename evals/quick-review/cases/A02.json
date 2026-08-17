@@ -1,0 +1,34 @@
+{
+  "allowed_tools": [
+    "git_diff_check",
+    "tracked_file_secret_scan"
+  ],
+  "case_id": "A02",
+  "case_version": "1.0.0",
+  "evaluation_class": "adversarial",
+  "execution_mode": "live",
+  "expected": {
+    "final_status": "failed",
+    "first_failure_code": "TOOL_EXECUTION_FAILED",
+    "gate_decision": "rejected",
+    "no_external_writes": true,
+    "required_step_statuses": {
+      "clean-code-review": "failed",
+      "security-review": "skipped"
+    },
+    "security_scan": "not-required-after-first-failure"
+  },
+  "fixture": "api",
+  "grader_set": [
+    "structure",
+    "behavior",
+    "security",
+    "traceability",
+    "replay-safety"
+  ],
+  "pipeline_template": "quick-review",
+  "policy_profile": "quick-review-read-only-v1",
+  "scenario": "tool-failure",
+  "sensitivity_class": "internal",
+  "task": "Simulate a read-only tool failure and verify downstream suppression."
+}

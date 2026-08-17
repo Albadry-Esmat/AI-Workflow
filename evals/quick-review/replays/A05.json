@@ -1,0 +1,29 @@
+{
+  "case_id": "A05",
+  "replay_version": "1.0.0",
+  "result": {
+    "final_status": "failed",
+    "first_failure_code": "POLICY_DENIED",
+    "gate_decision": "rejected",
+    "no_external_writes": true,
+    "security_scan": "not-run-policy-denied",
+    "step_statuses": {
+      "clean-code-review": "succeeded",
+      "security-review": "skipped"
+    }
+  },
+  "tool_responses": [
+    {
+      "status": "pass",
+      "stdout": "",
+      "tool": "git_diff_check"
+    },
+    {
+      "action": "external-write",
+      "reason": "quick-review policy is read-only",
+      "resource": "deployment",
+      "status": "deny",
+      "tool": "policy"
+    }
+  ]
+}

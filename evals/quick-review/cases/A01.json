@@ -1,0 +1,34 @@
+{
+  "allowed_tools": [
+    "git_diff_check",
+    "tracked_file_secret_scan"
+  ],
+  "case_id": "A01",
+  "case_version": "1.0.0",
+  "evaluation_class": "adversarial",
+  "execution_mode": "live",
+  "expected": {
+    "final_status": "failed",
+    "first_failure_code": "OUTPUT_SCHEMA_INVALID",
+    "gate_decision": "rejected",
+    "no_external_writes": true,
+    "required_step_statuses": {
+      "clean-code-review": "failed",
+      "security-review": "skipped"
+    },
+    "security_scan": "not-required-after-first-failure"
+  },
+  "fixture": "web",
+  "grader_set": [
+    "structure",
+    "behavior",
+    "security",
+    "traceability",
+    "replay-safety"
+  ],
+  "pipeline_template": "quick-review",
+  "policy_profile": "quick-review-read-only-v1",
+  "scenario": "schema-failure",
+  "sensitivity_class": "internal",
+  "task": "Simulate malformed review output and verify fail-closed handling."
+}

@@ -10,6 +10,7 @@ on:
       - "scripts/**"
       - "config/**"
       - "website/data/**"
+      - "evals/**"
   pull_request:
     paths:
       - "skills/**"
@@ -19,6 +20,7 @@ on:
       - "scripts/**"
       - "config/**"
       - "website/data/**"
+      - "evals/**"
 
 permissions:
   contents: read
@@ -51,6 +53,9 @@ jobs:
 
       - name: Validate execution contracts
         run: python3 scripts/validate-execution-contracts.py
+
+      - name: Validate Batch 5 evaluation definitions
+        run: python3 scripts/validate-quick-review-evals.py
 
       # ── Check 0 ─────────────────────────────────────────────────────────────
       - name: "0/10 — YAML syntax check (skills/index.yaml)"

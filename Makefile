@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-contracts validate-evals eval-quick-review quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -53,6 +53,12 @@ validate: ## Run the full skill and execution-contract validation suites
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
 	@python3 scripts/validate-execution-contracts.py
+
+validate-evals: ## Validate Batch 5 evaluation definitions, fixtures, and replay traces
+	@python3 scripts/validate-quick-review-evals.py
+
+eval-quick-review: ## Run the Batch 5 golden and adversarial quick-review evaluation suite
+	@python3 scripts/evaluate-quick-review.py $(if $(OUTPUT_ROOT),--output-root $(OUTPUT_ROOT),)
 
 quick-review: ## Run bounded quick-review with local execution evidence
 	@python3 scripts/run-quick-review.py $(ARGS)
