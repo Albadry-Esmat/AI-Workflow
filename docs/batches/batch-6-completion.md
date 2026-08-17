@@ -78,7 +78,7 @@ The final evaluation report is generated at `evals/quick-review/reports/evaluati
 |---|---|---|---|
 | AI-Workflow | `Dev` | [`cc3f6b9`](https://github.com/Albadry-Esmat/AI-Workflow/commit/cc3f6b9ed465e76c05c95e11daedb09834eb39ea) | Add Batch 6 budgets, retry taxonomy, policy profile, contract extensions, adapter enforcement, evaluation coverage, docs, and CI gates |
 | ASE-OS-Website | `Dev` | [`6a23885`](https://github.com/Albadry-Esmat/ASE-OS-Website/commit/6a238854eab2f506e4ba8c2c3c1dfdf1df6a2f0a) | Publish the generated Batch 6 changelog mirror and ReleaseManifest |
-| AI-Workflow | `Dev` | Pending this report commit | Add this completion report and final evidence record |
+| AI-Workflow | `Dev` | [`42e5dda`](https://github.com/Albadry-Esmat/AI-Workflow/commit/42e5dda9908df0f8164fc1a633a5c87e1803c998) | Add this completion report and final evidence record |
 
 The final website ReleaseManifest records:
 
