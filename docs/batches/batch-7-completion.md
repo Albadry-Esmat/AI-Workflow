@@ -89,17 +89,18 @@ The quick-review regression summary is:
 | Repository | Branch | Commit | Meaning |
 |---|---|---|---|
 | AI-Workflow | `Dev` | [`ef93288`](https://github.com/Albadry-Esmat/AI-Workflow/commit/ef932886d6664138d2ef804ad104c266edcd5a94) | Add Batch 7 quality vector, hard blockers, traceability, context tests, evaluation policies, nightly workflow, and compatibility gate |
-| ASE-OS-Website | `Dev` | [`24d5ef3`](https://github.com/Albadry-Esmat/ASE-OS-Website/commit/24d5ef3350684b57baa8d7a00e6390a64044c3ac) | Publish generated Batch 7 changelog mirror and ReleaseManifest |
+| ASE-OS-Website | `Dev` | [`93fb9ea`](https://github.com/Albadry-Esmat/ASE-OS-Website/commit/93fb9ea3a3f6834a9d678abe40e54523f2287f13) | Publish the final Batch 7 ReleaseManifest compatible with the final source tip |
 | AI-Workflow | `Dev` | [`3f48aa3`](https://github.com/Albadry-Esmat/AI-Workflow/commit/3f48aa3ab2817c9ebd3eb46acab260159955e3bc) | Add the initial completion report and final evidence record; this reference was finalized in the following documentation commit |
+| AI-Workflow | `Dev` | [`d27ef03`](https://github.com/Albadry-Esmat/AI-Workflow/commit/d27ef03cf9e575aa5e4c6ad5ff45b07c784416a4) | Finalize Batch 7 report references and source Dev tip |
 
 The final website ReleaseManifest records:
 
 | Field | Value |
 |---|---|
 | Source branch | `Dev` |
-| Source commit | `ef932886d6664138d2ef804ad104c266edcd5a94` |
+| Source commit | `d27ef03cf9e575aa5e4c6ad5ff45b07c784416a4` |
 | Website branch | `Dev` |
-| Website synchronization base | `6a238854eab2f506e4ba8c2c3c1dfdf1df6a2f0a` |
+| Website synchronization base | `203368ea8dafc27d3a23ca2f03486272ea420c8c` |
 | Data hash | `sha256:836e71be35c8ecba5a3387d1b7288a4fa56b1cd2402e433457387e6f3c08d7f1` |
 | Source validation | `pass` |
 | Website validation | `not-run` in the generated manifest; website lint/tests/build were run separately and passed |
