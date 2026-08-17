@@ -27,7 +27,7 @@ def validate(path: Path, schema_path: Path) -> list[str]:
 
 def run(command: list[str], cwd: Path = ROOT, expect: int = 0) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
-    env.setdefault("AIW_AJV_BIN", str(ROOT / "node_modules/.bin/ajv"))
+    env.setdefault("AIW_AJV_BIN", str(ROOT / "scripts/validate-json-schema.mjs"))
     env.setdefault("AIW_PYTHON_BIN", sys.executable)
     result = subprocess.run(command, cwd=cwd, text=True, capture_output=True, env=env)
     if result.returncode != expect:

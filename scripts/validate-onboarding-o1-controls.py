@@ -79,11 +79,11 @@ def main() -> int:
 
     req_lines = [line.strip() for line in paths["requirements"].read_text(encoding="utf-8").splitlines() if line.strip() and not line.startswith("#")]
     check(req_lines and all("==" in line for line in req_lines), "Python requirements are exact-pinned", failures)
-    check(package.get("devDependencies", {}).get("ajv-cli") == "^5.0.0", "package.json declares pinned AJV CLI major/minor", failures)
-    check(package.get("devDependencies", {}).get("ajv-formats") == "^3.0.1", "package.json declares pinned AJV formats major/minor", failures)
+    check(package.get("devDependencies", {}).get("ajv") == "^8.20.0", "package.json declares pinned AJV library", failures)
+    check(package.get("devDependencies", {}).get("ajv-formats") == "^3.0.1", "package.json declares pinned AJV formats", failures)
     packages = lockfile.get("packages", {})
     check(lockfile.get("lockfileVersion") == 3, "package-lock uses lockfileVersion 3", failures)
-    check("node_modules/ajv-cli" in packages and "node_modules/ajv-formats" in packages, "package-lock contains AJV tool entries", failures)
+    check("node_modules/ajv" in packages and "node_modules/ajv-formats" in packages, "package-lock contains AJV library entries", failures)
 
     setup_text = (ROOT / "scripts/setup.sh").read_text(encoding="utf-8")
     health_text = (ROOT / "scripts/health-check.sh").read_text(encoding="utf-8")
@@ -93,8 +93,8 @@ def main() -> int:
     check("npm ci --ignore-scripts" in setup_text, "setup uses deterministic root npm ci", failures)
     check("python3 -m venv" in setup_text, "setup creates a project-local Python environment", failures)
     check("_fail \"opencode not found" not in health_text, "health does not require OpenCode", failures)
-    check("node_modules/.bin/ajv" in health_text and "npm install -g" not in health_text, "health resolves project-local AJV", failures)
-    check("node_modules/.bin/ajv" in validate_text and "npm install -g" not in validate_text, "skill validation resolves project-local AJV", failures)
+    check("scripts/validate-json-schema.mjs" in health_text and "npm install -g" not in health_text, "health resolves project-owned schema validation", failures)
+    check("scripts/validate-json-schema.mjs" in validate_text and "npm install -g" not in validate_text, "skill validation resolves project-owned schema validation", failures)
 
     fixture_ids = {f["id"] for f in fixtures["fixtures"]}
     required = {

@@ -97,10 +97,10 @@ else
   _fail "package-lock.json not found — deterministic Node installation is unavailable"
 fi
 
-if [[ -x "$ROOT/node_modules/.bin/ajv" ]]; then
-  _ok "Project-local ajv-cli found"
+if [[ -x "$ROOT/scripts/validate-json-schema.mjs" ]]; then
+  _ok "Project-owned JSON Schema validator found"
 else
-  _fail "Project-local ajv-cli not found after npm ci"
+  _fail "Project-owned JSON Schema validator not found"
 fi
 
 # ── 4. .opencode/ npm plugin ──────────────────────────────────────────────────

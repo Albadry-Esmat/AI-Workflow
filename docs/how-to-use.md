@@ -177,7 +177,7 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 | Token budget exhausted | Context not compressed | See `docs/context-engineering.md` |
 | Skill not found | Registry not updated | Run `make validate` to find which entry is missing |
 | Agent permission denied | Incorrect agent config | Check permission in `opencode.json` |
-| `ajv: command not found` | ajv-cli not installed | Run `npm install -g ajv-cli ajv-formats` |
+| `schema validator not found` | Project-local Node dependencies are missing | Run `make setup`, then `aiw toolchain-check` |
 | `GITHUB_TOKEN is not set` | Missing env var | Add a short-lived fine-grained token to the ignored `.env`; do not commit it |
 
 ---

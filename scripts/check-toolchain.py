@@ -95,14 +95,14 @@ def check(root: Path, no_network: bool) -> tuple[list[dict[str, str]], list[str]
     package_json = load(package_json_path) if package_json_path.is_file() else {}
     lockfile = load(lockfile_path) if lockfile_path.is_file() else {}
     dev_dependencies = package_json.get("devDependencies", {})
-    local_ajv = root / "node_modules/.bin/ajv"
+    local_ajv = root / "scripts/validate-json-schema.mjs"
     lock_packages = lockfile.get("packages", {})
     lock_root = lock_packages.get("", {})
     record("Node package-lock exists", lockfile_path.is_file(), str(lockfile_path))
     record("Node lockfile v3", lockfile.get("lockfileVersion") == 3, str(lockfile.get("lockfileVersion")))
-    record("AJV dependencies are pinned in package.json", dev_dependencies.get("ajv-cli") == "^5.0.0" and dev_dependencies.get("ajv-formats") == "^3.0.1", "ajv-cli and ajv-formats")
-    record("AJV dependencies are present in lockfile", "node_modules/ajv-cli" in lock_packages and "node_modules/ajv-formats" in lock_packages, "package-lock dependency tree")
-    record("AJV executable is project-local", local_ajv.is_file(), str(local_ajv))
+    record("AJV libraries are pinned in package.json", dev_dependencies.get("ajv") == "^8.20.0" and dev_dependencies.get("ajv-formats") == "^3.0.1", "ajv and ajv-formats")
+    record("AJV libraries are present in lockfile", "node_modules/ajv" in lock_packages and "node_modules/ajv-formats" in lock_packages, "package-lock dependency tree")
+    record("schema validator wrapper is project-owned", local_ajv.is_file(), str(local_ajv))
     record("root package lock has no unexpected package manager override", not lock_root.get("packageManager", "").startswith("global"), "local lockfile")
 
     setup_text = (root / "scripts/setup.sh").read_text(encoding="utf-8")

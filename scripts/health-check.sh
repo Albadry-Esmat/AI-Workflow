@@ -5,14 +5,15 @@
 #
 # Checks:
 #   1. Required host tools (git, node, npm, python3)
-#   2. Project-local tools (.venv and node_modules/.bin/ajv)
+#   2. Project-local tools (.venv and scripts/validate-json-schema.mjs)
 #   3. Optional agent runtimes and graphify
 #   4. .env file exists
 #   5. Credentials are optional until a provider operation is requested
-#   5. Optional env vars (with warnings, not failures)
-#   6. .opencode/node_modules installed
-#   7. Skill count sanity (index.yaml vs .opencode/skills/)
-#   8. opencode.json skill paths exist on disk
+#   6. Optional env vars (with warnings, not failures)
+#   7. .opencode plugin dependency state
+#   8. Skill count sanity (index.yaml vs .opencode/skills/)
+#   9. opencode.json skill paths exist on disk
+#  10. Required runtime directories
 #
 # Exit code: 0 if all required checks pass (warnings are non-fatal)
 
@@ -35,7 +36,7 @@ PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
 if [[ ! -x "$PYTHON_BIN" ]]; then
   PYTHON_BIN="$(command -v python3 || true)"
 fi
-AJV_BIN="${AIW_AJV_BIN:-$ROOT/node_modules/.bin/ajv}"
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/scripts/validate-json-schema.mjs}"
 if [[ ! -x "$AJV_BIN" ]]; then
   AJV_BIN="$(command -v ajv || true)"
 fi
@@ -79,9 +80,9 @@ else
 fi
 
 if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
-  _ok "project-local ajv-cli  →  $AJV_BIN"
+  _ok "project-local JSON Schema validator  →  $AJV_BIN"
 else
-  _fail "project-local ajv-cli missing — run: make setup"
+  _fail "project-local JSON Schema validator missing — run: make setup"
 fi
 
 # ── 3. Optional agent runtimes and tools ───────────────────────────────────────

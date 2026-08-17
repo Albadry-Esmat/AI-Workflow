@@ -18,7 +18,7 @@
 #   11. Credential guidance and canonical data ownership checks
 #
 # Requires: node (checks 5, 7, 8), project-local Python (checks 0, 9, 10, 11)
-# Requires: project-local ajv-cli for pipeline schema validation.
+# Requires: the project-owned JSON Schema wrapper for pipeline validation.
 
 set -euo pipefail
 
@@ -33,9 +33,9 @@ PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
 if [[ ! -x "$PYTHON_BIN" ]]; then
   PYTHON_BIN="$(command -v python3 || true)"
 fi
-AJV_BIN="${AIW_AJV_BIN:-$ROOT/node_modules/.bin/ajv}"
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/scripts/validate-json-schema.mjs}"
 if [[ ! -x "$AJV_BIN" ]]; then
-  AJV_BIN="$(command -v ajv || true)"
+  AJV_BIN=""
 fi
 
 # Load .env (non-fatal — env vars are only informational here)
@@ -81,7 +81,7 @@ if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
     fi
   done
 else
-  _fail "project-local ajv-cli not found — run: make setup"
+  _fail "project-owned JSON Schema validator not found — run: make setup"
 fi
 
 # ── 2. SKILL.md required sections ─────────────────────────────────────────────
