@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "state": {
+    "owned_root": ".aiw/onboarding-o4",
+    "redact_secrets": true,
+    "atomic_writes": true,
+    "unknown_state_fails_closed": true
+  },
+  "catalog": {
+    "path": "config/runtime-installer-catalog.json",
+    "schema_path": "config/runtime-installer-catalog-schema.json",
+    "official_provenance_required": true,
+    "review_status_required": true,
+    "source_fingerprint_required": true,
+    "exact_record_required": true
+  },
+  "planning": {
+    "default_mode": "plan",
+    "network": "disabled",
+    "mutations": 0,
+    "commands_executed": 0,
+    "raw_secret_values": 0
+  },
+  "verification": {
+    "read_only": true,
+    "version_probe_required": true,
+    "doctor_probe_optional": true,
+    "timeout_max_seconds": 30,
+    "secrets_seen": false
+  },
+  "execution": {
+    "default_status": "manual-only",
+    "explicit_yes_required": true,
+    "reviewed_record_required": true,
+    "platform_match_required": true,
+    "shell_match_required": true,
+    "pipe_to_shell_allowed": false,
+    "elevated_allowed": false,
+    "network_downloads_allowed": false,
+    "package_manager_mutation_allowed": false,
+    "docker_mutation_allowed": false,
+    "target_project_mutations": 0,
+    "current_eligible_records": []
+  },
+  "authentication": {
+    "login_automation": "runtime-owned",
+    "raw_secret_input": false,
+    "raw_secret_storage": false,
+    "status_only": true
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred"
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "vendor_guidance_required": true,
+    "target_untouched": true
+  },
+  "commands": {
+    "install_plan": "aiw onboarding install-plan [--agent <id|auto>] [--platform <platform>] [--json]",
+    "verify": "aiw onboarding install-verify [--agent <id>] [--json]",
+    "install": "aiw onboarding install --installer <installer-id> --yes [--json]",
+    "recover": "aiw onboarding recover --o4 [--reset-state] [--json]"
+  },
+  "non_goals": [
+    "Executing curl-piped shell installers",
+    "Executing PowerShell expression installers",
+    "Running elevated package-manager commands",
+    "Downloading binaries or mutating Docker state",
+    "Automating provider or runtime authentication",
+    "Initializing or mutating target projects",
+    "Launching a provider-specific runtime",
+    "Claiming rollback support without official vendor guidance"
+  ]
+}

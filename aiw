@@ -61,6 +61,9 @@ show_help() {
   echo -e "    ${CYAN}onboarding apply${NC}              Apply guided O3 core setup after explicit --yes"
   echo -e "    ${CYAN}onboarding doctor${NC}             Guided O3 runtime and setup diagnostics"
   echo -e "    ${CYAN}onboarding recover${NC}            Recover or reset O3-owned guided state"
+  echo -e "    ${CYAN}onboarding install-plan${NC}       Show provenance-aware runtime installer options"
+  echo -e "    ${CYAN}onboarding install-verify${NC}     Run a read-only installed-runtime verification"
+  echo -e "    ${CYAN}onboarding install${NC}            Attempt only an eligible, explicitly approved installer record"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
@@ -143,11 +146,25 @@ cmd_onboarding() {
   local subcmd="${1:-plan}"
   shift || true
   case "$subcmd" in
-    plan|apply|doctor|recover)
+    install-plan|install-verify|install)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" "$subcmd" "$@"
+      ;;
+    recover)
+      if [[ " $* " == *" --o4 "* ]]; then
+        local filtered=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o4" ]] || filtered+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" recover "${filtered[@]}"
+      else
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" recover "$@"
+      fi
+      ;;
+    plan|apply|doctor)
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
       ;;
     *)
-      echo "Usage: aiw onboarding [plan|apply|doctor|recover]"
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4]|install-plan|install-verify|install]"
       return 2
       ;;
   esac

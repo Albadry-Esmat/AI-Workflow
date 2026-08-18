@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o4-policy-schema.json",
+  "title": "AI-Workflow Onboarding O4 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "catalog", "planning", "verification", "execution", "authentication", "target", "rollback", "commands", "non_goals"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "redact_secrets", "atomic_writes", "unknown_state_fails_closed"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o4"},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "atomic_writes": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "schema_path", "official_provenance_required", "review_status_required", "source_fingerprint_required", "exact_record_required"],
+      "properties": {
+        "path": {"type": "string", "const": "config/runtime-installer-catalog.json"},
+        "schema_path": {"type": "string", "const": "config/runtime-installer-catalog-schema.json"},
+        "official_provenance_required": {"type": "boolean", "const": true},
+        "review_status_required": {"type": "boolean", "const": true},
+        "source_fingerprint_required": {"type": "boolean", "const": true},
+        "exact_record_required": {"type": "boolean", "const": true}
+      }
+    },
+    "planning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_mode", "network", "mutations", "commands_executed", "raw_secret_values"],
+      "properties": {
+        "default_mode": {"type": "string", "const": "plan"},
+        "network": {"type": "string", "const": "disabled"},
+        "mutations": {"type": "integer", "const": 0},
+        "commands_executed": {"type": "integer", "const": 0},
+        "raw_secret_values": {"type": "integer", "const": 0}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only", "version_probe_required", "doctor_probe_optional", "timeout_max_seconds", "secrets_seen"],
+      "properties": {
+        "read_only": {"type": "boolean", "const": true},
+        "version_probe_required": {"type": "boolean", "const": true},
+        "doctor_probe_optional": {"type": "boolean", "const": true},
+        "timeout_max_seconds": {"type": "integer", "maximum": 30},
+        "secrets_seen": {"type": "boolean", "const": false}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_status", "explicit_yes_required", "reviewed_record_required", "platform_match_required", "shell_match_required", "pipe_to_shell_allowed", "elevated_allowed", "network_downloads_allowed", "package_manager_mutation_allowed", "docker_mutation_allowed", "target_project_mutations", "current_eligible_records"],
+      "properties": {
+        "default_status": {"type": "string", "const": "manual-only"},
+        "explicit_yes_required": {"type": "boolean", "const": true},
+        "reviewed_record_required": {"type": "boolean", "const": true},
+        "platform_match_required": {"type": "boolean", "const": true},
+        "shell_match_required": {"type": "boolean", "const": true},
+        "pipe_to_shell_allowed": {"type": "boolean", "const": false},
+        "elevated_allowed": {"type": "boolean", "const": false},
+        "network_downloads_allowed": {"type": "boolean", "const": false},
+        "package_manager_mutation_allowed": {"type": "boolean", "const": false},
+        "docker_mutation_allowed": {"type": "boolean", "const": false},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "current_eligible_records": {"type": "array", "maxItems": 0, "items": {"type": "string"}}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["login_automation", "raw_secret_input", "raw_secret_storage", "status_only"],
+      "properties": {
+        "login_automation": {"type": "string", "const": "runtime-owned"},
+        "raw_secret_input": {"type": "boolean", "const": false},
+        "raw_secret_storage": {"type": "boolean", "const": false},
+        "status_only": {"type": "boolean", "const": true}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_policy", "vendor_guidance_required", "target_untouched"],
+      "properties": {
+        "claim_policy": {"type": "string", "const": "record-only-unless-officially-supported"},
+        "vendor_guidance_required": {"type": "boolean", "const": true},
+        "target_untouched": {"type": "boolean", "const": true}
+      }
+    },
+    "commands": {"type": "object", "additionalProperties": {"type": "string"}},
+    "non_goals": {"type": "array", "minItems": 5, "items": {"type": "string"}}
+  }
+}

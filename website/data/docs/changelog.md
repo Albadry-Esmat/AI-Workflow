@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Verified Agent-Neutral Runtime Installation (Onboarding Batch O4)
+
+- Added a provenance-aware runtime installer catalog for OpenCode, Claude Code, and Codex channels across Linux, macOS, and Windows, with official URLs, source fingerprints, platform/shell requirements, read-only verification probes, and rollback ownership.
+- Added `aiw onboarding install-plan`, `aiw onboarding install-verify`, and exact-record `aiw onboarding install --yes`; planning and verification are bounded and redacted, while all current installer records remain manual-only and fail closed.
+- Blocked shell-piped installers, PowerShell expression installers, network downloads, elevated commands, package-manager mutation, Docker mutation, target-project changes, and login automation under the O4 policy.
+- Added O4 state/policy/catalog/contract schemas, deterministic fixtures, the 27-check master validator, Makefile gates, synchronization mappings, and `docs/verified-runtime-installation.md` with official-source references.
+
 ### Guided Agent-Neutral Onboarding (Onboarding Batch O3)
 
 - Added `aiw onboarding plan`, `aiw onboarding apply --yes`, `aiw onboarding doctor`, and `aiw onboarding recover` for deterministic, lane-explicit first-use guidance with redacted resumable state.

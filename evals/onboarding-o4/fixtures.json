@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O4",
+  "fixtures": [
+    {"id": "plan-linux-bash-zero-write", "scenario": "Linux Bash installer plan", "expected": {"verdict": "pass", "mutations": 0, "commands_executed": 0, "network": "disabled", "eligible_installer_ids": []}},
+    {"id": "plan-windows-powershell-zero-write", "scenario": "Windows PowerShell installer plan", "expected": {"verdict": "pass", "mutations": 0, "commands_executed": 0, "network": "disabled", "eligible_installer_ids": []}},
+    {"id": "plan-macos-zsh-zero-write", "scenario": "macOS zsh installer plan", "expected": {"verdict": "pass", "mutations": 0, "commands_executed": 0, "network": "disabled", "eligible_installer_ids": []}},
+    {"id": "plan-provenance-visible", "scenario": "Plan exposes official URL, source fingerprint, and review status", "expected": {"official_url": true, "source_fingerprint": true, "review_status": "source-reviewed"}},
+    {"id": "plan-shell-pipeline-blocked", "scenario": "Network-fetched shell pipeline remains manual-only", "expected": {"automatic_execution": "blocked", "blocked_reason": "shell pipeline execution is forbidden"}},
+    {"id": "plan-package-mutation-blocked", "scenario": "Global package-manager install remains manual-only", "expected": {"automatic_execution": "blocked", "blocked_reason": "package-manager mutation is forbidden"}},
+    {"id": "install-consent-required", "scenario": "Install without explicit yes", "expected": {"verdict": "fail", "error_code": "O4-CONSENT-REQUIRED", "commands_executed": 0}},
+    {"id": "install-record-not-eligible", "scenario": "Install with explicit yes against source-reviewed record", "expected": {"verdict": "fail", "error_code": "O4-INSTALL-NOT-ELIGIBLE", "commands_executed": 0, "host_mutations": 0}},
+    {"id": "verify-read-only", "scenario": "Safe version and optional doctor probes", "expected": {"read_only": true, "external_writes": 0, "secrets_seen": false, "target_mutations": 0}},
+    {"id": "state-redacted-and-owned", "scenario": "O4 state and evidence ledger", "expected": {"owned_root": ".aiw/onboarding-o4", "raw_secret_values": 0, "atomic_writes": true}},
+    {"id": "auth-target-launch-deferred", "scenario": "Installation does not authenticate, initialize, or launch", "expected": {"login_started": false, "target_initialization": "deferred", "launch": "deferred"}},
+    {"id": "recover-owned-state", "scenario": "O4 reset and recovery", "expected": {"owned_paths_only": true, "runtime_changes": 0, "target_project_changes": 0}}
+  ]
+}
