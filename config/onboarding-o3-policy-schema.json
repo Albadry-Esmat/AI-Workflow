@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o3-policy-schema.json",
+  "title": "AI-Workflow Onboarding O3 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "guided", "runtime", "authentication", "target", "recovery", "commands", "non_goals"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "redact_secrets", "resume_allowed", "unknown_state_fails_closed"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o3"},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "resume_allowed": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "guided": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_mode", "plan_mutations", "plan_network", "apply_requires_explicit_yes", "lane_required"],
+      "properties": {
+        "default_mode": {"type": "string", "const": "plan"},
+        "plan_mutations": {"type": "integer", "const": 0},
+        "plan_network": {"type": "string", "const": "disabled"},
+        "apply_requires_explicit_yes": {"type": "boolean", "const": true},
+        "lane_required": {"type": "boolean", "const": true}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalog_path", "installation", "installation_commands", "explicit_missing_fails", "silent_fallback", "selection_recorded"],
+      "properties": {
+        "catalog_path": {"type": "string", "const": "config/agent-runtime-catalog.json"},
+        "installation": {"type": "string", "const": "user-controlled-deferred"},
+        "installation_commands": {"type": "boolean", "const": false},
+        "explicit_missing_fails": {"type": "boolean", "const": true},
+        "silent_fallback": {"type": "boolean", "const": false},
+        "selection_recorded": {"type": "boolean", "const": true}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aiw_stores_raw_secrets", "login_automation", "status_only", "raw_secret_input"],
+      "properties": {
+        "aiw_stores_raw_secrets": {"type": "boolean", "const": false},
+        "login_automation": {"type": "string", "const": "runtime-owned"},
+        "status_only": {"type": "boolean", "const": true},
+        "raw_secret_input": {"type": "boolean", "const": false}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutation", "launch"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutation": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_paths_only", "target_untouched", "runtime_untouched", "command"],
+      "properties": {
+        "owned_paths_only": {"type": "boolean", "const": true},
+        "target_untouched": {"type": "boolean", "const": true},
+        "runtime_untouched": {"type": "boolean", "const": true},
+        "command": {"type": "string", "const": "aiw onboarding recover"}
+      }
+    },
+    "commands": {"type": "object", "additionalProperties": {"type": "string"}},
+    "non_goals": {"type": "array", "minItems": 5, "items": {"type": "string"}}
+  }
+}

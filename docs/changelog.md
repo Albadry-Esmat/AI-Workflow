@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Guided Agent-Neutral Onboarding (Onboarding Batch O3)
+
+- Added `aiw onboarding plan`, `aiw onboarding apply --yes`, `aiw onboarding doctor`, and `aiw onboarding recover` for deterministic, lane-explicit first-use guidance with redacted resumable state.
+- Added native, project-local, and Dev Container/Codespace lane summaries, safe runtime capability/install-channel reporting, explicit consent gating, and no-write/no-network planning output.
+- O3 keeps runtime installation, provider login, target initialization, and runtime launch deferred; no platform-specific installer command or raw secret handling was introduced.
+- Added O3 state/policy/contract schemas, safety fixtures, a 23-check master validator, Makefile integration, and the guided onboarding documentation.
+
 ### Resumable Agent-Neutral Onboarding (Onboarding Batch O2)
 
 - Added a resumable, atomically persisted O2 onboarding state machine under `.aiw/onboarding-o2/` with redacted step status, structured evidence, deterministic recovery, and owned-path rollback.

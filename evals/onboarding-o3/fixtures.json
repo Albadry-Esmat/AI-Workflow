@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O3",
+  "fixtures": [
+    {"id": "plan-native-zero-write", "scenario": "native lane plan with no runtime installed", "expected": {"verdict": "pass", "mode": "plan", "mutations": 0, "network": "disabled", "raw_secret_values": 0}},
+    {"id": "plan-project-local-zero-write", "scenario": "project-local lane plan", "expected": {"verdict": "pass", "mutations": 0, "target_mutations": 0}},
+    {"id": "plan-dev-container-zero-write", "scenario": "dev-container lane plan", "expected": {"verdict": "pass", "mutations": 0, "target_mutations": 0}},
+    {"id": "apply-requires-explicit-consent", "scenario": "apply without --yes", "expected": {"verdict": "fail", "error_code": "O3-CONSENT-REQUIRED", "mutations": 0}},
+    {"id": "explicit-missing-fails", "scenario": "explicit adapter missing from host", "expected": {"verdict": "fail", "error_code": "O3-ADAPTER-MISSING", "fallback": false}},
+    {"id": "auto-selection-defers", "scenario": "auto selection when no adapter is detected", "expected": {"verdict": "pass", "selection_verdict": "deferred", "fallback": false}},
+    {"id": "detected-runtime-recorded", "scenario": "fake safe version probe", "expected": {"selection_verdict": "pass", "selection_mode": "explicit", "fallback": false}},
+    {"id": "installation-never-executed", "scenario": "guided plan/apply runtime installation boundary", "expected": {"managed_by_aiw": false, "commands_executed": 0, "status": "deferred"}},
+    {"id": "auth-delegated", "scenario": "guided auth status", "expected": {"status": "delegated", "login_started": false, "raw_secret_values": 0}},
+    {"id": "target-init-deferred", "scenario": "guided target boundary", "expected": {"initialization": "deferred", "mutations": 0, "launch": "deferred"}},
+    {"id": "state-redacted-and-resumable", "scenario": "apply state ledger", "expected": {"owned_root": ".aiw/onboarding-o3", "raw_secret_values": 0, "recoverable": true}},
+    {"id": "recover-owned-state", "scenario": "reset O3 state", "expected": {"owned_paths_only": true, "target_project_changes": 0, "runtime_changes": 0}}
+  ]
+}

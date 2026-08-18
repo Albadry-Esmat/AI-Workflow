@@ -18,6 +18,8 @@
 #   config/onboarding-o0-contract.json → website/data/onboarding-o0.json
 #   config/onboarding-o2-contract.json → website/data/onboarding-o2.json
 #   config/onboarding-o2-policy.json → website/data/onboarding-o2-policy.json
+#   config/onboarding-o3-contract.json → website/data/onboarding-o3.json
+#   config/onboarding-o3-policy.json → website/data/onboarding-o3-policy.json
 #   config/toolchain-manifest.json → website/data/toolchain.json
 #   config/toolchain-policy.json → website/data/toolchain-policy.json
 #   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
@@ -242,6 +244,8 @@ sync_file "$ROOT/config/agent-runtime-catalog.json" "$DATA_DIR/agent-runtimes.js
 sync_file "$ROOT/config/onboarding-o0-contract.json" "$DATA_DIR/onboarding-o0.json"
 sync_file "$ROOT/config/onboarding-o2-contract.json" "$DATA_DIR/onboarding-o2.json"
 sync_file "$ROOT/config/onboarding-o2-policy.json" "$DATA_DIR/onboarding-o2-policy.json"
+sync_file "$ROOT/config/onboarding-o3-contract.json" "$DATA_DIR/onboarding-o3.json"
+sync_file "$ROOT/config/onboarding-o3-policy.json" "$DATA_DIR/onboarding-o3-policy.json"
 sync_file "$ROOT/config/toolchain-manifest.json" "$DATA_DIR/toolchain.json"
 sync_file "$ROOT/config/toolchain-policy.json" "$DATA_DIR/toolchain-policy.json"
 

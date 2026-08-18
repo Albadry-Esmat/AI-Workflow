@@ -57,6 +57,10 @@ show_help() {
   echo ""
   echo -e "  ${BOLD}GETTING STARTED${NC}"
   echo -e "    ${CYAN}setup${NC}                        Resumable project setup and onboarding state"
+  echo -e "    ${CYAN}onboarding plan${NC}               Guided O3 plan (lane required; no writes)"
+  echo -e "    ${CYAN}onboarding apply${NC}              Apply guided O3 core setup after explicit --yes"
+  echo -e "    ${CYAN}onboarding doctor${NC}             Guided O3 runtime and setup diagnostics"
+  echo -e "    ${CYAN}onboarding recover${NC}            Recover or reset O3-owned guided state"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
@@ -133,6 +137,20 @@ show_help() {
 
 cmd_setup() {
   "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" setup "$@"
+}
+
+cmd_onboarding() {
+  local subcmd="${1:-plan}"
+  shift || true
+  case "$subcmd" in
+    plan|apply|doctor|recover)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
+      ;;
+    *)
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover]"
+      return 2
+      ;;
+  esac
 }
 
 cmd_health() {
@@ -602,6 +620,7 @@ shift || true
 
 case "$COMMAND" in
   setup)            cmd_setup "$@" ;;
+  onboarding)       cmd_onboarding "$@" ;;
   health)           cmd_health "$@" ;;
   start|run)        cmd_start "$@" ;;
   init)             cmd_init "$@" ;;

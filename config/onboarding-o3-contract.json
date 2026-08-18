@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O3",
+  "title": "Guided Agent-Neutral Onboarding",
+  "state": {
+    "path": ".aiw/onboarding-o3/state.json",
+    "evidence_path": ".aiw/onboarding-o3/evidence.jsonl",
+    "owned_root": ".aiw/onboarding-o3",
+    "state_write_policy": "atomic-redacted"
+  },
+  "lanes": {
+    "native": {"description": "Existing host and user-managed runtime installation", "network": "user-controlled", "target_mutation": 0},
+    "project-local": {"description": "Project-local pinned dependencies; runtime remains user-controlled", "network": "user-controlled", "target_mutation": 0},
+    "dev-container": {"description": "Repository or Codespace container; provisioning remains user-controlled", "network": "user-controlled", "target_mutation": 0}
+  },
+  "phases": [
+    {"id": "preflight", "mutates_machine": false, "requires_auth": false},
+    {"id": "core-toolchain", "mutates_machine": true, "requires_auth": false},
+    {"id": "runtime-detect", "mutates_machine": false, "requires_auth": false},
+    {"id": "runtime-select", "mutates_machine": true, "requires_auth": false},
+    {"id": "auth-status", "mutates_machine": false, "requires_auth": false},
+    {"id": "target-init", "mutates_machine": true, "requires_auth": false},
+    {"id": "launch", "mutates_machine": true, "requires_auth": true},
+    {"id": "complete", "mutates_machine": false, "requires_auth": false}
+  ],
+  "commands": {
+    "plan": {"syntax": "aiw onboarding plan --lane <native|project-local|dev-container> [--agent <id|auto>] [--json]", "status": "implemented-in-o3"},
+    "apply": {"syntax": "aiw onboarding apply --yes --lane <native|project-local|dev-container> [--agent <id|auto>] [--resume] [--json]", "status": "implemented-in-o3"},
+    "doctor": {"syntax": "aiw onboarding doctor [--json]", "status": "implemented-in-o3"},
+    "recover": {"syntax": "aiw onboarding recover [--reset-state] [--json]", "status": "implemented-in-o3"},
+    "runtime_install": {"syntax": "runtime installation", "status": "deferred-user-controlled"},
+    "auth_login": {"syntax": "aiw auth login", "status": "deferred-runtime-owned"},
+    "target_init": {"syntax": "aiw init <target>", "status": "deferred-guarded-batch"},
+    "start": {"syntax": "aiw start [--agent <adapter-id>] <target>", "status": "deferred-launch-adapter"}
+  },
+  "sequences": {
+    "default": ["plan", "explicit-apply-consent", "apply", "doctor", "agent-detect", "agent-use", "auth-status"],
+    "plan_only": ["plan", "doctor"],
+    "no_secret": ["plan", "doctor", "agent-detect"],
+    "resume": ["load-state", "resume-first-incomplete-step", "doctor"]
+  },
+  "guided": {
+    "default_mode": "plan",
+    "apply_requires_explicit_yes": true,
+    "plan_mutations": 0,
+    "plan_network": "disabled",
+    "apply_uses_o1_core_setup": true,
+    "apply_runtime_installation": "not-performed"
+  },
+  "selection": {
+    "auto": {"precedence_source": "config/onboarding-o3-policy.json", "record_reason": true, "fail_if_none": false, "defer_installation": true},
+    "explicit": {"missing_adapter": "fail", "incompatible_adapter": "fail", "silent_fallback": false},
+    "state_update": "atomic"
+  },
+  "installation": {
+    "managed_by_aiw": false,
+    "commands_executed": 0,
+    "channels_presented": true,
+    "verified_installers_required_before_automation": true
+  },
+  "authentication": {
+    "raw_secret_storage": false,
+    "raw_secret_input": false,
+    "login_automation": "runtime-owned",
+    "status": "delegated-and-redacted",
+    "no_secret_plan_before_auth": true
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "diagnostics": {
+    "human_output": true,
+    "json_output": true,
+    "error_codes": true,
+    "redaction": true,
+    "warnings_nonfatal": true,
+    "plan_zero_write": true
+  },
+  "recovery": {
+    "state_atomicity": true,
+    "owned_paths_only": true,
+    "target_project_untouched": true,
+    "runtime_install_untouched": true,
+    "recover_command": "aiw onboarding recover"
+  },
+  "non_goals": [
+    "Installing runtimes or provider CLIs",
+    "Executing platform-specific installer commands",
+    "Automating login or handling raw credentials",
+    "Initializing or modifying a target project",
+    "Launching a provider-specific runtime",
+    "Making first-class safety or evidence claims for candidate adapters"
+  ]
+}

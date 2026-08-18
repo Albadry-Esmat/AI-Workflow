@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "state": {
+    "owned_root": ".aiw/onboarding-o3",
+    "redact_secrets": true,
+    "resume_allowed": true,
+    "unknown_state_fails_closed": true
+  },
+  "guided": {
+    "default_mode": "plan",
+    "plan_mutations": 0,
+    "plan_network": "disabled",
+    "apply_requires_explicit_yes": true,
+    "lane_required": true
+  },
+  "runtime": {
+    "catalog_path": "config/agent-runtime-catalog.json",
+    "installation": "user-controlled-deferred",
+    "installation_commands": false,
+    "explicit_missing_fails": true,
+    "silent_fallback": false,
+    "selection_recorded": true
+  },
+  "authentication": {
+    "aiw_stores_raw_secrets": false,
+    "login_automation": "runtime-owned",
+    "status_only": true,
+    "raw_secret_input": false
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutation": 0,
+    "launch": "deferred"
+  },
+  "recovery": {
+    "owned_paths_only": true,
+    "target_untouched": true,
+    "runtime_untouched": true,
+    "command": "aiw onboarding recover"
+  },
+  "commands": {
+    "plan": "aiw onboarding plan [--lane <native|project-local|dev-container>] [--agent <id|auto>] [--json]",
+    "apply": "aiw onboarding apply --yes [--lane <native|project-local|dev-container>] [--agent <id|auto>] [--json]",
+    "doctor": "aiw onboarding doctor [--json]",
+    "recover": "aiw onboarding recover [--reset-state] [--json]"
+  },
+  "non_goals": [
+    "Installing an agent runtime or provider CLI",
+    "Executing platform-specific installer commands",
+    "Automating provider or runtime login",
+    "Accepting or storing raw secrets",
+    "Initializing or mutating a target project",
+    "Launching a provider-specific runtime",
+    "Making first-class safety claims for candidate adapters"
+  ]
+}

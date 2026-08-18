@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o3-state-schema.json",
+  "title": "AI-Workflow Onboarding O3 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "lane", "consent", "steps", "runtime", "auth", "target", "recovery", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "mode": {"type": "string", "enum": ["plan", "apply", "resume"]},
+    "lane": {"type": "string", "enum": ["native", "project-local", "dev-container"]},
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apply_requested", "explicit_yes", "runtime_installation_allowed", "raw_secrets_allowed"],
+      "properties": {
+        "apply_requested": {"type": "boolean"},
+        "explicit_yes": {"type": "boolean"},
+        "runtime_installation_allowed": {"type": "boolean", "const": false},
+        "raw_secrets_allowed": {"type": "boolean", "const": false}
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "attempts", "mutates_machine", "requires_auth", "started_at", "completed_at", "error_code", "message"],
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"type": "string", "enum": ["pending", "running", "passed", "warned", "failed", "skipped", "blocked"]},
+          "attempts": {"type": "integer", "minimum": 0},
+          "mutates_machine": {"type": "boolean"},
+          "requires_auth": {"type": "boolean"},
+          "started_at": {"type": ["string", "null"]},
+          "completed_at": {"type": ["string", "null"]},
+          "error_code": {"type": ["string", "null"]},
+          "message": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_id", "selection_mode", "availability", "version", "selection_reason", "installation", "evidence_recorded"],
+      "properties": {
+        "adapter_id": {"type": ["string", "null"]},
+        "selection_mode": {"type": "string", "enum": ["none", "explicit", "auto"]},
+        "availability": {"type": "string", "enum": ["unknown", "available", "missing", "deferred"]},
+        "version": {"type": ["string", "null"]},
+        "selection_reason": {"type": ["string", "null"]},
+        "installation": {"type": "string", "const": "user-controlled-deferred"},
+        "evidence_recorded": {"type": "boolean"}
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "delegated", "raw_secret_values", "login_started"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-requested", "delegated", "deferred"]},
+        "delegated": {"type": "boolean", "const": true},
+        "raw_secret_values": {"type": "integer", "const": 0},
+        "login_started": {"type": "boolean", "const": false}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "recoverable", "last_failure_step", "rollback_required"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o3"},
+        "recoverable": {"type": "boolean", "const": true},
+        "last_failure_step": {"type": ["string", "null"]},
+        "rollback_required": {"type": "boolean"}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}
