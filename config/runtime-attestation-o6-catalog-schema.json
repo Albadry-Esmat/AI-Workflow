@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/runtime-attestation-o6-catalog-schema.json",
+  "title": "AI-Workflow O6 Runtime Attestation Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "records"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "catalog_version": {"type": "string", "const": "1.0.0"},
+    "records": {"type": "array", "items": {"$ref": "#/$defs/record"}}
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attestation_id", "artifact_installer_id", "artifact_sha256", "attestation_path", "trust_root_id", "trust_root_path", "signature_algorithm", "expectations", "verification", "status"],
+      "properties": {
+        "attestation_id": {"type": "string", "pattern": "^O6-[A-Z0-9-]+$"},
+        "artifact_installer_id": {"type": "string", "pattern": "^O5-[A-Z0-9-]+$"},
+        "artifact_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "attestation_path": {"type": "string", "minLength": 1},
+        "trust_root_id": {"type": "string", "pattern": "^TRUST-O6-[A-Z0-9-]+$"},
+        "trust_root_path": {"type": "string", "minLength": 1},
+        "signature_algorithm": {"type": "string", "const": "ed25519"},
+        "expectations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publisher", "builder_id", "source_repository", "commit", "build_type", "predicate_type", "external_parameters"],
+          "properties": {
+            "publisher": {"type": "string", "minLength": 1},
+            "builder_id": {"type": "string", "format": "uri"},
+            "source_repository": {"type": "string", "format": "uri"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "build_type": {"type": "string", "minLength": 1},
+            "predicate_type": {"type": "string", "format": "uri"},
+            "external_parameters": {"type": "object", "additionalProperties": {"type": ["string", "number", "boolean"]}}
+          }
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["offline_only", "network", "signature_required", "subject_digest_required", "identity_required", "builder_required", "external_parameters_strict", "transparency_mode"],
+          "properties": {
+            "offline_only": {"type": "boolean", "const": true},
+            "network": {"type": "boolean", "const": false},
+            "signature_required": {"type": "boolean", "const": true},
+            "subject_digest_required": {"type": "boolean", "const": true},
+            "identity_required": {"type": "boolean", "const": true},
+            "builder_required": {"type": "boolean", "const": true},
+            "external_parameters_strict": {"type": "boolean", "const": true},
+            "transparency_mode": {"type": "string", "enum": ["local-evidence-only", "required"]}
+          }
+        },
+        "status": {"type": "string", "enum": ["fixture-verified", "source-reviewed", "unverified", "rejected"]}
+      }
+    }
+  }
+}

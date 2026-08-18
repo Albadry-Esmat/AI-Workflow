@@ -1,0 +1,26 @@
+{
+  "bundle_format": "o6-local-attestation-v1",
+  "payload": {
+    "build_type": "https://github.com/Albadry-Esmat/AI-Workflow/buildtypes/o5-controlled-fixture/v1",
+    "builder_id": "https://github.com/Albadry-Esmat/AI-Workflow/.github/workflows/o5-controlled-fixture.yml@refs/heads/Dev",
+    "commit": "e548c8f9caf00b8ec6527f2629a2ca64541e5af8",
+    "external_parameters": {
+      "fixture": "safe-runtime-probe",
+      "staging_only": true
+    },
+    "predicate_type": "https://slsa.dev/provenance/v1",
+    "publisher": "AI-Workflow controlled fixture",
+    "source_repository": "https://github.com/Albadry-Esmat/AI-Workflow",
+    "subject": {
+      "digest": "sha256:784fb44f85c150ee86e39e3d6eea0c9905f922f4f34c47a69994d453c6b38cd3",
+      "name": "safe-runtime-probe.py"
+    }
+  },
+  "signature": "DWTO+Vlzw43417N6SVXLpkK1HSUjtzx5yJgT+jGqsX+dG7x8OSehf9gA+9dYNXjhlmy+8nyYscXURazobn0YAg==",
+  "signature_algorithm": "ed25519",
+  "transparency": {
+    "log_id": "controlled-fixture-local-evidence",
+    "status": "local-evidence"
+  },
+  "trust_root_id": "TRUST-O6-CONTROLLED-FIXTURE"
+}

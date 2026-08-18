@@ -25,6 +25,12 @@
 #   config/onboarding-o5-contract.json → website/data/onboarding-o5.json
 #   config/onboarding-o5-policy.json → website/data/onboarding-o5-policy.json
 #   config/onboarding-o5-state-schema.json → website/data/onboarding-o5-state-schema.json
+#   config/onboarding-o6-contract.json → website/data/onboarding-o6.json
+#   config/onboarding-o6-policy.json → website/data/onboarding-o6-policy.json
+#   config/onboarding-o6-state-schema.json → website/data/onboarding-o6-state-schema.json
+#   config/onboarding-o6-trust-root-schema.json → website/data/onboarding-o6-trust-root-schema.json
+#   config/runtime-attestation-o6-catalog.json → website/data/runtime-attestation-o6-catalog.json
+#   config/runtime-attestation-o6-catalog-schema.json → website/data/runtime-attestation-o6-catalog-schema.json
 #   config/runtime-installer-catalog.json → website/data/runtime-installer-catalog.json
 #   config/runtime-installer-catalog-schema.json → website/data/runtime-installer-catalog-schema.json
 #   config/toolchain-manifest.json → website/data/toolchain.json
@@ -258,6 +264,12 @@ sync_file "$ROOT/config/onboarding-o4-policy.json" "$DATA_DIR/onboarding-o4-poli
 sync_file "$ROOT/config/onboarding-o5-contract.json" "$DATA_DIR/onboarding-o5.json"
 sync_file "$ROOT/config/onboarding-o5-policy.json" "$DATA_DIR/onboarding-o5-policy.json"
 sync_file "$ROOT/config/onboarding-o5-state-schema.json" "$DATA_DIR/onboarding-o5-state-schema.json"
+sync_file "$ROOT/config/onboarding-o6-contract.json" "$DATA_DIR/onboarding-o6.json"
+sync_file "$ROOT/config/onboarding-o6-policy.json" "$DATA_DIR/onboarding-o6-policy.json"
+sync_file "$ROOT/config/onboarding-o6-state-schema.json" "$DATA_DIR/onboarding-o6-state-schema.json"
+sync_file "$ROOT/config/onboarding-o6-trust-root-schema.json" "$DATA_DIR/onboarding-o6-trust-root-schema.json"
+sync_file "$ROOT/config/runtime-attestation-o6-catalog.json" "$DATA_DIR/runtime-attestation-o6-catalog.json"
+sync_file "$ROOT/config/runtime-attestation-o6-catalog-schema.json" "$DATA_DIR/runtime-attestation-o6-catalog-schema.json"
 sync_file "$ROOT/config/runtime-installer-o5-catalog.json" "$DATA_DIR/runtime-installer-o5-catalog.json"
 sync_file "$ROOT/config/runtime-installer-o5-catalog-schema.json" "$DATA_DIR/runtime-installer-o5-catalog-schema.json"
 sync_file "$ROOT/config/runtime-installer-catalog.json" "$DATA_DIR/runtime-installer-catalog.json"

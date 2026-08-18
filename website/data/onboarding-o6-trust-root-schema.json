@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o6-trust-root-schema.json",
+  "title": "AI-Workflow O6 Trust Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "trust_root_id", "algorithm", "public_key_pem", "public_key_sha256", "subject_identity", "source_kind", "trust_level", "network_refresh"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "trust_root_id": {"type": "string", "pattern": "^TRUST-O6-[A-Z0-9-]+$"},
+    "algorithm": {"type": "string", "const": "ed25519"},
+    "public_key_pem": {"type": "string", "pattern": "^-----BEGIN PUBLIC KEY-----[\\s\\S]+-----END PUBLIC KEY-----\\n?$"},
+    "public_key_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "subject_identity": {"type": "string", "minLength": 1},
+    "source_kind": {"type": "string", "enum": ["controlled-fixture", "pinned-official-key", "organization-root"]},
+    "trust_level": {"type": "string", "enum": ["fixture", "trusted-builder", "trusted-publisher"]},
+    "network_refresh": {"type": "string", "const": "disabled"}
+  }
+}

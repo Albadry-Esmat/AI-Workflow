@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o6-state-schema.json",
+  "title": "AI-Workflow Onboarding O6 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "attestation_id", "artifact", "signature", "claims", "trust", "policy", "authentication", "target", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "mode": {"type": "string", "enum": ["plan", "verify", "recover"]},
+    "attestation_id": {"type": ["string", "null"], "pattern": "^O6-[A-Z0-9-]+$"},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["installer_id", "expected_sha256", "observed_sha256", "subject_match"],
+      "properties": {
+        "installer_id": {"type": ["string", "null"], "pattern": "^O5-[A-Z0-9-]+$"},
+        "expected_sha256": {"type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$"},
+        "observed_sha256": {"type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$"},
+        "subject_match": {"type": "boolean"}
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "status", "bundle_present", "signature_valid", "trust_root_id"],
+      "properties": {
+        "algorithm": {"type": "string", "enum": ["ed25519", "unknown"]},
+        "status": {"type": "string", "enum": ["not-run", "passed", "failed", "blocked"]},
+        "bundle_present": {"type": "boolean"},
+        "signature_valid": {"type": "boolean"},
+        "trust_root_id": {"type": ["string", "null"], "pattern": "^TRUST-O6-[A-Z0-9-]+$"}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "identity_match", "builder_id", "builder_match", "repository", "repository_match", "commit", "commit_match", "build_type", "build_type_match", "predicate_type", "predicate_match", "external_parameters_strict", "external_parameters_match"],
+      "properties": {
+        "identity": {"type": ["string", "null"]},
+        "identity_match": {"type": "boolean"},
+        "builder_id": {"type": ["string", "null"]},
+        "builder_match": {"type": "boolean"},
+        "repository": {"type": ["string", "null"]},
+        "repository_match": {"type": "boolean"},
+        "commit": {"type": ["string", "null"]},
+        "commit_match": {"type": "boolean"},
+        "build_type": {"type": ["string", "null"]},
+        "build_type_match": {"type": "boolean"},
+        "predicate_type": {"type": ["string", "null"]},
+        "predicate_match": {"type": "boolean"},
+        "external_parameters_strict": {"type": "boolean", "const": true},
+        "external_parameters_match": {"type": "boolean"}
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root_present", "root_fingerprint_match", "network", "transparency_status"],
+      "properties": {
+        "root_present": {"type": "boolean"},
+        "root_fingerprint_match": {"type": "boolean"},
+        "network": {"type": "boolean", "const": false},
+        "transparency_status": {"type": "string", "enum": ["local-evidence", "not-required", "missing", "unavailable"]}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "fail_closed", "reasons"],
+      "properties": {
+        "verdict": {"type": "string", "enum": ["pass", "fail", "blocked"]},
+        "fail_closed": {"type": "boolean", "const": true},
+        "reasons": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_started", "raw_secret_values"],
+      "properties": {
+        "status": {"type": "string", "const": "runtime-owned"},
+        "login_started": {"type": "boolean", "const": false},
+        "raw_secret_values": {"type": "integer", "const": 0}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch", "secret_copy"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"},
+        "secret_copy": {"type": "boolean", "const": false}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

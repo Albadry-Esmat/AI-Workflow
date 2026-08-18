@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "trust_root_id": "TRUST-O6-CONTROLLED-FIXTURE",
+  "algorithm": "ed25519",
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqQ3SRD9UsRqal1IAl2wRiG7f1fF1RF1PHJhScnCwUFc=\n-----END PUBLIC KEY-----\n",
+  "public_key_sha256": "sha256:70bd41368171efd271b43a640be741408086acf7163f5824ed60a93c52a10da7",
+  "subject_identity": "AI-Workflow controlled fixture",
+  "source_kind": "controlled-fixture",
+  "trust_level": "fixture",
+  "network_refresh": "disabled"
+}

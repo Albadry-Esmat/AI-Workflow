@@ -67,6 +67,8 @@ show_help() {
   echo -e "    ${CYAN}onboarding execute-plan${NC}       Show digest-bound local execution options"
   echo -e "    ${CYAN}onboarding artifact-hash${NC}      Verify an exact local artifact digest"
   echo -e "    ${CYAN}onboarding execute${NC}            Execute one approved local artifact with evidence"
+  echo -e "    ${CYAN}onboarding attestation-plan${NC}   Show offline signature and provenance verification options"
+  echo -e "    ${CYAN}onboarding attestation-verify${NC} Verify an exact local attestation bundle"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
@@ -89,6 +91,7 @@ show_help() {
   echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
   echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
   echo -e "    ${CYAN}validate-onboarding-o1${NC}       Validate deterministic core and adapter toolchain controls"
+  echo -e "    ${CYAN}validate-onboarding-o6${NC}       Validate offline signature and attestation controls"
   echo -e "    ${CYAN}validate-onboarding-o2${NC}       Validate resumable agent-neutral onboarding controls"
   echo -e "    ${CYAN}toolchain-check${NC}               Run non-mutating no-network toolchain verification"
   echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
@@ -155,8 +158,17 @@ cmd_onboarding() {
     execute-plan|artifact-hash|execute)
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o5.py" "$subcmd" "$@"
       ;;
+    attestation-plan|attestation-verify)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o6.py" "$subcmd" "$@"
+      ;;
     recover)
-      if [[ " $* " == *" --o5 "* ]]; then
+      if [[ " $* " == *" --o6 "* ]]; then
+        local filtered_o6=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o6" ]] || filtered_o6+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o6.py" recover "${filtered_o6[@]}"
+      elif [[ " $* " == *" --o5 "* ]]; then
         local filtered_o5=()
         for arg in "$@"; do
           [[ "$arg" == "--o5" ]] || filtered_o5+=("$arg")
@@ -176,7 +188,7 @@ cmd_onboarding() {
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
       ;;
     *)
-      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5]|install-plan|install-verify|install|execute-plan|artifact-hash|execute]"
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5|--o6]|install-plan|install-verify|install|execute-plan|artifact-hash|execute|attestation-plan|attestation-verify]"
       return 2
       ;;
   esac

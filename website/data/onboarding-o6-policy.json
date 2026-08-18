@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "state": {
+    "owned_root": ".aiw/onboarding-o6",
+    "atomic_writes": true,
+    "redact_secrets": true,
+    "unknown_state_fails_closed": true
+  },
+  "verification": {
+    "offline_only": true,
+    "network": false,
+    "signature_required": true,
+    "subject_digest_required": true,
+    "identity_required": true,
+    "builder_required": true,
+    "predicate_required": true,
+    "external_parameters_strict": true,
+    "transparency_mode": "local-evidence-only",
+    "missing_bundle_fails_closed": true
+  },
+  "trust": {
+    "pinned_root_required": true,
+    "root_fingerprint_required": true,
+    "network_refresh": "disabled",
+    "unknown_root_fails_closed": true,
+    "identity_allowlist_required": true
+  },
+  "claims": {
+    "source_repository_required": true,
+    "commit_required": true,
+    "build_type_required": true,
+    "predicate_type_required": true,
+    "external_parameters_strict": true,
+    "unknown_fields_fail_closed": true
+  },
+  "execution": {
+    "install_allowed": false,
+    "execute_allowed": false,
+    "network": false,
+    "target_project_mutations": 0,
+    "authentication": "deferred",
+    "attestation_only": true
+  },
+  "authentication": {
+    "status": "runtime-owned",
+    "login_automation": "deferred",
+    "raw_secret_input": false,
+    "raw_secret_storage": false
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "target_untouched": true,
+    "runtime_untouched": true
+  },
+  "commands": {
+    "attestation_plan": "aiw onboarding attestation-plan [--agent <id|auto>] [--json]",
+    "attestation_verify": "aiw onboarding attestation-verify --attestation <o6-attestation-id> --artifact <path> [--json]",
+    "recover": "aiw onboarding recover --o6 [--reset-state] [--json]"
+  },
+  "non_goals": [
+    "Downloading attestations, signatures, trust roots, or artifacts",
+    "Querying transparency logs or refreshing online trust roots",
+    "Installing Cosign or another verification tool automatically",
+    "Executing or installing the artifact after verification",
+    "Automating provider or runtime authentication",
+    "Initializing or mutating target projects",
+    "Launching provider-specific runtimes",
+    "Treating a valid signature as a complete safety or rollback guarantee"
+  ]
+}

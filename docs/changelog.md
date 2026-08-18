@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Offline Publisher Signature and Attestation Verification (Onboarding Batch O6)
+
+- Added a repository-local O6 attestation catalog, Ed25519 trust-root schema, signed controlled-fixture bundle, and redacted verification state contract.
+- Added `aiw onboarding attestation-plan` and `aiw onboarding attestation-verify`; verification is offline-only and fail-closed across exact artifact subject digest, signature, pinned trust root, publisher, builder, repository, commit, build type, predicate type, external parameters, and local transparency evidence.
+- O6 is attestation-only: it cannot install or execute artifacts, query transparency logs, refresh trust roots, automate authentication, mutate target projects, or launch runtimes.
+- Added O6 fixtures, validator, Makefile and CLI integration, source-owned synchronization mappings, and `docs/offline-attestation-verification.md` with GitHub, Sigstore, and SLSA references.
+
 ### Digest-Bound Local Runtime Execution (Onboarding Batch O5)
 
 - Added an exact local-artifact execution catalog with SHA-256 and size binding, staging-root ownership, provenance, approval status, closed argv execution, bounded timeouts, and rollback ownership.
