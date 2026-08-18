@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "records": [
+    {
+      "installer_id": "O5-FIXTURE-SAFE-RUNTIME-PROBE",
+      "adapter_id": "generic-command",
+      "display_name": "O5 controlled local runtime probe",
+      "platform": "linux",
+      "architecture": "any",
+      "artifact": {
+        "local_path": "safe-runtime-probe.py",
+        "kind": "controlled-fixture",
+        "expected_sha256": "sha256:784fb44f85c150ee86e39e3d6eea0c9905f922f4f34c47a69994d453c6b38cd3",
+        "expected_size_bytes": 127,
+        "staging_root_required": true
+      },
+      "provenance": {
+        "publisher": "AI-Workflow test fixture",
+        "release_url": "https://github.com/Albadry-Esmat/AI-Workflow",
+        "release_asset": "controlled fixture committed in evals/onboarding-o5",
+        "source_kind": "controlled-fixture",
+        "record_fingerprint": "sha256:23e970a09d42b2826ebfb999ac5987f75029fc4b2aab9625b212488da2dde311"
+      },
+      "approval": {
+        "status": "approved",
+        "reviewed_at": "2026-08-18",
+        "reviewer": "Manus AI",
+        "reason_required": true
+      },
+      "execution": {
+        "argv": ["/usr/bin/python3", "-I", "{artifact}"],
+        "shell": false,
+        "network": false,
+        "elevated": false,
+        "stdin": "closed",
+        "timeout_seconds": 10,
+        "cwd_policy": "o5-owned-staging",
+        "environment_policy": "allowlist-empty",
+        "target_project_mutations": 0
+      },
+      "verification": {
+        "hash_required": true,
+        "size_required": true,
+        "platform_required": true,
+        "read_only_preflight": true
+      },
+      "rollback": {
+        "owner": "aiw-fixture",
+        "guidance_url": "https://github.com/Albadry-Esmat/AI-Workflow",
+        "quarantine_owned_only": true,
+        "target_project_impact": 0
+      }
+    }
+  ]
+}

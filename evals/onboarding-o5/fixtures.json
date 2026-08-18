@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O5",
+  "fixtures": [
+    {"id": "plan-local-only", "scenario": "O5 execution plan", "expected": {"verdict": "pass", "network": "disabled", "mutations": 0, "commands_executed": 0, "target_project_mutations": 0}},
+    {"id": "plan-exact-record", "scenario": "Plan shows exact O5 installer ID and artifact path", "expected": {"installer_id": "O5-FIXTURE-SAFE-RUNTIME-PROBE", "artifact_local_path": "safe-runtime-probe.py", "approval_status": "approved"}},
+    {"id": "plan-argv-only", "scenario": "Plan exposes non-shell, non-network, non-elevated argv", "expected": {"shell": false, "network": false, "elevated": false, "stdin": "closed", "cwd_policy": "o5-owned-staging"}},
+    {"id": "hash-exact-match", "scenario": "Expected SHA-256 and size match the staged artifact", "expected": {"hash_status": "passed", "verdict": "pass"}},
+    {"id": "hash-mismatch", "scenario": "Tampered artifact fails before execution", "expected": {"hash_status": "mismatch", "verdict": "fail", "commands_executed": 0}},
+    {"id": "hash-missing", "scenario": "Missing artifact fails before execution", "expected": {"hash_status": "missing", "verdict": "fail", "commands_executed": 0}},
+    {"id": "path-outside-staging", "scenario": "Artifact outside O5 staging root", "expected": {"error_code": "O5-EXECUTION-BLOCKED", "commands_executed": 0}},
+    {"id": "path-symlink-blocked", "scenario": "Symlink artifact is rejected", "expected": {"hash_status": "blocked", "commands_executed": 0}},
+    {"id": "consent-required", "scenario": "Execution without explicit yes", "expected": {"error_code": "O5-EXECUTION-BLOCKED", "commands_executed": 0}},
+    {"id": "reason-required", "scenario": "Execution without approval reason", "expected": {"error_code": "O5-EXECUTION-BLOCKED", "commands_executed": 0}},
+    {"id": "approved-fixture-executes-one", "scenario": "Approved digest-bound controlled fixture executes once", "expected": {"verdict": "pass", "commands_executed": 1, "host_mutations": 0, "target_project_mutations": 0}},
+    {"id": "output-not-captured", "scenario": "Execution evidence does not capture stdout or stderr", "expected": {"stdout_captured": false, "stderr_captured": false}},
+    {"id": "auth-target-launch-deferred", "scenario": "O5 execution does not authenticate, initialize, or launch", "expected": {"login_started": false, "target_initialization": "deferred", "launch": "deferred", "raw_secret_values": 0}},
+    {"id": "recovery-preserves-staging", "scenario": "Owned state reset does not delete the staged artifact", "expected": {"staging_artifact_preserved": true, "runtime_changes": 0, "target_project_changes": 0}}
+  ]
+}

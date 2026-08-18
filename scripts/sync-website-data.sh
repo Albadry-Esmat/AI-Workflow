@@ -22,6 +22,9 @@
 #   config/onboarding-o3-policy.json → website/data/onboarding-o3-policy.json
 #   config/onboarding-o4-contract.json → website/data/onboarding-o4.json
 #   config/onboarding-o4-policy.json → website/data/onboarding-o4-policy.json
+#   config/onboarding-o5-contract.json → website/data/onboarding-o5.json
+#   config/onboarding-o5-policy.json → website/data/onboarding-o5-policy.json
+#   config/onboarding-o5-state-schema.json → website/data/onboarding-o5-state-schema.json
 #   config/runtime-installer-catalog.json → website/data/runtime-installer-catalog.json
 #   config/runtime-installer-catalog-schema.json → website/data/runtime-installer-catalog-schema.json
 #   config/toolchain-manifest.json → website/data/toolchain.json
@@ -252,6 +255,11 @@ sync_file "$ROOT/config/onboarding-o3-contract.json" "$DATA_DIR/onboarding-o3.js
 sync_file "$ROOT/config/onboarding-o3-policy.json" "$DATA_DIR/onboarding-o3-policy.json"
 sync_file "$ROOT/config/onboarding-o4-contract.json" "$DATA_DIR/onboarding-o4.json"
 sync_file "$ROOT/config/onboarding-o4-policy.json" "$DATA_DIR/onboarding-o4-policy.json"
+sync_file "$ROOT/config/onboarding-o5-contract.json" "$DATA_DIR/onboarding-o5.json"
+sync_file "$ROOT/config/onboarding-o5-policy.json" "$DATA_DIR/onboarding-o5-policy.json"
+sync_file "$ROOT/config/onboarding-o5-state-schema.json" "$DATA_DIR/onboarding-o5-state-schema.json"
+sync_file "$ROOT/config/runtime-installer-o5-catalog.json" "$DATA_DIR/runtime-installer-o5-catalog.json"
+sync_file "$ROOT/config/runtime-installer-o5-catalog-schema.json" "$DATA_DIR/runtime-installer-o5-catalog-schema.json"
 sync_file "$ROOT/config/runtime-installer-catalog.json" "$DATA_DIR/runtime-installer-catalog.json"
 sync_file "$ROOT/config/runtime-installer-catalog-schema.json" "$DATA_DIR/runtime-installer-catalog-schema.json"
 sync_file "$ROOT/config/toolchain-manifest.json" "$DATA_DIR/toolchain.json"

@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/runtime-installer-o5-catalog-schema.json",
+  "title": "AI-Workflow O5 Local Artifact Execution Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "records"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "catalog_version": {"type": "string", "const": "1.0.0"},
+    "records": {"type": "array", "items": {"$ref": "#/$defs/record"}}
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["installer_id", "adapter_id", "display_name", "platform", "architecture", "artifact", "provenance", "approval", "execution", "verification", "rollback"],
+      "properties": {
+        "installer_id": {"type": "string", "pattern": "^O5-[A-Z0-9-]+$"},
+        "adapter_id": {"type": "string", "minLength": 1},
+        "display_name": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "enum": ["linux", "macos", "windows"]},
+        "architecture": {"type": "string", "enum": ["x64", "arm64", "any"]},
+        "artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["local_path", "kind", "expected_sha256", "expected_size_bytes", "staging_root_required"],
+          "properties": {
+            "local_path": {"type": "string", "minLength": 1},
+            "kind": {"type": "string", "enum": ["native-binary", "controlled-fixture"]},
+            "expected_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+            "expected_size_bytes": {"type": "integer", "minimum": 1},
+            "staging_root_required": {"type": "boolean", "const": true}
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publisher", "release_url", "release_asset", "source_kind", "record_fingerprint"],
+          "properties": {
+            "publisher": {"type": "string", "minLength": 1},
+            "release_url": {"type": "string", "format": "uri"},
+            "release_asset": {"type": "string", "minLength": 1},
+            "source_kind": {"type": "string", "enum": ["official-release-digest", "official-package-integrity", "controlled-fixture"]},
+            "record_fingerprint": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+          }
+        },
+        "approval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reviewed_at", "reviewer", "reason_required"],
+          "properties": {
+            "status": {"type": "string", "enum": ["unapproved", "approved", "rejected"]},
+            "reviewed_at": {"type": "string", "format": "date"},
+            "reviewer": {"type": "string", "minLength": 1},
+            "reason_required": {"type": "boolean", "const": true}
+          }
+        },
+        "execution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["argv", "shell", "network", "elevated", "stdin", "timeout_seconds", "cwd_policy", "environment_policy", "target_project_mutations"],
+          "properties": {
+            "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "shell": {"type": "boolean", "const": false},
+            "network": {"type": "boolean", "const": false},
+            "elevated": {"type": "boolean", "const": false},
+            "stdin": {"type": "string", "const": "closed"},
+            "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 30},
+            "cwd_policy": {"type": "string", "const": "o5-owned-staging"},
+            "environment_policy": {"type": "string", "const": "allowlist-empty"},
+            "target_project_mutations": {"type": "integer", "const": 0}
+          }
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hash_required", "size_required", "platform_required", "read_only_preflight"],
+          "properties": {
+            "hash_required": {"type": "boolean", "const": true},
+            "size_required": {"type": "boolean", "const": true},
+            "platform_required": {"type": "boolean", "const": true},
+            "read_only_preflight": {"type": "boolean", "const": true}
+          }
+        },
+        "rollback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["owner", "guidance_url", "quarantine_owned_only", "target_project_impact"],
+          "properties": {
+            "owner": {"type": "string", "enum": ["publisher", "package-manager", "user", "aiw-fixture"]},
+            "guidance_url": {"type": "string", "format": "uri"},
+            "quarantine_owned_only": {"type": "boolean", "const": true},
+            "target_project_impact": {"type": "integer", "const": 0}
+          }
+        }
+      }
+    }
+  }
+}

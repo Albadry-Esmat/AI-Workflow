@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Digest-Bound Local Runtime Execution (Onboarding Batch O5)
+
+- Added an exact local-artifact execution catalog with SHA-256 and size binding, staging-root ownership, provenance, approval status, closed argv execution, bounded timeouts, and rollback ownership.
+- Added `aiw onboarding execute-plan`, `aiw onboarding artifact-hash`, and `aiw onboarding execute`; digest mismatch, path traversal, symlinks, missing consent, missing approval reasons, platform mismatch, and unsafe command policy fail closed before command execution.
+- O5 executes only an approved controlled fixture with `shell=False`, closed stdin, an empty environment, no stdout/stderr capture, one command maximum, and zero target-project mutations. Downloading, package-manager mutation, elevated commands, authentication, target initialization, and launch remain deferred.
+- Added O5 schemas, policy, contract, fixtures, a 30-check validator, Makefile integration, source-owned sync mappings, and `docs/digest-bound-local-execution.md` with GitHub and npm integrity references.
+
 ### Verified Agent-Neutral Runtime Installation (Onboarding Batch O4)
 
 - Added a provenance-aware runtime installer catalog for OpenCode, Claude Code, and Codex channels across Linux, macOS, and Windows, with official URLs, source fingerprints, platform/shell requirements, read-only verification probes, and rollback ownership.

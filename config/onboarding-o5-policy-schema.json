@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o5-policy-schema.json",
+  "title": "AI-Workflow Onboarding O5 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "artifact", "approval", "preflight", "execution", "authentication", "target", "rollback", "commands", "non_goals"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "atomic_writes", "redact_secrets", "unknown_state_fails_closed"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o5"},
+        "atomic_writes": {"type": "boolean", "const": true},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256_required", "size_required", "local_only", "staging_root_required", "path_traversal_blocked", "symlink_blocked"],
+      "properties": {
+        "sha256_required": {"type": "boolean", "const": true},
+        "size_required": {"type": "boolean", "const": true},
+        "local_only": {"type": "boolean", "const": true},
+        "staging_root_required": {"type": "boolean", "const": true},
+        "path_traversal_blocked": {"type": "boolean", "const": true},
+        "symlink_blocked": {"type": "boolean", "const": true}
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_record", "exact_path", "exact_digest", "platform_match", "reason_required", "explicit_yes_required", "unapproved_fails_closed"],
+      "properties": {
+        "exact_record": {"type": "boolean", "const": true},
+        "exact_path": {"type": "boolean", "const": true},
+        "exact_digest": {"type": "boolean", "const": true},
+        "platform_match": {"type": "boolean", "const": true},
+        "reason_required": {"type": "boolean", "const": true},
+        "explicit_yes_required": {"type": "boolean", "const": true},
+        "unapproved_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "shell", "elevated", "stdin", "environment_allowlist", "timeout_max_seconds", "target_project_mutations", "secrets_seen"],
+      "properties": {
+        "network": {"type": "string", "const": "disabled"},
+        "shell": {"type": "boolean", "const": false},
+        "elevated": {"type": "boolean", "const": false},
+        "stdin": {"type": "string", "const": "closed"},
+        "environment_allowlist": {"type": "array", "maxItems": 0, "items": {"type": "string"}},
+        "timeout_max_seconds": {"type": "integer", "maximum": 30},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "secrets_seen": {"type": "boolean", "const": false}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_status", "local_argv_only", "network", "shell", "elevated", "package_manager_mutation", "docker_mutation", "target_project_mutations", "stdout_capture", "stderr_capture", "max_commands"],
+      "properties": {
+        "default_status": {"type": "string", "const": "blocked-unless-approved"},
+        "local_argv_only": {"type": "boolean", "const": true},
+        "network": {"type": "boolean", "const": false},
+        "shell": {"type": "boolean", "const": false},
+        "elevated": {"type": "boolean", "const": false},
+        "package_manager_mutation": {"type": "boolean", "const": false},
+        "docker_mutation": {"type": "boolean", "const": false},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "stdout_capture": {"type": "boolean", "const": false},
+        "stderr_capture": {"type": "boolean", "const": false},
+        "max_commands": {"type": "integer", "const": 1}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_automation", "raw_secret_input", "raw_secret_storage"],
+      "properties": {
+        "status": {"type": "string", "const": "runtime-owned"},
+        "login_automation": {"type": "string", "const": "deferred"},
+        "raw_secret_input": {"type": "boolean", "const": false},
+        "raw_secret_storage": {"type": "boolean", "const": false}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch", "secret_copy"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"},
+        "secret_copy": {"type": "boolean", "const": false}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_policy", "quarantine_owned_only", "target_untouched"],
+      "properties": {
+        "claim_policy": {"type": "string", "const": "record-only-unless-officially-supported"},
+        "quarantine_owned_only": {"type": "boolean", "const": true},
+        "target_untouched": {"type": "boolean", "const": true}
+      }
+    },
+    "commands": {"type": "object", "additionalProperties": {"type": "string"}},
+    "non_goals": {"type": "array", "minItems": 6, "items": {"type": "string"}}
+  }
+}

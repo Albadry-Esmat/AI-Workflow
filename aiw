@@ -64,6 +64,9 @@ show_help() {
   echo -e "    ${CYAN}onboarding install-plan${NC}       Show provenance-aware runtime installer options"
   echo -e "    ${CYAN}onboarding install-verify${NC}     Run a read-only installed-runtime verification"
   echo -e "    ${CYAN}onboarding install${NC}            Attempt only an eligible, explicitly approved installer record"
+  echo -e "    ${CYAN}onboarding execute-plan${NC}       Show digest-bound local execution options"
+  echo -e "    ${CYAN}onboarding artifact-hash${NC}      Verify an exact local artifact digest"
+  echo -e "    ${CYAN}onboarding execute${NC}            Execute one approved local artifact with evidence"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
@@ -149,13 +152,22 @@ cmd_onboarding() {
     install-plan|install-verify|install)
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" "$subcmd" "$@"
       ;;
+    execute-plan|artifact-hash|execute)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o5.py" "$subcmd" "$@"
+      ;;
     recover)
-      if [[ " $* " == *" --o4 "* ]]; then
-        local filtered=()
+      if [[ " $* " == *" --o5 "* ]]; then
+        local filtered_o5=()
         for arg in "$@"; do
-          [[ "$arg" == "--o4" ]] || filtered+=("$arg")
+          [[ "$arg" == "--o5" ]] || filtered_o5+=("$arg")
         done
-        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" recover "${filtered[@]}"
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o5.py" recover "${filtered_o5[@]}"
+      elif [[ " $* " == *" --o4 "* ]]; then
+        local filtered_o4=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o4" ]] || filtered_o4+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" recover "${filtered_o4[@]}"
       else
         "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" recover "$@"
       fi
@@ -164,7 +176,7 @@ cmd_onboarding() {
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
       ;;
     *)
-      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4]|install-plan|install-verify|install]"
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5]|install-plan|install-verify|install|execute-plan|artifact-hash|execute]"
       return 2
       ;;
   esac

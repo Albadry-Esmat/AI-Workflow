@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0.0",
+  "state": {
+    "owned_root": ".aiw/onboarding-o5",
+    "atomic_writes": true,
+    "redact_secrets": true,
+    "unknown_state_fails_closed": true
+  },
+  "artifact": {
+    "sha256_required": true,
+    "size_required": true,
+    "local_only": true,
+    "staging_root_required": true,
+    "path_traversal_blocked": true,
+    "symlink_blocked": true
+  },
+  "approval": {
+    "exact_record": true,
+    "exact_path": true,
+    "exact_digest": true,
+    "platform_match": true,
+    "reason_required": true,
+    "explicit_yes_required": true,
+    "unapproved_fails_closed": true
+  },
+  "preflight": {
+    "network": "disabled",
+    "shell": false,
+    "elevated": false,
+    "stdin": "closed",
+    "environment_allowlist": [],
+    "timeout_max_seconds": 30,
+    "target_project_mutations": 0,
+    "secrets_seen": false
+  },
+  "execution": {
+    "default_status": "blocked-unless-approved",
+    "local_argv_only": true,
+    "network": false,
+    "shell": false,
+    "elevated": false,
+    "package_manager_mutation": false,
+    "docker_mutation": false,
+    "target_project_mutations": 0,
+    "stdout_capture": false,
+    "stderr_capture": false,
+    "max_commands": 1
+  },
+  "authentication": {
+    "status": "runtime-owned",
+    "login_automation": "deferred",
+    "raw_secret_input": false,
+    "raw_secret_storage": false
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "quarantine_owned_only": true,
+    "target_untouched": true
+  },
+  "commands": {
+    "plan": "aiw onboarding execute-plan [--agent <id|auto>] [--json]",
+    "hash": "aiw onboarding artifact-hash --installer <o5-installer-id> [--path <local-path>] [--json]",
+    "execute": "aiw onboarding execute --installer <o5-installer-id> --path <local-path> --reason <text> --yes [--json]",
+    "recover": "aiw onboarding recover --o5 [--reset-state] [--json]"
+  },
+  "non_goals": [
+    "Downloading artifacts or running network installers",
+    "Executing shell pipelines or shell expansions",
+    "Running elevated commands or package-manager mutations",
+    "Mutating Docker, system services, or global runtime state",
+    "Accepting or storing raw secrets",
+    "Automating provider or runtime authentication",
+    "Initializing or mutating target projects",
+    "Launching provider-specific runtimes",
+    "Claiming rollback support without official guidance"
+  ]
+}

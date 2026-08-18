@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o5-state-schema.json",
+  "title": "AI-Workflow Onboarding O5 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "installer_id", "artifact", "approval", "preflight", "execution", "authentication", "target", "rollback", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "mode": {"type": "string", "enum": ["plan", "hash", "execute", "recover"]},
+    "installer_id": {"type": ["string", "null"], "pattern": "^O5-[A-Z0-9-]+$"},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "expected_sha256", "observed_sha256", "expected_size_bytes", "observed_size_bytes", "hash_status", "path_owned"],
+      "properties": {
+        "path": {"type": ["string", "null"]},
+        "expected_sha256": {"type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$"},
+        "observed_sha256": {"type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$"},
+        "expected_size_bytes": {"type": ["integer", "null"], "minimum": 1},
+        "observed_size_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "hash_status": {"type": "string", "enum": ["not-run", "missing", "mismatch", "passed", "blocked"]},
+        "path_owned": {"type": "boolean", "const": true}
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_status", "explicit_yes", "reason", "exact_record", "platform_match"],
+      "properties": {
+        "record_status": {"type": "string", "enum": ["unapproved", "approved", "rejected", "unknown"]},
+        "explicit_yes": {"type": "boolean"},
+        "reason": {"type": ["string", "null"]},
+        "exact_record": {"type": "boolean"},
+        "platform_match": {"type": "boolean"}
+      }
+    },
+    "preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "read_only", "network", "shell", "elevated", "environment_variables", "target_project_mutations", "secrets_seen"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-run", "passed", "failed", "blocked"]},
+        "read_only": {"type": "boolean", "const": true},
+        "network": {"type": "boolean", "const": false},
+        "shell": {"type": "boolean", "const": false},
+        "elevated": {"type": "boolean", "const": false},
+        "environment_variables": {"type": "integer", "const": 0},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "secrets_seen": {"type": "boolean", "const": false}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "started", "finished", "commands_executed", "exit_code", "timeout", "stdout_captured", "stderr_captured", "target_project_mutations", "host_mutations"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-run", "blocked", "passed", "failed", "timed-out"]},
+        "started": {"type": "boolean"},
+        "finished": {"type": "boolean"},
+        "commands_executed": {"type": "integer", "minimum": 0, "maximum": 1},
+        "exit_code": {"type": ["integer", "null"]},
+        "timeout": {"type": "boolean"},
+        "stdout_captured": {"type": "boolean", "const": false},
+        "stderr_captured": {"type": "boolean", "const": false},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "host_mutations": {"type": "integer", "minimum": 0}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_started", "raw_secret_values"],
+      "properties": {
+        "status": {"type": "string", "const": "runtime-owned"},
+        "login_started": {"type": "boolean", "const": false},
+        "raw_secret_values": {"type": "integer", "const": 0}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch", "secret_copy"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"},
+        "secret_copy": {"type": "boolean", "const": false}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "guidance_url", "quarantine_owned_only", "target_project_impact"],
+      "properties": {
+        "owner": {"type": ["string", "null"]},
+        "guidance_url": {"type": ["string", "null"]},
+        "quarantine_owned_only": {"type": "boolean", "const": true},
+        "target_project_impact": {"type": "integer", "const": 0}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}
