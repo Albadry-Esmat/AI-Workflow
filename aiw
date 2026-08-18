@@ -69,6 +69,10 @@ show_help() {
   echo -e "    ${CYAN}onboarding execute${NC}            Execute one approved local artifact with evidence"
   echo -e "    ${CYAN}onboarding attestation-plan${NC}   Show offline signature and provenance verification options"
   echo -e "    ${CYAN}onboarding attestation-verify${NC} Verify an exact local attestation bundle"
+  echo -e "    ${CYAN}onboarding verifier-plan${NC}      Show vendor-neutral verifier adapters and trust boundaries"
+  echo -e "    ${CYAN}onboarding verifier-verify${NC}    Verify with one exact adapter and declared claims"
+  echo -e "    ${CYAN}onboarding verifier-refresh-plan${NC} Show bounded optional evidence refresh"
+  echo -e "    ${CYAN}onboarding verifier-refresh${NC}   Fetch only an explicit allowlisted candidate"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
@@ -92,6 +96,7 @@ show_help() {
   echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
   echo -e "    ${CYAN}validate-onboarding-o1${NC}       Validate deterministic core and adapter toolchain controls"
   echo -e "    ${CYAN}validate-onboarding-o6${NC}       Validate offline signature and attestation controls"
+  echo -e "    ${CYAN}validate-onboarding-o7${NC}       Validate neutral verifier adapters and refresh controls"
   echo -e "    ${CYAN}validate-onboarding-o2${NC}       Validate resumable agent-neutral onboarding controls"
   echo -e "    ${CYAN}toolchain-check${NC}               Run non-mutating no-network toolchain verification"
   echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
@@ -161,8 +166,17 @@ cmd_onboarding() {
     attestation-plan|attestation-verify)
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o6.py" "$subcmd" "$@"
       ;;
+    verifier-plan|verifier-verify|verifier-refresh-plan|verifier-refresh)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o7.py" "$subcmd" "$@"
+      ;;
     recover)
-      if [[ " $* " == *" --o6 "* ]]; then
+      if [[ " $* " == *" --o7 "* ]]; then
+        local filtered_o7=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o7" ]] || filtered_o7+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o7.py" recover "${filtered_o7[@]}"
+      elif [[ " $* " == *" --o6 "* ]]; then
         local filtered_o6=()
         for arg in "$@"; do
           [[ "$arg" == "--o6" ]] || filtered_o6+=("$arg")
@@ -188,7 +202,7 @@ cmd_onboarding() {
       "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
       ;;
     *)
-      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5|--o6]|install-plan|install-verify|install|execute-plan|artifact-hash|execute|attestation-plan|attestation-verify]"
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5|--o6|--o7]|install-plan|install-verify|install|execute-plan|artifact-hash|execute|attestation-plan|attestation-verify|verifier-plan|verifier-verify|verifier-refresh-plan|verifier-refresh]"
       return 2
       ;;
   esac

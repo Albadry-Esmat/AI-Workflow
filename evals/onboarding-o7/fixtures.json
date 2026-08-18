@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O7",
+  "fixtures": [
+    {"id": "catalog-neutral", "scenario": "Catalog exposes GitHub CLI, Cosign, npm, and local delegate under one neutral contract", "expected": {"records": 4, "vendor_neutral": true}},
+    {"id": "catalog-fingerprints", "scenario": "Every adapter record has a deterministic non-placeholder fingerprint", "expected": {"all_sha256": true}},
+    {"id": "offline-default", "scenario": "Adapter plan disables network by default", "expected": {"network": "disabled", "requests": 0}},
+    {"id": "local-delegate-pass", "scenario": "O6 local delegate verifies the controlled fixture", "expected": {"verdict": "pass", "offline_result": "pass", "signature_valid": true, "claims_valid": true}},
+    {"id": "online-only-blocked", "scenario": "npm online-only verification fails closed without explicit network path", "expected": {"verdict": "fail", "network_performed": false}},
+    {"id": "missing-tool-fails", "scenario": "Missing vendor verifier does not trigger installation", "expected": {"tool_installation": "manual-only", "installation_authorized": false}},
+    {"id": "refresh-plan", "scenario": "Refresh plan exposes allowlist, timeout, byte budget, and candidate root", "expected": {"active_root_overwrite": false, "source_digest_required": true, "evidence_required": true}},
+    {"id": "refresh-consent", "scenario": "Refresh apply requires explicit --yes", "expected": {"error_code": "O7-CONSENT-REQUIRED", "network": false}},
+    {"id": "host-allowlist", "scenario": "Refresh rejects non-HTTPS or unallowlisted hosts before network", "expected": {"error_code": "O7-HOST-NOT-ALLOWLISTED", "network": false}},
+    {"id": "refresh-bounded", "scenario": "Allowed refresh is bounded by timeout and response bytes", "expected": {"timeout_seconds_max": 30, "response_bytes_max": 1048576}},
+    {"id": "candidate-isolated", "scenario": "Refresh writes only an owned candidate and never overwrites active root", "expected": {"candidate_preserved": true, "active_root_overwritten": false}},
+    {"id": "claims-strict", "scenario": "Declared subject, identity, issuer, repository, signer, predicate, workflow/build, and external claims remain required", "expected": {"unknown_claims": "fail-closed"}},
+    {"id": "no-shell", "scenario": "External verifier argv is shell-free, elevated-free, closed-stdin, and empty-environment", "expected": {"shell": false, "elevated": false, "stdin": "closed", "environment": "empty"}},
+    {"id": "no-auth", "scenario": "Verifier adapters never start provider login or accept raw secrets", "expected": {"login_started": false, "raw_secret_values": 0}},
+    {"id": "no-target", "scenario": "Verification and refresh never initialize, mutate, or launch target projects", "expected": {"initialization": "deferred", "mutations": 0, "launch": "deferred"}},
+    {"id": "privacy-redaction", "scenario": "State and evidence redact payloads, signatures, response bodies, and secrets", "expected": {"redacted": true, "raw_secret_values": 0}},
+    {"id": "unknown-adapter", "scenario": "Unknown adapter IDs fail closed", "expected": {"verdict": "fail", "installation_authorized": false}},
+    {"id": "recovery-owned", "scenario": "O7 recovery resets owned state while preserving candidate evidence and active roots", "expected": {"owned_paths_only": true, "candidate_preserved": true, "active_root_untouched": true}}
+  ]
+}

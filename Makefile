@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify
+.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -63,6 +63,7 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@$(MAKE) validate-onboarding-o4
 	@$(MAKE) validate-onboarding-o5
 	@$(MAKE) validate-onboarding-o6
+	@$(MAKE) validate-onboarding-o7
 	@$(MAKE) validate-evals
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
@@ -110,6 +111,9 @@ validate-onboarding-o5: ## Validate digest-bound local artifact execution contro
 validate-onboarding-o6: ## Validate offline publisher signature and attestation controls
 	@$(PYTHON) scripts/validate-onboarding-o6-controls.py
 
+validate-onboarding-o7: ## Validate vendor-neutral verifier adapters and refresh controls
+	@$(PYTHON) scripts/validate-onboarding-o7-controls.py
+
 onboarding: ## Run the guided O3 onboarding plan (pass ARGS="--lane native")
 	@./aiw onboarding plan $(ARGS)
 
@@ -136,6 +140,18 @@ onboarding-attestation-plan: ## Show O6 offline attestation verification options
 
 onboarding-attestation-verify: ## Verify an O6 local attestation bundle (pass ARGS="--attestation <id> --artifact <path>")
 	@./aiw onboarding attestation-verify $(ARGS)
+
+onboarding-verifier-plan: ## Show O7 vendor-neutral verifier adapters without network or writes
+	@./aiw onboarding verifier-plan $(ARGS)
+
+onboarding-verifier-verify: ## Verify with one O7 adapter (pass ARGS="--adapter <id> --artifact <path>")
+	@./aiw onboarding verifier-verify $(ARGS)
+
+onboarding-verifier-refresh-plan: ## Show O7 bounded evidence-refresh policy
+	@./aiw onboarding verifier-refresh-plan $(ARGS)
+
+onboarding-verifier-refresh: ## Fetch an O7 allowlisted candidate only with explicit consent
+	@./aiw onboarding verifier-refresh $(ARGS)
 
 toolchain-check: ## Run non-mutating no-network toolchain verification
 	@$(PYTHON) scripts/check-toolchain.py --check-only --no-network --json-output artifacts/onboarding-o1-toolchain-evidence.json

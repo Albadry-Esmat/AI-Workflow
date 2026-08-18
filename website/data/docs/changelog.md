@@ -9,6 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Vendor-Neutral Verifier Adapters and Optional Evidence Refresh (Onboarding Batch O7)
+
+- Added a neutral verifier-adapter catalog for GitHub CLI attestations, Sigstore Cosign blobs, npm registry provenance, and the internal O6 local delegate, with deterministic record fingerprints and strict claim requirements.
+- Added `aiw onboarding verifier-plan`, `verifier-verify`, `verifier-refresh-plan`, and consent-gated `verifier-refresh`; offline verification remains the default, vendor tools are never auto-installed, and unknown claims fail closed.
+- Added bounded allowlisted HTTPS refresh that writes only an owned candidate, records source and response digests, never overwrites an active trust root, and requires explicit `--yes` after planning.
+- Added O7 fixtures, validator, Makefile and CLI integration, source-owned synchronization mappings, and `docs/vendor-neutral-verifier-adapters.md` with GitHub, Sigstore, npm, and GitHub CLI references.
+- Runtime installation, authentication automation, target initialization, target mutation, and runtime launch remain deferred.
+
 ### Offline Publisher Signature and Attestation Verification (Onboarding Batch O6)
 
 - Added a repository-local O6 attestation catalog, Ed25519 trust-root schema, signed controlled-fixture bundle, and redacted verification state contract.

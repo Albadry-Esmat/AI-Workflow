@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O7",
+  "title": "Vendor-Neutral Attestation Verifier Adapters and Optional Evidence Refresh",
+  "commands": {
+    "verifier-plan": {"syntax": "aiw onboarding verifier-plan [--adapter <id>] [--json]", "status": "supported"},
+    "verifier-verify": {"syntax": "aiw onboarding verifier-verify --adapter <id> --artifact <path> [--json]", "status": "supported"},
+    "verifier-refresh-plan": {"syntax": "aiw onboarding verifier-refresh-plan --adapter <id> [--json]", "status": "supported"},
+    "verifier-refresh": {"syntax": "aiw onboarding verifier-refresh --adapter <id> --yes [--json]", "status": "explicit-opt-in"},
+    "recover": {"syntax": "aiw onboarding recover --o7 [--reset-state] [--json]", "status": "supported"}
+  },
+  "lifecycle": {
+    "plan": ["load exact adapter record", "report offline default", "report network disabled", "report no installation or execution authority"],
+    "verify": ["resolve exact artifact", "run offline adapter if available", "require declared claims", "write redacted evidence"],
+    "refresh_plan": ["show allowlisted source", "show bounded timeout and response budget", "show candidate-root path", "show active-root overwrite blocked"],
+    "refresh_apply": ["require explicit --yes", "perform only allowlisted bounded request", "write candidate evidence atomically", "never activate candidate automatically"],
+    "recover": ["remove O7-owned state and evidence when requested", "preserve candidate evidence", "preserve active roots", "leave target project untouched"]
+  },
+  "adapters": {
+    "catalog": "config/verifier-adapter-o7-catalog.json",
+    "catalog_schema": "config/verifier-adapter-o7-catalog-schema.json",
+    "selection": "exact-adapter-id",
+    "vendor_neutral": true,
+    "missing_adapter": "fail-closed",
+    "missing_tool": "fail-closed"
+  },
+  "verification": {
+    "default_mode": "offline-bundle",
+    "offline_bundle_allowed": true,
+    "offline_key_allowed": true,
+    "online_modes_require_consent": true,
+    "subject_digest_required": true,
+    "identity_required": true,
+    "issuer_required": true,
+    "repository_required": true,
+    "signer_required": true,
+    "predicate_type_required": true,
+    "workflow_or_build_required": true,
+    "external_parameters_strict": true,
+    "unknown_claims": "fail-closed",
+    "missing_tool": "fail-closed"
+  },
+  "network_refresh": {
+    "default": "disabled",
+    "allowlist_required": true,
+    "timeout_seconds_max": 30,
+    "response_bytes_max": 1048576,
+    "source_digest_required": true,
+    "evidence_required": true,
+    "candidate_root": ".aiw/onboarding-o7/candidates",
+    "active_root_overwrite": "not-authorized",
+    "transparency_refresh": "explicit-only"
+  },
+  "execution": {
+    "installation": "not-authorized",
+    "artifact_execution": "not-authorized",
+    "tool_installation": "manual-only",
+    "shell": false,
+    "elevated": false,
+    "target_project_mutations": 0,
+    "authentication": "deferred",
+    "target_initialization": "deferred",
+    "launch": "deferred"
+  },
+  "state": {
+    "owned_root": ".aiw/onboarding-o7",
+    "atomic": true,
+    "redacted": true,
+    "raw_secret_values": 0,
+    "evidence_format": "jsonl"
+  },
+  "recovery": {
+    "owned_paths_only": true,
+    "candidate_preserved": true,
+    "active_root_untouched": true,
+    "target_project_untouched": true
+  },
+  "non_goals": [
+    "install vendor verifiers",
+    "download or install runtimes",
+    "automate provider login",
+    "store raw secrets",
+    "mutate target projects",
+    "initialize target projects",
+    "launch runtimes",
+    "disable claim checks",
+    "silently refresh or replace active trust roots"
+  ]
+}

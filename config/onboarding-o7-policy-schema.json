@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow O7 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "batch", "state", "adapters", "verification", "network_refresh", "tooling", "claims", "execution", "authentication", "target", "recovery"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "batch": {"type": "string", "const": "O7"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "atomic_writes", "redact_secrets", "unknown_state_fails_closed"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o7"},
+        "atomic_writes": {"type": "boolean", "const": true},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalog_path", "catalog_schema_path", "exact_record_required", "unknown_adapter_fails_closed", "vendor_neutral"],
+      "properties": {
+        "catalog_path": {"type": "string", "const": "config/verifier-adapter-o7-catalog.json"},
+        "catalog_schema_path": {"type": "string", "const": "config/verifier-adapter-o7-catalog-schema.json"},
+        "exact_record_required": {"type": "boolean", "const": true},
+        "unknown_adapter_fails_closed": {"type": "boolean", "const": true},
+        "vendor_neutral": {"type": "boolean", "const": true}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_mode", "offline_bundle_allowed", "offline_key_allowed", "online_requires_consent", "claims_required", "unknown_claims", "tool_installation"],
+      "properties": {
+        "default_mode": {"type": "string", "enum": ["offline-bundle", "offline-key"]},
+        "offline_bundle_allowed": {"type": "boolean", "const": true},
+        "offline_key_allowed": {"type": "boolean", "const": true},
+        "online_requires_consent": {"type": "boolean", "const": true},
+        "claims_required": {"type": "boolean", "const": true},
+        "unknown_claims": {"type": "string", "enum": ["fail-closed"]},
+        "tool_installation": {"type": "string", "enum": ["manual-only", "blocked"]}
+      }
+    },
+    "network_refresh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "explicit_command", "consent_flag", "allowlist_required", "timeout_seconds_max", "response_bytes_max", "candidate_owned_root", "active_root_overwrite", "source_digest_required", "evidence_required", "stale_root_fails_closed"],
+      "properties": {
+        "default": {"type": "string", "const": "disabled"},
+        "explicit_command": {"type": "string", "const": "refresh-plan-then-apply"},
+        "consent_flag": {"type": "string", "const": "--yes"},
+        "allowlist_required": {"type": "boolean", "const": true},
+        "timeout_seconds_max": {"type": "integer", "minimum": 1, "maximum": 60},
+        "response_bytes_max": {"type": "integer", "minimum": 1024, "maximum": 10485760},
+        "candidate_owned_root": {"type": "string", "const": ".aiw/onboarding-o7/candidates"},
+        "active_root_overwrite": {"type": "boolean", "const": false},
+        "source_digest_required": {"type": "boolean", "const": true},
+        "evidence_required": {"type": "boolean", "const": true},
+        "stale_root_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "tooling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auto_install", "shell", "elevated", "stdin", "environment", "missing_tool"],
+      "properties": {
+        "auto_install": {"type": "boolean", "const": false},
+        "shell": {"type": "boolean", "const": false},
+        "elevated": {"type": "boolean", "const": false},
+        "stdin": {"type": "string", "const": "closed"},
+        "environment": {"type": "string", "const": "empty"},
+        "missing_tool": {"type": "string", "enum": ["fail-closed", "manual-guidance"]}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_digest", "identity", "issuer", "repository", "signer", "predicate_type", "workflow_or_build", "external_parameters", "unknown_fields"],
+      "properties": {
+        "subject_digest": {"type": "boolean", "const": true},
+        "identity": {"type": "boolean", "const": true},
+        "issuer": {"type": "boolean", "const": true},
+        "repository": {"type": "boolean", "const": true},
+        "signer": {"type": "boolean", "const": true},
+        "predicate_type": {"type": "boolean", "const": true},
+        "workflow_or_build": {"type": "boolean", "const": true},
+        "external_parameters": {"type": "boolean", "const": true},
+        "unknown_fields": {"type": "string", "const": "fail-closed"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["install_allowed", "execute_allowed", "network_default", "target_project_mutations", "authentication", "target_initialization", "launch"],
+      "properties": {
+        "install_allowed": {"type": "boolean", "const": false},
+        "execute_allowed": {"type": "boolean", "const": false},
+        "network_default": {"type": "string", "const": "disabled"},
+        "target_project_mutations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "authentication": {"type": "string", "const": "deferred"},
+        "target_initialization": {"type": "string", "const": "deferred"},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raw_secret_input", "raw_secret_storage", "login_automation"],
+      "properties": {
+        "raw_secret_input": {"type": "boolean", "const": false},
+        "raw_secret_storage": {"type": "boolean", "const": false},
+        "login_automation": {"type": "string", "const": "deferred"}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "secret_copy", "launch"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "secret_copy": {"type": "boolean", "const": false},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_paths_only", "candidate_preserved", "active_root_untouched", "target_project_untouched", "recover_command"],
+      "properties": {
+        "owned_paths_only": {"type": "boolean", "const": true},
+        "candidate_preserved": {"type": "boolean", "const": true},
+        "active_root_untouched": {"type": "boolean", "const": true},
+        "target_project_untouched": {"type": "boolean", "const": true},
+        "recover_command": {"type": "string", "const": "aiw onboarding recover --o7"}
+      }
+    }
+  }
+}
