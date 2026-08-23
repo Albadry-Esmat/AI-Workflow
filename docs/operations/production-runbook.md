@@ -12,8 +12,9 @@ Run the following from the repository root:
 npm ci --ignore-scripts --no-audit --no-fund
 aiw self-test
 aiw validate
-node scripts/security-check.js
+node scripts/security-check.js --history
 aiw sync --check
+aiw version --json
 aiw preflight
 ```
 
@@ -35,7 +36,7 @@ Record the generated backup path with the session identifier. Do not copy the ba
 
 Monitor session status, retry count, gate decisions, and artifact availability. A downstream phase must not consume an artifact while its producer is pending. If a gate is rejected, preserve the rejection reason and resume only after the input or approval context has been updated.
 
-Do not delete session files to clear a stuck run. First create a backup, inspect the sanitized state, and determine whether the run is waiting for HITL input, an MCP response, a schema repair, or a process lock.
+Do not delete session files to clear a stuck run. First create a backup, inspect the sanitized state, and determine whether the run is waiting for HITL input, an MCP response, a schema repair, or a process lock. If you need to ask for help, run `aiw support-bundle` and share only the generated sanitized directory; it contains inventory and diagnostics, not raw session contents.
 
 ## Common Failures
 
@@ -96,7 +97,7 @@ Record the incident with the source commit, pipeline/session ID, affected artifa
 2. Update only the local or CI secret store that owns the credential.
 3. Confirm the token’s minimum required scope.
 4. Run `aiw health` without printing the token.
-5. Run `node scripts/security-check.js` and `aiw self-test`.
+5. Run `node scripts/security-check.js --history`, `aiw self-test`, and `aiw version --json`.
 6. Record the rotation date and owner without recording the secret value.
 
 Never place secrets in `opencode.json`, pipeline JSON, skill Markdown, generated website data, backups intended for publication, or issue comments.

@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { execFileSync } = require("child_process");
+const { execFileSync, spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
 const failures = [];
@@ -62,6 +62,18 @@ if (fs.existsSync(envFile) && process.platform !== "win32") {
   const mode = fs.statSync(envFile).mode & 0o777;
   if (mode !== 0o600) fail(`.env permissions are ${mode.toString(8)}; expected 600`);
   else pass(".env permissions are owner-only (600)");
+}
+
+if (process.argv.includes("--history")) {
+  const commits = execFileSync("git", ["rev-list", "--all"], { cwd: root, encoding: "utf8" }).trim().split(/\r?\n/).filter(Boolean);
+  const historyHits = [];
+  for (const commit of commits) {
+    const result = spawnSync("git", ["grep", "-nE", "ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}", commit, "--", ":!.env.example", ":!docs/**"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    if (result.status === 0 && result.stdout.trim()) historyHits.push(`${commit}: ${result.stdout.trim().split("\n")[0]}`);
+    else if (result.status !== 0 && result.status !== 1) throw new Error(`history scan failed at ${commit}`);
+  }
+  if (historyHits.length) fail(`credential-like token pattern found in history: ${historyHits[0]}`);
+  else pass(`no credential-like token patterns found across ${commits.length} reachable commits`);
 }
 
 if (failures.length) {

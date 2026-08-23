@@ -8,6 +8,15 @@ on:
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
+      - "tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - "Makefile"
+      - ".github/workflows/**"
+      - ".github/branch-protection-policy.json"
+      - "compatibility.json"
+      - "*.sh"
+      - "*.md"
   pull_request:
     paths:
       - "skills/**"
@@ -15,6 +24,15 @@ on:
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
+      - "tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - "Makefile"
+      - ".github/workflows/**"
+      - ".github/branch-protection-policy.json"
+      - "compatibility.json"
+      - "*.sh"
+      - "*.md"
 
 permissions:
   contents: read

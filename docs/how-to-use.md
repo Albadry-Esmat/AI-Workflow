@@ -19,8 +19,9 @@ cd AI-Workflow
 `./aiw` runs straight from the repo before anything is installed. Setup will add `aiw` to your PATH so you can use it globally from that point on. Then open `.env` and fill in your credentials:
 
 ```bash
-# Minimum required
-GITHUB_TOKEN=ghp_...          # https://github.com/settings/tokens
+# Minimum required: create a fine-grained token restricted to the repositories
+# this workflow operates on, grant only reviewed permissions, and set an expiration.
+GITHUB_TOKEN=your_fine_grained_token_here  # https://github.com/settings/personal-access-tokens/fine-grained
 
 # Optional but recommended
 CONTEXT7_API_KEY=...           # https://context7.com
@@ -75,6 +76,9 @@ This copies `opencode.json` and `.opencode/` (all 113 skills + 19 agents) into t
 | `aiw doctor` | Full diagnostic: health + validation + git |
 | `aiw self-test` | Credential-free production conformance tests |
 | `aiw preflight` | Strict release-readiness check; fails on missing prerequisites |
+| `aiw security-history` | Scan reachable Git history for credential-like patterns |
+| `aiw version --json` | Print framework, schema, and runtime compatibility metadata |
+| `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
 | `aiw sync` | Sync `website/data/` from source files |
 | `aiw sync --website --confirm-website` | Sync + publish to ASE-OS-Website after explicit confirmation |
 | `aiw graph` | Rebuild the knowledge graph |
@@ -84,6 +88,7 @@ This copies `opencode.json` and `.opencode/` (all 113 skills + 19 agents) into t
 | `aiw update` | Check the `.opencode/` plugin layout and show OpenCode update guidance |
 | `aiw backup` | Backup `.opencode/state/` with checksums and a manifest |
 | `aiw restore <backup>` | Verify and restore a state backup while retaining previous state |
+| `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
 | `aiw sessions` | Show expired session files (dry-run) |
 | `aiw sessions delete` | Delete expired session files |
 | `aiw website` | Build and start the website locally |
@@ -181,7 +186,7 @@ This copies `opencode.json` and `.opencode/` (all 113 skills + 19 agents) into t
 | Skill not found | Registry not updated | Run `make validate` to find which entry is missing |
 | Agent permission denied | Incorrect agent config | Check permission in `opencode.json` |
 | `ajv: command not found` | ajv-cli not installed | Run `npm install -g ajv-cli ajv-formats` |
-| `GITHUB_TOKEN is not set` | Missing env var | Add `GITHUB_TOKEN=` to `.env` |
+| `GITHUB_TOKEN is not set` | Missing env var | Add a repository-scoped fine-grained `GITHUB_TOKEN` to `.env` and keep mode 600 |
 
 ---
 

@@ -126,21 +126,39 @@ jobs:
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
           echo "Changed files: $changed"
 
-      - name: Commit and push to ASE-OS-Website
+      - name: Commit and open website data pull request
+        id: publish
         if: steps.changes.outputs.changed != '0'
         working-directory: ase-os-website
+        env:
+          GH_TOKEN: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
         run: |
           version=$(grep -m1 '## \[' ../docs/changelog.md 2>/dev/null \
             | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
           changed_files=$(git status --short | awk '{print $2}' | head -20 | tr '\n' ' ')
+          branch="automation/aiw-sync-${{ github.run_id }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
           git add data/
           git commit -m "sync: update data/ from AI-Workflow v${version}" \
             -m "Triggered by push to Albadry-Esmat/AI-Workflow@${{ github.sha }}" \
             -m "Changed: ${changed_files}" \
             -m "Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/${{ github.sha }}"
-          git push origin HEAD:main
+          git push --set-upstream origin "$branch"
+          body_file=$(mktemp)
+          printf '%s\n\n%s\n' \
+            "Automated website-data update from AI-Workflow commit ${{ github.sha }}." \
+            "Review the generated data diff before merging. This PR was created instead of pushing directly to main." > "$body_file"
+          pr_url=$(gh pr create \
+            --repo Albadry-Esmat/ASE-OS-Website \
+            --head "$branch" \
+            --base main \
+            --title "sync: update data from AI-Workflow v${version}" \
+            --body-file "$body_file")
+          rm -f "$body_file"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+          echo "Created website data PR: $pr_url"
 
       - name: No changes — skip push
         if: steps.changes.outputs.changed == '0'
@@ -162,4 +180,5 @@ jobs:
             echo "| Files changed | ${changed} |"
             echo "| Target repo | [ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website) |"
             echo "| Live site | [ase-os.vercel.app](https://ase-os.vercel.app) |"
+            if [[ -n "${{ steps.publish.outputs.pr_url }}" ]]; then echo "| Website data PR | ${{ steps.publish.outputs.pr_url }} |"; fi
           } >> "$GITHUB_STEP_SUMMARY"

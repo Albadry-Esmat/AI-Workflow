@@ -59,6 +59,7 @@ show_help() {
   echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
   echo -e "    ${CYAN}self-test${NC}          Credential-free production conformance tests"
   echo -e "    ${CYAN}preflight${NC}          Strict release readiness check"
+  echo -e "    ${CYAN}security-history${NC}   Scan reachable Git history for credential-like patterns"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
@@ -76,6 +77,7 @@ show_help() {
   echo -e "    ${CYAN}reset${NC}              Reset sessions, cache, and artifacts — preserves .env ⚠️"
   echo -e "    ${CYAN}backup${NC}             Backup .opencode/state/ with checksums"
   echo -e "    ${CYAN}restore${NC} ${DIM}<backup>${NC}      Verify and restore a state backup"
+  echo -e "    ${CYAN}support-bundle${NC} [dir]  Create sanitized diagnostics without raw state or secrets"
   echo ""
   echo -e "  ${BOLD}WEBSITE${NC}"
   echo -e "    ${CYAN}website${NC}            Build and start the website locally"
@@ -157,11 +159,16 @@ cmd_preflight() {
   node "$ROOT/scripts/preflight.js"
 }
 
+cmd_security_history() {
+  node "$ROOT/scripts/security-check.js" --history
+}
+
 cmd_lint() {
   echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
   echo ""
+  local failures=0
   # Run only checks 0 and 1 from validate
-  python3 -c "
+  if python3 -c "
 import yaml, sys
 try:
     with open('$ROOT/skills/index.yaml') as f:
@@ -170,7 +177,7 @@ try:
 except Exception as e:
     print(f'  FAIL: {e}')
     sys.exit(1)
-"
+"; then :; else failures=$((failures + 1)); fi
   echo ""
   # Pipeline schema validation
   for f in "$ROOT"/skills/pipelines/*.json; do
@@ -178,22 +185,28 @@ except Exception as e:
       echo -e "  ${GREEN}PASS${NC} $(basename "$f")"
     else
       echo -e "  ${RED}FAIL${NC} $(basename "$f")"
+      failures=$((failures + 1))
     fi
   done
+  if (( failures > 0 )); then
+    echo -e "${RED}Lint failed: $failures check(s) failed.${NC}"
+    return 1
+  fi
 }
 
 cmd_doctor() {
+  local failures=0
   echo -e "${BOLD}╔══════════════════════════════════════╗${NC}"
   echo -e "${BOLD}║   AI Workflow — Full Diagnostic      ║${NC}"
   echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
   echo ""
   echo -e "${BOLD}Step 1: Health Check${NC}"
   echo ""
-  bash "$ROOT/scripts/health-check.sh" || true
+  if ! bash "$ROOT/scripts/health-check.sh"; then failures=$((failures + 1)); fi
   echo ""
   echo -e "${BOLD}Step 2: Skill Validation${NC}"
   echo ""
-  bash "$ROOT/scripts/validate-skills.sh" || true
+  if ! bash "$ROOT/scripts/validate-skills.sh"; then failures=$((failures + 1)); fi
   echo ""
   echo -e "${BOLD}Step 3: Git Status${NC}"
   echo ""
@@ -202,6 +215,7 @@ cmd_doctor() {
   echo "  Commit: $(git log --oneline -1 2>/dev/null || echo 'N/A')"
   echo "  Status: $(git status --short 2>/dev/null | wc -l | tr -d ' ') changed file(s)"
   echo ""
+  if (( failures > 0 )); then return 1; fi
 }
 
 cmd_init() {
@@ -333,6 +347,10 @@ cmd_backup() {
   node "$ROOT/scripts/state-backup.js" backup
 }
 
+cmd_support_bundle() {
+  node "$ROOT/scripts/support-bundle.js" "$@"
+}
+
 cmd_restore() {
   local BACKUP_DIR="${1:-}"
   if [[ -z "$BACKUP_DIR" ]]; then
@@ -375,7 +393,7 @@ cmd_website() {
 }
 
 cmd_version() {
-  echo "aiw v${VERSION} (AI Workflow CLI)"
+  node "$ROOT/scripts/version.js" "$@"
 }
 
 cmd_status() {
@@ -407,19 +425,23 @@ cmd_status() {
   echo "    Active: ${session_count}"
   echo ""
   
+  local issues=0
   # Health (quick)
   echo -e "  ${CYAN}Environment${NC}"
   if [[ -f "$ROOT/.env" ]]; then
     echo -e "    .env: ${GREEN}present${NC}"
   else
     echo -e "    .env: ${RED}missing${NC}"
+    issues=$((issues + 1))
   fi
   if command -v opencode &>/dev/null; then
     echo -e "    opencode: ${GREEN}installed${NC}"
   else
     echo -e "    opencode: ${RED}not found${NC}"
+    issues=$((issues + 1))
   fi
   echo ""
+  if (( issues > 0 )); then return 1; fi
 }
 
 # ── Router ────────────────────────────────────────────────────────────────────
@@ -436,6 +458,7 @@ case "$COMMAND" in
   doctor|diagnose)  cmd_doctor "$@" ;;
   self-test)        cmd_self_test "$@" ;;
   preflight)        cmd_preflight "$@" ;;
+  security-history) cmd_security_history "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;
@@ -444,8 +467,9 @@ case "$COMMAND" in
   reset)            cmd_reset "$@" ;;
   backup)           cmd_backup "$@" ;;
   restore)          cmd_restore "$@" ;;
+  support-bundle)   cmd_support_bundle "$@" ;;
   website|web)      cmd_website "$@" ;;
-  version|--version|-v) cmd_version ;;
+  version|--version|-v) cmd_version "$@" ;;
   status)           cmd_status "$@" ;;
   help|--help|-h)   show_help ;;
   *)

@@ -101,8 +101,9 @@ if [[ -n "${GITHUB_TOKEN:-}" ]]; then
 else
   _fail "GITHUB_TOKEN is not set"
   echo "       Add GITHUB_TOKEN=<your-token> to .env"
-  echo "       Create a token at: https://github.com/settings/tokens"
-  echo "       Required scopes: repo, read:org"
+  echo "       Create a fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
+  echo "       Restrict it to required repositories and grant only reviewed permissions."
+  echo "       Use the shortest practical expiration and record a rotation owner."
 fi
 
 # ── 5. Optional env vars ──────────────────────────────────────────────────────

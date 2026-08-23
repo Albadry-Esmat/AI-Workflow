@@ -5,6 +5,7 @@ const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { atomicWriteJson, readJsonWithRecovery, acquireLock } = require("./lib/state-store");
+const { loadPipeline, executeFixturePipeline } = require("./conformance-harness");
 
 const root = path.resolve(__dirname, "..");
 const failures = [];
@@ -38,6 +39,12 @@ check("website data manifest is valid", () => {
 
 check("semantic pipeline invariants pass", () => {
   command(["scripts/validate-pipelines.js"]);
+});
+
+check("black-box fixture pipeline completes with HITL approval", () => {
+  const fixture = loadPipeline(path.join(root, "tests", "fixtures", "self-test-pipeline.json"));
+  const result = executeFixturePipeline(fixture, { gateDecisions: { approve: "approve" } });
+  if (result.status !== "completed" || !result.session_id) throw new Error("fixture pipeline did not complete");
 });
 
 check("atomic state recovery works", () => {

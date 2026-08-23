@@ -2,7 +2,7 @@
 # scripts/sync-website-data.sh — Sync website/data/ from authoritative source files.
 #
 # Run from the project root:  aiw sync             (sync this repo's website/data/)
-#                             aiw sync --website   (sync + push to ASE-OS-Website repo)
+#                             aiw sync --website   (sync + publish to ASE-OS-Website repo)
 #
 # The website reads from website/data/ at build time. This script keeps that
 # directory in sync with the source-of-truth files in the project root.
@@ -20,7 +20,7 @@
 # Flags:
 #   --dry-run    Show what would be synced without writing anything
 #   --check      Exit 1 if any file is out of sync (for CI use)
-#   --website    After syncing website/data/, also push to ASE-OS-Website repo
+#   --website    After syncing website/data/, also publish to ASE-OS-Website repo
 #   --confirm-website  Explicitly confirm local publication when used with --website
 
 WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
@@ -54,7 +54,7 @@ for arg in "$@"; do
       echo "Usage: $0 [--dry-run] [--check] [--website] [--confirm-website]"
       echo "  --dry-run          Show what would be synced without writing anything"
       echo "  --check            Exit 1 if any file is out of sync (for CI use)"
-      echo "  --website          Sync website/data/ then prepare to push to ASE-OS-Website"
+      echo "  --website          Sync website/data/ then prepare to publish to ASE-OS-Website"
       echo "  --confirm-website  Required with --website for local publication"
       exit 0
       ;;
@@ -244,10 +244,24 @@ if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY
   WEBSITE_REPO_DIR="$(mktemp -d)"
   step "Cloning $WEBSITE_REPO ..."
   if ! git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
-    fail "Could not clone ASE-OS-Website — check your GITHUB_TOKEN and network."
+    fail "Could not clone ASE-OS-Website — check repository access, WEBSITE_DEPLOY_TOKEN/credential helper, and network."
     exit 1
   fi
   ok "Cloned into $WEBSITE_REPO_DIR"
+
+  TARGET_BRANCH=$(git -C "$WEBSITE_REPO_DIR" branch --show-current)
+  if [[ "$TARGET_BRANCH" != "main" ]]; then
+    fail "Refusing publication: target repository checked out '$TARGET_BRANCH', expected 'main'."
+    exit 1
+  fi
+  if [[ -n "$(git -C "$WEBSITE_REPO_DIR" status --porcelain)" ]]; then
+    fail "Refusing publication: target repository checkout is not clean."
+    exit 1
+  fi
+  if ! git -C "$WEBSITE_REPO_DIR" pull --ff-only origin main --quiet; then
+    fail "Refusing publication: target main branch could not be fast-forwarded safely."
+    exit 1
+  fi
 
   # Mirror website/data/ → data/ in the website repo
   step "Copying data files..."
@@ -282,7 +296,7 @@ Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
       echo -e "  All website prose, features, agents, pipeline phases, and section content"
       echo -e "  are driven from ${CYAN}website/data/site-content.json${NC}."
     else
-      fail "Push failed — check your GITHUB_TOKEN has write access to ASE-OS-Website."
+      fail "Push failed — check the dedicated publication credential has write access to ASE-OS-Website."
       exit 1
     fi
   fi

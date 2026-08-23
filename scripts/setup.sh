@@ -67,6 +67,12 @@ else
   _fail "npm ci failed — package-lock.json and package.json may be out of sync"
 fi
 
+if node "$ROOT/scripts/version.js" --json >/dev/null 2>&1; then
+  _ok "Compatibility manifest and version metadata are valid"
+else
+  _fail "Compatibility manifest does not match package or schema metadata"
+fi
+
 # ── 3. Optional tools ─────────────────────────────────────────────────────────
 header "Checking optional tools"
 
@@ -116,8 +122,8 @@ else
     echo -e "  ${BOLD}${YELLOW}Action required:${NC} Open .env and set your GITHUB_TOKEN."
     echo "  The file is at: $ROOT/.env"
     echo
-    echo "  Create a GitHub token at: https://github.com/settings/tokens"
-    echo "  Required scopes: repo, read:org"
+    echo "  Create a fine-grained token at: https://github.com/settings/personal-access-tokens/fine-grained"
+    echo "  Restrict repository access and grant only the permissions your workflow needs."
     echo
   else
     _fail ".env.example not found — cannot create .env"
@@ -213,13 +219,22 @@ bash "$ROOT/scripts/health-check.sh" || true
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo
 echo -e "${BOLD}════════════════════════════════════════${NC}"
-echo -e "  Setup complete: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${NC}, ${RED}$FAIL failed${NC}"
+if (( FAIL > 0 )); then
+  echo -e "  Setup failed: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${NC}, ${RED}$FAIL failed${NC}"
+else
+  if (( WARN > 0 )); then
+    echo -e "  Setup complete with warnings: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${NC}, ${RED}$FAIL failed${NC}"
+    echo "  The repository is installed, but review the warnings before running a production pipeline."
+  else
+    echo -e "  Setup complete: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${NC}, ${RED}$FAIL failed${NC}"
+  fi
+fi
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo
 echo -e "${BOLD}Next steps:${NC}"
 echo "  1. Edit .env and set GITHUB_TOKEN (and any other keys you want)"
-echo "     Get one at: https://github.com/settings/tokens"
-echo "     Classic token, no expiration, scopes: repo + read:org"
+echo "     Create a fine-grained token with repository-scoped access and reviewed permissions."
+echo "     Set the shortest practical expiration and record a rotation owner."
 echo ""
 echo "  2. aiw health                      — verify your configuration"
 echo "  3. aiw start /path/to/your-project — launch on your project"

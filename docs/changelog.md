@@ -29,7 +29,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Credential-free conformance suite** — Added Jest fixtures for semantic validation, manifest integrity, atomic recovery, lock contention, and secure initialization.
 - **State recovery tools** — Added checksum-manifested `aiw backup`, `aiw restore <backup>`, and shared atomic JSON/lock primitives.
 - **Compatibility manifest** — Added `compatibility.json` for supported runtimes, schema version, package manifests, and MCP package expectations.
-- **Release diagnostics** — Added `aiw self-test` and strict `aiw preflight` commands.
+- **Release diagnostics** — Added `aiw self-test`, strict `aiw preflight`, `aiw version --json`, `aiw security-history`, and sanitized `aiw support-bundle` commands.
+- **Black-box conformance harness** — Added deterministic routing, retry, HITL, async reconciliation, artifact-readiness, persistence, redaction, and retention fixtures.
+- **Least-privilege credentials** — Replaced classic non-expiring token guidance with repository-scoped fine-grained token guidance and explicit rotation expectations.
+- **Website publication governance** — CI now opens a reviewable ASE-OS-Website pull request instead of pushing directly to its `main` branch; local publication retains explicit confirmation and target safety checks.
+- **Repository policy** — Added a machine-readable branch-protection policy and documented the current GitHub-plan limitation preventing remote enforcement.
 
 ---
 
@@ -103,8 +107,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **`docs/versioning.md`** — fixed dead link to `skills/governance/versioning.md` → correct `.opencode/skills/versioning/SKILL.md` path.
 - **`.github/workflows/validate-skills.yml`** — added `permissions: contents: read` and pinned all action versions.
 - **README, CONTRIBUTING, docs/how-to-use.md** — replaced `your-org` placeholder git URLs with `Albadry-Esmat/AI-Workflow`; updated commands to use `aiw`.
-- **`.env.example`** — updated token instructions: classic PAT, no expiration.
-- **`docs/github-export.md`** — removed 90-day expiry recommendation; classic PAT with no expiration is now the documented default.
+- **Historical token guidance (superseded)** — an earlier release documented classic, non-expiring PATs in `.env.example` and `docs/github-export.md`; current guidance uses fine-grained, repository-scoped tokens with explicit rotation.
 
 ---
 

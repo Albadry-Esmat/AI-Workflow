@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic self-test preflight clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic self-test preflight support-bundle security-history clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -59,6 +59,9 @@ self-test: ## Run credential-free production conformance tests
 preflight: ## Run strict release readiness checks
 	@node scripts/preflight.js
 
+security-history: ## Scan all reachable Git history for credential-like patterns
+	@node scripts/security-check.js --history
+
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint
 
@@ -81,6 +84,9 @@ backup: ## Backup .opencode/state/ with checksums
 restore: ## Verify and restore a state backup: make restore BACKUP=backups/state-...
 	@test -n "$(BACKUP)" || (echo "Usage: make restore BACKUP=backups/state-..."; exit 2)
 	@./aiw restore "$(BACKUP)"
+
+support-bundle: ## Create sanitized diagnostics without raw state or secrets
+	@./aiw support-bundle
 
 # ── Data & Knowledge ─────────────────────────────────────────────────────────
 sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/) — CI does this automatically on push

@@ -30,12 +30,14 @@ Use this checklist for every release candidate. A checked box must have evidence
 
 ## Security and Supply Chain
 
-- [ ] `node scripts/security-check.js` passes.
+- [ ] `node scripts/security-check.js --history` passes on the full reachable history.
 - [ ] `npm audit --audit-level=high --omit=optional` passes.
+- [ ] `aiw version --json` matches `compatibility.json` and the intended release tag.
 - [ ] GitHub Actions use immutable commit SHAs.
 - [ ] All enabled and disabled MCP package references are semver-pinned.
 - [ ] Secret scanning passes on the current tree and full history.
 - [ ] Logs, support bundles, generated data, and backups contain no credentials or raw sensitive payloads.
+- [ ] `aiw support-bundle` has been tested and only sanitized diagnostics are shared.
 - [ ] Publication credentials are separate from local development credentials.
 
 ## Website Data and Publication

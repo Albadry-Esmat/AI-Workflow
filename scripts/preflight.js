@@ -26,6 +26,17 @@ function run(label, command, args, options = {}) {
   return true;
 }
 
+const requiredReleaseFiles = [
+  "compatibility.json",
+  ".github/branch-protection-policy.json",
+  "docs/operations/production-runbook.md",
+  "docs/operations/release-checklist.md",
+];
+for (const relative of requiredReleaseFiles) {
+  if (!fs.existsSync(path.join(root, relative))) fail(`required release file is missing: ${relative}`);
+  else pass(`required release file present: ${relative}`);
+}
+
 const compatibilityPath = path.join(root, "compatibility.json");
 let compatibility;
 try {
@@ -33,6 +44,18 @@ try {
   pass("compatibility manifest parses");
 } catch (error) {
   fail(`compatibility manifest: ${error.message}`);
+}
+
+try {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  if (compatibility?.cli_version !== packageJson.version) fail(`compatibility cli_version ${compatibility?.cli_version || "missing"} does not match package version ${packageJson.version}`);
+  else pass("compatibility CLI version matches package version");
+  const schemaText = fs.readFileSync(path.join(root, "skills", "schema", "pipeline-schema.json"), "utf8");
+  const schemaVersion = schemaText.match(/schema-version:\s*([0-9.]+)/)?.[1];
+  if (schemaVersion && compatibility?.schema_version !== schemaVersion) fail(`compatibility schema_version ${compatibility?.schema_version || "missing"} does not match pipeline schema ${schemaVersion}`);
+  else pass("compatibility schema version matches pipeline schema");
+} catch (error) {
+  fail(`compatibility cross-check: ${error.message}`);
 }
 
 function versionParts(value) {
@@ -64,7 +87,7 @@ else {
 }
 
 run("semantic pipeline validation", process.execPath, ["scripts/validate-pipelines.js"]);
-run("security and supply-chain check", process.execPath, ["scripts/security-check.js"]);
+run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);
 run("credential-free self-test", process.execPath, ["scripts/self-test.js"]);
 run("structural validation", "bash", ["scripts/validate-skills.sh"]);

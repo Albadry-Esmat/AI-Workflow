@@ -107,6 +107,9 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw doctor` | Comprehensive diagnostic: health + validation + git status |
 | `aiw self-test` | Run credential-free production conformance tests |
 | `aiw preflight` | Run strict release-readiness checks |
+| `aiw security-history` | Scan reachable Git history for credential-like patterns |
+| `aiw version --json` | Print framework, schema, and runtime compatibility metadata |
+| `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
 
 ### Development
 
@@ -127,7 +130,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 ### Production Release Checks
 
-Before a release candidate, run `aiw self-test`, `aiw validate`, `node scripts/security-check.js`, `aiw sync --check`, and `aiw preflight`. Use the [production runbook](docs/operations/production-runbook.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
+Before a release candidate, run `aiw self-test`, `aiw validate`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, and `aiw preflight`. Use `aiw support-bundle` when reporting a failure; it collects sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
 
 ## Maintenance
 
@@ -137,6 +140,7 @@ Before a release candidate, run `aiw self-test`, `aiw validate`, `node scripts/s
 | `aiw reset` | Reset to clean state — removes `.env`, sessions, artifacts ⚠️ |
 | `aiw backup` | Backup `.opencode/state/` with checksums and a manifest |
 | `aiw restore <backup>` | Verify and restore a state backup while retaining previous state |
+| `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
 
 ### Website
 

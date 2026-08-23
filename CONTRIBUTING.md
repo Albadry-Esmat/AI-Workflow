@@ -27,17 +27,24 @@ cd AI-Workflow
 make setup
 ```
 
-This installs the `aiw` CLI and configures your environment. Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
+This installs the `aiw` CLI and configures your environment. Then open `.env` and set a repository-scoped fine-grained `GITHUB_TOKEN` with an expiration and reviewed permissions. Never commit the value or copy it into another project implicitly.
 
 ```bash
-aiw health      # verify your environment
-aiw validate    # run the full skill validation suite
-aiw start       # start the AI workflow
+aiw health                 # verify your environment
+aiw self-test              # run credential-free conformance tests
+aiw validate               # run structural and semantic validation
+aiw security-history       # scan reachable history for credential-like patterns
+aiw sync --check           # verify generated website data is current
+aiw start                 # start the AI workflow
 ```
 
 Type `aiw help` for a full list of available commands.
 
 ---
+
+## Before Opening a Pull Request
+
+Run `npm test -- --runInBand`, `aiw self-test`, `aiw validate`, `aiw security-history`, `node scripts/security-check.js`, and `aiw sync --check`. If a check fails, include the sanitized `aiw support-bundle` output only when requesting help; never attach raw state or `.env`.
 
 ## Branching strategy
 

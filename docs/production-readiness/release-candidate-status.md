@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The approved production-readiness plan has been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline validation, atomic state and lock primitives, checksum-backed backup/restore, credential-free conformance tests, immutable CI action references, MCP package pinning checks, a compatibility manifest, strict preflight, and operational release documentation.
+The approved production-readiness plan has been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles, machine-readable version output, full-history secret scanning, immutable CI action references, MCP package pinning checks, least-privilege credential guidance, a compatibility manifest, strict preflight, reviewed website PR publication, and operational release documentation.
 
 The branch is **ready for a controlled internal pilot after the operator supplies real production prerequisites**. It is not yet a general-production release from this sandbox because the real OpenCode CLI and a configured GitHub token were intentionally not installed or supplied here, and no live model/MCP pipeline was executed.
 
@@ -21,9 +21,9 @@ The branch is **ready for a controlled internal pilot after the operator supplie
 | Website synchronization | Added `scripts/website-data-manifest.json` and its reader. Sync now uses one manifest, removes stale generated files within the mirror scope, preserves non-mutating `--check`/`--dry-run`, and requires `--confirm-website` for local external publication. CI reuses the same sync check instead of duplicating source lists. |
 | Pipeline safety | Made ADR generation synchronous in all affected gated pipeline templates. Added semantic validation for skill paths, duplicate phases, gate targets, async declarations, deployment approval gates, and parallel groups. Corrected the compliance pipeline’s final sign-off gate to be indefinite and non-bypassable. |
 | State recovery | Added `scripts/lib/state-store.js` for atomic JSON writes, previous-file backups, corruption recovery, and single-writer locks. Added checksum-manifested `aiw backup`, `aiw restore <backup>`, and verification support. |
-| Conformance | Added Jest tests without live credentials or paid model calls. Coverage includes semantic validation, manifest integrity, atomic recovery, lock contention, backup/restore, and secure initialization. |
-| Security and supply chain | Removed the unused unpinned fetch MCP entry, verified all retained MCP versions, pinned GitHub Actions to immutable SHAs, added secret-like file/token checks, and added high-severity npm audit checks. |
-| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `docs/operations/production-runbook.md`, `docs/operations/release-checklist.md`, and this status report. |
+| Conformance | Added a deterministic black-box harness plus Jest tests without live credentials or paid model calls. Coverage includes routing, retries, HITL approval/rejection, async reconciliation, artifact readiness, redaction, persistence, retention, semantic validation, manifest integrity, atomic recovery, locking, backup/restore, version output, support bundles, and secure initialization. |
+| Security and supply chain | Removed the unused unpinned fetch MCP entry, verified all retained MCP versions, pinned GitHub Actions to immutable SHAs, added current-tree and full-history secret-like file/token checks, added high-severity npm audit checks, and replaced broad token guidance with fine-grained repository-scoped guidance. |
+| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and this status report. |
 | Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, and website-generated content to match the implementation. |
 
 ## Verification Evidence
@@ -31,17 +31,17 @@ The branch is **ready for a controlled internal pilot after the operator supplie
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 6 tests passed in one suite. |
+| Jest conformance | PASS | 16 tests passed in one suite. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
-| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, and token-pattern scan passed. |
+| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 117 reachable commits passed. |
 | `npm audit --audit-level=high --omit=optional` | PASS | 0 vulnerabilities reported. |
-| `aiw sync --check` | PASS | All 140 mirrored files current; check mode did not mutate the tree. |
+| `aiw sync --check` | PASS | All 140 mirrored files current; check mode did not mutate the tree. Local publication now validates target branch cleanliness and fast-forward safety; CI opens a target pull request instead of pushing directly to `main`. |
 | Shell syntax | PASS | Tracked shell scripts passed `bash -n`. |
 | Git diff hygiene | PASS | `git diff --check` passed. |
 | Clean-clone setup | PASS | First setup and second idempotent setup both returned 0; no `.opencode` ENOENT; `.env` mode 600. |
 | Backup/restore round trip | PASS | Disposable state backup, checksum verification, restore, and previous-state retention succeeded. |
-| Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. |
+| Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
 | Strict preflight pass path | PASS | Passed with a temporary fake OpenCode executable and test-only token; no production secret was used. |
 | Live OpenCode/MCP pipeline | NOT RUN | Requires user-owned OpenCode installation, credentials, and a non-critical pilot repository. |
 
@@ -54,7 +54,7 @@ The remaining items are environment and governance prerequisites rather than uni
 | P0 | Install the supported OpenCode CLI and confirm `opencode --version` succeeds. |
 | P0 | Create `.env` from `.env.example`, set a least-privilege `GITHUB_TOKEN`, and keep the file mode at 600. Do not place the token in tracked files. |
 | P0 | Review the MCP servers enabled in `opencode.json`, their permissions, and their credentials. Keep optional write-capable integrations disabled until explicitly needed. |
-| P1 | Configure branch protection and required CI checks on the GitHub repository. |
+| P1 | Enable the committed branch-protection policy when the repository plan permits it; the current private-repository plan returned HTTP 403 because branch protection requires GitHub Pro or a public repository. |
 | P1 | Confirm the website publication credential is separate from local credentials and decide whether direct push or pull-request publication is the desired policy. |
 | P1 | Run the constrained and full pilot described in `docs/operations/production-runbook.md` using non-sensitive data. |
 | P1 | Obtain independent security and rollback sign-off before creating a public release tag. |
@@ -68,8 +68,9 @@ npm ci --ignore-scripts --no-audit --no-fund
 aiw health
 aiw self-test
 aiw validate
-node scripts/security-check.js
+node scripts/security-check.js --history
 aiw sync --check
+aiw version --json
 aiw preflight
 aiw backup
 ```

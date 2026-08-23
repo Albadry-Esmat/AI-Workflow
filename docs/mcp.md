@@ -27,7 +27,7 @@ Disabled servers are pre-configured — set `"enabled": true` in `opencode.json`
 ### `github` — GitHub MCP
 **Package:** [`@modelcontextprotocol/server-github`](https://github.com/modelcontextprotocol/servers/tree/main/src/github)
 
-**Auth:** Add `GITHUB_TOKEN` to `.env`. Required scopes: `repo`, `read:org`, `issues:write`.
+**Auth:** Add `GITHUB_TOKEN` to `.env` using a fine-grained token restricted to the repositories this workflow operates on. Grant only the reviewed permissions required by the enabled GitHub MCP tools; begin with metadata/contents read access and add issue, pull-request, workflow, or organization permissions only when a specific reviewed flow needs them.
 
 **Tools exposed:**
 - `create_issue`, `update_issue`, `list_issues` — bridges the `work-item-exporter`, `defect-manager`, and `change-request-manager` skills to real GitHub Issues

@@ -2,10 +2,11 @@
 
 const fs = require("fs");
 const path = require("path");
+const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
-const pipelineDir = path.join(root, "skills", "pipelines");
-const skillDir = path.join(root, ".opencode", "skills");
+const pipelineDir = process.env.AIW_PIPELINE_DIR || path.join(root, "skills", "pipelines");
+const skillDir = process.env.AIW_SKILL_DIR || path.join(root, ".opencode", "skills");
 
 const failures = [];
 let pipelinesChecked = 0;
@@ -40,6 +41,40 @@ function collectSteps(config) {
   return steps;
 }
 
+function validateCondition(relative, condition, label) {
+  if (typeof condition !== "string" || condition.trim().length === 0) {
+    fail(relative, `${label} is empty`);
+    return;
+  }
+  if (/[;`]|\b(?:require|import|process|global|eval|Function|constructor|__proto__)\b/.test(condition)) {
+    fail(relative, `${label} contains a forbidden expression token`);
+    return;
+  }
+  let normalized = condition.replace(/\bOR\b/g, "||").replace(/\bAND\b/g, "&&").replace(/\bNOT\b/g, "!");
+  try {
+    new vm.Script(`(${normalized})`);
+  } catch (error) {
+    fail(relative, `${label} is not valid JS-like syntax: ${error.message}`);
+  }
+}
+
+function validateReference(relative, reference, currentPhaseIndex, phaseIdList, label) {
+  const phaseRefs = [];
+  for (const match of String(reference).matchAll(/phase_outputs\[['\"]([^'\"]+)['\"]\]/g)) phaseRefs.push(match[1]);
+  for (const match of String(reference).matchAll(/\$([A-Za-z0-9_-]+)(?:\.|$)/g)) phaseRefs.push(match[1]);
+  for (const phaseId of phaseRefs) {
+    const targetIndex = phaseIdList.indexOf(phaseId);
+    if (targetIndex < 0) fail(relative, `${label} references unknown phase/artifact producer: ${phaseId}`);
+    else if (targetIndex > currentPhaseIndex) fail(relative, `${label} consumes output from a future phase: ${phaseId}`);
+  }
+}
+
+function inspectValueReferences(relative, value, currentPhaseIndex, phaseIdList, label) {
+  if (typeof value === "string") validateReference(relative, value, currentPhaseIndex, phaseIdList, label);
+  else if (Array.isArray(value)) value.forEach((item, index) => inspectValueReferences(relative, item, currentPhaseIndex, phaseIdList, `${label}[${index}]`));
+  else if (value && typeof value === "object") Object.entries(value).forEach(([key, item]) => inspectValueReferences(relative, item, currentPhaseIndex, phaseIdList, `${label}.${key}`));
+}
+
 for (const fileName of fs.readdirSync(pipelineDir).filter((name) => name.endsWith(".json")).sort()) {
   const file = path.join(pipelineDir, fileName);
   const relative = path.relative(root, file);
@@ -61,6 +96,7 @@ for (const fileName of fs.readdirSync(pipelineDir).filter((name) => name.endsWit
     if (!Array.isArray(phase.skills) || phase.skills.length === 0) {
       fail(relative, `phase ${phase.id || "<unknown>"} has no skills`);
     }
+    if (phase.condition !== undefined) validateCondition(relative, phase.condition, `phase ${phase.id || "<unknown>"} condition`);
   }
 
   const steps = collectSteps(config);
@@ -81,6 +117,10 @@ for (const fileName of fs.readdirSync(pipelineDir).filter((name) => name.endsWit
     if (step.async === true && phase && config.gates?.some((gate) => gate.after_phase === phase.id)) {
       fail(relative, `async step ${step.name} is inside gated phase ${phase.id}`);
     }
+    const currentPhaseIndex = phase ? phaseIdList.indexOf(phase.id) : 0;
+    inspectValueReferences(relative, step.inputs, currentPhaseIndex, phaseIdList, `${step.name}.inputs`);
+    inspectValueReferences(relative, step.input_overrides, currentPhaseIndex, phaseIdList, `${step.name}.input_overrides`);
+    inspectValueReferences(relative, step.config, currentPhaseIndex, phaseIdList, `${step.name}.config`);
   }
 
   for (const asyncName of asyncNames) {
@@ -99,6 +139,7 @@ for (const fileName of fs.readdirSync(pipelineDir).filter((name) => name.endsWit
     if (["condition", "auto"].includes(gate.type) && typeof gate.condition !== "string") {
       fail(relative, `${gate.type} gate is missing condition`);
     }
+    if (gate.condition !== undefined) validateCondition(relative, gate.condition, `${gate.type || "gate"} condition`);
     if (gate.timeout === 0 && gate.bypass_on_timeout !== false) {
       fail(relative, "indefinite gate must set bypass_on_timeout=false");
     }

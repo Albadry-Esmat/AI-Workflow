@@ -31,6 +31,7 @@ docs/
 ├── versioning.md              ← Version strategy, changelog rules
 ├── operations/production-runbook.md ← Production operations and recovery
 ├── operations/release-checklist.md ← Release-candidate sign-off checklist
+├── operations/github-repository-settings.md ← Branch protection and CI policy
 ├── changelog.md               ← Full update history
 └── how-to-use.md              ← Step-by-step usage guides
 ```
@@ -47,6 +48,7 @@ docs/
 | Deploy the system | `deployment.md` → `operations/production-runbook.md` |
 | Prepare a release candidate | `operations/production-runbook.md` and `operations/release-checklist.md` |
 | Check compatibility | Root `compatibility.json` |
+| Configure GitHub release controls | `operations/github-repository-settings.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
 

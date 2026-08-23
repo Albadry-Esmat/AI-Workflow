@@ -1,5 +1,6 @@
 {
   "name": "ai-workflow",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "setup": "bash scripts/setup.sh",
@@ -17,7 +18,9 @@
     "test": "jest --runInBand",
     "test:ci": "jest --runInBand --ci",
     "self-test": "node scripts/self-test.js",
-    "preflight": "node scripts/preflight.js"
+    "preflight": "node scripts/preflight.js",
+    "support-bundle": "node scripts/support-bundle.js",
+    "security:history": "node scripts/security-check.js --history"
   },
   "devDependencies": {
     "jest": "^29.7.0"

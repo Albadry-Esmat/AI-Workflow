@@ -7,24 +7,24 @@ behaviour, and troubleshooting.
 ## Prerequisites
 
 - A GitHub repository where you have write access
-- A GitHub Personal Access Token (PAT) with **`repo` scope** (or `public_repo` for public repositories)
+- A GitHub fine-grained personal access token restricted to the target repository, with only the permissions required by the export flow
 - The `GITHUB_TOKEN` environment variable set in your shell or CI environment
 
 ## Setting Up GITHUB_TOKEN
 
 ### 1. Generate a Personal Access Token
 
-1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
-2. Click **Generate new token (classic)** ← use classic, NOT fine-grained
-3. Select scopes: ✅ `repo` (Full control of private repositories)
-4. Expiration: **No expiration** ← avoids repeated rotation; this is a local dev tool
-5. Click **Generate token** and copy the token immediately
+1. Go to [GitHub fine-grained tokens](https://github.com/settings/personal-access-tokens/fine-grained)
+2. Create a token restricted to the specific repository that receives exported issues.
+3. Grant repository metadata access and the minimum issue permission required by the export flow.
+4. Set the shortest practical expiration and record the rotation owner/date.
+5. Generate the token and copy it immediately; never commit it.
 
 ### 2. Set the Environment Variable
 
 **Local development:**
 ```bash
-export GITHUB_TOKEN="ghp_yourTokenHere"
+export GITHUB_TOKEN="your_fine_grained_token_here"
 ```
 
 Add to your shell profile (`.zshrc` / `.bashrc`) to persist across sessions.
@@ -135,9 +135,9 @@ Example:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `warning: GITHUB_TOKEN env var not set` | Token not exported in shell | Run `export GITHUB_TOKEN="ghp_..."` |
-| `HTTP 401 Unauthorized` | Token expired or wrong scope | Regenerate token with `repo` scope |
-| `HTTP 403 Forbidden` | Token lacks `repo` write access | Ensure `repo` scope is selected when generating token |
+| `warning: GITHUB_TOKEN env var not set` | Token not exported in shell | Export the repository-scoped fine-grained token without printing it |
+| `HTTP 401 Unauthorized` | Token expired or invalid | Rotate the token and verify repository ownership and expiration |
+| `HTTP 403 Forbidden` | Token lacks issue/repository permission | Grant only the reviewed issue permission required by this export flow |
 | `HTTP 422 Unprocessable Entity` | Invalid field (e.g. bad label format) | Check `jira_labels[]` for special characters; the skill sanitises labels automatically |
 | Issues created without milestone | Milestone creation failed silently | Check `github_repo` write permissions; verify milestone title has no leading/trailing spaces |
 
