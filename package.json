@@ -4,14 +4,22 @@
   "scripts": {
     "setup": "bash scripts/setup.sh",
     "health": "bash scripts/health-check.sh",
-    "validate": "bash scripts/validate-skills.sh",
+    "validate": "./aiw validate",
+    "validate:semantic": "node scripts/validate-pipelines.js",
     "clean": "bash scripts/clean.sh",
     "reset": "bash scripts/reset.sh",
     "sync": "bash scripts/sync-website-data.sh",
     "website": "bash rebuild.sh",
     "sessions": "bash scripts/cleanup-sessions.sh",
     "sessions:delete": "bash scripts/cleanup-sessions.sh --delete",
-    "update": "npm install --prefix .opencode",
-    "graph": "graphify update ."
+    "update": "./aiw update",
+    "graph": "graphify update .",
+    "test": "jest --runInBand",
+    "test:ci": "jest --runInBand --ci",
+    "self-test": "node scripts/self-test.js",
+    "preflight": "node scripts/preflight.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

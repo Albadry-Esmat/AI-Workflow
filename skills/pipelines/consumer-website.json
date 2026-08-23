@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "consumer-website",
   "version": "1.0.0",
-  "description": "End-to-end pipeline for public-facing consumer websites: requirements \u2192 architecture \u2192 UX/DB design \u2192 design system generation \u2192 planning \u2192 code generation \u2192 guard layer \u2192 SEO optimization \u2192 quality audit \u2192 release gate \u2192 deployment \u2192 docs",
+  "description": "End-to-end pipeline for public-facing consumer websites: requirements → architecture → UX/DB design → design system generation → planning → code generation → guard layer → SEO optimization → quality audit → release gate → deployment → docs",
   "mode": "hybrid",
   "phases": [
     {
@@ -29,7 +29,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         }
       ]
     },
@@ -320,7 +321,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -332,8 +333,7 @@
   },
   "async_skills": [
     "documentation-generator",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

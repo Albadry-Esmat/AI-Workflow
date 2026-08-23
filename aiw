@@ -54,15 +54,17 @@ show_help() {
   echo -e "    ${CYAN}init${NC}  ${DIM}<path>${NC}               Copy workflow into another project (makes it standalone)"
   echo ""
   echo -e "  ${BOLD}VALIDATION${NC}"
-  echo -e "    ${CYAN}validate${NC}           Run the full 11-check skill validation suite"
+  echo -e "    ${CYAN}validate${NC}           Run structural and semantic pipeline validation"
   echo -e "    ${CYAN}lint${NC}               Quick YAML + schema syntax check (checks 0-1 only)"
   echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
+  echo -e "    ${CYAN}self-test${NC}          Credential-free production conformance tests"
+  echo -e "    ${CYAN}preflight${NC}          Strict release readiness check"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
-  echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
+  echo -e "    ${CYAN}sync --website${NC}               Sync + publish to ASE-OS-Website (requires --confirm-website)"
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
-  echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
+  echo -e "    ${CYAN}update${NC}                       Check .opencode/ plugin layout and OpenCode guidance"
   echo ""
   echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
   echo -e "    ${CYAN}sessions${NC}           Show expired session files (dry-run)"
@@ -72,7 +74,8 @@ show_help() {
   echo -e "  ${BOLD}MAINTENANCE${NC}"
   echo -e "    ${CYAN}clean${NC}              Remove build artifacts and cache files (safe)"
   echo -e "    ${CYAN}reset${NC}              Reset sessions, cache, and artifacts — preserves .env ⚠️"
-  echo -e "    ${CYAN}backup${NC}             Backup .opencode/state/ to backups/"
+  echo -e "    ${CYAN}backup${NC}             Backup .opencode/state/ with checksums"
+  echo -e "    ${CYAN}restore${NC} ${DIM}<backup>${NC}      Verify and restore a state backup"
   echo ""
   echo -e "  ${BOLD}WEBSITE${NC}"
   echo -e "    ${CYAN}website${NC}            Build and start the website locally"
@@ -143,6 +146,15 @@ cmd_start() {
 
 cmd_validate() {
   bash "$ROOT/scripts/validate-skills.sh" "$@"
+  node "$ROOT/scripts/validate-pipelines.js"
+}
+
+cmd_self_test() {
+  node "$ROOT/scripts/self-test.js"
+}
+
+cmd_preflight() {
+  node "$ROOT/scripts/preflight.js"
 }
 
 cmd_lint() {
@@ -233,19 +245,13 @@ cmd_init() {
     "$ROOT/.opencode/" "$TARGET/.opencode/" 2>/dev/null || \
     cp -R "$ROOT/.opencode" "$TARGET/.opencode"
 
-  # Install plugin deps in the target
-  if [[ -f "$TARGET/.opencode/package.json" ]]; then
-    echo "  Installing .opencode/ plugin dependencies..."
-    npm install --prefix "$TARGET/.opencode" --silent
-  fi
-
-  # Copy .env if target doesn't have one
-  if [[ ! -f "$TARGET/.env" ]] && [[ -f "$ROOT/.env" ]]; then
-    cp "$ROOT/.env" "$TARGET/.env"
-    echo "  Copied .env (tokens included)."
-  elif [[ ! -f "$TARGET/.env" ]]; then
+  # Never copy populated source credentials implicitly. A target receives only
+  # the template and must be configured independently by its owner.
+  if [[ ! -f "$TARGET/.env" ]]; then
     cp "$ROOT/.env.example" "$TARGET/.env"
-    echo -e "  ${YELLOW}Created .env from template — remember to set GITHUB_TOKEN.${NC}"
+    chmod 600 "$TARGET/.env"
+    echo -e "  ${YELLOW}Created .env from template — no source credentials copied.${NC}"
+    echo "  Set GITHUB_TOKEN and any optional integration keys in the target .env."
   else
     echo "  .env already exists in target — skipped."
   fi
@@ -260,6 +266,8 @@ cmd_init() {
   echo ""
   echo "  Or from anywhere:"
   echo "    aiw start $TARGET"
+  echo ""
+  echo -e "  ${YELLOW}Security note:${NC} credentials are never copied from the source project."
   echo ""
 }
 
@@ -278,10 +286,14 @@ cmd_graph() {
 }
 
 cmd_update() {
-  echo "→ Updating .opencode/ dependencies..."
-  npm install --prefix "$ROOT/.opencode"
+  echo "→ Checking .opencode/ plugin layout..."
+  if [[ -f "$ROOT/.opencode/plugins/graphify.js" ]]; then
+    echo "  .opencode/plugins/graphify.js present — no separate npm install required."
+  else
+    echo -e "  ${YELLOW}Optional graphify plugin is not present.${NC}"
+  fi
   echo ""
-  echo "  Done. To update opencode CLI itself:"
+  echo "  To update opencode CLI itself:"
   echo "  https://opencode.ai/docs/installation"
 }
 
@@ -314,14 +326,22 @@ cmd_reset() {
 }
 
 cmd_backup() {
-  local BACKUP_DIR="$ROOT/backups/state-$(date +%Y%m%d-%H%M%S)"
-  mkdir -p "$BACKUP_DIR"
-  if [[ -d "$ROOT/.opencode/state" ]]; then
-    cp -R "$ROOT/.opencode/state/" "$BACKUP_DIR/"
-    echo -e "${GREEN}State backed up to:${NC} $BACKUP_DIR"
-  else
+  if [[ ! -d "$ROOT/.opencode/state" ]]; then
     echo -e "${YELLOW}No state directory found — nothing to backup.${NC}"
+    return 0
   fi
+  node "$ROOT/scripts/state-backup.js" backup
+}
+
+cmd_restore() {
+  local BACKUP_DIR="${1:-}"
+  if [[ -z "$BACKUP_DIR" ]]; then
+    echo -e "${RED}Error:${NC} specify a backup directory."
+    echo "  Usage: aiw restore backups/state-YYYY-MM-DD-HH-MM-SS"
+    exit 1
+  fi
+  echo -e "${YELLOW}Warning:${NC} current state will be retained beside the restored state."
+  node "$ROOT/scripts/state-backup.js" restore "$BACKUP_DIR"
 }
 
 cmd_website() {
@@ -414,6 +434,8 @@ case "$COMMAND" in
   validate)         cmd_validate "$@" ;;
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;
+  self-test)        cmd_self_test "$@" ;;
+  preflight)        cmd_preflight "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;
@@ -421,6 +443,7 @@ case "$COMMAND" in
   clean)            cmd_clean "$@" ;;
   reset)            cmd_reset "$@" ;;
   backup)           cmd_backup "$@" ;;
+  restore)          cmd_restore "$@" ;;
   website|web)      cmd_website "$@" ;;
   version|--version|-v) cmd_version ;;
   status)           cmd_status "$@" ;;

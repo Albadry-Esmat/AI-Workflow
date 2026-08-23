@@ -21,6 +21,7 @@
 #   --dry-run    Show what would be synced without writing anything
 #   --check      Exit 1 if any file is out of sync (for CI use)
 #   --website    After syncing website/data/, also push to ASE-OS-Website repo
+#   --confirm-website  Explicitly confirm local publication when used with --website
 
 WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
 WEBSITE_REPO_DIR=""   # set below if --website is passed
@@ -38,6 +39,7 @@ DATA_DIR="$ROOT/website/data"
 DRY_RUN=false
 CHECK_MODE=false
 PUSH_WEBSITE=false
+CONFIRM_WEBSITE=false
 SYNCED=0
 UP_TO_DATE=0
 ERRORS=0
@@ -46,12 +48,14 @@ for arg in "$@"; do
   case "$arg" in
     --dry-run)  DRY_RUN=true       ;;
     --check)    CHECK_MODE=true    ;;
-    --website)  PUSH_WEBSITE=true  ;;
+    --website)  PUSH_WEBSITE=true       ;;
+    --confirm-website|--confirm) CONFIRM_WEBSITE=true ;;
     --help|-h)
-      echo "Usage: $0 [--dry-run] [--check] [--website]"
-      echo "  --dry-run    Show what would be synced without writing anything"
-      echo "  --check      Exit 1 if any file is out of sync (for CI use)"
-      echo "  --website    Sync website/data/ then push to ASE-OS-Website repo"
+      echo "Usage: $0 [--dry-run] [--check] [--website] [--confirm-website]"
+      echo "  --dry-run          Show what would be synced without writing anything"
+      echo "  --check            Exit 1 if any file is out of sync (for CI use)"
+      echo "  --website          Sync website/data/ then prepare to push to ASE-OS-Website"
+      echo "  --confirm-website  Required with --website for local publication"
       exit 0
       ;;
   esac
@@ -67,8 +71,16 @@ fi
 
 # ── Pre-sync: patch site-content.json with live-derived counts ────────────────
 if [[ "$DRY_RUN" != "true" ]] && command -v node &>/dev/null; then
-  header "Auto-patch site-content.json (live counts)"
-  node "$ROOT/scripts/patch-site-content.js" || true
+  header "Check site-content.json (live counts)"
+  if [[ "$CHECK_MODE" == "true" ]]; then
+    if ! node "$ROOT/scripts/patch-site-content.js" --check; then
+      fail "website/data/site-content.json has stale derived content"
+      ERRORS=$((ERRORS+1))
+    fi
+  elif ! node "$ROOT/scripts/patch-site-content.js"; then
+    fail "Could not update website/data/site-content.json"
+    ERRORS=$((ERRORS+1))
+  fi
 fi
 
 # ── Guard: website/data must exist ────────────────────────────────────────────
@@ -135,29 +147,63 @@ sync_dir() {
     dst_file="$dst_dir/$rel"
     sync_file "$src_file" "$dst_file"
   done < <(find "$src_dir" -name "$pattern" -type f -print0 2>/dev/null || true)
+
+  # A mirror must not retain files removed from the authoritative source.
+  if [[ -d "$dst_dir" ]]; then
+    while IFS= read -r -d '' dst_file; do
+      rel="${dst_file#"$dst_dir/"}"
+      if [[ ! -f "$src_dir/$rel" ]]; then
+        if [[ "$CHECK_MODE" == "true" ]]; then
+          fail "Stale mirror file: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        elif [[ "$DRY_RUN" == "true" ]]; then
+          ok "Would remove stale mirror file: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        else
+          rm -f "$dst_file"
+          ok "Removed stale mirror file: ${dst_file#"$ROOT/"}"
+          SYNCED=$((SYNCED+1))
+        fi
+      fi
+    done < <(find "$dst_dir" -name "$pattern" -type f -print0 2>/dev/null || true)
+  fi
 }
 
-# ── Sync: skills/ root files ──────────────────────────────────────────────────
-header "Skills registry files"
-sync_file "$ROOT/skills/index.yaml"             "$DATA_DIR/skills/index.yaml"
-sync_file "$ROOT/skills/registry.json"          "$DATA_DIR/skills/registry.json"
-sync_file "$ROOT/skills/graph/skill-graph.yaml" "$DATA_DIR/skills/graph/skill-graph.yaml"
+# ── Sync from the single authoritative manifest ────────────────────────────────
+MANIFEST_READER="$ROOT/scripts/website-data-manifest.js"
+PLAN_FILE="$(mktemp)"
+_cleanup() {
+  rm -f "${PLAN_FILE:-}"
+  if [[ -n "${WEBSITE_REPO_DIR:-}" ]]; then
+    rm -rf "$WEBSITE_REPO_DIR"
+  fi
+}
+trap _cleanup EXIT
 
-# ── Sync: pipeline JSON files ─────────────────────────────────────────────────
-header "Pipeline templates"
-sync_dir "$ROOT/skills/pipelines" "$DATA_DIR/skills/pipelines" "*.json"
+if [[ ! -f "$MANIFEST_READER" ]] || ! command -v node &>/dev/null; then
+  fail "Website data manifest reader is unavailable"
+  exit 1
+fi
+if ! node "$MANIFEST_READER" > "$PLAN_FILE"; then
+  fail "Website data manifest is invalid"
+  exit 1
+fi
 
-# ── Sync: docs/changelog.md ───────────────────────────────────────────────────
-header "Documentation"
-sync_file "$ROOT/docs/changelog.md" "$DATA_DIR/docs/changelog.md"
-
-# ── Sync: root opencode.json ──────────────────────────────────────────────────
-header "opencode.json"
-sync_file "$ROOT/opencode.json" "$DATA_DIR/opencode.json"
-
-# ── Sync: .opencode/skills/ SKILL.md files ────────────────────────────────────
-header "Skill files (.opencode/skills/)"
-sync_dir "$ROOT/.opencode/skills" "$DATA_DIR/.opencode/skills" "SKILL.md"
+header "Manifest-driven website data sync"
+while IFS=$'\t' read -r kind source destination pattern; do
+  case "$kind" in
+    file)
+      sync_file "$ROOT/$source" "$DATA_DIR/$destination"
+      ;;
+    directory)
+      sync_dir "$ROOT/$source" "$DATA_DIR/$destination" "$pattern"
+      ;;
+    *)
+      fail "Unknown manifest entry type: $kind"
+      ERRORS=$((ERRORS+1))
+      ;;
+  esac
+done < "$PLAN_FILE"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo
@@ -187,12 +233,15 @@ echo
 
 # ── Push to ASE-OS-Website repo (--website flag) ──────────────────────────────
 if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY_RUN" == "false" ]]; then
+  if [[ "$CONFIRM_WEBSITE" != "true" ]]; then
+    fail "External website publication requires --confirm-website"
+    echo "  Local data sync completed; no external repository was modified."
+    exit 2
+  fi
   header "Pushing to ASE-OS-Website"
 
   # Clone into a temp dir
   WEBSITE_REPO_DIR="$(mktemp -d)"
-  trap 'rm -rf "$WEBSITE_REPO_DIR"' EXIT
-
   step "Cloning $WEBSITE_REPO ..."
   if ! git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
     fail "Could not clone ASE-OS-Website — check your GITHUB_TOKEN and network."

@@ -29,7 +29,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         }
       ]
     },
@@ -231,13 +232,13 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate admin panel requirements \u2014 confirm RBAC model, privileged operations, and data access scope",
+      "label": "Validate admin panel requirements — confirm RBAC model, privileged operations, and data access scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
-      "label": "Sign off on architecture \u2014 confirm auth boundaries, role hierarchy, and privileged data access patterns",
+      "label": "Sign off on architecture — confirm auth boundaries, role hierarchy, and privileged data access patterns",
       "timeout": 3600
     },
     {
@@ -267,7 +268,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Mandatory security sign-off \u2014 admin panels have elevated risk; all security findings must be resolved",
+      "label": "Mandatory security sign-off — admin panels have elevated risk; all security findings must be resolved",
       "timeout": 7200
     },
     {
@@ -279,7 +280,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -291,8 +292,7 @@
   },
   "async_skills": [
     "documentation-generator",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

@@ -81,7 +81,7 @@ function main() {
   // Pattern: "N skills" (case insensitive within the JSON strings)
   raw = raw.replace(
     /"\$description":\s*"[^"]*"/,
-    `"$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via \`aiw sync --website\`. Last synced: pipeline v${version} — ${skills} skills, ${agents} agents, ${pipelines} pipelines, ${phases} phases."`
+    `"$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via \`aiw sync --website --confirm-website\`. Last synced: pipeline v${version} — ${skills} skills, ${agents} agents, ${pipelines} pipelines, ${phases} phases."`
   );
 
   // meta.description

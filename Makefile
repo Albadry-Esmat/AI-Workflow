@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status
+.PHONY: help setup health validate validate-semantic self-test preflight clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -47,8 +47,17 @@ start: ## Launch the AI Workflow (opens opencode session)
 health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per item
 	@bash scripts/health-check.sh
 
-validate: ## Run the full 11-check skill validation suite
-	@bash scripts/validate-skills.sh
+validate: ## Run structural and semantic skill/pipeline validation
+	@./aiw validate
+
+validate-semantic: ## Run semantic pipeline invariant validation only
+	@node scripts/validate-pipelines.js
+
+self-test: ## Run credential-free production conformance tests
+	@node scripts/self-test.js
+
+preflight: ## Run strict release readiness checks
+	@node scripts/preflight.js
 
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint
@@ -63,18 +72,22 @@ clean: ## Remove build artifacts and generated cache files (safe, reversible)
 reset: ## Reset sessions, cache, and artifacts — preserves .env and tokens [destructive]
 	@bash scripts/reset.sh
 
-update: ## Update opencode plugin dependencies in .opencode/
+update: ## Check .opencode plugin layout and show OpenCode update guidance
 	@./aiw update
 
-backup: ## Backup .opencode/state/ to backups/ directory
+backup: ## Backup .opencode/state/ with checksums
 	@./aiw backup
+
+restore: ## Verify and restore a state backup: make restore BACKUP=backups/state-...
+	@test -n "$(BACKUP)" || (echo "Usage: make restore BACKUP=backups/state-..."; exit 2)
+	@./aiw restore "$(BACKUP)"
 
 # ── Data & Knowledge ─────────────────────────────────────────────────────────
 sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/) — CI does this automatically on push
 	@bash scripts/sync-website-data.sh
 
-sync-push: ## Sync website/data/ AND push the result to ASE-OS-Website repo
-	@bash scripts/sync-website-data.sh --website
+sync-push: ## Sync website/data/ and publish after explicit confirmation
+	@bash scripts/sync-website-data.sh --website --confirm-website
 
 graph: ## Rebuild the knowledge graph after code changes (requires graphify — optional)
 	@./aiw graph

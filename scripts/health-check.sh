@@ -9,7 +9,7 @@
 #   3. .env file exists
 #   4. GITHUB_TOKEN is set (required)
 #   5. Optional env vars (with warnings, not failures)
-#   6. .opencode/node_modules installed
+#   6. .opencode plugin layout is present
 #   7. Skill count sanity (index.yaml vs .opencode/skills/)
 #   8. opencode.json skill paths exist on disk
 #
@@ -131,12 +131,15 @@ for mcp_var in CONTEXT7_API_KEY BRAVE_API_KEY; do
 done
 
 # ── 6. .opencode/ plugin ──────────────────────────────────────────────────────
-header ".opencode/ plugin dependencies"
+header ".opencode/ plugin layout"
 
-if [[ -d "$ROOT/.opencode/node_modules" ]]; then
-  _ok ".opencode/node_modules exists"
+# The checked-in graphify plugin has no third-party dependencies. Validate the
+# plugin file itself rather than requiring a package directory that does not
+# exist in a clean clone.
+if [[ -f "$ROOT/.opencode/plugins/graphify.js" ]]; then
+  _ok ".opencode/plugins/graphify.js present"
 else
-  _fail ".opencode/node_modules missing — run: make setup  (or: npm install --prefix .opencode)"
+  _warn ".opencode/plugins/graphify.js missing — optional graph reminder unavailable"
 fi
 
 # ── 7. Skill count sanity ─────────────────────────────────────────────────────

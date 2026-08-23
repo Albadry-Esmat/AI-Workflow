@@ -29,6 +29,8 @@ docs/
 ├── monitoring.md              ← Observability, metrics, cost tracking
 ├── governance.md              ← Approval gates, quality enforcement
 ├── versioning.md              ← Version strategy, changelog rules
+├── operations/production-runbook.md ← Production operations and recovery
+├── operations/release-checklist.md ← Release-candidate sign-off checklist
 ├── changelog.md               ← Full update history
 └── how-to-use.md              ← Step-by-step usage guides
 ```
@@ -42,7 +44,9 @@ docs/
 | Add a new skill | `how-to-use.md` → `skills-registry.md` |
 | Add a new agent | `how-to-use.md` → `agents.md` |
 | Understand security rules | `security.md` |
-| Deploy the system | `deployment.md` |
+| Deploy the system | `deployment.md` → `operations/production-runbook.md` |
+| Prepare a release candidate | `operations/production-runbook.md` and `operations/release-checklist.md` |
+| Check compatibility | Root `compatibility.json` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
 
@@ -67,6 +71,7 @@ docs/
 | Deployment changed | `deployment.md`, `changelog.md` |
 | Security changed | `security.md`, `changelog.md` |
 | Version bumped | `versioning.md`, `changelog.md` |
+| Production hardening or release controls changed | `security.md`, `operations/production-runbook.md`, `changelog.md` |
 
 ## File Format Convention
 

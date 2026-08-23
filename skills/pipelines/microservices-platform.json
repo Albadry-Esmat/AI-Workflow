@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "microservices-platform",
   "version": "1.0.0",
-  "description": "Microservices platform pipeline (v1.0.0): requirements \u2192 DDD \u2192 microservices decomposition \u2192 event schema + API contracts \u2192 resilience design \u2192 container orchestration \u2192 SLO + security \u2192 chaos engineering \u2192 deployment. Use for complex multi-service architectures.",
+  "description": "Microservices platform pipeline (v1.0.0): requirements → DDD → microservices decomposition → event schema + API contracts → resilience design → container orchestration → SLO + security → chaos engineering → deployment. Use for complex multi-service architectures.",
   "mode": "hybrid",
   "phases": [
     {
@@ -177,7 +177,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         },
         {
           "name": "doc-maintainer",
@@ -221,7 +222,7 @@
     {
       "after_phase": "phase-5-contracts",
       "type": "human_approval",
-      "label": "Approve API and event contracts \u2014 binding interface boundaries",
+      "label": "Approve API and event contracts — binding interface boundaries",
       "timeout": 3600
     },
     {
@@ -239,7 +240,7 @@
     {
       "after_phase": "phase-12-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -251,7 +252,6 @@
   },
   "async_skills": [
     "documentation-generator",
-    "adr-generator",
     "doc-maintainer"
   ],
   "token_policy": {

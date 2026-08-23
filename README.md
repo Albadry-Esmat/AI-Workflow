@@ -14,7 +14,7 @@ cd AI-Workflow
 ./aiw setup
 ```
 
-`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs dependencies, creates your `.env`, and adds `aiw` to your PATH. Then:
+`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs root dependencies from the lockfile, creates your `.env` with owner-only permissions, and adds `aiw` to your PATH. Then:
 
 ```bash
 # Edit .env and set your GITHUB_TOKEN
@@ -43,7 +43,7 @@ opencode   # all 113 skills + 19 agents, fully self-contained
 
 **Option A** keeps AI Workflow in its own folder. Your project's files are what the agents read and edit.
 
-**Option B** copies `opencode.json`, `.opencode/` (all skills + agents), and `.env` into your project. After that it works standalone — no dependency on the AI-Workflow folder.
+**Option B** copies `opencode.json` and `.opencode/` (all skills + agents) into your project. It creates `.env` from the template when needed and never copies source credentials implicitly. After that it works standalone — no dependency on the AI-Workflow folder.
 
 ---
 
@@ -102,9 +102,11 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 | Command | What it does |
 |---------|-------------|
-| `aiw validate` | Run the full 11-check skill validation suite |
+| `aiw validate` | Run structural skill and semantic pipeline validation |
 | `aiw lint` | Quick YAML + schema syntax check (checks 0-1 only) |
 | `aiw doctor` | Comprehensive diagnostic: health + validation + git status |
+| `aiw self-test` | Run credential-free production conformance tests |
+| `aiw preflight` | Run strict release-readiness checks |
 
 ### Development
 
@@ -112,7 +114,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 |---------|-------------|
 | `aiw sync` | Sync `website/data/` from source files after changing skills |
 | `aiw graph` | Rebuild the knowledge graph after code changes |
-| `aiw update` | Update `.opencode/` plugin dependencies |
+| `aiw update` | Check `.opencode/` plugin layout and OpenCode update guidance |
 | `aiw status` | Show project status (git, sessions, skills, environment) |
 
 ### Session Management
@@ -123,13 +125,18 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw sessions delete` | Delete expired session files |
 | `aiw sessions backup` | Backup current state before cleanup |
 
-### Maintenance
+### Production Release Checks
+
+Before a release candidate, run `aiw self-test`, `aiw validate`, `node scripts/security-check.js`, `aiw sync --check`, and `aiw preflight`. Use the [production runbook](docs/operations/production-runbook.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
+
+## Maintenance
 
 | Command | What it does |
 |---------|-------------|
 | `aiw clean` | Remove build artifacts and cache files (safe, reversible) |
 | `aiw reset` | Reset to clean state — removes `.env`, sessions, artifacts ⚠️ |
-| `aiw backup` | Backup `.opencode/state/` to `backups/` directory |
+| `aiw backup` | Backup `.opencode/state/` with checksums and a manifest |
+| `aiw restore <backup>` | Verify and restore a state backup while retaining previous state |
 
 ### Website
 
@@ -320,8 +327,8 @@ Run: `npm install -g ajv-cli ajv-formats` (or just re-run `aiw setup`).
 ### `Skill count mismatch` in validation
 Every SKILL.md directory under `.opencode/skills/` must have a corresponding `- id:` entry in `skills/index.yaml`. Run `aiw validate` for the specific skill that is missing.
 
-### `.opencode/node_modules missing`
-Run: `aiw update`.
+### `.opencode` plugin unavailable
+The checked-in graphify plugin uses only Node.js built-ins and does not require a separate `.opencode/node_modules` directory. Run `aiw health` to verify that `.opencode/plugins/graphify.js` is present. Use `aiw update` to re-check the plugin layout and view the OpenCode update instructions.
 
 ### Website won't start (`website/package.json not found`)
 The website source lives in a separate repository: [ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website). The `website/` directory in this repo contains only the data mirror (`website/data/`). To work on the website locally:

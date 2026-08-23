@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_version": "1.0.0",
+  "framework_version": "4.0.0",
+  "schema_version": "1.0.0",
+  "runtime": {
+    "node": ">=20 <23",
+    "python": ">=3.9 <4",
+    "npm": ">=10"
+  },
+  "external_cli": {
+    "opencode": {
+      "required": true,
+      "validation": "aiw preflight checks that opencode is available on PATH"
+    },
+    "graphify": {
+      "required": false,
+      "validation": "aiw health reports graphify availability as optional"
+    }
+  },
+  "package_manifests": [
+    { "path": "package.json", "lockfile": "package-lock.json" }
+  ],
+  "mcp_packages": {
+    "github": "@modelcontextprotocol/server-github@2025.4.8",
+    "brave-search": "@modelcontextprotocol/server-brave-search@0.6.2",
+    "memory": "@modelcontextprotocol/server-memory@2026.7.4",
+    "context7": "@upstash/context7-mcp@3.2.2",
+    "playwright": "@playwright/mcp@0.0.77",
+    "slack": "@modelcontextprotocol/server-slack@2025.4.25",
+    "vercel": "vercel-mcp@0.0.7"
+  },
+  "migration_policy": "Schema or framework version changes require a changelog entry and release notes."
+}

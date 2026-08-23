@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "api-first",
   "version": "1.0.0",
-  "description": "API-first design pipeline (v1.0.0): requirements \u2192 architecture \u2192 API contract design (REST/GraphQL/Events) \u2192 security review \u2192 code generation \u2192 testing \u2192 deployment. Use for API-centric products where contract-first design is mandated.",
+  "description": "API-first design pipeline (v1.0.0): requirements → architecture → API contract design (REST/GraphQL/Events) → security review → code generation → testing → deployment. Use for API-centric products where contract-first design is mandated.",
   "mode": "hybrid",
   "phases": [
     {
@@ -147,7 +147,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         }
       ]
     }
@@ -173,7 +174,7 @@
     {
       "after_phase": "phase-3-api-contracts",
       "type": "human_approval",
-      "label": "Approve API contracts before security review \u2014 contracts are the binding interface",
+      "label": "Approve API contracts before security review — contracts are the binding interface",
       "timeout": 3600
     },
     {
@@ -191,7 +192,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -203,8 +204,7 @@
   },
   "async_skills": [
     "documentation-generator",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

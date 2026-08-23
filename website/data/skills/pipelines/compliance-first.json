@@ -291,7 +291,7 @@
       "after_phase": "phase-9b-compliance-check",
       "type": "human_approval",
       "label": "Final compliance sign-off before deployment",
-      "timeout": 3600,
+      "timeout": 0,
       "bypass_on_timeout": false,
       "note": "Non-bypassable. Human must confirm all compliance gates passed and the deployment is cleared for production. Reply OVERRIDE <reason> only with explicit approval authority."
     }

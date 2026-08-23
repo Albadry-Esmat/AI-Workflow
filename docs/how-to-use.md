@@ -57,7 +57,7 @@ cd /path/to/your-project
 opencode
 ```
 
-This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your `.env` tokens into the target project. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
+This copies `opencode.json` and `.opencode/` (all 113 skills + 19 agents) into the target project. It creates `.env` from `.env.example` when the target does not already have one; it does not copy credentials from the source project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
 
 ---
 
@@ -65,22 +65,25 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 
 | Command | What it does |
 |---------|-------------|
-| `./aiw setup` | **First run only** — install deps, create `.env`, add `aiw` to PATH |
+| `./aiw setup` | **First run only** — check prerequisites, install validation tools, create `.env`, add `aiw` to PATH |
 | `aiw health` | Check tools, `.env`, and config — PASS/WARN/FAIL output |
 | `aiw start` | Launch the AI Workflow on this repo |
 | `aiw start <path>` | Launch on any project on your machine |
 | `aiw init <path>` | Copy the full workflow into another project (standalone) |
-| `aiw validate` | Run all 11 skill validation checks |
+| `aiw validate` | Run structural skill and semantic pipeline validation |
 | `aiw lint` | Quick YAML + schema syntax check |
 | `aiw doctor` | Full diagnostic: health + validation + git |
+| `aiw self-test` | Credential-free production conformance tests |
+| `aiw preflight` | Strict release-readiness check; fails on missing prerequisites |
 | `aiw sync` | Sync `website/data/` from source files |
-| `aiw sync --website` | Sync + push directly to ASE-OS-Website repo |
+| `aiw sync --website --confirm-website` | Sync + publish to ASE-OS-Website after explicit confirmation |
 | `aiw graph` | Rebuild the knowledge graph |
 | `aiw status` | Show project status (git, sessions, skills) |
 | `aiw clean` | Remove build artifacts |
 | `aiw reset` | Reset to clean state (removes `.env`, sessions) |
-| `aiw update` | Update `.opencode/` plugin dependencies |
-| `aiw backup` | Backup `.opencode/state/` to backups/ |
+| `aiw update` | Check the `.opencode/` plugin layout and show OpenCode update guidance |
+| `aiw backup` | Backup `.opencode/state/` with checksums and a manifest |
+| `aiw restore <backup>` | Verify and restore a state backup while retaining previous state |
 | `aiw sessions` | Show expired session files (dry-run) |
 | `aiw sessions delete` | Delete expired session files |
 | `aiw website` | Build and start the website locally |
@@ -92,7 +95,7 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
  1. Start with raw input (feature description)
  2. Run requirement-analyzer → structured requirements, open_questions   [Phase 1]
  3. Resolve open_questions with stakeholder; HITL gate approves scope   [HITL gate]
- 4. Run architecture-design; adr-generator captures decisions (async)   [Phase 2]
+ 4. Run architecture-design; adr-generator captures decisions after required architecture artifacts are ready   [Phase 2]
  5. Run frontend-ux-architect + database-architect in parallel          [Phase 2b]
  6. HITL gate: approve architecture, UX design, and DB schema           [HITL gate]
  7. Run dependency-analyzer to build / refresh module dependency graph  [Phase 3]
@@ -117,12 +120,12 @@ This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your
 
 ```
 1. Copy skills/template/skill-template.md to .opencode/skills/<name>/SKILL.md
-2. Fill in all 13 sections (see CONTRIBUTING.md for section list)
+2. Fill in all 12 sections (see CONTRIBUTING.md for section list)
 3. Add entry to skills/index.yaml (follow exact format)
 4. Add entry to skills/registry.json
 5. Increment total_nodes in skills/graph/skill-graph.yaml
 6. Update docs/changelog.md
-7. Run: make validate && make sync
+7. Run: make validate && make sync (or `aiw sync`)
 ```
 
 ### How to Create a New Agent

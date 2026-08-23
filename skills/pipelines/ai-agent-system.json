@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "ai-agent-system",
   "version": "1.0.0",
-  "description": "End-to-end pipeline for LLM-powered applications, RAG pipelines, and multi-agent systems: requirements \u2192 architecture + AI domain constraints \u2192 DB design \u2192 planning \u2192 code generation \u2192 AI safety guard layer (prompt-injection non-bypassable) \u2192 quality + eval framework \u2192 completeness audit \u2192 deployment + CI scaffold \u2192 docs",
+  "description": "End-to-end pipeline for LLM-powered applications, RAG pipelines, and multi-agent systems: requirements → architecture + AI domain constraints → DB design → planning → code generation → AI safety guard layer (prompt-injection non-bypassable) → quality + eval framework → completeness audit → deployment + CI scaffold → docs",
   "mode": "hybrid",
   "domain": "ai_agent",
   "phases": [
@@ -30,7 +30,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         }
       ]
     },
@@ -53,7 +54,7 @@
     },
     {
       "id": "phase-2d-architecture-refine",
-      "label": "Architecture (second pass \u2014 domain-constrained)",
+      "label": "Architecture (second pass — domain-constrained)",
       "note": "Re-invokes architecture-design with domain_constraints from phase-2c-domain injected as input.",
       "skills": [
         {
@@ -158,7 +159,7 @@
     },
     {
       "id": "phase-7b-guards",
-      "label": "Guard Layer (AI Safety \u2014 prompt injection non-bypassable)",
+      "label": "Guard Layer (AI Safety — prompt injection non-bypassable)",
       "parallel": true,
       "skills": [
         {
@@ -279,7 +280,7 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate AI system requirements \u2014 confirm agent type, safety level, and compliance scope",
+      "label": "Validate AI system requirements — confirm agent type, safety level, and compliance scope",
       "timeout": 3600
     },
     {
@@ -291,7 +292,7 @@
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
-      "label": "Approve AI domain constraints: agent pattern, memory architecture, token budget, safety_level \u2014 critical for regulated domains",
+      "label": "Approve AI domain constraints: agent pattern, memory architecture, token budget, safety_level — critical for regulated domains",
       "timeout": 3600
     },
     {
@@ -315,7 +316,7 @@
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
-      "label": "Block if security-guard verdict is 'block' \u2014 prompt injection check is NON-BYPASSABLE",
+      "label": "Block if security-guard verdict is 'block' — prompt injection check is NON-BYPASSABLE",
       "condition": "guards.every(g => g.verdict === 'pass')",
       "note": "security-guard.verdict='block' with reason='prompt_injection_open' cannot be overridden. Code remediation required before pipeline can advance."
     },
@@ -334,7 +335,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -346,8 +347,7 @@
   },
   "async_skills": [
     "documentation-generator",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

@@ -6,13 +6,14 @@
 #   bash scripts/setup.sh    ← direct invocation (works from any directory)
 #
 # What this script does:
-#   1. Checks required prerequisites (git, node, python3)
-#   2. Checks optional tools (opencode, ajv-cli) and installs ajv-cli if missing
-#   3. Installs .opencode/ npm plugin dependencies (skips if already done)
-#   4. Creates .env from .env.example if .env does not yet exist
-#   5. Creates required runtime directories
-#   6. Runs health-check.sh to validate the final state
-#   7. Prints next steps
+#   1. Checks required prerequisites (git, node, npm, python3)
+#   2. Installs committed root npm dependencies with npm ci
+#   3. Checks optional tools (opencode, ajv-cli) and installs ajv-cli if missing
+#   4. Checks the dependency-free .opencode plugin layout
+#   5. Creates .env from .env.example if .env does not yet exist
+#   6. Creates required runtime directories
+#   7. Runs health-check.sh to validate the final state
+#   8. Prints next steps
 
 set -euo pipefail
 
@@ -41,7 +42,7 @@ banner "Setup"
 # ── 1. Required prerequisites ─────────────────────────────────────────────────
 header "Checking required prerequisites"
 
-for tool in git node python3; do
+for tool in git node npm python3; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool found ($(command -v "$tool"))"
   else
@@ -58,7 +59,15 @@ if [[ "$FAIL" -gt 0 ]]; then
   exit 1
 fi
 
-# ── 2. Optional tools ─────────────────────────────────────────────────────────
+# ── 2. Root npm dependencies ───────────────────────────────────────────────────
+header "Installing root npm dependencies"
+if npm ci --ignore-scripts --no-audit --no-fund --silent; then
+  _ok "Root npm dependencies installed from package-lock.json"
+else
+  _fail "npm ci failed — package-lock.json and package.json may be out of sync"
+fi
+
+# ── 3. Optional tools ─────────────────────────────────────────────────────────
 header "Checking optional tools"
 
 if command -v opencode &>/dev/null; then
@@ -80,21 +89,19 @@ else
   fi
 fi
 
-# ── 3. .opencode/ npm plugin ──────────────────────────────────────────────────
-header "Setting up .opencode/ plugin dependencies"
+# ── 4. .opencode/ plugin layout ───────────────────────────────────────────────
+header "Checking .opencode/ plugin layout"
 
-if [[ -d "$ROOT/.opencode/node_modules" ]]; then
-  _ok ".opencode/node_modules already present — skipping install"
+# The checked-in graphify plugin uses only Node.js built-ins and has no separate
+# package manifest. Do not run npm install against .opencode/; doing so fails on
+# a clean clone because .opencode/package.json does not exist.
+if [[ -f "$ROOT/.opencode/plugins/graphify.js" ]]; then
+  _ok ".opencode/plugins/graphify.js present — no plugin install required"
 else
-  step "Installing .opencode/ npm packages..."
-  if npm install --prefix "$ROOT/.opencode" --silent; then
-    _ok ".opencode/ packages installed"
-  else
-    _warn ".opencode/ npm install failed — run: npm install --prefix .opencode"
-  fi
+  _warn ".opencode/plugins/graphify.js not found — continuing without optional plugin"
 fi
 
-# ── 4. Create .env from .env.example ─────────────────────────────────────────
+# ── 5. Create .env from .env.example ─────────────────────────────────────────
 header "Environment configuration (.env)"
 
 if [[ -f "$ROOT/.env" ]]; then
@@ -103,7 +110,8 @@ if [[ -f "$ROOT/.env" ]]; then
 else
   if [[ -f "$ROOT/.env.example" ]]; then
     cp "$ROOT/.env.example" "$ROOT/.env"
-    _ok ".env created from .env.example"
+    chmod 600 "$ROOT/.env"
+    _ok ".env created from .env.example (mode 600)"
     echo
     echo -e "  ${BOLD}${YELLOW}Action required:${NC} Open .env and set your GITHUB_TOKEN."
     echo "  The file is at: $ROOT/.env"
@@ -165,7 +173,6 @@ else
   _fail "aiw script not found at $AIW_BIN"
 fi
 
-# ── 7. Pre-commit hook ────────────────────────────────────────────────────────
 # ── 7. Pre-commit hook ────────────────────────────────────────────────────────
 header "Installing pre-commit hook"
 

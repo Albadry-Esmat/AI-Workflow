@@ -24,11 +24,6 @@
       "enabled": true
     },
 
-    "fetch": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
-      "enabled": false
-    },
 
     "context7": {
       "type": "local",

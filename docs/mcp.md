@@ -4,7 +4,7 @@
 
 ## Overview
 
-ASE-OS integrates eight Model Context Protocol (MCP) servers that extend every agent in the pipeline with live external capabilities — GitHub, web search, persistent memory, documentation lookup, browser automation, and more. MCPs are configured in `opencode.json` under the `mcp` key and are available to all agents regardless of their `bash: deny` permission.
+ASE-OS integrates seven Model Context Protocol (MCP) server definitions that extend agents with live external capabilities such as GitHub, web search, persistent memory, documentation lookup, browser automation, Slack, and Vercel. Five are enabled by default; Slack and Vercel remain disabled until explicitly configured. MCPs are configured in `opencode.json` under the `mcp` key and are available to all agents regardless of their `bash: deny` permission.
 
 ## Enabled Servers
 
@@ -13,7 +13,6 @@ ASE-OS integrates eight Model Context Protocol (MCP) servers that extend every a
 | `github` | `@modelcontextprotocol/server-github` | ✅ enabled | `GITHUB_TOKEN` |
 | `brave-search` | `@modelcontextprotocol/server-brave-search` | ✅ enabled | `BRAVE_API_KEY` |
 | `memory` | `@modelcontextprotocol/server-memory` | ✅ enabled | none |
-| `fetch` | `@modelcontextprotocol/server-fetch` | ✅ enabled | none |
 | `context7` | `@upstash/context7-mcp` | ✅ enabled | `CONTEXT7_API_KEY` |
 | `playwright` | `@playwright/mcp` | ✅ enabled | none |
 | `slack` | `@modelcontextprotocol/server-slack` | ⏸ disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
@@ -77,25 +76,6 @@ Disabled servers are pre-configured — set `"enabled": true` in `opencode.json`
 - `recovery` — stores rollback checkpoints as named memory entities for cross-session recovery
 
 **Governance note:** This MCP stores only structured agent artifacts (JSON key-value entities), never raw user content, source code, or PII — consistent with Layer 5 PII protection rules in `docs/governance.md`.
-
----
-
-### `fetch` — Web Fetch for Subagents
-**Package:** [`@modelcontextprotocol/server-fetch`](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch)
-
-**Auth:** None.
-
-**Tools exposed:**
-- `fetch` — retrieve any public URL as markdown, HTML, or raw text
-
-**Agents that benefit most:**
-- `api-designer` → `api-design-architect` fetches the target API's current OpenAPI spec for comparison
-- `reviewer` → `security-review` fetches NIST 800-53 controls and OWASP cheat sheets
-- `builder` → `seo-optimizer` fetches current Core Web Vitals thresholds from web.dev
-- `documenter` → `documentation-generator` fetches upstream changelogs for ADR context
-- `sre` → `runbook-generator` fetches cloud provider status pages as context
-
-**Note:** This gives subagents the same `webfetch` capability the primary agent already has. Subagents with `bash: deny` cannot use shell curl — `fetch` fills this gap.
 
 ---
 

@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "iot-embedded",
   "version": "1.0.0",
-  "description": "End-to-end pipeline for embedded systems, IoT platforms, and real-time systems: requirements \u2192 architecture + systems domain constraints (HAL, RTOS, protocol, OTA, safety) \u2192 DB/data design \u2192 planning \u2192 code generation \u2192 hardcoded-credential guard (non-bypassable) \u2192 quality + HIL testing strategy \u2192 completeness audit \u2192 deployment + CI scaffold \u2192 docs",
+  "description": "End-to-end pipeline for embedded systems, IoT platforms, and real-time systems: requirements → architecture + systems domain constraints (HAL, RTOS, protocol, OTA, safety) → DB/data design → planning → code generation → hardcoded-credential guard (non-bypassable) → quality + HIL testing strategy → completeness audit → deployment + CI scaffold → docs",
   "mode": "hybrid",
   "domain": "embedded_iot",
   "phases": [
@@ -30,7 +30,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before downstream gated phases consume architecture decisions."
         }
       ]
     },
@@ -53,7 +54,7 @@
     },
     {
       "id": "phase-2d-architecture-refine",
-      "label": "Architecture (second pass \u2014 systems-constrained)",
+      "label": "Architecture (second pass — systems-constrained)",
       "note": "Re-invokes architecture-design with domain_constraints from systems-specialist: HAL design, RTOS task model, memory map, integration protocol selection.",
       "skills": [
         {
@@ -169,7 +170,7 @@
     },
     {
       "id": "phase-7b-guards",
-      "label": "Guard Layer (IoT Security \u2014 hardcoded credentials NON-BYPASSABLE)",
+      "label": "Guard Layer (IoT Security — hardcoded credentials NON-BYPASSABLE)",
       "parallel": true,
       "skills": [
         {
@@ -190,7 +191,7 @@
           "config": {
             "embedded_budgets": {
               "isr_max_ms": 1,
-              "wcet_margin_factor": 2.0
+              "wcet_margin_factor": 2
             }
           }
         }
@@ -303,7 +304,7 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate IoT/embedded requirements \u2014 confirm system type, real-time class, safety standard, hardware target, and communication protocols before domain specialist runs",
+      "label": "Validate IoT/embedded requirements — confirm system type, real-time class, safety standard, hardware target, and communication protocols before domain specialist runs",
       "timeout": 3600
     },
     {
@@ -315,7 +316,7 @@
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
-      "label": "Approve systems domain constraints: architecture pattern (bare-metal/RTOS/IoT), memory budget, protocol selection, OTA design, safety standard controls \u2014 these are foundational hardware decisions",
+      "label": "Approve systems domain constraints: architecture pattern (bare-metal/RTOS/IoT), memory budget, protocol selection, OTA design, safety standard controls — these are foundational hardware decisions",
       "timeout": 3600
     },
     {
@@ -345,7 +346,7 @@
     {
       "after_phase": "phase-7b-guards",
       "type": "condition",
-      "label": "Block if any guard verdict is 'block' \u2014 hardcoded credentials and unsigned OTA are NON-BYPASSABLE",
+      "label": "Block if any guard verdict is 'block' — hardcoded credentials and unsigned OTA are NON-BYPASSABLE",
       "condition": "guards.every(g => g.verdict === 'pass')",
       "note": "security-guard.verdict='block' with reason='hardcoded_credentials' cannot be overridden for embedded_iot domain. Code remediation required."
     },
@@ -364,7 +365,7 @@
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable. Confirm firmware signing, OTA rollback tested, and staged fleet rollout plan approved.",
+      "label": "Mandatory deployment approval — non-bypassable. Confirm firmware signing, OTA rollback tested, and staged fleet rollout plan approved.",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -376,8 +377,7 @@
   },
   "async_skills": [
     "documentation-generator",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

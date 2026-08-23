@@ -110,7 +110,8 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false,
+          "note": "Must complete before the phase-2 architecture approval gate; downstream planning and design may consume the ADR artifact."
         }
       ]
     },
@@ -556,7 +557,6 @@
   "async_skills": [
     "documentation-generator",
     "doc-maintainer",
-    "adr-generator",
     "work-item-exporter",
     "cost-estimator"
   ],

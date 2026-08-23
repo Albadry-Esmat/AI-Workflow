@@ -11,8 +11,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Production hardening baseline** — Added `docs/production-readiness/release-candidate-baseline.md` to record the release branch, baseline commit, exit criteria, severity definitions, and initial P0/P1 findings.
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.
 - **Delegate skill (SKL-120)** — formal protocol for intra-pipeline task delegation with scoped context, success criteria, turn limits, and audit trail. Prevents ad-hoc agent-to-agent handoff sprawl.
+
+### Changed
+
+- **Pipeline safety** — ADR generation is synchronous in every gated pipeline, and the compliance pipeline’s final sign-off is now an indefinite non-bypassable approval.
+- **CI supply chain** — GitHub Actions are pinned to immutable commit SHAs; validation workflows install from the committed lockfile.
+- **MCP configuration** — Removed the unused unpinned fetch server and aligned MCP documentation with the seven-server configuration.
+- **Website synchronization** — Replaced duplicated source lists with a manifest-driven generator, stale-mirror cleanup, non-mutating check mode, and explicit confirmation for local external publication.
+- **Clean-clone setup** — Removed the nonexistent `.opencode/package.json` installation requirement. Setup and health checks now validate the dependency-free checked-in plugin layout.
+- **Secure project initialization** — `aiw init` now creates `.env` from `.env.example`, enforces mode 600, and never copies populated source credentials implicitly.
+- **Setup dependencies** — `aiw setup` now installs root dependencies with `npm ci` from the committed lockfile.
+- **CLI update guidance** — `aiw update` now checks the plugin layout and points users to OpenCode’s own update instructions.
+- **Semantic pipeline validator** — Added `scripts/validate-pipelines.js` and integrated it into `aiw validate`, CI, and release preflight. It checks executable skill paths, duplicate phases, gate targets, async ordering, deployment approvals, and parallel groups.
+- **Credential-free conformance suite** — Added Jest fixtures for semantic validation, manifest integrity, atomic recovery, lock contention, and secure initialization.
+- **State recovery tools** — Added checksum-manifested `aiw backup`, `aiw restore <backup>`, and shared atomic JSON/lock primitives.
+- **Compatibility manifest** — Added `compatibility.json` for supported runtimes, schema version, package manifests, and MCP package expectations.
+- **Release diagnostics** — Added `aiw self-test` and strict `aiw preflight` commands.
 
 ---
 
@@ -132,8 +149,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 - **Infrastructure** — `.env.example`: Complete environment variable template with inline documentation for every variable. Resolves the critical onboarding gap where `cp .env.example .env` was documented but the file did not exist.
 - **Infrastructure** — `Makefile`: Primary developer CLI entry point. Provides `make setup`, `make health`, `make validate`, `make sync`, `make graph`, `make clean`, `make reset`, `make update`, `make website`, `make sessions`, `make sessions-delete`, and `make help`.
-- **Infrastructure** — `scripts/setup.sh`: Single-command project setup. Checks prerequisites, installs `ajv-cli`, installs `.opencode/` npm packages (skips if already done), creates `.env` from template, creates required runtime directories, and runs health check.
-- **Infrastructure** — `scripts/health-check.sh`: Environment validation script. Checks required tools, optional tools, `.env` existence, `GITHUB_TOKEN` (masked), optional env vars, `.opencode/node_modules`, skill count sanity, and `opencode.json` path integrity. Outputs PASS/WARN/FAIL with actionable guidance per item.
+- **Infrastructure** — `scripts/setup.sh`: Single-command project setup. Checks prerequisites, installs `ajv-cli` when missing, validates the dependency-free `.opencode/` plugin layout, creates `.env` from template, creates required runtime directories, and runs health check.
+- **Infrastructure** — `scripts/health-check.sh`: Environment validation script. Checks required tools, optional tools, `.env` existence, `GITHUB_TOKEN` (masked), optional env vars, `.opencode` plugin layout, skill count sanity, and `opencode.json` path integrity. Outputs PASS/WARN/FAIL with actionable guidance per item.
 - **Infrastructure** — `scripts/sync-website-data.sh`: Automates the `website/data/` data sync. Copies `skills/`, `docs/changelog.md`, `opencode.json`, and all SKILL.md files to their `website/data/` mirror. Supports `--dry-run` and `--check` (CI mode) flags.
 - **Infrastructure** — `scripts/clean.sh`: Removes build artifacts and cache files safely (website/.next/, graphify-out/cache/, dated graphify snapshots).
 - **Infrastructure** — `scripts/reset.sh`: Resets workspace to clean state with confirmation prompt. Removes `.env`, session state, exports, and build artifacts. Accepts `--yes` to skip confirmation.

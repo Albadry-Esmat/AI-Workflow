@@ -37,7 +37,7 @@ The security review skill (`.opencode/skills/security-review/SKILL.md`) performs
 |-----------|---------------|
 | PII | Must be stripped before any skill processing. Never stored in output. |
 | Credentials | Never appear in skill output. Use `{env:VAR}` or `{file:path}` references. |
-| Pipeline artifacts | Stored only in session context during active session. Not persisted. |
+| Pipeline artifacts | Stored according to the configured session/state policy; state backups are checksum-manifested and restoreable. Sensitive content must still be redacted before logging or publication. |
 | Execution logs | Retained for 7 days. Archived after. |
 
 ## Agent Permissions
@@ -47,6 +47,21 @@ The security review skill (`.opencode/skills/security-review/SKILL.md`) performs
 | `primary` | Read all | Ask | Ask |
 | Read-only subagents (`analyzer`, `architect`, `tester`, `impact-analyzer`, `deployer`, `data-engineer`, `api-designer`, `distributed-systems`, `cloud-platform`, `security-specialist`, `sre`) | Read assigned skill files only | Deny | Deny |
 | Write-enabled subagents (`planner`, `reviewer`, `builder`, `test-generator`, `recovery`, `documenter`, `doc-maintainer`) | Read assigned skill files + write scope | Ask | Deny |
+
+## Production Hardening Controls
+
+The release-hardening path adds executable controls in addition to the agent permission model:
+
+| Control | Enforcement |
+|---|---|
+| Credential-safe initialization | `aiw init` creates `.env` from `.env.example`, never copies populated source credentials implicitly, and applies mode 600 on POSIX systems. |
+| State integrity | `scripts/lib/state-store.js` provides atomic JSON replacement, a previous-file backup, corruption recovery, and single-writer lock primitives. |
+| Backup verification | `aiw backup` writes a manifest with byte counts and SHA-256 checksums; `aiw restore` verifies the manifest before replacement and retains the previous state directory. |
+| Pipeline invariants | `scripts/validate-pipelines.js` rejects unknown skills, duplicate phases, invalid gate references, unsafe async steps, and missing non-bypassable deployment approvals. |
+| Supply-chain checks | CI workflows use immutable action commit SHAs and `scripts/security-check.js` verifies action and MCP pinning. |
+| External publication | Website publication requires an explicit `--confirm-website` flag and source-to-mirror validation before external repository mutation. |
+
+Use `aiw self-test` for credential-free conformance checks and `aiw preflight` before a release candidate. Neither command invokes paid model calls.
 
 ## Security Skill
 
@@ -73,3 +88,5 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 - Any change to security policies requires updating this file AND `changelog.md`.
 - Security skill changes require re-running threat modeling.
 - New integration points require security review before pipeline inclusion.
+- Production publication credentials must be separate from local development credentials and must never be copied by `aiw init`.
+- Run `node scripts/security-check.js` after changing MCP definitions or GitHub Actions workflows.
