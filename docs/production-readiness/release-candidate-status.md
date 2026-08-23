@@ -4,7 +4,7 @@
 **Branch:** `release/production-hardening`  
 **Initial hardening commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
 **Implementation commit:** `c482a77` (`feat: complete production hardening controls`)  
-**Final branch commit:** pending report metadata commit  
+**Final documentation commit:** verify with `git log -1 --oneline` on `release/production-hardening` (the report intentionally avoids self-referential commit metadata)  
 **Date:** 2026-08-23
 
 ## Executive Summary
