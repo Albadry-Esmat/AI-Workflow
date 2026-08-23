@@ -21,6 +21,9 @@ Use this checklist for every release candidate. A checked box must have evidence
 
 - [ ] `aiw validate` passes structural and semantic checks.
 - [ ] `aiw self-test` passes without credentials or paid model calls.
+- [ ] `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` creates a sanitized manifest and verified backup; actual live execution is recorded separately.
+- [ ] `npm run validate:budget` passes and the selected run has explicit retry, duration, token, and API-call limits.
+- [ ] `npm run validate:golden` passes against the compatibility manifest.
 - [ ] All P0/P1 findings have regression coverage or an approved exception.
 - [ ] Delayed asynchronous output cannot pass a dependent gate prematurely.
 - [ ] Concurrent state access is rejected or serialized safely.
@@ -30,6 +33,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 
 ## Security and Supply Chain
 
+- [ ] `npm run validate:mcp` passes for the approved pilot profile.
 - [ ] `node scripts/security-check.js --history` passes on the full reachable history.
 - [ ] `npm audit --audit-level=high --omit=optional` passes.
 - [ ] `aiw version --json` matches `compatibility.json` and the intended release tag.
@@ -37,6 +41,8 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] All enabled and disabled MCP package references are semver-pinned.
 - [ ] Secret scanning passes on the current tree and full history.
 - [ ] Logs, support bundles, generated data, and backups contain no credentials or raw sensitive payloads.
+- [ ] `aiw events --json` contains only the approved sanitized event schema and retention/deletion behavior has been tested.
+- [ ] Retryable publication operations use a deterministic idempotency key and duplicate-claim behavior has been tested.
 - [ ] `aiw support-bundle` has been tested and only sanitized diagnostics are shared.
 - [ ] Publication credentials are separate from local development credentials.
 
@@ -49,9 +55,11 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] Publication is performed only with explicit `--confirm-website` approval.
 - [ ] The target diff is reviewed before push.
 - [ ] Website rollback commit is identified.
+- [ ] `aiw rollback-rehearsal` passes in a disposable workspace and the report contains no raw state.
 
 ## Pilot and Release
 
+- [ ] The operator-owned live smoke sequence in `docs/operations/live-smoke-test.md` completes on a non-critical repository.
 - [ ] One constrained pipeline completes on a non-critical repository.
 - [ ] One full pipeline completes with non-sensitive data.
 - [ ] Human gate decisions and recovery actions are recorded.

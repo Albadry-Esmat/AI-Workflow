@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic self-test preflight support-bundle security-history clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -50,8 +50,17 @@ health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per it
 validate: ## Run structural and semantic skill/pipeline validation
 	@./aiw validate
 
-validate-semantic: ## Run semantic pipeline invariant validation only
+validate-semantic: ## Run semantic pipeline validation
 	@node scripts/validate-pipelines.js
+
+validate-mcp: ## Validate the approved MCP permission profile
+	@node scripts/validate-mcp-policy.js
+
+validate-budget: ## Validate pilot execution capacity and cost limits
+	@node scripts/validate-execution-budget.js
+
+validate-golden: ## Validate golden artifact compatibility contracts
+	@node scripts/validate-golden-artifacts.js
 
 self-test: ## Run credential-free production conformance tests
 	@node scripts/self-test.js
@@ -59,8 +68,17 @@ self-test: ## Run credential-free production conformance tests
 preflight: ## Run strict release readiness checks
 	@node scripts/preflight.js
 
+pilot-preflight: ## Prepare a constrained live smoke test without executing OpenCode
+	@node scripts/pilot-preflight.js
+
+rollback-rehearsal: ## Rehearse disposable state corruption and verified restore
+	@node scripts/rollback-rehearsal.js
+
 security-history: ## Scan all reachable Git history for credential-like patterns
 	@node scripts/security-check.js --history
+
+events: ## Show recent sanitized execution events
+	@node scripts/events.js
 
 lint: ## Quick YAML + schema syntax check (checks 0-1 only)
 	@./aiw lint

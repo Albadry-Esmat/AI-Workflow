@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { atomicWriteJson, readJsonWithRecovery } = require("./lib/state-store");
+const { appendEvent } = require("./lib/event-log");
 
 class ContractError extends Error {
   constructor(code, message) {
@@ -68,6 +69,12 @@ function executeFixturePipeline(pipeline, options = {}) {
     gates: [],
     events: [],
   };
+  const emitEvent = (event) => {
+    const record = { session_id: session.session_id, pipeline_id: session.pipeline_id, ...event };
+    session.events.push(record);
+    if (options.persistEvents) appendEvent(record, options.eventsFile);
+    if (options.emitEvent) options.emitEvent(record);
+  };
   const pending = new Map();
   const phases = pipeline.phases || [];
 
@@ -77,23 +84,23 @@ function executeFixturePipeline(pipeline, options = {}) {
       const unavailable = required.filter((artifact) => !session.artifacts[artifact]);
       if (unavailable.length) throw new ContractError("ARTIFACT_NOT_READY", `${task.id || task.skill} requires unavailable artifact(s): ${unavailable.join(", ")}`);
 
-      session.events.push({ session_id: session.session_id, phase_id: phase.id, task_id: task.id, status: "started" });
+      emitEvent({ event: "task", phase_id: phase.id, skill: task.id, status: "started" });
       if (task.type === "hitl_gate") {
         const decision = options.gateDecisions?.[task.id] || task.decision || "reject";
         session.gates.push({ task_id: task.id, decision });
         if (decision !== "approve") {
           session.status = decision === "timeout" ? "timed_out" : "rejected";
-          session.events.push({ session_id: session.session_id, phase_id: phase.id, task_id: task.id, status: session.status });
+          emitEvent({ event: "gate", phase_id: phase.id, skill: task.id, status: session.status });
           return session;
         }
       } else if (task.async) {
         const result = options.asyncResults?.[task.id];
         if (result && result.status === "completed") {
           session.artifacts[task.output] = result.output;
-          session.events.push({ session_id: session.session_id, phase_id: phase.id, task_id: task.id, status: "reconciled" });
+          emitEvent({ event: "async", phase_id: phase.id, skill: task.id, status: "reconciled" });
         } else {
           pending.set(task.id, task);
-          session.events.push({ session_id: session.session_id, phase_id: phase.id, task_id: task.id, status: "pending" });
+          emitEvent({ event: "async", phase_id: phase.id, skill: task.id, status: "pending" });
         }
         continue;
       } else {
@@ -101,7 +108,7 @@ function executeFixturePipeline(pipeline, options = {}) {
         if (task.required_fields) validateOutput(output, task.required_fields);
         if (task.output) session.artifacts[task.output] = output;
       }
-      session.events.push({ session_id: session.session_id, phase_id: phase.id, task_id: task.id, status: "completed" });
+      emitEvent({ event: "task", phase_id: phase.id, skill: task.id, status: "completed" });
     }
   }
 
@@ -111,6 +118,7 @@ function executeFixturePipeline(pipeline, options = {}) {
   }
 
   session.status = "completed";
+  emitEvent({ event: "pipeline", status: "completed" });
   return session;
 }
 

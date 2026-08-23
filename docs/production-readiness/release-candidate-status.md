@@ -11,7 +11,7 @@
 
 The approved production-readiness plan has been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles, machine-readable version output, full-history secret scanning, immutable CI action references, MCP package pinning checks, least-privilege credential guidance, a compatibility manifest, strict preflight, reviewed website PR publication, and operational release documentation.
 
-The branch is **ready for a controlled internal pilot after the operator supplies real production prerequisites**. It is not yet a general-production release from this sandbox because the real OpenCode CLI and a configured GitHub token were intentionally not installed or supplied here, and no live model/MCP pipeline was executed.
+The branch is **ready for constrained pilot preparation after the operator supplies real production prerequisites**. It is not yet a general-production release from this sandbox because the real OpenCode CLI and a configured GitHub token were intentionally not installed or supplied here, and no live model/MCP pipeline was executed.
 
 ## Implemented Changes
 
@@ -24,15 +24,15 @@ The branch is **ready for a controlled internal pilot after the operator supplie
 | State recovery | Added `scripts/lib/state-store.js` for atomic JSON writes, previous-file backups, corruption recovery, and single-writer locks. Added checksum-manifested `aiw backup`, `aiw restore <backup>`, and verification support. |
 | Conformance | Added a deterministic black-box harness plus Jest tests without live credentials or paid model calls. Coverage includes routing, retries, HITL approval/rejection, async reconciliation, artifact readiness, redaction, persistence, retention, semantic validation, manifest integrity, atomic recovery, locking, backup/restore, version output, support bundles, and secure initialization. |
 | Security and supply chain | Removed the unused unpinned fetch MCP entry, verified all retained MCP versions, pinned GitHub Actions to immutable SHAs, added current-tree and full-history secret-like file/token checks, added high-severity npm audit checks, and replaced broad token guidance with fine-grained repository-scoped guidance. |
-| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and this status report. |
-| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, and website-generated content to match the implementation. |
+| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw pilot-preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, sanitized event reporting, execution-budget validation, idempotency protection, rollback rehearsal, golden artifact compatibility checks, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/live-smoke-test.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and this status report. |
+| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, live smoke procedure, and website-generated content to match the implementation. |
 
 ## Verification Evidence
 
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 16 tests passed in one suite. |
+| Jest conformance | PASS | 25 tests passed in one suite after the operational-control additions. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
 | Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 117 reachable commits passed. |
@@ -42,6 +42,12 @@ The branch is **ready for a controlled internal pilot after the operator supplie
 | Git diff hygiene | PASS | `git diff --check` passed. |
 | Clean-clone setup | PASS | First setup and second idempotent setup both returned 0; no `.opencode` ENOENT; `.env` mode 600. |
 | Backup/restore round trip | PASS | Disposable state backup, checksum verification, restore, and previous-state retention succeeded. |
+| Pilot-preflight preparation | PASS (repository path) | Disposable fixture created a sanitized blocked/ready manifest, validated MCP permissions, and created a checksum-backed backup; no live runtime was invoked. |
+| Structured event log | PASS | Event redaction, locking, bounded reads, summaries, and conformance integration passed. |
+| Capacity and cost policy | PASS | Static pilot budget policy and negative fixture validation passed. |
+| Idempotency guard | PASS | Deterministic operation claims reject duplicates and record completion; website publication path is guarded without live publication. |
+| Rollback rehearsal | PASS | Disposable corruption and verified restore produced a sanitized report with matching checksums. |
+| Golden artifact compatibility | PASS | Versioned structured-only artifact contracts and negative drift fixture passed. |
 | Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
 | Strict preflight pass path | PASS | Passed with a temporary fake OpenCode executable and test-only token; no production secret was used. |
 | Live OpenCode/MCP pipeline | NOT RUN | Requires user-owned OpenCode installation, credentials, and a non-critical pilot repository. |
@@ -73,10 +79,11 @@ node scripts/security-check.js --history
 aiw sync --check
 aiw version --json
 aiw preflight
+aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only
 aiw backup
 ```
 
-Then run a constrained pipeline against a non-critical project, review all human gates and generated artifacts, and only afterward run one full pipeline with non-sensitive input. Do not enable autonomous adaptation or direct external publication during the pilot.
+Then follow `docs/operations/live-smoke-test.md` for the constrained pipeline, review all human gates and generated artifacts, and only afterward run one full pipeline with non-sensitive input. Do not enable autonomous adaptation or direct external publication during the pilot. Run `aiw rollback-rehearsal` before any publication-policy change.
 
 ## Release Decision
 

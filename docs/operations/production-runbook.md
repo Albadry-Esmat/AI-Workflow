@@ -16,9 +16,12 @@ node scripts/security-check.js --history
 aiw sync --check
 aiw version --json
 aiw preflight
+aiw validate-budget
+aiw validate-golden
+aiw rollback-rehearsal
 ```
 
-`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception.
+`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
 
 ## Before Running a Pipeline
 
@@ -27,8 +30,11 @@ Use a non-critical repository for the first run. Confirm the selected pipeline, 
 Create a state backup before a long or high-value run:
 
 ```bash
+aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>
 aiw backup
 ```
+
+Use the configured pilot budget as the ceiling for retries, duration, estimated tokens, active sessions, queue depth, and external API calls. A threshold pauses for approval; a hard limit stops safely. Inspect sanitized lifecycle events with `aiw events --json` and do not expose raw prompts or MCP payloads.
 
 Record the generated backup path with the session identifier. Do not copy the backup into a public repository.
 
@@ -49,7 +55,9 @@ Do not delete session files to clear a stuck run. First create a backup, inspect
 | Corrupted session JSON | Stop writes, preserve the file, inspect its `.bak`, and use the documented recovery/restore procedure. |
 | MCP unavailable | Mark the integration unavailable, use the documented fallback if safe, and do not invent external results. |
 | Website mirror drift | Run `aiw sync` locally, review the diff, run `aiw sync --check`, and commit source plus generated data together. |
-| Website publication failure | Do not retry blindly. Confirm target branch, credentials, non-fast-forward status, and current target diff before another publication attempt. |
+| Website publication failure | Do not retry blindly. Confirm target branch, credentials, non-fast-forward status, current target diff, and the deterministic idempotency ledger before another publication attempt. A duplicate claim is a stop-and-inspect condition. |
+| Budget threshold or hard limit | Pause for explicit approval at a threshold; stop safely at a hard limit. Preserve the correlation ID and sanitized event summary. |
+| Rollback required | Run `aiw rollback-rehearsal` in a disposable workspace first, then use only a verified backup for real restore. |
 
 ## Backup and Restore
 
@@ -83,9 +91,17 @@ External publication requires explicit confirmation:
 aiw sync --website --confirm-website
 ```
 
+For changed website data, publication claims a deterministic operation key based on the source-data digest. If the same key is claimed again, stop and inspect the target repository and `.opencode/state/idempotency.json`; never blindly create a duplicate commit or pull request.
+
 The publication workflow validates source data, semantic pipeline invariants, security checks, conformance tests, and mirror cleanliness before pushing. Review the target diff and ensure the publication token is separate from local development credentials.
 
 ## Rollback
+
+Rehearse the recovery path before release:
+
+```bash
+aiw rollback-rehearsal
+```
 
 For a bad local release candidate, switch to the previous known-good tag and restore the last verified state backup. For a bad website publication, revert the generated data commit in ASE-OS-Website and confirm the live site rebuilds from the reverted commit. Do not force-push or rewrite the target branch history.
 

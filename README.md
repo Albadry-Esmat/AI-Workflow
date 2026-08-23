@@ -17,8 +17,8 @@ cd AI-Workflow
 `./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs root dependencies from the lockfile, creates your `.env` with owner-only permissions, and adds `aiw` to your PATH. Then:
 
 ```bash
-# Edit .env and set your GITHUB_TOKEN
-# (get one at https://github.com/settings/tokens — classic token, no expiration, scopes: repo + read:org)
+# Edit .env and set a dedicated fine-grained GITHUB_TOKEN
+# Scope it only to the required repositories and permissions, with a short practical expiration
 aiw health                       # verify everything is configured
 aiw start /path/to/your-project  # launch on your project
 ```
@@ -107,9 +107,15 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw doctor` | Comprehensive diagnostic: health + validation + git status |
 | `aiw self-test` | Run credential-free production conformance tests |
 | `aiw preflight` | Run strict release-readiness checks |
+| `aiw pilot-preflight --project-id <id> --pipeline <name>` | Create a sanitized smoke-test manifest and verified backup; never runs OpenCode |
+| `aiw validate-mcp` | Validate the pilot read-only MCP permission profile |
+| `aiw validate-budget` | Validate pilot retry, duration, token, session, queue, and API-call limits |
+| `aiw validate-golden` | Validate versioned artifact contracts against compatibility metadata |
 | `aiw security-history` | Scan reachable Git history for credential-like patterns |
 | `aiw version --json` | Print framework, schema, and runtime compatibility metadata |
 | `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
+| `aiw events [--json] [--limit N]` | Read recent sanitized execution events |
+| `aiw events --prune-days N` | Delete expired sanitized events using the documented retention window |
 
 ### Development
 
@@ -130,7 +136,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 ### Production Release Checks
 
-Before a release candidate, run `aiw self-test`, `aiw validate`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, and `aiw preflight`. Use `aiw support-bundle` when reporting a failure; it collects sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
+Before a release candidate, run `aiw self-test`, `aiw validate`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, `aiw rollback-rehearsal`, and `aiw preflight`. Before live execution, run `aiw pilot-preflight` against a disposable project. The first pilot uses the `pilot-read-only` MCP profile: browser, Slack, and Vercel integrations are disabled by default. Use `aiw support-bundle` and `aiw events --json` when reporting a failure; they collect sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [live smoke-test procedure](docs/operations/live-smoke-test.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
 
 ## Maintenance
 

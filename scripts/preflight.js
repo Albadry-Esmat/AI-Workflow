@@ -31,6 +31,9 @@ const requiredReleaseFiles = [
   ".github/branch-protection-policy.json",
   "docs/operations/production-runbook.md",
   "docs/operations/release-checklist.md",
+  "mcp-permission-policy.json",
+  "execution-budget.json",
+  "tests/fixtures/golden-artifacts.json",
 ];
 for (const relative of requiredReleaseFiles) {
   if (!fs.existsSync(path.join(root, relative))) fail(`required release file is missing: ${relative}`);
@@ -87,6 +90,9 @@ else {
 }
 
 run("semantic pipeline validation", process.execPath, ["scripts/validate-pipelines.js"]);
+run("MCP pilot permission policy", process.execPath, ["scripts/validate-mcp-policy.js"]);
+run("execution budget policy", process.execPath, ["scripts/validate-execution-budget.js"]);
+run("golden artifact compatibility", process.execPath, ["scripts/validate-golden-artifacts.js"]);
 run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);
 run("credential-free self-test", process.execPath, ["scripts/self-test.js"]);

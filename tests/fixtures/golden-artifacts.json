@@ -1,0 +1,12 @@
+{
+  "fixture_version": "1.0.0",
+  "compatibility": { "framework_version": "4.0.0", "schema_version": "2.1.0" },
+  "artifacts": [
+    { "type": "requirements", "required_fields": ["requirements"], "content_policy": "structured-only" },
+    { "type": "adr", "required_fields": ["decision", "status"], "content_policy": "structured-only" },
+    { "type": "task-dag", "required_fields": ["tasks", "dependencies"], "content_policy": "structured-only" },
+    { "type": "rtm", "required_fields": ["requirements", "coverage"], "content_policy": "structured-only" },
+    { "type": "guard-verdict", "required_fields": ["decision", "findings"], "content_policy": "structured-only" },
+    { "type": "deployment-plan", "required_fields": ["approval_required", "rollback"], "content_policy": "structured-only" }
+  ]
+}

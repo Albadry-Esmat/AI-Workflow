@@ -271,6 +271,15 @@ if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY
   cd "$WEBSITE_REPO_DIR"
   CHANGED=$(git status --short | wc -l | tr -d ' ')
 
+  PUBLICATION_DIGEST=""
+  if [[ "$CHANGED" -gt 0 ]]; then
+    PUBLICATION_DIGEST=$(find "$DATA_DIR" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | awk '{print $1}')
+    if ! node "$ROOT/scripts/idempotency-guard.js" --operation website-data-publication --material "$PUBLICATION_DIGEST" --claim; then
+      fail "Refusing publication: this deterministic website-data operation is already claimed; inspect the target repository and idempotency ledger before retrying."
+      exit 3
+    fi
+  fi
+
   if [[ "$CHANGED" -eq 0 ]]; then
     ok "ASE-OS-Website is already up to date — nothing to push"
   else
@@ -287,6 +296,9 @@ Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
 
     step "Pushing to origin/main..."
     if git push origin main --quiet; then
+      if [[ -n "$PUBLICATION_DIGEST" ]]; then
+        node "$ROOT/scripts/idempotency-guard.js" --operation website-data-publication --material "$PUBLICATION_DIGEST" --complete --status published --result-category "commit-and-push"
+      fi
       ok "Pushed $CHANGED file(s) to ASE-OS-Website"
       echo ""
       echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"

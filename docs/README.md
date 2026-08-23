@@ -50,6 +50,7 @@ docs/
 | Prepare a release candidate | `operations/production-runbook.md` and `operations/release-checklist.md` |
 | Check compatibility | Root `compatibility.json` |
 | Configure GitHub release controls | `operations/github-repository-settings.md` |
+| Review MCP permissions | Root `mcp-permission-policy.json` and `npm run validate:mcp` |
 | Record release ownership and exceptions | `production-readiness/release-governance-record.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |

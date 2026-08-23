@@ -59,7 +59,13 @@ show_help() {
   echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
   echo -e "    ${CYAN}self-test${NC}          Credential-free production conformance tests"
   echo -e "    ${CYAN}preflight${NC}          Strict release readiness check"
+  echo -e "    ${CYAN}pilot-preflight${NC}   Prepare constrained live smoke test; no runtime execution"
+  echo -e "    ${CYAN}rollback-rehearsal${NC} Rehearse disposable state corruption and restore"
   echo -e "    ${CYAN}security-history${NC}   Scan reachable Git history for credential-like patterns"
+  echo -e "    ${CYAN}validate-mcp${NC}       Validate the pilot MCP permission profile"
+  echo -e "    ${CYAN}validate-budget${NC}    Validate pilot execution capacity and cost limits"
+  echo -e "    ${CYAN}validate-golden${NC}    Validate golden artifact compatibility contracts"
+  echo -e "    ${CYAN}events${NC}             Show recent sanitized execution events"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
@@ -159,8 +165,32 @@ cmd_preflight() {
   node "$ROOT/scripts/preflight.js"
 }
 
+cmd_pilot_preflight() {
+  node "$ROOT/scripts/pilot-preflight.js" "$@"
+}
+
+cmd_rollback_rehearsal() {
+  node "$ROOT/scripts/rollback-rehearsal.js" "$@"
+}
+
 cmd_security_history() {
   node "$ROOT/scripts/security-check.js" --history
+}
+
+cmd_validate_mcp() {
+  node "$ROOT/scripts/validate-mcp-policy.js"
+}
+
+cmd_validate_budget() {
+  node "$ROOT/scripts/validate-execution-budget.js"
+}
+
+cmd_validate_golden() {
+  node "$ROOT/scripts/validate-golden-artifacts.js"
+}
+
+cmd_events() {
+  node "$ROOT/scripts/events.js" "$@"
 }
 
 cmd_lint() {
@@ -458,7 +488,13 @@ case "$COMMAND" in
   doctor|diagnose)  cmd_doctor "$@" ;;
   self-test)        cmd_self_test "$@" ;;
   preflight)        cmd_preflight "$@" ;;
+  pilot-preflight)  cmd_pilot_preflight "$@" ;;
+  rollback-rehearsal) cmd_rollback_rehearsal "$@" ;;
   security-history) cmd_security_history "$@" ;;
+  validate-mcp)     cmd_validate_mcp "$@" ;;
+  validate-budget)  cmd_validate_budget "$@" ;;
+  validate-golden)  cmd_validate_golden "$@" ;;
+  events)           cmd_events "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;

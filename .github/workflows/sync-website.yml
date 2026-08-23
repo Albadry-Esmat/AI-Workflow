@@ -66,8 +66,11 @@ jobs:
       - name: Validate skills and pipeline contracts
         run: bash scripts/validate-skills.sh
 
-      - name: Validate semantic pipeline invariants
+      - name: Run semantic pipeline validation
         run: node scripts/validate-pipelines.js
+
+      - name: Run MCP permission policy validation
+        run: node scripts/validate-mcp-policy.js
 
       - name: Security and supply-chain check
         run: node scripts/security-check.js

@@ -60,8 +60,16 @@ The release-hardening path adds executable controls in addition to the agent per
 | Pipeline invariants | `scripts/validate-pipelines.js` rejects unknown skills, duplicate phases, invalid gate references, unsafe async steps, and missing non-bypassable deployment approvals. |
 | Supply-chain checks | CI workflows use immutable action commit SHAs and `scripts/security-check.js` verifies action and MCP pinning. |
 | External publication | Website publication requires an explicit `--confirm-website` flag and source-to-mirror validation before external repository mutation. |
+| MCP permission policy | `mcp-permission-policy.json` defines the pilot-read-only profile; `npm run validate:mcp` blocks unapproved side-effect servers and unpinned MCP commands. |
+| Structured observability | `scripts/lib/event-log.js` stores only bounded, redacted lifecycle fields; `aiw events --prune-days 7` removes expired records and runtime files are ignored from source control. |
+| Capacity and cost | `execution-budget.json` and `aiw validate-budget` define pilot retry, duration, token, session, queue, and external-call ceilings; thresholds pause and hard limits stop safely. |
+| External-write idempotency | The website publication path derives a deterministic source-data digest key and rejects duplicate claims before commit/push. |
+| Rollback rehearsal | `aiw rollback-rehearsal` injects disposable corruption, verifies a backup, restores it, and emits a sanitized checksum report. |
+| Compatibility drift | `aiw validate-golden` checks versioned structured-only artifact contracts against `compatibility.json`. |
 
-Use `aiw self-test` for credential-free conformance checks and `aiw preflight` before a release candidate. Neither command invokes paid model calls.
+The first pilot uses the `pilot-read-only` profile. GitHub, memory, Context7, and Brave Search are allowed subject to credential review; Playwright, Slack, and Vercel remain disabled because they can create browser, messaging, or deployment side effects. Any profile change requires security review, negative tests, and a release-record update.
+
+Use `aiw self-test` for credential-free conformance checks, `aiw pilot-preflight` before operator-owned live smoke execution, and `aiw preflight` before a release candidate. These repository commands do not invoke paid model calls or simulate live OpenCode/MCP evidence.
 
 ## Security Skill
 

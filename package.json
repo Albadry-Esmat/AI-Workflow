@@ -19,8 +19,14 @@
     "test:ci": "jest --runInBand --ci",
     "self-test": "node scripts/self-test.js",
     "preflight": "node scripts/preflight.js",
+    "pilot-preflight": "node scripts/pilot-preflight.js",
     "support-bundle": "node scripts/support-bundle.js",
-    "security:history": "node scripts/security-check.js --history"
+    "security:history": "node scripts/security-check.js --history",
+    "validate:mcp": "node scripts/validate-mcp-policy.js",
+    "validate:budget": "node scripts/validate-execution-budget.js",
+    "rollback-rehearsal": "node scripts/rollback-rehearsal.js",
+    "validate:golden": "node scripts/validate-golden-artifacts.js",
+    "events": "node scripts/events.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"

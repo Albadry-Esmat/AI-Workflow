@@ -316,6 +316,9 @@ jobs:
       - name: Semantic pipeline validation
         run: node scripts/validate-pipelines.js
 
+      - name: MCP permission policy validation
+        run: node scripts/validate-mcp-policy.js
+
       - name: Security and supply-chain check
         run: node scripts/security-check.js
 

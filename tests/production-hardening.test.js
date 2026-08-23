@@ -136,6 +136,149 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("pilot-preflight creates a sanitized blocked manifest without live execution", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-pilot-"));
+    const envFile = path.join(directory, ".env");
+    const bin = path.join(directory, "bin");
+    const output = path.join(directory, "manifest.json");
+    fs.mkdirSync(bin, { recursive: true });
+    fs.writeFileSync(envFile, "GITHUB_TOKEN=placeholder-for-fixture\\n", { mode: 0o600 });
+    const opencode = path.join(bin, "opencode");
+    fs.writeFileSync(opencode, "#!/usr/bin/env bash\nif [[ \\\"$1\\\" == \\\"--version\\\" ]]; then echo \\\"1.2.3\\\"; else echo \\\"live execution forbidden in fixture\\\" >&2; exit 99; fi\n", { mode: 0o700 });
+    try {
+      const result = spawnSync(process.execPath, ["scripts/pilot-preflight.js", "--project-id", "fixture-project", "--output", output, "--state-dir", path.join(directory, "state"), "--backup-root", path.join(directory, "backups")], {
+        cwd: root,
+        encoding: "utf8",
+        env: { ...process.env, AIW_ENV_FILE: envFile, PATH: `${bin}:${process.env.PATH}` },
+      });
+      expect(result.status).toBe(0);
+      const manifest = JSON.parse(fs.readFileSync(output, "utf8"));
+      expect(manifest.status).toBe("ready-for-operator-live-execution");
+      expect(manifest.live_execution.attempted).toBe(false);
+      expect(JSON.stringify(manifest)).not.toMatch(/placeholder-for-fixture/);
+      expect(fs.existsSync(path.join(directory, "backups", manifest.correlation_id, "manifest.json"))).toBe(true);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("structured event retention removes only expired records", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-retention-"));
+    const eventsFile = path.join(directory, "events.jsonl");
+    try {
+      fs.writeFileSync(eventsFile, [
+        JSON.stringify({ timestamp: "2000-01-01T00:00:00.000Z", event: "old", status: "completed" }),
+        JSON.stringify({ timestamp: new Date().toISOString(), event: "new", status: "completed" }),
+        "",
+      ].join("\n"), { mode: 0o600 });
+      const eventLog = require(path.join(root, "scripts/lib/event-log.js"));
+      expect(eventLog.pruneEvents(eventsFile, 1).removed).toBe(1);
+      expect(eventLog.readEvents(eventsFile, 10).map((event) => event.event)).toEqual(["new"]);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("structured events redact secrets and summarize lifecycle records", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-events-"));
+    const eventsFile = path.join(directory, "events.jsonl");
+    try {
+      const eventLog = require(path.join(root, "scripts/lib/event-log.js"));
+      eventLog.appendEvent({ event: "task", session_id: "s-1", status: "completed", message: "Authorization: Bearer secret123 GITHUB_TOKEN=ghp_test" }, eventsFile);
+      eventLog.appendEvent({ event: "gate", session_id: "s-1", status: "rejected" }, eventsFile);
+      const events = eventLog.readEvents(eventsFile, 10);
+      expect(events).toHaveLength(2);
+      expect(JSON.stringify(events)).not.toMatch(/secret123|ghp_test/);
+      expect(eventLog.summarizeEvents(events).by_status.completed).toBe(1);
+      expect(eventLog.summarizeEvents(events).by_event.gate).toBe(1);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("golden artifact contracts pass and reject unsafe drift", () => {
+    expect(runNode("scripts/validate-golden-artifacts.js")).toMatch(/Golden artifact compatibility validation passed/);
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-golden-"));
+    const fixture = path.join(directory, "golden.json");
+    try {
+      const source = JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/golden-artifacts.json"), "utf8"));
+      source.artifacts[0].required_fields.push("raw_prompt");
+      fs.writeFileSync(fixture, JSON.stringify(source));
+      const result = spawnSync(process.execPath, ["scripts/validate-golden-artifacts.js"], { cwd: root, encoding: "utf8", env: { ...process.env, AIW_GOLDEN_FILE: fixture } });
+      expect(result.status).not.toBe(0);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/unsafe field/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("idempotency ledger rejects duplicate claims and records completion", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-idempotency-"));
+    const ledger = path.join(directory, "ledger.json");
+    try {
+      const idempotency = require(path.join(root, "scripts/lib/idempotency.js"));
+      const key = idempotency.operationKey("fixture-write", "digest-1");
+      expect(idempotency.claim(key, ledger).duplicate).toBe(false);
+      expect(idempotency.claim(key, ledger).duplicate).toBe(true);
+      idempotency.record(key, { status: "published", result_category: "fixture" }, ledger);
+      expect(idempotency.inspect(key, ledger).status).toBe("published");
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("rollback rehearsal restores checksummed state with a sanitized report", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-rollback-test-"));
+    try {
+      const result = spawnSync(process.execPath, ["scripts/rollback-rehearsal.js", "--workspace", directory, "--keep"], { cwd: root, encoding: "utf8" });
+      expect(result.status).toBe(0);
+      const report = JSON.parse(fs.readFileSync(path.join(directory, "rollback-report.json"), "utf8"));
+      expect(report.status).toBe("passed");
+      expect(report.restored_checksum_verified).toBe(true);
+      expect(report.raw_state_included).toBe(false);
+      expect(JSON.stringify(report)).not.toMatch(/rollback-fixture|artifact_names/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("execution budget policy passes and rejects unsafe fixtures", () => {
+    expect(runNode("scripts/validate-execution-budget.js")).toMatch(/Execution budget validation passed/);
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-budget-"));
+    const fixture = path.join(directory, "budget.json");
+    try {
+      fs.writeFileSync(fixture, JSON.stringify({ schema_version: "1.0.0", limits: { max_active_sessions: 1, max_queue_depth: 1, max_retries_per_task: 3, max_total_retries: 2, max_duration_ms: 1, max_estimated_tokens: 1, max_external_api_calls: 1 }, actions: { on_threshold: "continue", on_hard_limit: "continue" } }));
+      const result = spawnSync(process.execPath, ["scripts/validate-execution-budget.js"], { cwd: root, encoding: "utf8", env: { ...process.env, AIW_BUDGET_FILE: fixture } });
+      expect(result.status).not.toBe(0);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/per-task retry limit|on_threshold|on_hard_limit/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("MCP pilot permission policy passes the active configuration", () => {
+    expect(runNode("scripts/validate-mcp-policy.js")).toMatch(/MCP policy validation passed/);
+  });
+
+  test("MCP policy rejects side-effect servers in the pilot profile", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-mcp-policy-"));
+    const policy = path.join(directory, "policy.json");
+    const config = path.join(directory, "config.json");
+    fs.writeFileSync(policy, JSON.stringify({ profiles: { "pilot-read-only": { enabled_servers: ["github"], disabled_servers: ["playwright"], allowed_external_writes: false } } }), "utf8");
+    fs.writeFileSync(config, JSON.stringify({ mcp: { github: { enabled: true, command: ["npx", "@x/pkg@1.0.0"] }, playwright: { enabled: true, command: ["npx", "@x/browser@1.0.0"] } } }), "utf8");
+    try {
+      const result = spawnSync(process.execPath, ["scripts/validate-mcp-policy.js"], {
+        cwd: root,
+        env: { ...process.env, AIW_MCP_POLICY: policy, AIW_MCP_CONFIG: config },
+        encoding: "utf8",
+      });
+      expect(result.status).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/profile-disabled server is enabled|side-effect server/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("all pipeline templates satisfy semantic invariants", () => {
     expect(runNode("scripts/validate-pipelines.js")).toMatch(/22 pipeline\(s\) checked/);
   });
