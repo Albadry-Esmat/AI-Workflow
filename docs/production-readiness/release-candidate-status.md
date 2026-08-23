@@ -2,8 +2,9 @@
 
 **Status:** Production-hardening implementation complete on local release branch  
 **Branch:** `release/production-hardening`  
-**Implementation commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
-**Final branch commit:** `389137d` (`docs: add release candidate status`)  
+**Initial hardening commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
+**Implementation commit:** `c482a77` (`feat: complete production hardening controls`)  
+**Final branch commit:** pending report metadata commit  
 **Date:** 2026-08-23
 
 ## Executive Summary
@@ -81,4 +82,4 @@ Then run a constrained pipeline against a non-critical project, review all human
 
 **Decision:** Conditional approval for internal pilot; not yet approved for general production.
 
-The code-level and repository-level release controls now pass. General production remains gated on real-environment preflight, live OpenCode/MCP smoke testing, pilot evidence, independent review, and repository branch-protection configuration. No changes were pushed to GitHub from this task; the implementation is committed locally on `release/production-hardening`.
+The code-level and repository-level release controls now pass. General production remains gated on real-environment preflight, live OpenCode/MCP smoke testing, pilot evidence, independent review, and repository branch-protection configuration. No changes were pushed to GitHub from this task; all implementation work is committed locally on `release/production-hardening`.
