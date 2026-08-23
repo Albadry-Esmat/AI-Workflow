@@ -2,8 +2,8 @@
 
 **Status:** Production-hardening implementation complete on local release branch  
 **Branch:** `release/production-hardening`  
-**Commit:** `836676d7e189882580e0483d54e7175ed1322a44`  
-**Commit message:** `chore: harden production readiness`  
+**Implementation commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
+**Final branch commit:** `389137d` (`docs: add release candidate status`)  
 **Date:** 2026-08-23
 
 ## Executive Summary
