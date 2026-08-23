@@ -34,6 +34,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Least-privilege credentials** — Replaced classic non-expiring token guidance with repository-scoped fine-grained token guidance and explicit rotation expectations.
 - **Website publication governance** — CI now opens a reviewable ASE-OS-Website pull request instead of pushing directly to its `main` branch; local publication retains explicit confirmation and target safety checks.
 - **Repository policy** — Added a machine-readable branch-protection policy and documented the current GitHub-plan limitation preventing remote enforcement.
+- **Release governance** — Added `docs/production-readiness/release-governance-record.md` with ownership assignments, feature-freeze rules, risk classification, change-control requirements, pilot signatures, and explicit environment exceptions.
 
 ---
 

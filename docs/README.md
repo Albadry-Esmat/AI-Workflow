@@ -32,6 +32,7 @@ docs/
 ├── operations/production-runbook.md ← Production operations and recovery
 ├── operations/release-checklist.md ← Release-candidate sign-off checklist
 ├── operations/github-repository-settings.md ← Branch protection and CI policy
+├── production-readiness/release-governance-record.md ← Ownership, freeze, and change-control record
 ├── changelog.md               ← Full update history
 └── how-to-use.md              ← Step-by-step usage guides
 ```
@@ -49,6 +50,7 @@ docs/
 | Prepare a release candidate | `operations/production-runbook.md` and `operations/release-checklist.md` |
 | Check compatibility | Root `compatibility.json` |
 | Configure GitHub release controls | `operations/github-repository-settings.md` |
+| Record release ownership and exceptions | `production-readiness/release-governance-record.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
 
