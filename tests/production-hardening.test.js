@@ -308,6 +308,15 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("all target adapters pass credential-free descriptor and dry-run certification", () => {
+    const adapters = ["opencode", "claude-code", "codex-cli", "gemini-cli", "aider", "cursor", "github-copilot", "cline-roo", "windsurf"];
+    for (const adapter of adapters) {
+      const result = spawnSync(process.execPath, ["scripts/adapter-certification.js", adapter], { cwd: root, encoding: "utf8" });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toMatch(new RegExp(`Adapter certification passed \\(${adapter}`));
+    }
+  });
+
   test("runtime guards deny unauthorized capabilities and require approval", () => {
     const policy = JSON.parse(fs.readFileSync(path.join(root, "mcp-permission-policy.json"), "utf8"));
     expect(() => require(path.join(root, "scripts/lib/runtime-guards.js")).assertMcpCapabilities({ required_capabilities: ["write:repository"] }, { policy, profileName: "pilot-read-only" })).toThrow(/MCP_CAPABILITY_DENIED/);

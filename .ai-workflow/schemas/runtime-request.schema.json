@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/runtime-request.schema.json",
+  "title": "AI Workflow Runtime Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_version", "correlation_id", "pipeline_id", "phase_id", "task_id", "mode", "mcp_profile", "budget", "required_capabilities"],
+  "properties": {
+    "request_version": { "const": "1.0.0" },
+    "correlation_id": { "type": "string", "maxLength": 160 },
+    "pipeline_id": { "type": "string", "maxLength": 160 },
+    "phase_id": { "type": ["string", "integer"] },
+    "task_id": { "type": "string", "maxLength": 160 },
+    "mode": { "type": "string", "enum": ["read-only", "dry-run", "canary", "approved-write"] },
+    "mcp_profile": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "project_classification": { "type": "string", "enum": ["disposable", "non-sensitive", "sensitive", "production"] },
+    "required_capabilities": { "type": "array", "uniqueItems": true, "items": { "type": "string", "maxLength": 120 } },
+    "budget": { "type": "object", "additionalProperties": false, "required": ["max_duration_ms", "max_estimated_tokens", "max_external_api_calls"], "properties": { "max_duration_ms": { "type": "integer", "minimum": 1 }, "max_estimated_tokens": { "type": "integer", "minimum": 1 }, "max_external_api_calls": { "type": "integer", "minimum": 0 } } },
+    "input_artifact_names": { "type": "array", "uniqueItems": true, "items": { "type": "string", "maxLength": 160 } },
+    "approval_id": { "type": "string", "maxLength": 160 },
+    "dry_run": { "type": "boolean" }
+  }
+}

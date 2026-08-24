@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/artifact-envelope.schema.json",
+  "title": "AI Workflow Artifact Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["envelope_version", "artifact_name", "artifact_type", "schema_version", "sha256", "classification", "quality_decision", "provenance"],
+  "properties": {
+    "envelope_version": { "const": "1.0.0" },
+    "artifact_name": { "type": "string", "maxLength": 160 },
+    "artifact_type": { "type": "string", "maxLength": 120 },
+    "schema_version": { "type": "string", "maxLength": 40 },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "classification": { "type": "string", "enum": ["disposable", "non-sensitive", "sensitive", "production"] },
+    "quality_decision": { "type": "string", "enum": ["pass", "needs_human_review", "reject"] },
+    "provenance": { "type": "object", "additionalProperties": false, "required": ["runtime", "adapter_id", "correlation_id"], "properties": { "runtime": { "type": "string", "maxLength": 120 }, "adapter_id": { "type": "string", "maxLength": 120 }, "correlation_id": { "type": "string", "maxLength": 160 }, "source_commit": { "type": "string", "maxLength": 120 } } },
+    "raw_content_included": { "const": false }
+  }
+}

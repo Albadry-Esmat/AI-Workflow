@@ -30,6 +30,9 @@
     "validate:pilot-evidence": "node scripts/validate-pilot-evidence.js",
     "write-plan": "node scripts/write-plan.js",
     "score-artifact": "node scripts/score-artifact.js",
+    "validate:adapters": "node scripts/validate-adapter-config.js",
+    "certify:opencode": "node scripts/adapter-certification.js opencode",
+    "generate:projections": "node scripts/generate-projections.js",
     "events": "node scripts/events.js"
   },
   "devDependencies": {

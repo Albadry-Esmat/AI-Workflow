@@ -47,6 +47,10 @@ backups/
 .opencode/state/idempotency.json
 .opencode/state/idempotency.json.lock
 
+# ─── Generated multi-runtime projections ───────────────────────────────────────
+# Generate to this directory for local review; canonical sources remain tracked.
+.ai-workflow/generated/
+
 # ─── Work-item runtime content (project-specific, not part of the framework) ─
 # The work-items/ directory structure and README are framework; the actual
 # tasks/features/bugs you create are yours and should never go to main.

@@ -55,6 +55,29 @@ check("artifact quality policy passes representative fixture", () => {
   command(["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 });
 
+check("adapter registry and capability matrix pass", () => {
+  command(["scripts/validate-adapter-config.js"]);
+});
+
+check("OpenCode reference adapter certification passes", () => {
+  command(["scripts/adapter-certification.js", "opencode"]);
+});
+
+check("runtime projections are deterministic", () => {
+  const first = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-projection-test-"));
+  const second = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-projection-test-"));
+  try {
+    command(["scripts/generate-projections.js", "--output", first, "--profile", "pilot-read-only"]);
+    command(["scripts/generate-projections.js", "--output", second, "--profile", "pilot-read-only"]);
+    const firstManifest = fs.readFileSync(path.join(first, "manifest.json"), "utf8").replace(/generated_at[^,]+,?/, "");
+    const secondManifest = fs.readFileSync(path.join(second, "manifest.json"), "utf8").replace(/generated_at[^,]+,?/, "");
+    if (firstManifest !== secondManifest) throw new Error("projection manifests differ");
+  } finally {
+    fs.rmSync(first, { recursive: true, force: true });
+    fs.rmSync(second, { recursive: true, force: true });
+  }
+});
+
 check("black-box fixture pipeline completes with HITL approval", () => {
   const fixture = loadPipeline(path.join(root, "tests", "fixtures", "self-test-pipeline.json"));
   const result = executeFixturePipeline(fixture, { gateDecisions: { approve: "approve" } });

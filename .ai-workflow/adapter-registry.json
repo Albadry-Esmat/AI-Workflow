@@ -1,0 +1,105 @@
+{
+  "registry_version": "1.0.0",
+  "default_adapter": "opencode",
+  "adapters": {
+    "opencode": {
+      "display_name": "OpenCode",
+      "runtime_family": "terminal-agent",
+      "tier": 1,
+      "status": "reference",
+      "entrypoint": "adapters/opencode",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "skills", "subagents", "approvals", "checkpoints", "cli", "write_guard"],
+      "version_range": ">=1.0.0",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "claude-code": {
+      "display_name": "Claude Code",
+      "runtime_family": "terminal-agent",
+      "tier": 1,
+      "status": "experimental",
+      "entrypoint": "adapters/claude-code",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "skills", "hooks", "subagents", "cli"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "codex-cli": {
+      "display_name": "OpenAI Codex CLI",
+      "runtime_family": "terminal-agent",
+      "tier": 1,
+      "status": "experimental",
+      "entrypoint": "adapters/codex-cli",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "agents-md", "cli"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "gemini-cli": {
+      "display_name": "Gemini CLI",
+      "runtime_family": "terminal-agent",
+      "tier": 1,
+      "status": "experimental",
+      "entrypoint": "adapters/gemini-cli",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "extensions", "cli"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "aider": {
+      "display_name": "Aider",
+      "runtime_family": "terminal-agent",
+      "tier": 1,
+      "status": "experimental",
+      "entrypoint": "adapters/aider",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["cli", "git"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "cursor": {
+      "display_name": "Cursor",
+      "runtime_family": "editor-agent",
+      "tier": 2,
+      "status": "experimental",
+      "entrypoint": "adapters/cursor",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "rules", "skills", "hooks", "editor"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "github-copilot": {
+      "display_name": "GitHub Copilot agent surfaces",
+      "runtime_family": "editor-cloud-agent",
+      "tier": 2,
+      "status": "experimental",
+      "entrypoint": "adapters/github-copilot",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "editor", "enterprise-policy"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "cline-roo": {
+      "display_name": "Cline / Roo Code",
+      "runtime_family": "editor-agent",
+      "tier": 2,
+      "status": "experimental",
+      "entrypoint": "adapters/cline-roo",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "hooks", "plugins", "editor"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    },
+    "windsurf": {
+      "display_name": "Windsurf",
+      "runtime_family": "editor-agent",
+      "tier": 2,
+      "status": "experimental",
+      "entrypoint": "adapters/windsurf",
+      "supported_operations": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"],
+      "supported_capabilities": ["mcp", "rules", "editor"],
+      "version_range": "operator-defined",
+      "real_evidence": "repository-fixtures-only"
+    }
+  }
+}

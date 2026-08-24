@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/runtime-event.schema.json",
+  "title": "AI Workflow Runtime Event",
+  "description": "Cross-runtime event envelope; payload fields remain sanitized and bounded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["timestamp", "event_id", "schema_version", "event", "adapter_id"],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "event_id": { "type": "string", "pattern": "^evt-[0-9a-f-]{36}$" },
+    "schema_version": { "const": "1.0.0" },
+    "event": { "type": "string", "maxLength": 80 },
+    "adapter_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "session_id": { "type": "string", "maxLength": 160 },
+    "pipeline_id": { "type": "string", "maxLength": 160 },
+    "phase_id": { "type": ["string", "integer"] },
+    "skill": { "type": "string", "maxLength": 160 },
+    "status": { "type": "string", "maxLength": 80 },
+    "duration_ms": { "type": "integer", "minimum": 0 },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "error_code": { "type": "string", "maxLength": 120 },
+    "message": { "type": "string", "maxLength": 500 },
+    "raw_content_included": { "const": false }
+  }
+}

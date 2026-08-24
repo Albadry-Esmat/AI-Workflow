@@ -31,6 +31,7 @@ docs/
 ├── versioning.md              ← Version strategy, changelog rules
 ├── operations/production-runbook.md ← Production operations and recovery
 ├── operations/release-checklist.md ← Release-candidate sign-off checklist
+├── operations/multi-runtime-compatibility.md ← Runtime adapter tiers and certification
 ├── operations/github-repository-settings.md ← Branch protection and CI policy
 ├── production-readiness/release-governance-record.md ← Ownership, freeze, and change-control record
 ├── changelog.md               ← Full update history
@@ -51,6 +52,7 @@ docs/
 | Check compatibility | Root `compatibility.json` |
 | Configure GitHub release controls | `operations/github-repository-settings.md` |
 | Review MCP permissions | Root `mcp-permission-policy.json` and `npm run validate:mcp` |
+| Review multi-runtime support tiers | `operations/multi-runtime-compatibility.md` and `.ai-workflow/runtime-capability-matrix.json` |
 | Record release ownership and exceptions | `production-readiness/release-governance-record.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
@@ -77,6 +79,7 @@ docs/
 | Security changed | `security.md`, `changelog.md` |
 | Version bumped | `versioning.md`, `changelog.md` |
 | Production hardening or release controls changed | `security.md`, `operations/production-runbook.md`, `changelog.md` |
+| Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
 
 ## File Format Convention
 

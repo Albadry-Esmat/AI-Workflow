@@ -38,6 +38,25 @@ const requiredReleaseFiles = [
   "tests/fixtures/pilot-evidence.json",
   "artifact-quality-policy.json",
   "tests/fixtures/requirements-artifact.json",
+  ".ai-workflow/config.json",
+  ".ai-workflow/adapter-registry.json",
+  ".ai-workflow/runtime-capability-matrix.json",
+  ".ai-workflow/schemas/runtime-adapter.schema.json",
+  ".ai-workflow/schemas/runtime-request.schema.json",
+  ".ai-workflow/schemas/runtime-event.schema.json",
+  ".ai-workflow/schemas/approval-request.schema.json",
+  ".ai-workflow/schemas/checkpoint.schema.json",
+  ".ai-workflow/schemas/artifact-envelope.schema.json",
+  "adapters/opencode/index.js",
+  "adapters/claude-code/index.js",
+  "adapters/codex-cli/index.js",
+  "adapters/gemini-cli/index.js",
+  "adapters/aider/index.js",
+  "adapters/cursor/index.js",
+  "adapters/github-copilot/index.js",
+  "adapters/cline-roo/index.js",
+  "adapters/windsurf/index.js",
+  "scripts/generate-projections.js",
 ];
 for (const relative of requiredReleaseFiles) {
   if (!fs.existsSync(path.join(root, relative))) fail(`required release file is missing: ${relative}`);
@@ -100,6 +119,9 @@ run("golden artifact compatibility", process.execPath, ["scripts/validate-golden
 run("execution event schema", process.execPath, ["scripts/validate-events.js"]);
 run("pilot evidence contract", process.execPath, ["scripts/validate-pilot-evidence.js"]);
 run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
+run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]);
+run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);
+run("deterministic runtime projections", process.execPath, ["scripts/generate-projections.js", "--output", path.join(os.tmpdir(), "aiw-preflight-projections"), "--profile", "pilot-read-only"]);
 run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);
 run("credential-free self-test", process.execPath, ["scripts/self-test.js"]);

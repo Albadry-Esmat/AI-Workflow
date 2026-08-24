@@ -1,0 +1,26 @@
+{
+  "config_version": "1.0.0",
+  "canonical_root": ".ai-workflow",
+  "adapter_registry": ".ai-workflow/adapter-registry.json",
+  "capability_matrix": ".ai-workflow/runtime-capability-matrix.json",
+  "schemas_root": ".ai-workflow/schemas",
+  "policy_sources": {
+    "mcp": "mcp-permission-policy.json",
+    "budget": "execution-budget.json",
+    "quality": "artifact-quality-policy.json",
+    "compatibility": "compatibility.json"
+  },
+  "workflow_sources": {
+    "pipelines": "skills/pipelines",
+    "skills": ".opencode/skills",
+    "agents": ".opencode/agent"
+  },
+  "projections": {
+    "opencode": { "config": "opencode.json", "skills": ".opencode/skills", "agents": ".opencode/agent" },
+    "agents-md": { "config": "AGENTS.md" },
+    "claude-code": { "config": "CLAUDE.md", "mode": "generated-after-explicit-approval" },
+    "cursor": { "config": ".cursor/rules", "mode": "generated-after-explicit-approval" },
+    "gemini-cli": { "config": "GEMINI.md", "mode": "generated-after-explicit-approval" }
+  },
+  "generation_policy": "deterministic-reviewable-no-silent-user-config-edits"
+}

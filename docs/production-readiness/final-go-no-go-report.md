@@ -9,7 +9,7 @@
 
 ## Executive decision
 
-The approved expert production plan and the approved enhancement roadmap have been implemented as far as repository-side controls can be completed without operator-owned credentials or a real OpenCode runtime. The project now has a repeatable constrained-pilot preparation path, runtime MCP capability and approval guards, live budget accounting, formal event-schema validation, circuit-breaker behavior, sanitized checkpoints, deterministic website-publication idempotency and reconciliation, canary-only write planning, pilot-evidence validation, artifact quality scoring, disposable rollback rehearsal, compatibility-aware golden artifact contracts, release documentation, and synchronized website data.
+The approved expert production plan, enhancement roadmap, and multi-runtime compatibility foundation have been implemented as far as repository-side controls can be completed without operator-owned credentials or real agent runtimes. The project now has a repeatable constrained-pilot preparation path, runtime MCP capability and approval guards, live budget accounting, formal event-schema validation, circuit-breaker behavior, sanitized checkpoints, deterministic website-publication idempotency and reconciliation, canary-only write planning, pilot-evidence validation, artifact quality scoring, disposable rollback rehearsal, compatibility-aware golden artifact contracts, a runtime-neutral adapter boundary, nine adapter projections, deterministic runtime projections, and a compatibility-matrix CI job.
 
 The project must **not** be described as general-production-ready yet. The sandbox cannot honestly provide evidence for the actual OpenCode executable, real credentials, MCP startup, live model execution, non-sensitive pilot completion, independent security review, or operator recovery in the real environment. Those remain release gates rather than simulated test results.
 
@@ -25,6 +25,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Capacity and cost | `execution-budget.json`, `aiw validate-budget`, and runtime `BudgetTracker` enforce pilot limits for retries, duration, estimated tokens, and external API calls; violations stop before continued work. |
 | Recovery | `aiw rollback-rehearsal` injects disposable corruption, verifies a backup, restores it, checks checksums, and writes a sanitized report; the harness also writes sanitized resumable checkpoints and uses a circuit breaker for repeated failures. |
 | Compatibility and quality | `aiw validate-golden` checks structured-only versioned contracts; `aiw score-artifact` routes incomplete outputs to human review and rejects prohibited fields. |
+| Multi-runtime support | `.ai-workflow/` canonical config, adapter registry, capability matrix, six normalized schemas, supervised terminal adapters for Claude Code/Codex/Gemini/Aider, host projections for Cursor/Copilot/Cline-Roo/Windsurf, deterministic projections, and fixture certification. External adapters remain experimental until real evidence. |
 | Publication and documentation | Website mirror synchronized and checked; local publication retains explicit confirmation, deterministic idempotency, ambiguous-outcome reconciliation, and canary write planning; CI publication remains reviewable. |
 
 ## Final validation evidence
@@ -41,6 +42,9 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Artifact-quality scoring | **PASS** |
 | Canary write-plan behavior | **PASS** |
 | Runtime permission/budget guards, checkpoints, and circuit breaker | **PASS** |
+| Multi-runtime adapter descriptors and dry-run certification | **PASS — 9 target adapters** |
+| Deterministic runtime projection generation | **PASS** |
+| Adapter compatibility CI workflow YAML | **PASS** |
 | Full reachable-history security scan | **PASS — 122 reachable commits** |
 | High-severity dependency audit | **PASS — 0 vulnerabilities** |
 | Website mirror check | **PASS — 140 files current** |
@@ -61,9 +65,11 @@ The strict preflight reported exactly two environment blockers: the OpenCode exe
 | P1 | Complete one or two controlled non-sensitive pilots, including a recovery scenario and sanitized evidence record. | Not run; operator-owned. |
 | P1 | Obtain independent security and rollback sign-off and assign release/runtime/publication owners. | Pending operator assignment. |
 | P1 | Enable remote branch protection if the GitHub plan permits it, or maintain the documented compensating review control. | Exception documented; prior private-repository API response was HTTP 403. |
+| P1 | Certify at least one non-OpenCode runtime with real preflight, smoke-test, recovery, and controlled-pilot evidence before advertising cross-runtime production support. | Not run; operator-owned. |
+| P1 | Certify remaining adapters individually; do not infer support from fixture certification or MCP compatibility alone. | Not run; operator-owned. |
 
 ## Operator handoff
 
 Run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
 
-No changes were pushed to GitHub by this task. The enhancement implementation is currently being finalized locally on `release/production-hardening` and remains ready for operator-owned real-environment validation, not for an unconditional general-production release.
+No changes were pushed to GitHub by this task. The multi-runtime compatibility foundation is implemented locally on `release/production-hardening`; it provides experimental adapter projections and certification scaffolding, not an unconditional claim that every target runtime is production-certified.

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/approval-request.schema.json",
+  "title": "AI Workflow Approval Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["approval_version", "approval_id", "correlation_id", "reason", "requested_capabilities", "target", "risk", "decision"],
+  "properties": {
+    "approval_version": { "const": "1.0.0" },
+    "approval_id": { "type": "string", "maxLength": 160 },
+    "correlation_id": { "type": "string", "maxLength": 160 },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "requested_capabilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "maxLength": 120 } },
+    "target": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "risk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "decision": { "type": "string", "enum": ["pending", "approve", "reject", "expired"] },
+    "decided_by": { "type": "string", "maxLength": 160 },
+    "decided_at": { "type": "string", "format": "date-time" }
+  }
+}

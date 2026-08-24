@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode generate-projections self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -73,6 +73,15 @@ write-plan: ## Create a canary-only dry-run plan for a write-capable operation
 
 score-artifact: ## Score a structured artifact and route low-quality output to human review
 	@node scripts/score-artifact.js --type requirements --input tests/fixtures/requirements-artifact.json
+
+validate-adapters: ## Validate the canonical adapter registry and capability matrix
+	@node scripts/validate-adapter-config.js
+
+certify-opencode: ## Run credential-free OpenCode reference-adapter certification
+	@node scripts/adapter-certification.js opencode
+
+generate-projections: ## Generate deterministic runtime-specific configuration projections
+	@node scripts/generate-projections.js --output /tmp/aiw-projections --profile pilot-read-only
 
 self-test: ## Run credential-free production conformance tests
 	@node scripts/self-test.js
