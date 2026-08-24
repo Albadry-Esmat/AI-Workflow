@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const { execFileSync, spawnSync } = require("child_process");
 const { atomicWriteJson } = require("./lib/state-store");
 const { redact } = require("./conformance-harness");
+const { readEvents, summarizeEvents } = require("./lib/event-log");
 
 const root = path.resolve(__dirname, "..");
 const defaultDirectory = path.join(root, "support-bundles");
@@ -45,6 +46,8 @@ function main() {
   const git = (args) => {
     try { return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim(); } catch (_) { return "unavailable"; }
   };
+  const eventsFile = path.join(root, ".opencode", "state", "events.jsonl");
+  const eventSummary = summarizeEvents(readEvents(eventsFile, 100000));
   const manifest = {
     bundle_version: "1.0.0",
     generated_at: new Date().toISOString(),
@@ -57,6 +60,7 @@ function main() {
     git_commit: git(["rev-parse", "HEAD"]),
     working_tree_changes: git(["status", "--short"]).split("\n").filter(Boolean).length,
     state_inventory: inventory(path.join(root, ".opencode", "state")),
+    event_summary: { total: eventSummary.total, by_status: eventSummary.by_status, by_event: eventSummary.by_event, retention_days: 7, raw_records_included: false },
     included_files: ["manifest.json", "diagnostics.txt", "state-inventory.json"],
     excluded_data: [".env values", "raw session JSON", "raw pipeline artifacts", "MCP payloads", "authorization headers"],
   };
@@ -81,6 +85,10 @@ function main() {
     "",
     "--- State handling ---",
     "Only state filenames and byte counts are included. Raw state content is intentionally excluded.",
+    "",
+    "--- Sanitized event summary ---",
+    `Events: ${eventSummary.total}; retention days: 7; raw event records excluded`,
+    JSON.stringify({ by_status: eventSummary.by_status, by_event: eventSummary.by_event }),
   ].join("\n");
   fs.writeFileSync(path.join(bundleDirectory, "diagnostics.txt"), redact(`${diagnostics}\n`), { mode: 0o600 });
   console.log(path.relative(root, bundleDirectory));

@@ -5,6 +5,8 @@ const path = require("path");
 const crypto = require("crypto");
 const { atomicWriteJson, readJsonWithRecovery } = require("./lib/state-store");
 const { appendEvent } = require("./lib/event-log");
+const { assertMcpCapabilities, BudgetTracker, classifyFailure } = require("./lib/runtime-guards");
+const { CircuitBreaker } = require("./lib/circuit-breaker");
 
 class ContractError extends Error {
   constructor(code, message) {
@@ -68,7 +70,14 @@ function executeFixturePipeline(pipeline, options = {}) {
     artifacts: {},
     gates: [],
     events: [],
+    budget: null,
+    circuit: null,
+    completed_tasks: [],
   };
+  const budgetTracker = options.budgetTracker || new BudgetTracker(options.budgetPolicy, { startedAt: Date.now() });
+  const circuitBreaker = options.circuitBreaker || new CircuitBreaker(options.circuitBreakerOptions);
+  session.budget = budgetTracker.snapshot();
+  session.circuit = circuitBreaker.snapshot();
   const emitEvent = (event) => {
     const record = { session_id: session.session_id, pipeline_id: session.pipeline_id, ...event };
     session.events.push(record);
@@ -84,6 +93,20 @@ function executeFixturePipeline(pipeline, options = {}) {
       const unavailable = required.filter((artifact) => !session.artifacts[artifact]);
       if (unavailable.length) throw new ContractError("ARTIFACT_NOT_READY", `${task.id || task.skill} requires unavailable artifact(s): ${unavailable.join(", ")}`);
 
+      try {
+        circuitBreaker.assertCanCall();
+        const guard = assertMcpCapabilities(task, { policy: options.mcpPolicy, profileName: options.mcpProfile, approval: options.approvedCapabilities === true });
+        emitEvent({ event: "permission", phase_id: phase.id, skill: task.id, status: "allowed", message: `profile=${guard.profile}` });
+        session.budget = budgetTracker.consume({ retries: task.retry_count, estimated_tokens: task.estimated_tokens, external_api_calls: task.external_api_calls });
+        circuitBreaker.recordSuccess();
+        session.circuit = circuitBreaker.snapshot();
+      } catch (error) {
+        circuitBreaker.recordFailure(classifyFailure(error));
+        session.circuit = circuitBreaker.snapshot();
+        session.status = "failed";
+        emitEvent({ event: "failure", phase_id: phase.id, skill: task.id, status: "failed", error_code: error.code || "GUARD_FAILURE", message: classifyFailure(error) });
+        throw error;
+      }
       emitEvent({ event: "task", phase_id: phase.id, skill: task.id, status: "started" });
       if (task.type === "hitl_gate") {
         const decision = options.gateDecisions?.[task.id] || task.decision || "reject";
@@ -108,7 +131,10 @@ function executeFixturePipeline(pipeline, options = {}) {
         if (task.required_fields) validateOutput(output, task.required_fields);
         if (task.output) session.artifacts[task.output] = output;
       }
+      session.budget = budgetTracker.consume({ completed_task: true });
+      session.completed_tasks.push(task.id || task.skill || `phase-${phase.id}`);
       emitEvent({ event: "task", phase_id: phase.id, skill: task.id, status: "completed" });
+      if (options.checkpointFile) saveCheckpoint(options.checkpointFile, session, phase.id);
     }
   }
 
@@ -118,8 +144,35 @@ function executeFixturePipeline(pipeline, options = {}) {
   }
 
   session.status = "completed";
-  emitEvent({ event: "pipeline", status: "completed" });
+  session.budget = budgetTracker.snapshot();
+  emitEvent({ event: "pipeline", status: "completed", duration_ms: session.budget.elapsed_ms });
   return session;
+}
+
+function checkpointSnapshot(session, phaseId) {
+  return {
+    checkpoint_version: "1.0.0",
+    saved_at: new Date().toISOString(),
+    session_id: session.session_id,
+    pipeline_id: session.pipeline_id,
+    phase_id: phaseId,
+    status: session.status,
+    completed_tasks: [...session.completed_tasks],
+    artifact_names: Object.keys(session.artifacts),
+    gate_decisions: session.gates.map((gate) => ({ task_id: gate.task_id, decision: gate.decision })),
+    budget: session.budget,
+    circuit: session.circuit,
+    raw_artifacts_included: false,
+  };
+}
+
+function saveCheckpoint(file, session, phaseId) {
+  atomicWriteJson(file, checkpointSnapshot(session, phaseId));
+  return file;
+}
+
+function resumeCheckpoint(file) {
+  return readJsonWithRecovery(file).value;
 }
 
 function saveSession(file, session) {
@@ -154,4 +207,7 @@ module.exports = {
   executeFixturePipeline,
   saveSession,
   resumeSession,
+  checkpointSnapshot,
+  saveCheckpoint,
+  resumeCheckpoint,
 };

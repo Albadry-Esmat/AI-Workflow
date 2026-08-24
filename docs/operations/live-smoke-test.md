@@ -19,6 +19,9 @@ aiw validate
 aiw sync --check
 aiw preflight
 aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only
+aiw validate-events
+aiw validate-pilot-evidence tests/fixtures/pilot-evidence.json
+aiw rollback-rehearsal
 ```
 
 If `pilot-preflight` reports a blocking prerequisite, stop. Resolve the environment issue and rerun it. Do not override a missing executable, missing credential, failed MCP policy, failed backup, or failed checksum verification by writing a fake pass record.
@@ -35,6 +38,11 @@ Use the correlation ID and manifest path printed by `pilot-preflight`. Record on
 | 4 | Resume with explicit approval. | The same run resumes and completes with schema-valid artifacts. | Gate bypass, state loss, or artifact mismatch. |
 | 5 | Run an architecture-focused pipeline. | ADR and architecture outputs exist before any dependent gate or consumer proceeds. | Downstream work observes an unavailable or stale artifact. |
 | 6 | Verify recovery in a disposable copy. | Pre-run backup verifies; restore returns the last verified state and checksums pass. | Only-copy overwrite, checksum mismatch, or unsafe restore. |
+| 7 | Request a capability beyond the pilot profile. | Runtime guard denies it before invocation and emits a typed permission event. | Any unauthorized invocation or unclear audit record. |
+| 8 | Exercise the configured retry, duration, token, and API-call ceilings in a safe fixture. | Budget threshold pauses or hard limit stops safely. | Continued work after a hard limit. |
+| 9 | Trigger repeated safe failures in a disposable fixture. | Circuit breaker opens and prevents blind retries; recovery requires the documented cooldown/success path. | Manual bypass or unbounded retry. |
+| 10 | Score representative artifacts. | `aiw score-artifact` passes strong output and routes weak output to human review. | Weak output is promoted automatically. |
+| 11 | Prepare any future write operation. | `aiw write-plan --operation <name> --target <approved-target> --canary` produces a dry-run plan with `executed: false`. | Plan is not canary-only or indicates an external write. |
 
 Do not perform external writes during this smoke test. The enabled MCP profile must remain `pilot-read-only`; Playwright, Slack, Vercel, deployment tools, direct publication, autonomous adaptation, payment, and account changes remain disabled.
 
@@ -73,5 +81,7 @@ independent_reviewer: "<name>"
 decision: "pilot-ready|blocked"
 notes: "<sanitized failure categories or limitations>"
 ```
+
+Validate the sanitized event record with `aiw validate-events` and the evidence record with `aiw validate-pilot-evidence <private-record.json>`. Score important outputs with `aiw score-artifact`; any `needs_human_review` or `reject` result must be reviewed before promotion.
 
 The final decision remains **blocked** until the actual OpenCode executable, reviewed credentials, MCP startup, and this live sequence have been exercised on the operator machine. Sandbox fixture runs validate CLI logic only and cannot satisfy live acceptance criteria.

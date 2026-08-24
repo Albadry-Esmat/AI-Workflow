@@ -212,6 +212,58 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("artifact quality scoring routes incomplete output to review and rejects prohibited fields", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-quality-"));
+    const incomplete = path.join(directory, "incomplete.json");
+    const prohibited = path.join(directory, "prohibited.json");
+    try {
+      fs.writeFileSync(incomplete, JSON.stringify({}));
+      const review = spawnSync(process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", incomplete], { cwd: root, encoding: "utf8" });
+      expect(review.status).toBe(0);
+      expect(JSON.parse(review.stdout).decision).toBe("needs_human_review");
+      fs.writeFileSync(prohibited, JSON.stringify({ requirements: [], acceptance_criteria: [], raw_prompt: "must not be stored" }));
+      const rejected = spawnSync(process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", prohibited], { cwd: root, encoding: "utf8" });
+      expect(rejected.status).not.toBe(0);
+      expect(rejected.stdout).toMatch(/prohibited_fields/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("canary write plans are dry-run only and require explicit approval for writes", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-write-plan-"));
+    const output = path.join(directory, "plan.json");
+    try {
+      const result = spawnSync(process.execPath, ["scripts/write-plan.js", "--operation", "fixture-publication", "--target", "fixture-repo", "--canary", "--approved", "--output", output], { cwd: root, encoding: "utf8" });
+      expect(result.status).toBe(0);
+      const plan = JSON.parse(fs.readFileSync(output, "utf8"));
+      expect(plan.canary).toBe(true);
+      expect(plan.dry_run).toBe(true);
+      expect(plan.executed).toBe(false);
+      expect(plan.external_write_performed).toBe(false);
+      const noCanary = spawnSync(process.execPath, ["scripts/write-plan.js", "--operation", "fixture-publication", "--target", "fixture-repo", "--approved"], { cwd: root, encoding: "utf8" });
+      expect(noCanary.status).not.toBe(0);
+      expect(`${noCanary.stdout}${noCanary.stderr}`).toMatch(/WRITE_PLAN_REQUIRES_CANARY/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("idempotency reconciliation records ambiguous external-write outcomes", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-reconcile-"));
+    const ledger = path.join(directory, "ledger.json");
+    try {
+      const idempotency = require(path.join(root, "scripts/lib/idempotency.js"));
+      const key = idempotency.operationKey("publication", "digest-ambiguous");
+      idempotency.claim(key, ledger);
+      idempotency.reconcile(key, "unknown", ledger);
+      expect(idempotency.inspect(key, ledger).status).toBe("needs_operator_reconciliation");
+      expect(() => idempotency.reconcile(key, "invalid", ledger)).toThrow(/IDEMPOTENCY_OUTCOME_INVALID/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("idempotency ledger rejects duplicate claims and records completion", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-idempotency-"));
     const ledger = path.join(directory, "ledger.json");
@@ -254,6 +306,47 @@ describe("production hardening conformance", () => {
     } finally {
       fs.rmSync(directory, { recursive: true, force: true });
     }
+  });
+
+  test("runtime guards deny unauthorized capabilities and require approval", () => {
+    const policy = JSON.parse(fs.readFileSync(path.join(root, "mcp-permission-policy.json"), "utf8"));
+    expect(() => require(path.join(root, "scripts/lib/runtime-guards.js")).assertMcpCapabilities({ required_capabilities: ["write:repository"] }, { policy, profileName: "pilot-read-only" })).toThrow(/MCP_CAPABILITY_DENIED/);
+    expect(() => require(path.join(root, "scripts/lib/runtime-guards.js")).assertMcpCapabilities({ required_capabilities: ["write:repository"] }, { policy, profileName: "repository-write" })).toThrow(/MCP_APPROVAL_REQUIRED/);
+    expect(require(path.join(root, "scripts/lib/runtime-guards.js")).assertMcpCapabilities({ required_capabilities: ["write:repository"] }, { policy, profileName: "repository-write", approval: true }).allowed).toBe(true);
+  });
+
+  test("checkpoints contain handoff metadata but no raw artifacts", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-checkpoint-"));
+    const file = path.join(directory, "checkpoint.json");
+    try {
+      const harness = require(path.join(root, "scripts/conformance-harness.js"));
+      const pipeline = { id: "checkpoint", phases: [{ id: "one", tasks: [{ id: "req", output: "requirements" }] }] };
+      const result = harness.executeFixturePipeline(pipeline, { checkpointFile: file, taskOutputs: { req: { requirements: [{ id: "R1", text: "sensitive content excluded" }] } } });
+      const checkpoint = harness.resumeCheckpoint(file);
+      expect(result.status).toBe("completed");
+      expect(checkpoint.artifact_names).toEqual(["requirements"]);
+      expect(checkpoint.raw_artifacts_included).toBe(false);
+      expect(JSON.stringify(checkpoint)).not.toMatch(/sensitive content excluded/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("circuit breaker opens after repeated failures and resets after success", () => {
+    const { CircuitBreaker } = require(path.join(root, "scripts/lib/circuit-breaker.js"));
+    const breaker = new CircuitBreaker({ failureThreshold: 2, cooldownMs: 1000 });
+    breaker.recordFailure("timeout", 100);
+    breaker.recordFailure("timeout", 200);
+    expect(() => breaker.assertCanCall(500)).toThrow(/CIRCUIT_OPEN/);
+    expect(() => breaker.assertCanCall(1300)).not.toThrow();
+    breaker.recordSuccess();
+    expect(breaker.snapshot().state).toBe("closed");
+  });
+
+  test("runtime budget tracker stops before an over-limit operation continues", () => {
+    const { BudgetTracker } = require(path.join(root, "scripts/lib/runtime-guards.js"));
+    const tracker = new BudgetTracker({ limits: { max_total_retries: 1, max_duration_ms: 100000, max_estimated_tokens: 10, max_external_api_calls: 2 } });
+    expect(() => tracker.consume({ estimated_tokens: 11 })).toThrow(/EXECUTION_BUDGET_EXCEEDED/);
   });
 
   test("MCP pilot permission policy passes the active configuration", () => {

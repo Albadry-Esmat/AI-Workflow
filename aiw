@@ -65,6 +65,10 @@ show_help() {
   echo -e "    ${CYAN}validate-mcp${NC}       Validate the pilot MCP permission profile"
   echo -e "    ${CYAN}validate-budget${NC}    Validate pilot execution capacity and cost limits"
   echo -e "    ${CYAN}validate-golden${NC}    Validate golden artifact compatibility contracts"
+  echo -e "    ${CYAN}validate-events${NC}    Validate sanitized execution event records"
+  echo -e "    ${CYAN}validate-pilot-evidence${NC} Validate a sanitized pilot evidence record"
+  echo -e "    ${CYAN}write-plan${NC}         Create a canary-only dry-run write plan"
+  echo -e "    ${CYAN}score-artifact${NC}    Score an artifact and route low quality to review"
   echo -e "    ${CYAN}events${NC}             Show recent sanitized execution events"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
@@ -187,6 +191,22 @@ cmd_validate_budget() {
 
 cmd_validate_golden() {
   node "$ROOT/scripts/validate-golden-artifacts.js"
+}
+
+cmd_validate_events() {
+  node "$ROOT/scripts/validate-events.js"
+}
+
+cmd_validate_pilot_evidence() {
+  node "$ROOT/scripts/validate-pilot-evidence.js" "$@"
+}
+
+cmd_write_plan() {
+  node "$ROOT/scripts/write-plan.js" "$@"
+}
+
+cmd_score_artifact() {
+  node "$ROOT/scripts/score-artifact.js" "$@"
 }
 
 cmd_events() {
@@ -494,6 +514,10 @@ case "$COMMAND" in
   validate-mcp)     cmd_validate_mcp "$@" ;;
   validate-budget)  cmd_validate_budget "$@" ;;
   validate-golden)  cmd_validate_golden "$@" ;;
+  validate-events)  cmd_validate_events "$@" ;;
+  validate-pilot-evidence) cmd_validate_pilot_evidence "$@" ;;
+  write-plan)       cmd_write_plan "$@" ;;
+  score-artifact)   cmd_score_artifact "$@" ;;
   events)           cmd_events "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;

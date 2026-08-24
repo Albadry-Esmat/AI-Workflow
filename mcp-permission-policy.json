@@ -1,11 +1,21 @@
 {
-  "policy_version": "1.0.0",
+  "policy_version": "1.1.0",
   "default_profile": "pilot-read-only",
+  "capability_vocabulary": [
+    "read:repository",
+    "read:public-web",
+    "read:memory",
+    "write:memory",
+    "write:repository",
+    "write:external",
+    "deploy"
+  ],
   "profiles": {
     "pilot-read-only": {
       "description": "Non-sensitive smoke tests and pilots with no external writes or deployments.",
       "enabled_servers": ["github", "memory", "context7", "brave-search"],
       "disabled_servers": ["slack", "vercel", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory"],
       "allowed_external_writes": false,
       "required_approval": "human_before_any_write"
     },
@@ -13,6 +23,7 @@
       "description": "Explicitly approved repository issue and pull-request operations.",
       "enabled_servers": ["github", "memory", "context7", "brave-search"],
       "disabled_servers": ["slack", "vercel", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory", "write:repository"],
       "allowed_external_writes": true,
       "required_approval": "human_before_each_write",
       "credential_requirements": ["dedicated_repository_scoped_token"]
@@ -21,6 +32,7 @@
       "description": "Explicit deployment work after a separate release approval.",
       "enabled_servers": ["github", "memory", "context7", "brave-search", "vercel"],
       "disabled_servers": ["slack", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory", "write:repository", "write:external", "deploy"],
       "allowed_external_writes": true,
       "required_approval": "human_before_deployment",
       "credential_requirements": ["dedicated_repository_scoped_token", "dedicated_deployment_token"]

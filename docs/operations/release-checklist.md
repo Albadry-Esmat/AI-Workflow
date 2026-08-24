@@ -28,12 +28,17 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] Delayed asynchronous output cannot pass a dependent gate prematurely.
 - [ ] Concurrent state access is rejected or serialized safely.
 - [ ] Corrupt state is detected and previous valid state is recoverable.
+- [ ] Sanitized checkpoints can be saved and resumed without embedding raw artifact content.
+- [ ] Circuit-breaker behavior opens after repeated failures, blocks calls safely, and resets only after the cooldown/success path.
 - [ ] Backup, checksum verification, restore, and previous-state retention are tested.
 - [ ] The deployment approval remains indefinite and non-bypassable in every pipeline that includes deployment strategy.
 
 ## Security and Supply Chain
 
 - [ ] `npm run validate:mcp` passes for the approved pilot profile.
+- [ ] Runtime capability checks reject undeclared MCP permissions before invocation and require approval for write/deployment capabilities.
+- [ ] Runtime budget enforcement is tested for retry, duration, token, and external-call hard stops.
+- [ ] Event records validate against `skills/schema/execution-event.schema.json` and retention pruning is tested.
 - [ ] `node scripts/security-check.js --history` passes on the full reachable history.
 - [ ] `npm audit --audit-level=high --omit=optional` passes.
 - [ ] `aiw version --json` matches `compatibility.json` and the intended release tag.
@@ -53,6 +58,8 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] Stale mirror files are removed only inside the generated data scope.
 - [ ] Target website repository branch and destination path are verified.
 - [ ] Publication is performed only with explicit `--confirm-website` approval.
+- [ ] A canary-only dry-run write plan is reviewed before any new write-capable operation.
+- [ ] Ambiguous external-write outcomes are reconciled before retry; duplicate operation keys are rejected.
 - [ ] The target diff is reviewed before push.
 - [ ] Website rollback commit is identified.
 - [ ] `aiw rollback-rehearsal` passes in a disposable workspace and the report contains no raw state.
@@ -63,6 +70,8 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] One constrained pipeline completes on a non-critical repository.
 - [ ] One full pipeline completes with non-sensitive data.
 - [ ] Human gate decisions and recovery actions are recorded.
+- [ ] `aiw validate-pilot-evidence` passes the sanitized evidence record.
+- [ ] `aiw score-artifact` is run for representative artifacts; weak outputs route to human review.
 - [ ] No unresolved P0/P1 finding remains.
 - [ ] Release tag is created from the passing commit.
 - [ ] Release notes include upgrade, rollback, compatibility, and known-limitations guidance.

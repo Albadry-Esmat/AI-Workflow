@@ -14,6 +14,22 @@ catch (error) { fail(`golden fixture cannot be read: ${error.message}`); }
 let compatibility;
 try { compatibility = JSON.parse(fs.readFileSync(compatibilityFile, "utf8")); }
 catch (error) { fail(`compatibility manifest cannot be read: ${error.message}`); }
+if (compatibility?.operational_contracts) {
+  const expected = compatibility.operational_contracts;
+  const actualFiles = {
+    mcp_policy_version: path.join(root, "mcp-permission-policy.json"),
+    budget_policy_version: path.join(root, "execution-budget.json"),
+    quality_policy_version: path.join(root, "artifact-quality-policy.json"),
+    pilot_evidence_version: path.join(root, "tests/fixtures/pilot-evidence.json"),
+  };
+  for (const [key, filePath] of Object.entries(actualFiles)) {
+    try {
+      const value = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      const actual = key === "mcp_policy_version" ? value.policy_version : key === "budget_policy_version" ? value.schema_version : key === "quality_policy_version" ? value.policy_version : value.record_version;
+      if (actual !== expected[key]) fail(`${key} ${actual || "missing"} differs from compatibility manifest ${expected[key]}`);
+    } catch (error) { fail(`${key} source cannot be read: ${error.message}`); }
+  }
+}
 if (fixture && compatibility) {
   if (fixture.fixture_version !== "1.0.0") fail(`unsupported fixture version: ${fixture.fixture_version || "missing"}`);
   if (fixture.compatibility?.framework_version !== compatibility.framework_version) fail("golden framework version differs from compatibility manifest");

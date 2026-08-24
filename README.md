@@ -111,6 +111,10 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw validate-mcp` | Validate the pilot read-only MCP permission profile |
 | `aiw validate-budget` | Validate pilot retry, duration, token, session, queue, and API-call limits |
 | `aiw validate-golden` | Validate versioned artifact contracts against compatibility metadata |
+| `aiw validate-events` | Validate sanitized execution events against the formal event schema |
+| `aiw validate-pilot-evidence [file]` | Validate a sanitized live-pilot evidence record |
+| `aiw write-plan --operation ... --target ... --canary` | Create a non-executing, single-target write plan |
+| `aiw score-artifact --type ... --input ...` | Score artifact completeness and route weak output to human review |
 | `aiw security-history` | Scan reachable Git history for credential-like patterns |
 | `aiw version --json` | Print framework, schema, and runtime compatibility metadata |
 | `aiw support-bundle [dir]` | Create sanitized diagnostics without raw state or secrets |
@@ -136,7 +140,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 ### Production Release Checks
 
-Before a release candidate, run `aiw self-test`, `aiw validate`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, `aiw rollback-rehearsal`, and `aiw preflight`. Before live execution, run `aiw pilot-preflight` against a disposable project. The first pilot uses the `pilot-read-only` MCP profile: browser, Slack, and Vercel integrations are disabled by default. Use `aiw support-bundle` and `aiw events --json` when reporting a failure; they collect sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [live smoke-test procedure](docs/operations/live-smoke-test.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
+Before a release candidate, run `aiw self-test`, `aiw validate`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, `aiw rollback-rehearsal`, and `aiw preflight`. Before live execution, run `aiw pilot-preflight` against a disposable project. The first pilot uses the `pilot-read-only` MCP profile: browser, Slack, and Vercel integrations are disabled by default. Runtime guards reject unauthorized MCP capabilities, enforce budgets, trip a circuit breaker after repeated failures, and save sanitized checkpoints. Use `aiw support-bundle` and `aiw events --json` when reporting a failure; they collect sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [live smoke-test procedure](docs/operations/live-smoke-test.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
 
 ## Maintenance
 

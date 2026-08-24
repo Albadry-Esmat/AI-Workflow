@@ -15,6 +15,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.
 - **Delegate skill (SKL-120)** — formal protocol for intra-pipeline task delegation with scoped context, success criteria, turn limits, and audit trail. Prevents ad-hoc agent-to-agent handoff sprawl.
 - **Pilot preparation and operational controls** — Added `aiw pilot-preflight`, sanitized structured event logging with retention pruning, MCP pilot-profile validation, static capacity/cost limits, deterministic website-publication idempotency protection, disposable rollback rehearsal, and versioned golden-artifact compatibility contracts. Live OpenCode/MCP execution remains operator-owned and is not simulated by repository tests.
+- **Runtime enforcement and pilot evidence** — Added explicit MCP capability/approval guards, live execution-budget accounting, formal event-schema validation, circuit breakers, sanitized checkpoints, ambiguous-write reconciliation, canary-only dry-run write plans, pilot-evidence validation, and deterministic artifact-quality scoring with human-review routing. No new side-effect integration was enabled.
 
 ### Changed
 

@@ -1,0 +1,26 @@
+{
+  "record_version": "1.0.0",
+  "release_commit": "fixture-release-commit",
+  "project_id": "disposable-fixture-project",
+  "correlation_id": "pilot-fixture-001",
+  "pipeline_runs": [
+    {
+      "name": "requirements-only",
+      "started_at": "2026-01-01T00:00:00.000Z",
+      "finished_at": "2026-01-01T00:01:00.000Z",
+      "status": "pass",
+      "phase_durations_ms": { "requirements": 1000 },
+      "retry_count": 0,
+      "gate_decisions": ["approve"],
+      "artifacts": [{ "name": "requirements", "schema_valid": true }]
+    }
+  ],
+  "backup": { "path": "private-backup-path", "checksum_verified": true },
+  "recovery": { "scenario": "corrupt-disposable-state", "result": "pass" },
+  "external_writes": "none",
+  "secret_exposure": "none",
+  "operator": "fixture-operator",
+  "independent_reviewer": "fixture-reviewer",
+  "decision": "pilot-ready",
+  "notes": "sanitized fixture"
+}

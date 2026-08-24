@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -61,6 +61,18 @@ validate-budget: ## Validate pilot execution capacity and cost limits
 
 validate-golden: ## Validate golden artifact compatibility contracts
 	@node scripts/validate-golden-artifacts.js
+
+validate-events: ## Validate sanitized execution event records
+	@node scripts/validate-events.js
+
+validate-pilot-evidence: ## Validate a sanitized pilot evidence record
+	@node scripts/validate-pilot-evidence.js
+
+write-plan: ## Create a canary-only dry-run plan for a write-capable operation
+	@node scripts/write-plan.js
+
+score-artifact: ## Score a structured artifact and route low-quality output to human review
+	@node scripts/score-artifact.js --type requirements --input tests/fixtures/requirements-artifact.json
 
 self-test: ## Run credential-free production conformance tests
 	@node scripts/self-test.js

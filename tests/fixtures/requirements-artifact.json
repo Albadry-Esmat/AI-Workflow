@@ -1,0 +1,4 @@
+{
+  "requirements": [{ "id": "R1", "statement": "The system shall validate outputs." }],
+  "acceptance_criteria": ["Schema validation passes"]
+}

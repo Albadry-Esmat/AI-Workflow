@@ -4,6 +4,14 @@
   "cli_version": "1.0.0",
   "framework_version": "4.0.0",
   "schema_version": "2.1.0",
+  "operational_contracts": {
+    "mcp_policy_version": "1.1.0",
+    "execution_event_schema_version": "1.0.0",
+    "budget_policy_version": "1.0.0",
+    "quality_policy_version": "1.0.0",
+    "golden_fixture_version": "1.0.0",
+    "pilot_evidence_version": "1.0.0"
+  },
   "runtime": {
     "node": ">=20 <23",
     "python": ">=3.9 <4",

@@ -31,6 +31,17 @@ if (!config || !policy || !profile) {
   process.exit(1);
 }
 
+const vocabulary = new Set(policy.capability_vocabulary || []);
+for (const [name, currentProfile] of Object.entries(policy.profiles || {})) {
+  if (!Array.isArray(currentProfile.allowed_capabilities)) failures.push(`profile has no allowed_capabilities list: ${name}`);
+  for (const capability of currentProfile.allowed_capabilities || []) {
+    if (!vocabulary.has(capability)) failures.push(`profile ${name} uses unknown capability: ${capability}`);
+  }
+  const writes = (currentProfile.allowed_capabilities || []).some((capability) => /^write:|^deploy$/.test(capability));
+  if (writes && !currentProfile.required_approval) failures.push(`write-capable profile has no approval requirement: ${name}`);
+  if (currentProfile.allowed_external_writes === true && (!Array.isArray(currentProfile.credential_requirements) || currentProfile.credential_requirements.length === 0)) failures.push(`external-write profile has no credential requirement: ${name}`);
+}
+
 const configured = config.mcp || {};
 const configuredNames = new Set(Object.keys(configured));
 const enabledNames = new Set(Object.entries(configured).filter(([, server]) => server && server.enabled === true).map(([name]) => name));

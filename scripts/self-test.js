@@ -41,6 +41,20 @@ check("semantic pipeline invariants pass", () => {
   command(["scripts/validate-pipelines.js"]);
 });
 
+for (const [label, script] of [
+  ["MCP permission policy passes", "scripts/validate-mcp-policy.js"],
+  ["execution budget policy passes", "scripts/validate-execution-budget.js"],
+  ["golden compatibility contracts pass", "scripts/validate-golden-artifacts.js"],
+  ["execution event schema passes", "scripts/validate-events.js"],
+  ["pilot evidence contract passes", "scripts/validate-pilot-evidence.js"],
+]) {
+  check(label, () => { command([script]); });
+}
+
+check("artifact quality policy passes representative fixture", () => {
+  command(["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
+});
+
 check("black-box fixture pipeline completes with HITL approval", () => {
   const fixture = loadPipeline(path.join(root, "tests", "fixtures", "self-test-pipeline.json"));
   const result = executeFixturePipeline(fixture, { gateDecisions: { approve: "approve" } });

@@ -19,6 +19,9 @@ aiw preflight
 aiw validate-budget
 aiw validate-golden
 aiw rollback-rehearsal
+aiw validate-events
+aiw validate-pilot-evidence
+aiw score-artifact --type requirements --input tests/fixtures/requirements-artifact.json
 ```
 
 `aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
@@ -34,13 +37,13 @@ aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>
 aiw backup
 ```
 
-Use the configured pilot budget as the ceiling for retries, duration, estimated tokens, active sessions, queue depth, and external API calls. A threshold pauses for approval; a hard limit stops safely. Inspect sanitized lifecycle events with `aiw events --json` and do not expose raw prompts or MCP payloads.
+Use the configured pilot budget as the ceiling for retries, duration, estimated tokens, active sessions, queue depth, and external API calls. The runtime budget tracker stops before continued work when a hard limit is exceeded. A threshold pauses for approval; a hard limit stops safely. Runtime MCP guards reject capabilities outside the selected profile and require explicit approval for write or deployment capabilities. Inspect sanitized lifecycle events with `aiw events --json`; validate them with `aiw validate-events`; never expose raw prompts or MCP payloads.
 
 Record the generated backup path with the session identifier. Do not copy the backup into a public repository.
 
 ## During Execution
 
-Monitor session status, retry count, gate decisions, and artifact availability. A downstream phase must not consume an artifact while its producer is pending. If a gate is rejected, preserve the rejection reason and resume only after the input or approval context has been updated.
+Monitor session status, retry count, gate decisions, artifact availability, budget snapshots, circuit state, and checkpoints. A downstream phase must not consume an artifact while its producer is pending. If a gate is rejected, preserve the rejection reason and resume only after the input or approval context has been updated. Repeated runtime failures trip the circuit breaker and require operator inspection before retry.
 
 Do not delete session files to clear a stuck run. First create a backup, inspect the sanitized state, and determine whether the run is waiting for HITL input, an MCP response, a schema repair, or a process lock. If you need to ask for help, run `aiw support-bundle` and share only the generated sanitized directory; it contains inventory and diagnostics, not raw session contents.
 
@@ -58,6 +61,9 @@ Do not delete session files to clear a stuck run. First create a backup, inspect
 | Website publication failure | Do not retry blindly. Confirm target branch, credentials, non-fast-forward status, current target diff, and the deterministic idempotency ledger before another publication attempt. A duplicate claim is a stop-and-inspect condition. |
 | Budget threshold or hard limit | Pause for explicit approval at a threshold; stop safely at a hard limit. Preserve the correlation ID and sanitized event summary. |
 | Rollback required | Run `aiw rollback-rehearsal` in a disposable workspace first, then use only a verified backup for real restore. |
+| Unauthorized capability | Stop before invocation, record the typed permission failure, and use a profile with only the minimum approved capability. |
+| Circuit open | Inspect the sanitized error category and integration status; do not bypass the cooldown or reset the breaker blindly. |
+| Weak artifact | Run `aiw score-artifact`; route `needs_human_review` or `reject` results to manual review and do not promote them automatically. |
 
 ## Backup and Restore
 
@@ -91,7 +97,7 @@ External publication requires explicit confirmation:
 aiw sync --website --confirm-website
 ```
 
-For changed website data, publication claims a deterministic operation key based on the source-data digest. If the same key is claimed again, stop and inspect the target repository and `.opencode/state/idempotency.json`; never blindly create a duplicate commit or pull request.
+For changed website data, publication claims a deterministic operation key based on the source-data digest. If the same key is claimed again, stop and inspect the target repository and `.opencode/state/idempotency.json`; never blindly create a duplicate commit or pull request. For future write-capable operations, first create a canary-only dry-run plan with `aiw write-plan --operation <name> --target <approved-target> --canary`, review it, and execute only through the operation-specific approved path.
 
 The publication workflow validates source data, semantic pipeline invariants, security checks, conformance tests, and mirror cleanliness before pushing. Review the target diff and ensure the publication token is separate from local development credentials.
 
@@ -120,4 +126,4 @@ Never place secrets in `opencode.json`, pipeline JSON, skill Markdown, generated
 
 ## Pilot Sign-off
 
-A pilot is complete only when one or two non-critical repositories have completed a constrained pipeline and one full pipeline using non-sensitive data, all required gates were reviewed by a human, artifacts were recoverable, logs were sanitized, and no P0/P1 issue remains open.
+A pilot is complete only when one or two non-critical repositories have completed a constrained pipeline and one full pipeline using non-sensitive data, all required gates were reviewed by a human, artifacts were recoverable, logs were sanitized, pilot evidence passes `aiw validate-pilot-evidence`, weak artifacts were routed through quality review, and no P0/P1 issue remains open.

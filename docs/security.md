@@ -65,9 +65,16 @@ The release-hardening path adds executable controls in addition to the agent per
 | Capacity and cost | `execution-budget.json` and `aiw validate-budget` define pilot retry, duration, token, session, queue, and external-call ceilings; thresholds pause and hard limits stop safely. |
 | External-write idempotency | The website publication path derives a deterministic source-data digest key and rejects duplicate claims before commit/push. |
 | Rollback rehearsal | `aiw rollback-rehearsal` injects disposable corruption, verifies a backup, restores it, and emits a sanitized checksum report. |
-| Compatibility drift | `aiw validate-golden` checks versioned structured-only artifact contracts against `compatibility.json`. |
+| Compatibility drift | `aiw validate-golden` checks versioned structured-only artifact contracts against `compatibility.json`, including operational contract versions. |
+| Runtime capability enforcement | `scripts/lib/runtime-guards.js` rejects undeclared MCP capabilities before invocation and requires explicit approval for write or deployment capabilities. |
+| Runtime budget enforcement | `BudgetTracker` stops a run when retry, duration, estimated-token, or external-call limits are exceeded. |
+| Event contract | `skills/schema/execution-event.schema.json` and `aiw validate-events` enforce the sanitized event shape; raw prompts and MCP payloads remain excluded. |
+| Failure containment | `CircuitBreaker` opens after repeated runtime failures and prevents blind retries until the cooldown and recovery path succeed. |
+| Checkpoint safety | Harness checkpoints contain session, phase, artifact-name, gate, budget, and circuit metadata only; raw artifact values are excluded. |
+| Write planning | `aiw write-plan` is canary-only and dry-run-only, requiring one target and an explicit profile/approval record before any operation-specific write path. |
+| Artifact quality | `aiw score-artifact` routes incomplete structured output to human review and rejects prohibited sensitive fields. |
 
-The first pilot uses the `pilot-read-only` profile. GitHub, memory, Context7, and Brave Search are allowed subject to credential review; Playwright, Slack, and Vercel remain disabled because they can create browser, messaging, or deployment side effects. Any profile change requires security review, negative tests, and a release-record update.
+The first pilot uses the `pilot-read-only` profile. GitHub, memory, Context7, and Brave Search are allowed subject to credential review; Playwright, Slack, and Vercel remain disabled because they can create browser, messaging, or deployment side effects. Any profile change requires security review, negative tests, and a release-record update. Runtime capability requests are checked again at invocation time; static policy validation alone is not sufficient authorization.
 
 Use `aiw self-test` for credential-free conformance checks, `aiw pilot-preflight` before operator-owned live smoke execution, and `aiw preflight` before a release candidate. These repository commands do not invoke paid model calls or simulate live OpenCode/MCP evidence.
 

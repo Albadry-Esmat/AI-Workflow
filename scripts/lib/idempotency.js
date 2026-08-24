@@ -26,6 +26,16 @@ function record(key, value, file) {
   });
   return ledgerPath(target);
 }
+function reconcile(key, outcome, file) {
+  const allowed = new Set(["published", "not_published", "unknown"]);
+  if (!allowed.has(outcome)) {
+    const error = new Error(`IDEMPOTENCY_OUTCOME_INVALID: unsupported reconciliation outcome: ${outcome}`);
+    error.code = "IDEMPOTENCY_OUTCOME_INVALID";
+    throw error;
+  }
+  return record(key, { status: outcome === "unknown" ? "needs_operator_reconciliation" : outcome, result_category: `operator-reconciled-${outcome}` }, file);
+}
+
 function claim(key, file) {
   const target = ledgerPath(file);
   let result;
@@ -44,4 +54,4 @@ function claim(key, file) {
   });
   return result;
 }
-module.exports = { operationKey, ledgerPath, load, inspect, record, claim };
+module.exports = { operationKey, ledgerPath, load, inspect, record, reconcile, claim };

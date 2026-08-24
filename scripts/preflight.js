@@ -34,6 +34,10 @@ const requiredReleaseFiles = [
   "mcp-permission-policy.json",
   "execution-budget.json",
   "tests/fixtures/golden-artifacts.json",
+  "skills/schema/execution-event.schema.json",
+  "tests/fixtures/pilot-evidence.json",
+  "artifact-quality-policy.json",
+  "tests/fixtures/requirements-artifact.json",
 ];
 for (const relative of requiredReleaseFiles) {
   if (!fs.existsSync(path.join(root, relative))) fail(`required release file is missing: ${relative}`);
@@ -93,6 +97,9 @@ run("semantic pipeline validation", process.execPath, ["scripts/validate-pipelin
 run("MCP pilot permission policy", process.execPath, ["scripts/validate-mcp-policy.js"]);
 run("execution budget policy", process.execPath, ["scripts/validate-execution-budget.js"]);
 run("golden artifact compatibility", process.execPath, ["scripts/validate-golden-artifacts.js"]);
+run("execution event schema", process.execPath, ["scripts/validate-events.js"]);
+run("pilot evidence contract", process.execPath, ["scripts/validate-pilot-evidence.js"]);
+run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);
 run("credential-free self-test", process.execPath, ["scripts/self-test.js"]);
