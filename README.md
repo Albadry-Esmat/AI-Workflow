@@ -14,7 +14,7 @@ cd AI-Workflow
 ./aiw setup
 ```
 
-`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs root dependencies from the lockfile, creates your `.env` with owner-only permissions, and adds `aiw` to your PATH. Then:
+`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs root dependencies from the lockfile, creates your `.env` with owner-only permissions, adds `aiw` to your PATH, and installs a managed pre-commit hook when no custom hook exists. The hook checks affected documentation, changelog, website synchronization, and structural validation before local commits; CI remains authoritative. Then:
 
 ```bash
 # Edit .env and set a dedicated fine-grained GITHUB_TOKEN

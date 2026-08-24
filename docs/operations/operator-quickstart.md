@@ -20,7 +20,7 @@ aiw setup
 aiw health
 ```
 
-Create `.env` only from `.env.example`. Use a dedicated least-privilege credential, keep the file mode at `600`, and never paste its value into a ticket, prompt, log, issue, or evidence record.
+Create `.env` only from `.env.example`. Use a dedicated least-privilege credential, keep the file mode at `600`, and never paste its value into a ticket, prompt, log, issue, or evidence record. `aiw setup` also installs a managed pre-commit hook when no custom hook exists; it checks documentation policy, website synchronization, and structural validation before local commits. CI remains the authoritative enforcement layer.
 
 ## Release-candidate validation
 

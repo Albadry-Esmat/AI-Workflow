@@ -24,6 +24,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Documentation navigation** — Updated the documentation index to surface the new operator, troubleshooting, and adapter-development guides.
 - **Complete documentation synchronization policy** — Added a machine-readable path-aware policy, `aiw docs-check`, strict-preflight enforcement, and a dedicated CI job requiring `docs/changelog.md` plus all affected domain guides for every implementation or configuration change.
 - **Self-test documentation gate** — Added documentation-policy validation to the credential-free self-test so routine conformance checks detect stale or incomplete documentation before release review.
+- **Managed documentation-aware pre-commit hook** — `aiw setup` now installs or refreshes the versioned hook when no custom hook exists; it blocks local commits with incomplete documentation, stale website data, or failed structural validation while preserving CI as the authoritative gate.
+- **Hook maintenance guidance** — Added troubleshooting and setup guidance for absent, stale, or intentionally customized local hooks, with explicit preservation of custom hooks and continued CI enforcement.
 
 ### Changed
 

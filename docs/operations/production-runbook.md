@@ -6,6 +6,8 @@ This runbook applies to the local-first AI Workflow CLI and its public website-d
 
 ## Before Every Release Candidate
 
+`./aiw setup` installs a managed pre-commit hook when no custom hook exists. The hook runs documentation-policy, website-synchronization, and structural validation checks before local commits. Local hooks are a convenience; CI and the release commands below remain authoritative.
+
 Run the following from the repository root:
 
 ```bash

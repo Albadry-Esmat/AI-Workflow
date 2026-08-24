@@ -27,7 +27,7 @@ cd AI-Workflow
 make setup
 ```
 
-This installs the `aiw` CLI and configures your environment. Then open `.env` and set a repository-scoped fine-grained `GITHUB_TOKEN` with an expiration and reviewed permissions. Never commit the value or copy it into another project implicitly.
+This installs the `aiw` CLI, configures your environment, and installs a managed pre-commit hook when no custom hook exists. The hook checks documentation policy, website synchronization, and structural validation before local commits. CI remains authoritative. Then open `.env` and set a repository-scoped fine-grained `GITHUB_TOKEN` with an expiration and reviewed permissions. Never commit the value or copy it into another project implicitly.
 
 ```bash
 aiw health                 # verify your environment

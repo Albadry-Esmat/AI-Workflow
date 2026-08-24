@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# AIW_MANAGED_PRECOMMIT_V2
+# Local safety hook installed by scripts/setup.sh. CI remains authoritative.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+run_check() {
+  local label="$1"
+  shift
+  echo "Running ${label}..."
+  if "$@"; then
+    echo "  PASS: ${label}"
+  else
+    echo "  FAIL: ${label} — commit blocked"
+    exit 1
+  fi
+}
+
+run_check "documentation policy" node "$ROOT/scripts/verify-documentation-policy.js"
+run_check "website synchronization" node "$ROOT/scripts/verify-website-sync.js"
+run_check "skill validation" bash "$ROOT/scripts/validate-skills.sh" --quiet

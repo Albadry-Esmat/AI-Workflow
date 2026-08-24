@@ -12,8 +12,9 @@
 #   4. Checks the dependency-free .opencode plugin layout
 #   5. Creates .env from .env.example if .env does not yet exist
 #   6. Creates required runtime directories
-#   7. Runs health-check.sh to validate the final state
-#   8. Prints next steps
+#   7. Installs or refreshes the managed documentation-aware pre-commit hook
+#   8. Runs health-check.sh to validate the final state
+#   9. Prints next steps
 
 set -euo pipefail
 
@@ -184,31 +185,25 @@ header "Installing pre-commit hook"
 
 HOOKS_DIR="$ROOT/.git/hooks"
 PRECOMMIT="$HOOKS_DIR/pre-commit"
+HOOK_SOURCE="$ROOT/.githooks/pre-commit"
 
 if [[ ! -d "$ROOT/.git" ]]; then
   _warn "Not a git repository — skipping pre-commit hook install"
-elif [[ -f "$PRECOMMIT" ]]; then
-  _ok "pre-commit hook already installed"
-else
+elif [[ ! -f "$HOOK_SOURCE" ]]; then
+  _fail "Versioned pre-commit hook is missing at $HOOK_SOURCE"
+elif [[ ! -f "$PRECOMMIT" ]]; then
   mkdir -p "$HOOKS_DIR"
-  cat > "$PRECOMMIT" << 'HOOK'
-#!/usr/bin/env bash
-# Pre-commit hook — run skill validation before every commit.
-# Installed by scripts/setup.sh. Remove this file to disable.
-set -euo pipefail
-ROOT="$(git rev-parse --show-toplevel)"
-echo "Running skill validation..."
-if bash "$ROOT/scripts/validate-skills.sh" --quiet 2>&1; then
-  echo "  PASS: Skill validation passed"
-else
-  echo "  FAIL: Skill validation failed — commit blocked"
-  echo "  Run: make validate  for a full diagnostic"
-  exit 1
-fi
-HOOK
+  cp "$HOOK_SOURCE" "$PRECOMMIT"
   chmod +x "$PRECOMMIT"
   _ok "pre-commit hook installed at $PRECOMMIT"
-  info "The hook runs 'make validate' before every commit. Remove .git/hooks/pre-commit to disable."
+  info "The hook checks documentation policy, website synchronization, and skill validation before every commit."
+elif grep -q "AIW_MANAGED_PRECOMMIT_V" "$PRECOMMIT" 2>/dev/null; then
+  cp "$HOOK_SOURCE" "$PRECOMMIT"
+  chmod +x "$PRECOMMIT"
+  _ok "managed pre-commit hook refreshed at $PRECOMMIT"
+else
+  _warn "Custom pre-commit hook already exists; leaving it unchanged"
+  info "CI remains authoritative. Integrate $HOOK_SOURCE checks into the custom hook or run aiw docs-check and aiw website-check manually."
 fi
 
 # ── 8. Final health check ─────────────────────────────────────────────────────
@@ -243,6 +238,8 @@ echo ""
 echo "  Quick reference:"
 echo "    aiw init /path/to/project  — copy workflow into another project"
 echo "    aiw validate               — validate all skills"
+echo "    aiw docs-check             — require affected docs and changelog"
+echo "    aiw website-check          — verify the website mirror"
 echo "    aiw doctor                 — full diagnostic"
 echo "    aiw help                   — all available commands"
 echo

@@ -29,6 +29,8 @@ The mapping is a minimum. Reviewers must add any domain guide that explains the 
 
 ## Required workflow
 
+`./aiw setup` installs a managed `.git/hooks/pre-commit` hook when no custom hook exists. The hook runs the documentation policy, website synchronization guard, and structural skill validation before each local commit. CI remains authoritative because local hooks can be removed or replaced.
+
 Before committing an authoritative change:
 
 ```bash

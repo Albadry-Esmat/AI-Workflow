@@ -11,7 +11,8 @@
     ".ai-workflow/generated/**",
     "website/.next/**",
     "website/node_modules/**",
-    "website/dist/**"
+    "website/dist/**",
+    "website/data/**"
   ],
   "rules": [
     {
