@@ -60,6 +60,7 @@ The release-hardening path adds executable controls in addition to the agent per
 | Pipeline invariants | `scripts/validate-pipelines.js` rejects unknown skills, duplicate phases, invalid gate references, unsafe async steps, and missing non-bypassable deployment approvals. |
 | Supply-chain checks | CI workflows use immutable action commit SHAs and `scripts/security-check.js` verifies action and MCP pinning. |
 | External publication | Website publication requires an explicit `--confirm-website` flag and source-to-mirror validation before external repository mutation. |
+| Documentation integrity | `aiw docs-check` requires `docs/changelog.md` and all affected domain guides for every implementation or configuration change; `aiw website-check` verifies generated website data. |
 | MCP permission policy | `mcp-permission-policy.json` defines the pilot-read-only profile; `npm run validate:mcp` blocks unapproved side-effect servers and unpinned MCP commands. |
 | Structured observability | `scripts/lib/event-log.js` stores only bounded, redacted lifecycle fields; `aiw events --prune-days 7` removes expired records and runtime files are ignored from source control. |
 | Capacity and cost | `execution-budget.json` and `aiw validate-budget` define pilot retry, duration, token, session, queue, and external-call ceilings; thresholds pause and hard limits stop safely. |
@@ -101,6 +102,8 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 ## Security Change Rules
 
 - Any change to security policies requires updating this file AND `changelog.md`.
+- Any repository change requires all affected documentation and `changelog.md`; run `aiw docs-check` before commit and release.
+- Changes to authoritative docs or configuration require `aiw sync`, `aiw website-check`, and `aiw sync --check` before commit.
 - Security skill changes require re-running threat modeling.
 - New integration points require security review before pipeline inclusion.
 - Production publication credentials must be separate from local development credentials and must never be copied by `aiw init`.

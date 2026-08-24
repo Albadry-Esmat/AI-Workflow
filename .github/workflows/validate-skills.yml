@@ -408,7 +408,28 @@ jobs:
         run: node scripts/verify-website-sync.js
 
 
-  # ── Job 4: Runtime adapter compatibility matrix ─────────────────────────────
+  # ── Job 4: Documentation policy ─────────────────────────────────────────────
+  documentation-policy:
+    name: Documentation Policy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+
+      - name: Require affected documentation and changelog updates
+        env:
+          AIW_DOCS_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: node scripts/verify-documentation-policy.js --base "$AIW_DOCS_BASE"
+
+  # ── Job 5: Runtime adapter compatibility matrix ─────────────────────────────
   adapter-compatibility:
     name: Runtime Adapter Compatibility
     runs-on: ubuntu-latest

@@ -70,9 +70,12 @@ docs/
 3. Read `workflows.md` to understand pipeline execution.
 4. Reference `skills-registry.md` and `agents.md` for specific implementation details.
 5. Consult `governance.md` for rules and constraints before making changes.
-6. After any change, update the relevant doc(s) and `changelog.md`.
+6. Read [`documentation-policy.md`](documentation-policy.md) before editing the repository.
+7. After any change, update all affected docs and `changelog.md`, run `node scripts/verify-documentation-policy.js`, synchronize `website/data/`, and run `aiw website-check`.
 
 ## Documentation Governance
+
+The complete machine-checkable rule is defined in [`documentation-policy.md`](documentation-policy.md) and [`scripts/documentation-policy.json`](../scripts/documentation-policy.json). Every implementation or configuration change requires `docs/changelog.md` plus the affected domain guides. Generated website data must be synchronized and committed with its authoritative source.
 
 | Change | Must Update |
 |--------|-------------|

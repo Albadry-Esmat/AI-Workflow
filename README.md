@@ -116,6 +116,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw write-plan --operation ... --target ... --canary` | Create a non-executing, single-target write plan |
 | `aiw score-artifact --type ... --input ...` | Score artifact completeness and route weak output to human review |
 | `aiw validate-adapters` | Validate the multi-runtime adapter registry and capability matrix |
+| `aiw docs-check` | Require the changelog and affected documentation for every change |
 | `aiw certify-opencode` | Run credential-free OpenCode reference-adapter certification |
 | `aiw certify-adapters` | Run fixture-only certification across every registered adapter |
 | `aiw generate-projections [--output DIR]` | Generate deterministic runtime-specific configuration projections |
@@ -146,7 +147,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 
 ### Production Release Checks
 
-Before a release candidate, run `aiw self-test`, `aiw validate`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw validate-adapters`, `aiw certify-opencode`, `aiw certify-adapters`, `aiw website-check`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, `aiw rollback-rehearsal`, and `aiw preflight`. Before live execution, run `aiw pilot-preflight` against a disposable project. The first pilot uses the `pilot-read-only` MCP profile: browser, Slack, and Vercel integrations are disabled by default. Runtime guards reject unauthorized MCP capabilities, enforce budgets, trip a circuit breaker after repeated failures, and save sanitized checkpoints. OpenCode is the reference Tier 1 adapter; all other runtime adapters remain experimental until real preflight, smoke-test, and controlled-pilot evidence exists. Use `aiw support-bundle` and `aiw events --json` when reporting a failure; they collect sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [multi-runtime compatibility guide](docs/operations/multi-runtime-compatibility.md), [live smoke-test procedure](docs/operations/live-smoke-test.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
+Before a release candidate, run `aiw docs-check`, `aiw self-test`, `aiw validate`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw validate-adapters`, `aiw certify-opencode`, `aiw certify-adapters`, `aiw website-check`, `node scripts/security-check.js`, `aiw sync --check`, `aiw version --json`, `aiw rollback-rehearsal`, and `aiw preflight`. Before live execution, run `aiw pilot-preflight` against a disposable project. The first pilot uses the `pilot-read-only` MCP profile: browser, Slack, and Vercel integrations are disabled by default. Runtime guards reject unauthorized MCP capabilities, enforce budgets, trip a circuit breaker after repeated failures, and save sanitized checkpoints. OpenCode is the reference Tier 1 adapter; all other runtime adapters remain experimental until real preflight, smoke-test, and controlled-pilot evidence exists. Use `aiw support-bundle` and `aiw events --json` when reporting a failure; they collect sanitized diagnostics only. Use the [production runbook](docs/operations/production-runbook.md), [multi-runtime compatibility guide](docs/operations/multi-runtime-compatibility.md), [live smoke-test procedure](docs/operations/live-smoke-test.md), [release checklist](docs/operations/release-checklist.md), and [compatibility manifest](compatibility.json) for the complete process.
 
 ## Maintenance
 
@@ -304,7 +305,7 @@ AI-Workflow/
 │   ├── reset.sh               ← reset to clean state
 │   ├── cleanup-sessions.sh    ← prune expired session files
 │   └── lib/common.sh          ← shared bash utilities
-├── docs/                      ← system documentation (35 files)
+├── docs/                      ← system documentation (62 Markdown files)
 ├── examples/                  ← starter files for new projects
 ├── work-items/                ← task/feature/bug tracking templates
 └── exports/                   ← work item export output
@@ -377,7 +378,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide on adding skills, pipe
 
 ## Documentation
 
-Full system documentation lives in [`docs/`](docs/):
+Full system documentation lives in [`docs/`](docs/). Read the mandatory [documentation policy](docs/documentation-policy.md) before making changes; it requires all affected guides, `docs/changelog.md`, and synchronized website data to be updated together.
 
 | File | What it covers |
 |------|---------------|

@@ -43,9 +43,20 @@ Do not share raw state, session JSON, tokens, authorization headers, prompts, or
 | Artifact is `needs_human_review` | Structure exists but required content or quality is incomplete. | Route to human review; do not promote or publish automatically. |
 | Artifact checksum mismatch | The file changed after capture or came from an untrusted source. | Reject the artifact, preserve both references, and recapture from a trusted run. |
 | Duplicate publication or idempotency claim | The operation may already have been attempted. | Inspect the ledger and target repository; reconcile as published, not-published, or unknown. Never blindly retry unknown outcomes. |
+| Documentation policy failure | A changed area is missing `docs/changelog.md` or one of its required domain guides. | Read `docs/documentation-policy.md`, update every affected guide, then rerun `aiw docs-check`. |
 | Website mirror drift | Source documentation/configuration and generated website data differ. | Run `aiw sync`, review the diff, run `aiw website-check`, then `aiw sync --check`; commit both sides together. |
 | Projection conflicts with user files | Generated runtime configuration would overwrite existing content. | Review the diff. Use `--confirm` only for an intentional installation and `--overwrite` only after approving the backup and target path. |
 | Adapter fixture passes but live runtime fails | Fixture contract is not proof of vendor runtime behavior. | Record the live result as blocked or failed; update the adapter limitation or version range instead of changing the evidence label. |
+
+## Documentation-policy diagnosis
+
+Run the validator from the repository root:
+
+```bash
+aiw docs-check
+```
+
+The validator reports every changed file and the required documentation that is missing. Update the affected domain guides and `docs/changelog.md`; do not silence the failure by changing the policy or classifying a substantive change as maintenance. Then synchronize the website mirror and rerun the validator before staging the final diff.
 
 ## Recovery decision tree
 

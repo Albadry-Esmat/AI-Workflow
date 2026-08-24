@@ -16,8 +16,8 @@ Layer 2: Guard Skills (enforced by orchestrator as validation_check gates)
 Layer 3: HITL Gates (enforced by orchestrator, decided by humans)
   → Architecture approval, security posture, completeness sign-off, deployment go/no-go
 
-Layer 4: Documentation Governance (enforced by process)
-  → Doc sync rules, changelog updates, versioning
+Layer 4: Documentation Governance (enforced by validator and review)
+  → Affected-doc rules, changelog updates, website synchronization, versioning
 
 Layer 5: Adaptive Governance (enforced by observability pipeline)
   → Telemetry opt-out, PII protection, read-only insights, no autonomous adaptation
@@ -139,6 +139,8 @@ The deployment gate is a system-level invariant:
 
 ## Documentation Governance (Layer 4)
 
+The complete rule is defined in [`documentation-policy.md`](documentation-policy.md) and enforced by `aiw docs-check` / `node scripts/verify-documentation-policy.js`. Every implementation, configuration, schema, pipeline, adapter, security, test, operational, website, or workflow change must update all affected documentation and `docs/changelog.md`. Authoritative website data must be synchronized and committed with its source.
+
 ### Sync Rules
 
 | Change | Must Update |
@@ -156,13 +158,14 @@ The deployment gate is a system-level invariant:
 ### Change Approval Process
 
 ```
-1. Identify change type (feat, fix, docs, refactor, etc.)
-2. Determine which docs need updating (see sync rules)
-3. Make code change + doc change in same branch
-4. Run quality checks (lint, test, validate)
-5. Submit PR with doc changes included
-6. Review: verify docs match code changes
-7. Merge → changelog updated → docs synced
+1. Read documentation-policy.md and identify every affected guide.
+2. Make the implementation/configuration change, affected doc changes, and changelog entry in one branch.
+3. Run aiw docs-check.
+4. Run aiw sync, review the generated mirror diff, aiw website-check, and aiw sync --check.
+5. Run quality checks (lint, test, validate).
+6. Submit the PR with source, docs, changelog, and website data together.
+7. Review: verify docs match code changes and no support-tier or security claim is stale.
+8. Merge only after all documentation and CI gates pass.
 ```
 
 ## Quality Enforcement
@@ -173,7 +176,9 @@ The deployment gate is a system-level invariant:
 - [ ] Lint passes
 - [ ] No schema validation errors
 - [ ] All affected docs updated
+- [ ] `aiw docs-check` passes
 - [ ] Changelog entry added
+- [ ] Website data synchronized and `aiw website-check` passes
 - [ ] Version bumped if applicable
 - [ ] Registry updated if skill changed
 - [ ] All guard verdicts are `pass` (or block resolved with human approval)

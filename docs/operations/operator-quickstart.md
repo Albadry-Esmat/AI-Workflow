@@ -36,6 +36,7 @@ aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-adapters
 aiw certify-adapters
+aiw docs-check
 aiw website-check
 aiw rollback-rehearsal
 node scripts/security-check.js --history
@@ -89,6 +90,16 @@ aiw rollback-rehearsal
 ```
 
 Do not delete state files, bypass a gate, reset a circuit blindly, or rerun an uncertain publication. Restore only from a verified checksum-backed backup.
+
+## Complete documentation rule
+
+After any implementation, configuration, schema, pipeline, adapter, security, test, operational, website, or workflow change, update all affected documentation and `docs/changelog.md`. Run:
+
+```bash
+aiw docs-check
+```
+
+Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard.
 
 ## Website synchronization rule
 

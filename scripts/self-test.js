@@ -37,6 +37,10 @@ check("website data manifest is valid", () => {
   if (lines.length !== 7 || new Set(lines).size !== lines.length) throw new Error("manifest entries are not unique");
 });
 
+check("documentation policy passes", () => {
+  command(["scripts/verify-documentation-policy.js"]);
+});
+
 check("semantic pipeline invariants pass", () => {
   command(["scripts/validate-pipelines.js"]);
 });

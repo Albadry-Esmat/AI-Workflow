@@ -75,6 +75,7 @@ show_help() {
   echo -e "    ${CYAN}generate-projections${NC} Generate deterministic runtime projections"
   echo -e "    ${CYAN}install-projections${NC} Install reviewed projections (requires explicit confirmation)"
   echo -e "    ${CYAN}website-check${NC}      Verify website/data matches the authoritative manifest"
+  echo -e "    ${CYAN}docs-check${NC}        Require changelog and affected documentation for every change"
   echo -e "    ${CYAN}events${NC}             Show recent sanitized execution events"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
@@ -237,6 +238,10 @@ cmd_install_projections() {
 
 cmd_website_check() {
   node "$ROOT/scripts/verify-website-sync.js" "$@"
+}
+
+cmd_docs_check() {
+  node "$ROOT/scripts/verify-documentation-policy.js" "$@"
 }
 
 cmd_events() {
@@ -554,6 +559,7 @@ case "$COMMAND" in
   generate-projections) cmd_generate_projections "$@" ;;
   install-projections) cmd_install_projections "$@" ;;
   website-check)    cmd_website_check "$@" ;;
+  docs-check)       cmd_docs_check "$@" ;;
   events)           cmd_events "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;

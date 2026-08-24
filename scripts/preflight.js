@@ -60,6 +60,9 @@ const requiredReleaseFiles = [
   "scripts/certify-adapters.js",
   "scripts/install-projections.js",
   "scripts/verify-website-sync.js",
+  "scripts/documentation-policy.json",
+  "scripts/verify-documentation-policy.js",
+  "docs/documentation-policy.md",
 ];
 for (const relative of requiredReleaseFiles) {
   if (!fs.existsSync(path.join(root, relative))) fail(`required release file is missing: ${relative}`);
@@ -126,6 +129,7 @@ run("adapter configuration", process.execPath, ["scripts/validate-adapter-config
 run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);
 run("all adapter fixture certification", process.execPath, ["scripts/certify-adapters.js"]);
 run("deterministic runtime projections", process.execPath, ["scripts/generate-projections.js", "--output", path.join(os.tmpdir(), "aiw-preflight-projections"), "--profile", "pilot-read-only"]);
+run("documentation policy", process.execPath, ["scripts/verify-documentation-policy.js"]);
 run("website mirror synchronization", process.execPath, ["scripts/verify-website-sync.js"]);
 run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);

@@ -33,6 +33,7 @@ This installs the `aiw` CLI and configures your environment. Then open `.env` an
 aiw health                 # verify your environment
 aiw self-test              # run credential-free conformance tests
 aiw validate               # run structural and semantic validation
+aiw docs-check             # require changelog and affected docs for every change
 aiw security-history       # scan reachable history for credential-like patterns
 aiw sync --check           # verify generated website data is current
 aiw start                 # start the AI workflow
@@ -44,7 +45,9 @@ Type `aiw help` for a full list of available commands.
 
 ## Before Opening a Pull Request
 
-Run `npm test -- --runInBand`, `aiw self-test`, `aiw validate`, `aiw security-history`, `node scripts/security-check.js`, and `aiw sync --check`. If a check fails, include the sanitized `aiw support-bundle` output only when requesting help; never attach raw state or `.env`.
+Read [`docs/documentation-policy.md`](docs/documentation-policy.md) first. Every implementation, configuration, schema, pipeline, adapter, security, test, operational, website, or workflow change must include all affected documentation and a `docs/changelog.md` entry. Run `aiw docs-check`; it fails when the path-aware documentation requirements are incomplete. Then run `aiw sync`, review the generated website diff, `aiw website-check`, and `aiw sync --check`.
+
+Run `npm test -- --runInBand`, `aiw self-test`, `aiw validate`, `aiw security-history`, `node scripts/security-check.js`, and the documentation and website checks above. If a check fails, include the sanitized `aiw support-bundle` output only when requesting help; never attach raw state or `.env`.
 
 ## Branching strategy
 

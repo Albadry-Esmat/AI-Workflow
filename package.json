@@ -36,6 +36,7 @@
     "generate:projections": "node scripts/generate-projections.js",
     "install:projections": "node scripts/install-projections.js",
     "website:check": "node scripts/verify-website-sync.js",
+    "docs:check": "node scripts/verify-documentation-policy.js",
     "events": "node scripts/events.js"
   },
   "devDependencies": {

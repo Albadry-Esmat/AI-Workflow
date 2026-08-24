@@ -22,6 +22,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Operator quickstart and troubleshooting** — Added a concise safe-execution path, failure diagnosis table, recovery decision tree, incident-record minimum, and explicit website synchronization sequence for operators.
 - **Runtime adapter developer guide** — Added the canonical adapter boundary, normalized operation contract, safety rules, testing ladder, evidence requirements, and pull-request review standard for future runtime integrations.
 - **Documentation navigation** — Updated the documentation index to surface the new operator, troubleshooting, and adapter-development guides.
+- **Complete documentation synchronization policy** — Added a machine-readable path-aware policy, `aiw docs-check`, strict-preflight enforcement, and a dedicated CI job requiring `docs/changelog.md` plus all affected domain guides for every implementation or configuration change.
+- **Self-test documentation gate** — Added documentation-policy validation to the credential-free self-test so routine conformance checks detect stale or incomplete documentation before release review.
 
 ### Changed
 
