@@ -14,6 +14,7 @@ The system uses a risk-based testing strategy: higher-risk components (domain lo
 | **Integration** | Skill input/output contracts, schema validation | ≥ 80% of integration points | Developer |
 | **E2E** | Full pipeline execution (orchestrator → skills → output) | ≥ 60% of pipeline paths | QA / System |
 | **Contract** | JSON Schema conformance, required fields, types | 100% of declared schemas | Automated |
+| **Certification evidence** | Runtime identity, staged checks, capability decisions, sanitization, and truthful promotion state | 100% of evidence records | Automated + independent review |
 
 ## Test Types
 
@@ -57,6 +58,7 @@ The system uses a risk-based testing strategy: higher-risk components (domain lo
 | Feedback loops | Loop detection, max iteration enforcement, artifact invalidation |
 | HITL timeouts | Gate timeout behavior, auto-continue, gate skip logging |
 | Token budget | Session budget exceeded, compression rules, resume behavior |
+| Runtime certification | Fixture-only record cannot certify capabilities; pilot-certified record requires every staged check and independent review; prohibited sensitive fields and credential-like values are rejected |
 
 ## Testing Skill
 
@@ -67,8 +69,13 @@ The `testing-strategy` skill (`skills/testing/testing-strategy.md`) generates th
 - Coverage targets per module
 - Quality gates with block criteria
 
+## Runtime-certification evidence tests
+
+The fixture at `tests/fixtures/runtime-certification.json` is deliberately repository-fixture-only and blocked for live promotion. Validate it with `aiw validate-runtime-certification`. The validator must also be exercised against negative fixtures or isolated temporary repositories for missing changelog/documentation, unregistered runtimes, duplicate checks, incomplete staged evidence, invalid capability decisions, unsupported promotion states, and credential-like content. A fixture or fake executable can validate control flow but never proves a real runtime.
+
 ## Testing Change Rules
 
 - Changes to testing strategy require updating this file AND `changelog.md`.
+- Changes to runtime-certification schemas or validators require updating this file, the compatibility guide, the operator runbook, and `changelog.md`.
 - New test types must be added to the testing skill's execution logic.
 - Coverage threshold changes require updating quality gates in deployment.

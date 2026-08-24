@@ -59,6 +59,7 @@ docs/
 | Configure GitHub release controls | `operations/github-repository-settings.md` |
 | Review MCP permissions | Root `mcp-permission-policy.json` and `npm run validate:mcp` |
 | Review multi-runtime support tiers | `operations/multi-runtime-compatibility.md` and `.ai-workflow/runtime-capability-matrix.json` |
+| Validate runtime certification evidence | `operations/multi-runtime-compatibility.md`, `.ai-workflow/schemas/runtime-certification.schema.json`, and `aiw validate-runtime-certification` |
 | Record release ownership and exceptions | `production-readiness/release-governance-record.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
@@ -88,7 +89,7 @@ The complete machine-checkable rule is defined in [`documentation-policy.md`](do
 | Security changed | `security.md`, `changelog.md` |
 | Version bumped | `versioning.md`, `changelog.md` |
 | Production hardening or release controls changed | `security.md`, `operations/production-runbook.md`, `changelog.md` |
-| Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `development-runtime-adapter-guide.md`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
+| Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `development-runtime-adapter-guide.md`, `.ai-workflow/schemas/runtime-certification.schema.json`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
 | Operational procedure or recovery control changed | `operations/operator-quickstart.md`, `operations/troubleshooting.md`, `operations/production-runbook.md`, `changelog.md` |
 
 ## File Format Convention

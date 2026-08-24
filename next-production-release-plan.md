@@ -6,7 +6,7 @@ Move the AI Workflow from a repository-side **NO-GO for general production** to 
 
 ## Current baseline
 
-The repository-side enhancement work is complete on `release/production-hardening` at commit `32b8d15`, with a clean working tree. The current automated baseline includes 32 passing Jest tests, successful structural and semantic validation, MCP policy validation, execution-budget validation, event-schema validation, pilot-evidence validation, artifact-quality checks, security-history scanning, dependency auditing, mirror verification, rollback rehearsal, and shell/diff hygiene. Strict preflight remains blocked only by the absence of a real OpenCode executable and `.env`/`GITHUB_TOKEN` in the sandbox.
+The repository-side enhancement work is complete on the current `release/production-hardening` branch. The automated baseline includes 34 passing Jest tests, successful structural and semantic validation, MCP policy validation, execution-budget validation, event-schema validation, pilot-evidence validation, runtime-certification evidence validation, artifact-quality checks, security-history scanning, dependency auditing, mirror verification, rollback rehearsal, and shell/diff hygiene. Strict preflight remains blocked by the absence of a real OpenCode executable and `.env`/`GITHUB_TOKEN` in the sandbox.
 
 ## Phase 1 — Prepare the operator environment
 
@@ -16,7 +16,7 @@ Entry criteria are a clean checkout of the release branch, a non-sensitive dispo
 
 ## Phase 2 — Run repository and environment preflight
 
-From the clean release branch, run `npm ci`, `aiw health`, `aiw self-test`, `aiw validate`, `node scripts/security-check.js --history`, `aiw sync --check`, `aiw version --json`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw rollback-rehearsal`, and `aiw preflight`. Then run `aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only`.
+From the clean release branch, run `npm ci`, `aiw health`, `aiw self-test`, `aiw validate`, `node scripts/security-check.js --history`, `aiw docs-check`, `aiw sync --check`, `aiw version --json`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw validate-runtime-certification tests/fixtures/runtime-certification.json`, `aiw rollback-rehearsal`, and `aiw preflight`. Then run `aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only`.
 
 The expected result is a fully passing strict preflight and a sanitized pilot manifest containing a correlation ID, verified backup reference, selected pipeline, MCP profile, and budget policy. The command must not execute OpenCode or MCP itself. Any failure is recorded as a blocker and corrected before continuing.
 
@@ -30,7 +30,7 @@ The stop conditions are unexpected server enablement, capability mismatch, crede
 
 Follow `docs/operations/live-smoke-test.md` against the disposable non-sensitive project. Exercise routing, schema validation, one safe retry failure, HITL rejection and explicit resume, asynchronous artifact readiness, backup and recovery, unauthorized-capability denial, budget hard-stop behavior, circuit-breaker behavior, and artifact-quality routing. Keep all external writes, deployment, messaging, browser interaction, payment, account changes, and autonomous adaptation disabled.
 
-The smoke test passes only if all expected artifacts are schema-valid, no downstream task consumes unavailable output, all gates preserve their decisions, the budget and circuit controls stop unsafe continuation, checkpoints contain metadata but no raw artifact content, and sanitized event validation passes. Save the private evidence record and validate it with `aiw validate-pilot-evidence <private-record.json>`.
+The smoke test passes only if all expected artifacts are schema-valid, no downstream task consumes unavailable output, all gates preserve their decisions, the budget and circuit controls stop unsafe continuation, checkpoints contain metadata but no raw artifact content, and sanitized event validation passes. Save the private evidence record, validate it with `aiw validate-pilot-evidence <private-record.json>`, and validate the per-runtime promotion record with `aiw validate-runtime-certification <private-runtime-certification.json>`. A fixture record cannot certify a live runtime.
 
 ## Phase 5 — Run the controlled pilot
 
@@ -57,6 +57,7 @@ For the initial release window, monitor sanitized event summaries, budget consum
 | Event report | Validated sanitized JSONL summary, counts, failure categories, retention result | Raw model or MCP content |
 | Artifact review | Artifact names, schema results, quality scores, reviewer decision | Prompt text or secret-bearing fields |
 | Recovery report | Backup checksum result, restore result, circuit/checkpoint behavior | Unredacted state contents |
+| Runtime-certification record | Runtime/adapter identity, versions, staged check results, capability decisions, evidence state, operator, independent reviewer, timestamp | Raw prompts, MCP payloads, tokens, headers, personal data, session JSON |
 | Sign-off record | Operator, independent reviewer, release owner, decision, timestamp | Secret values or unsupported claims |
 
 ## Assumptions and open risks

@@ -18,7 +18,8 @@
     "runtime_event_schema_version": "1.0.0",
     "approval_request_schema_version": "1.0.0",
     "checkpoint_schema_version": "1.0.0",
-    "artifact_envelope_schema_version": "1.0.0"
+    "artifact_envelope_schema_version": "1.0.0",
+    "runtime_certification_schema_version": "1.0.0"
   },
   "runtime": {
     "node": ">=20 <23",

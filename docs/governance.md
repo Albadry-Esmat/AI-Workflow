@@ -154,6 +154,7 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 | Security changed | `security.md`, `changelog.md` |
 | Version bumped | `versioning.md`, `changelog.md` |
 | Guard skill added/modified | `governance.md`, `skills-registry.md`, `changelog.md` |
+| Runtime evidence or promotion rule changed | `operations/multi-runtime-compatibility.md`, `testing.md`, `operations/production-runbook.md`, `production-readiness/multi-runtime-certification-status.md`, `changelog.md` |
 
 ### Change Approval Process
 

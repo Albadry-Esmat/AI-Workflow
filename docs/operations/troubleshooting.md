@@ -48,6 +48,7 @@ Do not share raw state, session JSON, tokens, authorization headers, prompts, or
 | Website mirror drift | Source documentation/configuration and generated website data differ. | Run `aiw sync`, review the diff, run `aiw website-check`, then `aiw sync --check`; commit both sides together. |
 | Projection conflicts with user files | Generated runtime configuration would overwrite existing content. | Review the diff. Use `--confirm` only for an intentional installation and `--overwrite` only after approving the backup and target path. |
 | Adapter fixture passes but live runtime fails | Fixture contract is not proof of vendor runtime behavior. | Record the live result as blocked or failed; update the adapter limitation or version range instead of changing the evidence label. |
+| Runtime certification evidence fails | The record is missing a staged check, capability decision, registered target, or required sanitized metadata. | Run `aiw validate-runtime-certification <private-record.json>`, correct the record without adding raw content, and keep the status blocked until real evidence exists. |
 
 ## Documentation-policy diagnosis
 
@@ -72,11 +73,12 @@ Use the correlation ID to answer these questions in order:
 
 ## Runtime adapter diagnosis
 
-For a runtime-specific diagnosis, start with descriptor and fixture checks:
+For a runtime-specific diagnosis, start with descriptor, fixture, and evidence checks:
 
 ```bash
 aiw validate-adapters
 aiw certify-adapters
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 

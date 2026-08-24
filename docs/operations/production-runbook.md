@@ -23,6 +23,7 @@ aiw validate-golden
 aiw rollback-rehearsal
 aiw validate-events
 aiw validate-pilot-evidence
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -31,7 +32,7 @@ aiw score-artifact --type requirements --input tests/fixtures/requirements-artif
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 
-`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. `aiw validate-adapters` checks the registry, capability matrix, implementation descriptors, and compatibility versions. `aiw certify-adapters` proves fixture-only contract behavior for the registered adapters; it does not prove that any external runtime is installed or production-certified. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
+`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. `aiw validate-adapters` checks the registry, capability matrix, implementation descriptors, and compatibility versions. `aiw certify-adapters` proves fixture-only contract behavior for the registered adapters; it does not prove that any external runtime is installed or production-certified. `aiw validate-runtime-certification` validates the sanitized per-runtime evidence contract and prevents fixture records from being promoted as live certification. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
 
 ## Runtime Projection Installation
 

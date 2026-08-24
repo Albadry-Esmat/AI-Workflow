@@ -3,7 +3,7 @@
 **Author:** Manus AI  
 **Plan status:** Approved by the user; repository-controlled implementation completed through the live-runtime gate
 **Scope:** Runtime portability, adapter contracts, certification, and safe configuration projections  
-**Current baseline:** OpenCode is the only reference runtime with repository-side production controls. The repository has a clean local release branch, deterministic conformance tests, MCP permission profiles, execution budgets, sanitized events, checkpoints, rollback, idempotency, canary planning, pilot evidence validation, artifact-quality gates, versioned runtime contracts, adapter projections, deterministic projection generation, and fixture certification. Real-runtime certification remains operator-owned and blocked in the sandbox.
+**Current baseline:** OpenCode is the only reference runtime with repository-side production controls. The repository has a clean local release branch, deterministic conformance tests, MCP permission profiles, execution budgets, sanitized events, checkpoints, rollback, idempotency, canary planning, pilot evidence validation, artifact-quality gates, versioned runtime contracts, adapter projections, deterministic projection generation, fixture certification, and a sanitized per-runtime certification evidence contract. Real-runtime certification remains operator-owned and blocked in the sandbox.
 
 ## 1. Goal and definition of compatibility
 
@@ -285,10 +285,13 @@ Turn experimental adapter projections into evidence-backed support, one runtime 
 | Independent review | Required | Required | Required for release documentation |
 
 ### Exit criteria
-
 At least OpenCode and one external CLI runtime have full Tier 1 evidence before the first cross-runtime production statement. Host/editor runtimes are separately classified and never inherit certification from a terminal adapter.
 
+### Repository-safe implementation status
+The repository now provides `.ai-workflow/schemas/runtime-certification.schema.json`, a sanitized `aiw validate-runtime-certification` validator, a fixture record, compatibility-version registration, strict-preflight coverage, and self-test coverage. These controls validate evidence shape and promotion rules only; they do not create or imply live runtime evidence. The sandbox remains blocked for the real-runtime sequence because the target executables, host integrations, and `.env` are unavailable.
+
 ## Phase 8 — Release and post-launch operations
+
 
 ### Objective
 
@@ -359,7 +362,7 @@ The plan is complete when all of the following are true:
 4. At least one external runtime reaches Tier 1 through real non-sensitive smoke, recovery, and controlled-pilot evidence.
 5. At least one host/editor runtime reaches Tier 2 through real host verification and pilot evidence, or is explicitly retained as Tier 3.
 6. Generated projections are deterministic, checksummed, reviewable, credential-free, and never silently installed.
-7. CI blocks registry drift, schema drift, unsafe capability changes, projection drift, unsupported version claims, and malformed evidence.
+7. CI blocks registry drift, schema drift, unsafe capability changes, projection drift, unsupported version claims, malformed evidence, and invalid runtime-certification promotion states.
 8. Release documentation identifies certified versions, degraded operations, unsupported operations, and operator-owned prerequisites.
 9. Post-launch review, deprecation, incident, retention, and rollback procedures are documented and tested.
 10. No production support claim is made for a runtime whose real lifecycle and safety evidence is absent.

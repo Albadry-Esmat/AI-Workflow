@@ -24,6 +24,7 @@ From the repository root:
 aiw validate-adapters
 aiw certify-opencode
 aiw certify-adapters
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 
@@ -52,6 +53,18 @@ node scripts/adapter-certification.js windsurf
 
 These commands prove descriptor validity, normalized requests, policy denial, event sanitization, and dry-run behavior only. The aggregate command reports every registered adapter as `fixture-certified` only when those local checks pass. They do not prove that the vendor runtime is installed, authenticated, or capable of safe live execution.
 
+## Sanitized runtime-certification evidence
+
+The runtime-certification contract at `.ai-workflow/schemas/runtime-certification.schema.json` separates repository fixtures from operator-verified and pilot-certified evidence. Validate a private, sanitized record with:
+
+```bash
+aiw validate-runtime-certification /path/to/private-runtime-certification.json
+```
+
+Every record identifies one registered runtime and adapter, the release commit, tested timestamp, execution surface, runtime and adapter versions, project classification, staged certification checks, capability-level decisions, operator, independent reviewer, and `secret_exposure: none`. Raw prompts, MCP payloads, tokens, authorization headers, personal data, full session JSON, and unbounded model output are prohibited.
+
+`repository-fixtures-only` records must use the repository-fixture surface and cannot certify capabilities. `operator-verified` records require a real version-preflight pass. `pilot-certified` records require every staged check to pass, a non-fixture environment, an independent review, and a `certified-capabilities-only` decision. Promotion is capability-specific; unsupported capabilities remain degraded or blocked.
+
 ## Installation and projection policy
 
 Canonical configuration lives under `.ai-workflow/`. Runtime projections are generated from canonical sources and written to an explicitly selected output directory. The generator never silently edits a user’s `CLAUDE.md`, `AGENTS.md`, Cursor rules, Gemini guidance, or editor configuration. Review generated diffs before installing them into a project.
@@ -75,4 +88,4 @@ A runtime cannot be promoted from experimental to certified solely because it su
 
 ## Release rules
 
-Every adapter change must update the registry, capability matrix, compatibility evidence, and relevant documentation. CI runs adapter configuration validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review.
+Every adapter change must update the registry, capability matrix, compatibility evidence, and relevant documentation. CI runs adapter configuration validation, runtime-certification evidence validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review.

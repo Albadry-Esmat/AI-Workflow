@@ -15,8 +15,9 @@ const compatibility = read("compatibility.json");
 if (compatibility?.operational_contracts) {
   if (compatibility.operational_contracts.adapter_registry_version !== registry?.registry_version) failures.push("adapter registry version differs from compatibility manifest");
   if (compatibility.operational_contracts.capability_matrix_version !== matrix?.matrix_version) failures.push("capability matrix version differs from compatibility manifest");
+  if (compatibility.operational_contracts.runtime_certification_schema_version !== "1.0.0") failures.push("runtime certification schema version differs from compatibility manifest");
 }
-const schemaFiles = ["runtime-adapter.schema.json", "runtime-request.schema.json", "runtime-event.schema.json", "approval-request.schema.json", "checkpoint.schema.json", "artifact-envelope.schema.json"];
+const schemaFiles = ["runtime-adapter.schema.json", "runtime-request.schema.json", "runtime-event.schema.json", "approval-request.schema.json", "checkpoint.schema.json", "artifact-envelope.schema.json", "runtime-certification.schema.json"];
 for (const file of schemaFiles) {
   if (fs.existsSync(path.join(root, ".ai-workflow/schemas", file))) pass.push(`schema present: ${file}`);
   else failures.push(`schema missing: .ai-workflow/schemas/${file}`);

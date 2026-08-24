@@ -162,6 +162,33 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("runtime certification fixture passes without live promotion", () => {
+    const result = spawnSync(process.execPath, ["scripts/validate-runtime-certification.js", "tests/fixtures/runtime-certification.json"], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    expect(result.status).toBe(0);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/Runtime certification validation passed/);
+  });
+
+  test("runtime certification rejects nested prohibited evidence fields", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-runtime-evidence-"));
+    const file = path.join(directory, "evidence.json");
+    const evidence = JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/runtime-certification.json"), "utf8"));
+    evidence.capability_decisions[0].secret_token = "placeholder";
+    fs.writeFileSync(file, JSON.stringify(evidence), "utf8");
+    try {
+      const result = spawnSync(process.execPath, ["scripts/validate-runtime-certification.js", file], {
+        cwd: root,
+        encoding: "utf8",
+      });
+      expect(result.status).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/prohibited sensitive-data field/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("structured event retention removes only expired records", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-retention-"));
     const eventsFile = path.join(directory, "events.jsonl");

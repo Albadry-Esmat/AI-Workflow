@@ -26,7 +26,8 @@ adapters/<adapter-id>/
     ├── runtime-event.schema.json
     ├── approval-request.schema.json
     ├── checkpoint.schema.json
-    └── artifact-envelope.schema.json
+    ├── artifact-envelope.schema.json
+    └── runtime-certification.schema.json
 ```
 
 The adapter ID must be lowercase, stable, and independent of a user’s local executable alias. Do not encode credentials, installation paths, machine names, or user identity in the descriptor.
@@ -100,6 +101,8 @@ cmp /tmp/aiw-projections-a/manifest.json /tmp/aiw-projections-b/manifest.json
 
 Certification evidence must include only runtime version, adapter version, tier, test commit, profile, budget policy version, status, failure category, reviewer, and timestamps. It must exclude credentials, raw prompts, raw MCP payloads, session transcripts, authorization headers, personal data, and unbounded model output.
 
+Use `.ai-workflow/schemas/runtime-certification.schema.json` and `aiw validate-runtime-certification` for the staged evidence record. The record must separate repository fixtures from operator-verified and pilot-certified evidence, list each certification check, and record capability-level decisions. `pilot-certified` is valid only when version preflight, MCP profile, read-only smoke, approval stop, canary, recovery, artifact review, and independent review all pass on a non-fixture environment.
+
 Keep fixture evidence and real-runtime evidence in separate records. A temporary fake executable can test CLI control flow but cannot certify a runtime. Promotion is capability-specific: a runtime may be certified for read-only artifact generation while remaining blocked for external writes or deployment.
 
 ## Pull request checklist
@@ -110,6 +113,7 @@ Before requesting review, confirm that the adapter has a registry entry, capabil
 aiw validate
 aiw validate-adapters
 aiw certify-adapters
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw website-check
 aiw sync --check
 npm test -- --runInBand

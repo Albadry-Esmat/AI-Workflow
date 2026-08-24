@@ -21,6 +21,8 @@ Use this checklist for every release candidate. A checked box must have evidence
 
 - [ ] `aiw validate` passes structural and semantic checks.
 - [ ] `aiw self-test` passes without credentials or paid model calls.
+- [ ] `aiw docs-check` passes with all affected documentation and `docs/changelog.md` included.
+- [ ] `aiw validate-runtime-certification tests/fixtures/runtime-certification.json` passes; the fixture remains blocked for live promotion.
 - [ ] `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` creates a sanitized manifest and verified backup; actual live execution is recorded separately.
 - [ ] `npm run validate:budget` passes and the selected run has explicit retry, duration, token, and API-call limits.
 - [ ] `npm run validate:golden` passes against the compatibility manifest.
@@ -71,6 +73,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] One full pipeline completes with non-sensitive data.
 - [ ] Human gate decisions and recovery actions are recorded.
 - [ ] `aiw validate-pilot-evidence` passes the sanitized evidence record.
+- [ ] `aiw validate-runtime-certification <private-runtime-certification.json>` passes and records capability-specific evidence only.
 - [ ] `aiw score-artifact` is run for representative artifacts; weak outputs route to human review.
 - [ ] No unresolved P0/P1 finding remains.
 - [ ] Release tag is created from the passing commit.

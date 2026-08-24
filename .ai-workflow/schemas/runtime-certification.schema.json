@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schemas/runtime-certification.schema.json",
+  "title": "AI Workflow Runtime Certification Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_version",
+    "runtime_id",
+    "adapter_id",
+    "release_commit",
+    "tested_at",
+    "environment",
+    "evidence_state",
+    "checks",
+    "capability_decisions",
+    "decision",
+    "operator",
+    "independent_reviewer",
+    "secret_exposure"
+  ],
+  "properties": {
+    "record_version": { "const": "1.0.0" },
+    "runtime_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+    "adapter_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+    "release_commit": { "type": "string", "minLength": 7, "maxLength": 128, "pattern": "^[A-Za-z0-9._/-]+$" },
+    "tested_at": { "type": "string", "format": "date-time" },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_surface", "runtime_version", "adapter_version", "project_classification"],
+      "properties": {
+        "execution_surface": { "type": "string", "enum": ["repository-fixture", "terminal", "host-editor", "wrapper"] },
+        "runtime_version": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "adapter_version": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "project_classification": { "type": "string", "enum": ["repository-fixture", "disposable", "non-sensitive"] }
+      }
+    },
+    "evidence_state": {
+      "type": "string",
+      "enum": ["repository-fixtures-only", "operator-verified", "pilot-certified", "blocked"]
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "result", "detail"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": ["version-preflight", "mcp-profile", "read-only-smoke", "approval-stop", "approved-canary", "recovery", "artifact-review", "independent-review"]
+          },
+          "result": { "type": "string", "enum": ["pass", "fail", "blocked", "not-run"] },
+          "detail": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      }
+    },
+    "capability_decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability", "decision"],
+        "properties": {
+          "capability": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "decision": { "type": "string", "enum": ["verified", "degraded", "blocked", "not-run"] },
+          "evidence_ref": { "type": "string", "maxLength": 200 }
+        }
+      }
+    },
+    "decision": { "type": "string", "enum": ["pilot-ready", "certified-capabilities-only", "blocked", "no-go"] },
+    "operator": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "independent_reviewer": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "secret_exposure": { "const": "none" },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 300 },
+      "maxItems": 30
+    }
+  }
+}

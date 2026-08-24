@@ -67,6 +67,7 @@ The release-hardening path adds executable controls in addition to the agent per
 | External-write idempotency | The website publication path derives a deterministic source-data digest key and rejects duplicate claims before commit/push. |
 | Rollback rehearsal | `aiw rollback-rehearsal` injects disposable corruption, verifies a backup, restores it, and emits a sanitized checksum report. |
 | Compatibility drift | `aiw validate-golden` checks versioned structured-only artifact contracts against `compatibility.json`, including operational contract versions. |
+| Runtime certification evidence | `aiw validate-runtime-certification` validates registered runtime identity, staged checks, capability decisions, sanitization, and prevents repository fixtures from being promoted as live certification. |
 | Runtime capability enforcement | `scripts/lib/runtime-guards.js` rejects undeclared MCP capabilities before invocation and requires explicit approval for write or deployment capabilities. |
 | Runtime budget enforcement | `BudgetTracker` stops a run when retry, duration, estimated-token, or external-call limits are exceeded. |
 | Event contract | `skills/schema/execution-event.schema.json` and `aiw validate-events` enforce the sanitized event shape; raw prompts and MCP payloads remain excluded. |
@@ -108,3 +109,4 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 - New integration points require security review before pipeline inclusion.
 - Production publication credentials must be separate from local development credentials and must never be copied by `aiw init`.
 - Run `node scripts/security-check.js` after changing MCP definitions or GitHub Actions workflows.
+- Runtime-certification records must remain sanitized, capability-specific, independently reviewed, and blocked until real non-fixture evidence exists.

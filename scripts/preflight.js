@@ -47,6 +47,7 @@ const requiredReleaseFiles = [
   ".ai-workflow/schemas/approval-request.schema.json",
   ".ai-workflow/schemas/checkpoint.schema.json",
   ".ai-workflow/schemas/artifact-envelope.schema.json",
+  ".ai-workflow/schemas/runtime-certification.schema.json",
   "adapters/opencode/index.js",
   "adapters/claude-code/index.js",
   "adapters/codex-cli/index.js",
@@ -62,6 +63,7 @@ const requiredReleaseFiles = [
   "scripts/verify-website-sync.js",
   "scripts/documentation-policy.json",
   "scripts/verify-documentation-policy.js",
+  "scripts/validate-runtime-certification.js",
   "docs/documentation-policy.md",
 ];
 for (const relative of requiredReleaseFiles) {
@@ -124,6 +126,7 @@ run("execution budget policy", process.execPath, ["scripts/validate-execution-bu
 run("golden artifact compatibility", process.execPath, ["scripts/validate-golden-artifacts.js"]);
 run("execution event schema", process.execPath, ["scripts/validate-events.js"]);
 run("pilot evidence contract", process.execPath, ["scripts/validate-pilot-evidence.js"]);
+run("runtime certification evidence", process.execPath, ["scripts/validate-runtime-certification.js"]);
 run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]);
 run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);

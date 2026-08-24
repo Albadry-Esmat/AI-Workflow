@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections website-check docs-check self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence validate-runtime-certification write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections website-check docs-check self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -67,6 +67,9 @@ validate-events: ## Validate sanitized execution event records
 
 validate-pilot-evidence: ## Validate a sanitized pilot evidence record
 	@node scripts/validate-pilot-evidence.js
+
+validate-runtime-certification: ## Validate sanitized per-runtime certification evidence
+	@node scripts/validate-runtime-certification.js
 
 write-plan: ## Create a canary-only dry-run plan for a write-capable operation
 	@node scripts/write-plan.js

@@ -34,6 +34,7 @@ aiw validate-budget
 aiw validate-golden
 aiw validate-events
 aiw validate-pilot-evidence
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -99,7 +100,7 @@ After any implementation, configuration, schema, pipeline, adapter, security, te
 aiw docs-check
 ```
 
-Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard.
+Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard. For runtime promotion, use the sanitized evidence contract at `.ai-workflow/schemas/runtime-certification.schema.json`; fixture evidence cannot certify a live runtime.
 
 ## Website synchronization rule
 

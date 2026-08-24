@@ -456,6 +456,9 @@ jobs:
             node scripts/adapter-certification.js "$adapter"
           done
 
+      - name: Validate sanitized runtime-certification fixture
+        run: node scripts/validate-runtime-certification.js tests/fixtures/runtime-certification.json
+
       - name: Verify deterministic projection generation
         run: |
           set -euo pipefail

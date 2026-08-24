@@ -3,9 +3,9 @@
 **Decision:** **NO-GO for general production; conditional GO for repository-side pilot preparation.**
 
 **Release branch:** `release/production-hardening`  
-**Release checkpoint:** `75492e9` — `docs: finalize multi-runtime certification status`
+**Release checkpoint:** Current verified repository-side compatibility evidence commit on `release/production-hardening`
 **Working tree:** clean at final verification  
-**Date:** 2026-08-24
+**Date:** 2026-08-25
 
 ## Executive decision
 
@@ -25,20 +25,21 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Capacity and cost | `execution-budget.json`, `aiw validate-budget`, and runtime `BudgetTracker` enforce pilot limits for retries, duration, estimated tokens, and external API calls; violations stop before continued work. |
 | Recovery | `aiw rollback-rehearsal` injects disposable corruption, verifies a backup, restores it, checks checksums, and writes a sanitized report; the harness also writes sanitized resumable checkpoints and uses a circuit breaker for repeated failures. |
 | Compatibility and quality | `aiw validate-golden` checks structured-only versioned contracts; `aiw score-artifact` routes incomplete outputs to human review and rejects prohibited fields. |
-| Multi-runtime support | `.ai-workflow/` canonical config, adapter registry, capability matrix, six normalized schemas, supervised terminal adapters for Claude Code/Codex/Gemini/Aider, host projections for Cursor/Copilot/Cline-Roo/Windsurf, deterministic projections, and fixture certification. External adapters remain experimental until real evidence. |
+| Multi-runtime support | `.ai-workflow/` canonical config, adapter registry, capability matrix, seven normalized schemas including runtime-certification evidence, supervised terminal adapters for Claude Code/Codex/Gemini/Aider, host projections for Cursor/Copilot/Cline-Roo/Windsurf, deterministic projections, sanitized evidence validation, and fixture certification. External adapters remain experimental until real evidence. |
 | Publication and documentation | Website mirror synchronized and checked; local publication retains explicit confirmation, deterministic idempotency, ambiguous-outcome reconciliation, and canary write planning; CI publication remains reviewable. |
 
 ## Final validation evidence
 
 | Check | Result |
 |---|---:|
-| Jest conformance | **PASS — 34 tests** |
+| Jest conformance | **PASS — 36 tests** |
 | Structural and semantic validation | **PASS — 187 structural checks and 22 pipeline validations** |
 | MCP policy validation | **PASS** |
 | Execution-budget validation | **PASS** |
 | Golden-artifact compatibility validation | **PASS** |
 | Execution-event schema validation | **PASS** |
 | Pilot-evidence contract validation | **PASS** |
+| Runtime-certification evidence validation | **PASS — fixture-only record correctly remains blocked for live promotion** |
 | Artifact-quality scoring | **PASS** |
 | Canary write-plan behavior | **PASS** |
 | Runtime permission/budget guards, checkpoints, and circuit breaker | **PASS** |
@@ -47,14 +48,14 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Real runtime probes | **BLOCKED — OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider unavailable; host integrations unavailable** |
 | Deterministic runtime projection generation | **PASS** |
 | Adapter compatibility CI workflow YAML | **PASS** |
-| Full reachable-history security scan | **PASS — 126 reachable commits** |
+| Full reachable-history security scan | **PASS — full reachable history scanned** |
 | High-severity dependency audit | **PASS — 0 vulnerabilities** |
 | Website mirror check | **PASS — 140 files current** |
 | Shell syntax and `git diff --check` | **PASS** |
 | Final working-tree state | **PASS — clean** |
 | Strict preflight | **BLOCKED — expected in sandbox** |
 
-The strict preflight reported exactly two environment blockers: the OpenCode executable is missing or cannot report its version, and `.env` is missing. All repository-side checks invoked by preflight passed.
+The strict preflight remains expected to report environment blockers when the OpenCode executable or `.env` is absent. All repository-side checks invoked by preflight, including runtime-certification evidence validation, pass without live runtime execution.
 
 ## Remaining release gates
 
@@ -72,6 +73,6 @@ The strict preflight reported exactly two environment blockers: the OpenCode exe
 
 ## Operator handoff
 
-Run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
+Run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`, create the private sanitized runtime-certification record, and validate it with `aiw validate-runtime-certification <private-runtime-certification.json>`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
 
-No changes were pushed to GitHub by this task. The multi-runtime compatibility foundation is implemented locally on `release/production-hardening` at `75492e9`; it provides experimental adapter projections and certification scaffolding, not an unconditional claim that every target runtime is production-certified.
+The multi-runtime compatibility work is maintained on `release/production-hardening`; it provides experimental adapter projections and evidence-validation scaffolding, not an unconditional claim that every target runtime is production-certified.

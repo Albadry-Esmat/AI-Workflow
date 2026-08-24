@@ -51,6 +51,7 @@ for (const [label, script] of [
   ["golden compatibility contracts pass", "scripts/validate-golden-artifacts.js"],
   ["execution event schema passes", "scripts/validate-events.js"],
   ["pilot evidence contract passes", "scripts/validate-pilot-evidence.js"],
+  ["runtime certification evidence passes", "scripts/validate-runtime-certification.js"],
 ]) {
   check(label, () => { command([script]); });
 }

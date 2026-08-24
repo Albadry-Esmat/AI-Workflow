@@ -5,11 +5,11 @@
 **Initial hardening commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
 **Implementation commit:** `c482a77` (`feat: complete production hardening controls`)  
 **Latest compatibility commit:** `15ed80d` (`feat: add multi-runtime adapter compatibility foundation`)
-**Date:** 2026-08-23
+**Date:** 2026-08-25
 
 ## Executive Summary
 
-The approved production-readiness plan, enhancement roadmap, and detailed multi-runtime compatibility plan have been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles and event logs, machine-readable version output, full-history secret scanning, immutable CI action references, explicit MCP capability and approval guards, runtime budget enforcement, circuit breakers, sanitized checkpoints, deterministic publication idempotency and reconciliation, canary write planning, pilot-evidence validation, artifact quality scoring, golden compatibility contracts, a runtime-neutral adapter boundary, nine experimental adapters, deterministic runtime projections, strict preflight, reviewed website PR publication, and operational release documentation.
+The approved production-readiness plan, enhancement roadmap, and detailed multi-runtime compatibility plan have been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles and event logs, machine-readable version output, full-history secret scanning, immutable CI action references, explicit MCP capability and approval guards, runtime budget enforcement, circuit breakers, sanitized checkpoints, deterministic publication idempotency and reconciliation, canary write planning, pilot-evidence validation, sanitized runtime-certification evidence validation, artifact quality scoring, golden compatibility contracts, a runtime-neutral adapter boundary, nine experimental adapters, deterministic runtime projections, strict preflight, reviewed website PR publication, and complete documentation synchronization gates.
 
 The branch is **ready for constrained pilot preparation after the operator supplies real production prerequisites**. It is not yet a general-production release from this sandbox because the real OpenCode CLI and a configured GitHub token were intentionally not installed or supplied here, and no live model/MCP pipeline was executed.
 
@@ -24,18 +24,18 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | State recovery | Added `scripts/lib/state-store.js` for atomic JSON writes, previous-file backups, corruption recovery, and single-writer locks. Added checksum-manifested `aiw backup`, `aiw restore <backup>`, and verification support. |
 | Conformance | Added a deterministic black-box harness plus Jest tests without live credentials or paid model calls. Coverage includes routing, retries, HITL approval/rejection, async reconciliation, artifact readiness, redaction, persistence, retention, semantic validation, manifest integrity, atomic recovery, locking, backup/restore, version output, support bundles, secure initialization, runtime capability denial, budget hard stops, checkpoints, circuit breakers, write reconciliation, canary plans, pilot evidence, and artifact quality routing. |
 | Security and supply chain | Removed the unused unpinned fetch MCP entry, verified all retained MCP versions, pinned GitHub Actions to immutable SHAs, added current-tree and full-history secret-like file/token checks, added high-severity npm audit checks, and replaced broad token guidance with fine-grained repository-scoped guidance. |
-| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw pilot-preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, sanitized event reporting and formal event-schema validation, execution-budget validation and runtime accounting, MCP capability guards, circuit breakers, checkpoints, idempotency reconciliation, canary write plans, pilot-evidence validation, artifact quality scoring, rollback rehearsal, golden artifact compatibility checks, the `.ai-workflow/` canonical config boundary, adapter registry, capability matrix, versioned runtime schemas, adapter certification harness, deterministic projections, compatibility CI, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/live-smoke-test.md`, `docs/operations/multi-runtime-compatibility.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and this status report. |
-| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, live smoke procedure, and website-generated content to match the implementation. |
+| Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw pilot-preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, sanitized event reporting and formal event-schema validation, execution-budget validation and runtime accounting, MCP capability guards, circuit breakers, checkpoints, idempotency reconciliation, canary write plans, pilot-evidence validation, runtime-certification evidence validation, artifact quality scoring, rollback rehearsal, golden artifact compatibility checks, the `.ai-workflow/` canonical config boundary, adapter registry, capability matrix, versioned runtime schemas, adapter certification harness, deterministic projections, compatibility CI, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/live-smoke-test.md`, `docs/operations/multi-runtime-compatibility.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and complete documentation synchronization policy. |
+| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, live smoke procedure, runtime-certification status, release checklist, complete documentation policy, and website-generated content to match the implementation. |
 
 ## Verification Evidence
 
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 34 tests passed in one suite after the detailed multi-runtime compatibility and projection-installation additions. |
+| Jest conformance | PASS | 36 tests passed in one suite after runtime-certification evidence coverage was added. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
-| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 125 reachable commits passed. |
+| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full reachable-history scan passed. |
 | `npm audit --audit-level=high --omit=optional` | PASS | 0 vulnerabilities reported. |
 | `aiw sync --check` | PASS | All 140 mirrored files current; check mode did not mutate the tree. Local publication now validates target branch cleanliness and fast-forward safety; CI opens a target pull request instead of pushing directly to `main`. |
 | Shell syntax | PASS | Tracked shell scripts passed `bash -n`. |
@@ -50,7 +50,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Golden artifact compatibility | PASS | Versioned structured-only artifact contracts and negative drift fixture passed. |
 | Execution event schema | PASS | Formal schema validator, redaction checks, support-bundle summaries, and retention pruning passed. |
 | Runtime guards | PASS | MCP permission/approval guards, budget hard stops, checkpoint safety, and circuit-breaker transitions passed. |
-| Canary and evidence controls | PASS | Canary-only dry-run write plans, pilot-evidence validation, and artifact-quality review routing passed. |
+| Canary and evidence controls | PASS | Canary-only dry-run write plans, pilot-evidence validation, runtime-certification evidence validation, and artifact-quality review routing passed. |
 | Multi-runtime adapter foundation | PASS | Registry/matrix validation, nine descriptor dry-run certifications, deterministic projection generation, safe projection installation tests, aggregate certification, and compatibility CI YAML validation passed. |
 | Real runtime certification | BLOCKED / NOT RUN | OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider are unavailable in the sandbox; host/editor integrations are unavailable. Each runtime requires operator-owned preflight and a separate non-sensitive pilot; fixture certification is not live evidence. |
 | Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
@@ -86,6 +86,8 @@ aiw version --json
 aiw preflight
 aiw validate-events
 aiw validate-pilot-evidence
+aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw docs-check
 aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only
 aiw backup
 aiw rollback-rehearsal
@@ -97,4 +99,4 @@ Then follow `docs/operations/live-smoke-test.md` for the constrained pipeline, r
 
 **Decision:** Conditional approval for internal pilot; not yet approved for general production.
 
-The code-level and repository-level release controls now pass. General production remains gated on real-environment preflight, live OpenCode/MCP smoke testing, pilot evidence, independent review, and repository branch-protection configuration. No changes were pushed to GitHub from this task; all implementation work is committed locally on `release/production-hardening`.
+The code-level and repository-level release controls now pass, including the sanitized runtime-certification evidence contract. General production remains gated on real-environment preflight, live OpenCode/MCP smoke testing, pilot evidence, independent review, and repository branch-protection configuration. The compatibility work is maintained on `release/production-hardening`; this status report does not authorize a production release or imply live runtime certification.
