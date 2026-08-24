@@ -4,7 +4,7 @@
 **Branch:** `release/production-hardening`  
 **Initial hardening commit:** `836676d7e189882580e0483d54e7175ed1322a44` (`chore: harden production readiness`)  
 **Implementation commit:** `c482a77` (`feat: complete production hardening controls`)  
-**Final documentation commit:** verify with `git log -1 --oneline` on `release/production-hardening` (the report intentionally avoids self-referential commit metadata)  
+**Latest compatibility commit:** `15ed80d` (`feat: add multi-runtime adapter compatibility foundation`)
 **Date:** 2026-08-23
 
 ## Executive Summary
@@ -32,10 +32,10 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 32 tests passed in one suite after the operational-control additions. |
+| Jest conformance | PASS | 33 tests passed in one suite after the multi-runtime compatibility additions. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
-| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 117 reachable commits passed. |
+| Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 125 reachable commits passed. |
 | `npm audit --audit-level=high --omit=optional` | PASS | 0 vulnerabilities reported. |
 | `aiw sync --check` | PASS | All 140 mirrored files current; check mode did not mutate the tree. Local publication now validates target branch cleanliness and fast-forward safety; CI opens a target pull request instead of pushing directly to `main`. |
 | Shell syntax | PASS | Tracked shell scripts passed `bash -n`. |

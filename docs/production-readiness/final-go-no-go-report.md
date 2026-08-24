@@ -3,7 +3,7 @@
 **Decision:** **NO-GO for general production; conditional GO for repository-side pilot preparation.**
 
 **Release branch:** `release/production-hardening`  
-**Release checkpoint:** latest local enhancement commits; verify with `git log -1 --oneline`
+**Release checkpoint:** `15ed80d` — `feat: add multi-runtime adapter compatibility foundation`
 **Working tree:** clean at final verification  
 **Date:** 2026-08-24
 
@@ -32,7 +32,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 
 | Check | Result |
 |---|---:|
-| Jest conformance | **PASS — 32 tests** |
+| Jest conformance | **PASS — 33 tests** |
 | Structural and semantic validation | **PASS — 187 structural checks and 22 pipeline validations** |
 | MCP policy validation | **PASS** |
 | Execution-budget validation | **PASS** |
@@ -45,7 +45,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Multi-runtime adapter descriptors and dry-run certification | **PASS — 9 target adapters** |
 | Deterministic runtime projection generation | **PASS** |
 | Adapter compatibility CI workflow YAML | **PASS** |
-| Full reachable-history security scan | **PASS — 122 reachable commits** |
+| Full reachable-history security scan | **PASS — 125 reachable commits** |
 | High-severity dependency audit | **PASS — 0 vulnerabilities** |
 | Website mirror check | **PASS — 140 files current** |
 | Shell syntax and `git diff --check` | **PASS** |
@@ -72,4 +72,4 @@ The strict preflight reported exactly two environment blockers: the OpenCode exe
 
 Run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
 
-No changes were pushed to GitHub by this task. The multi-runtime compatibility foundation is implemented locally on `release/production-hardening`; it provides experimental adapter projections and certification scaffolding, not an unconditional claim that every target runtime is production-certified.
+No changes were pushed to GitHub by this task. The multi-runtime compatibility foundation is implemented locally on `release/production-hardening` at `15ed80d`; it provides experimental adapter projections and certification scaffolding, not an unconditional claim that every target runtime is production-certified.
