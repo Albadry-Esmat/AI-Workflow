@@ -35,6 +35,7 @@
     "certify:adapters": "node scripts/certify-adapters.js",
     "generate:projections": "node scripts/generate-projections.js",
     "install:projections": "node scripts/install-projections.js",
+    "website:check": "node scripts/verify-website-sync.js",
     "events": "node scripts/events.js"
   },
   "devDependencies": {

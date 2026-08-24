@@ -23,6 +23,7 @@ aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-adapters
 aiw certify-adapters
+aiw website-check
 aiw score-artifact --type requirements --input tests/fixtures/requirements-artifact.json
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
@@ -40,6 +41,10 @@ aiw install-projections --source /tmp/aiw-projections --target /path/to/project 
 ```
 
 The installer is a dry-run by default. Existing target files require both `--confirm` and `--overwrite`; explicitly overwritten files are backed up under the target’s `.ai-workflow/projection-backups/` directory. Never install a projection into a production project before reviewing its contents and confirming the target path.
+
+## Mandatory Website Synchronization
+
+The website mirror must be synchronized after every authoritative documentation or configuration change. Run `aiw sync`, review the generated diff, then run `aiw website-check` and `aiw sync --check` before committing. CI runs the same guard and rejects a change when `website/data/` is stale. Commit authoritative sources and their generated website data together.
 
 ## Before Running a Pipeline
 

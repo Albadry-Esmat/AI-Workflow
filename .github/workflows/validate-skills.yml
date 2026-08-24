@@ -17,6 +17,7 @@ on:
       - "compatibility.json"
       - ".ai-workflow/**"
       - "adapters/**"
+      - "website/data/**"
       - "*.sh"
       - "*.md"
   pull_request:
@@ -35,6 +36,7 @@ on:
       - "compatibility.json"
       - ".ai-workflow/**"
       - "adapters/**"
+      - "website/data/**"
       - "*.sh"
       - "*.md"
 
@@ -402,54 +404,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - name: Check website/data/ is in sync with source files
-        run: |
-          # Only run if website/data/ exists — skip gracefully otherwise
-          if [ ! -d "website/data" ]; then
-            echo "  INFO: website/data/ not present — sync check skipped"
-            exit 0
-          fi
-
-          FAILED=0
-
-          check_file() {
-            local src="$1"
-            local dst="$2"
-            if [ ! -f "$src" ]; then
-              echo "  WARN: Source not found: $src — skipping"
-              return
-            fi
-            if [ ! -f "$dst" ]; then
-              echo "  FAIL: website/data copy missing: $dst"
-              echo "        Fix: run 'make sync' and commit the result"
-              FAILED=1
-              return
-            fi
-            if ! cmp -s "$src" "$dst"; then
-              echo "  FAIL: Out of sync: $src vs $dst"
-              echo "        Fix: run 'make sync' and commit the result"
-              FAILED=1
-            else
-              echo "  PASS: In sync: $dst"
-            fi
-          }
-
-          # Key files that must always be in sync
-          check_file "skills/index.yaml"             "website/data/skills/index.yaml"
-          check_file "skills/registry.json"          "website/data/skills/registry.json"
-          check_file "skills/graph/skill-graph.yaml" "website/data/skills/graph/skill-graph.yaml"
-          check_file "docs/changelog.md"             "website/data/docs/changelog.md"
-          check_file "opencode.json"                 "website/data/opencode.json"
-
-          # Check pipeline files
-          for f in skills/pipelines/*.json; do
-            [ -f "$f" ] || continue   # guard: skip if glob did not expand (empty dir)
-            fname=$(basename "$f")
-            check_file "$f" "website/data/skills/pipelines/$fname"
-          done
-
-          [ "$FAILED" -eq 0 ] || exit 1
-          echo "  PASS: All website/data/ files are in sync"
+      - name: Enforce authoritative website-data synchronization
+        run: node scripts/verify-website-sync.js
 
 
   # ── Job 4: Runtime adapter compatibility matrix ─────────────────────────────

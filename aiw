@@ -74,6 +74,7 @@ show_help() {
   echo -e "    ${CYAN}certify-adapters${NC}   Run fixture-only certification for all adapters"
   echo -e "    ${CYAN}generate-projections${NC} Generate deterministic runtime projections"
   echo -e "    ${CYAN}install-projections${NC} Install reviewed projections (requires explicit confirmation)"
+  echo -e "    ${CYAN}website-check${NC}      Verify website/data matches the authoritative manifest"
   echo -e "    ${CYAN}events${NC}             Show recent sanitized execution events"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
@@ -232,6 +233,10 @@ cmd_generate_projections() {
 
 cmd_install_projections() {
   node "$ROOT/scripts/install-projections.js" "$@"
+}
+
+cmd_website_check() {
+  node "$ROOT/scripts/verify-website-sync.js" "$@"
 }
 
 cmd_events() {
@@ -548,6 +553,7 @@ case "$COMMAND" in
   certify-adapters) cmd_certify_adapters "$@" ;;
   generate-projections) cmd_generate_projections "$@" ;;
   install-projections) cmd_install_projections "$@" ;;
+  website-check)    cmd_website_check "$@" ;;
   events)           cmd_events "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;

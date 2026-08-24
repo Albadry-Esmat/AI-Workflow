@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections website-check self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -88,6 +88,9 @@ generate-projections: ## Generate deterministic runtime-specific configuration p
 
 install-projections: ## Install reviewed projections only with explicit --confirm --overwrite
 	@node scripts/install-projections.js --source /tmp/aiw-projections --target . --confirm --overwrite
+
+website-check: ## Fail when authoritative sources and website/data are out of sync
+	@node scripts/verify-website-sync.js
 
 self-test: ## Run credential-free production conformance tests
 	@node scripts/self-test.js
