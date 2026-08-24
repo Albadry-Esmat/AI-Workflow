@@ -53,6 +53,7 @@ for (const [label, script] of [
   ["pilot evidence contract passes", "scripts/validate-pilot-evidence.js"],
   ["runtime certification evidence passes", "scripts/validate-runtime-certification.js"],
   ["runtime version watch completes", "scripts/runtime-version-watch.js"],
+  ["sanitized release-status handoff completes", "scripts/release-status.js"],
 ]) {
   check(label, () => { command([script]); });
 }

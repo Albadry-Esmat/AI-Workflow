@@ -25,6 +25,7 @@ aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw runtime-watch
+aiw release-status
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -55,7 +56,7 @@ The website mirror must be synchronized after every authoritative documentation 
 
 ## Compatibility Maintenance
 
-Use [`compatibility-maintenance.md`](compatibility-maintenance.md) for the Phase 8 cadence. Run `aiw runtime-watch` at every release candidate, review the capability matrix quarterly and after major vendor changes, retain only sanitized evidence, block or deprecate invalidated adapters, and update release communication with capability-specific support statements.
+Use [`compatibility-maintenance.md`](compatibility-maintenance.md) for the Phase 8 cadence. Generate [`../production-readiness/release-status-handoff.md`](../production-readiness/release-status-handoff.md) with `aiw release-status --json` before assigning the operator-owned blockers. Run `aiw runtime-watch` at every release candidate, review the capability matrix quarterly and after major vendor changes, retain only sanitized evidence, block or deprecate invalidated adapters, and update release communication with capability-specific support statements.
 
 ## Before Running a Pipeline
 

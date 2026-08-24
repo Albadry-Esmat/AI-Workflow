@@ -156,6 +156,7 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 | Guard skill added/modified | `governance.md`, `skills-registry.md`, `changelog.md` |
 | Runtime evidence or promotion rule changed | `operations/multi-runtime-compatibility.md`, `testing.md`, `operations/production-runbook.md`, `production-readiness/multi-runtime-certification-status.md`, `changelog.md` |
 | Compatibility maintenance changed | `operations/compatibility-maintenance.md`, `operations/multi-runtime-compatibility.md`, `operations/production-runbook.md`, `production-readiness/release-candidate-status.md`, `changelog.md` |
+| Release-status command or handoff changed | `production-readiness/release-status-handoff.md`, `production-readiness/release-governance-record.md`, `production-readiness/next-release-gate-status.md`, `operations/release-checklist.md`, `changelog.md` |
 
 ### Change Approval Process
 
@@ -168,7 +169,8 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 6. Submit the PR with source, docs, changelog, and website data together.
 7. Review: verify docs match code changes and no support-tier or security claim is stale.
 8. For compatibility changes, run `aiw runtime-watch` and confirm the capability-specific evidence and deprecation statement are current.
-9. Merge only after all documentation and CI gates pass.
+9. For release handoff, run `aiw release-status --json`, assign every operator blocker, and retain only sanitized output.
+10. Merge only after all documentation and CI gates pass.
 ```
 
 ## Quality Enforcement

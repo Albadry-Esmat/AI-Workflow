@@ -243,6 +243,23 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("release status emits sanitized JSON and owner-only output", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-release-status-"));
+    const output = path.join(directory, "release-status.json");
+    try {
+      const result = spawnSync(process.execPath, ["scripts/release-status.js", "--json", "--output", output], { cwd: root, encoding: "utf8" });
+      expect(result.status).toBe(0);
+      const report = JSON.parse(fs.readFileSync(output, "utf8"));
+      expect(report.report_version).toBe("1.0.0");
+      expect(report.checks.documentation_policy.status).toBe("pass");
+      expect(report.operator_blockers).toEqual(expect.arrayContaining(["environment: .env-missing"]));
+      expect(JSON.stringify(report)).not.toMatch(/Bearer\\s+[^[]/i);
+      if (process.platform !== "win32") expect(fs.statSync(output).mode & 0o777).toBe(0o600);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("structured event retention removes only expired records", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-retention-"));
     const eventsFile = path.join(directory, "events.jsonl");

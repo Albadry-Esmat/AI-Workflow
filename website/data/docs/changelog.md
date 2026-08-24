@@ -11,6 +11,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Release-status handoff controls** — Added `aiw release-status` and JSON output for a deterministic sanitized summary of repository checks, runtime/host blockers, current commit, working-tree state, and operator next actions. Reconciled stale release-gate metadata without creating live-runtime claims.
 - **Phase 8 compatibility maintenance controls** — Added the read-only `aiw runtime-watch` command, strict OpenCode version-range enforcement in preflight, a canonical compatibility-maintenance guide for quarterly review, retention, incidents, deprecation, release communication, and security review, plus coverage for host and terminal adapter filesystem operations.
 - **Production hardening baseline** — Added `docs/production-readiness/release-candidate-baseline.md` to record the release branch, baseline commit, exit criteria, severity definitions, and initial P0/P1 findings.
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.

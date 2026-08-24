@@ -69,6 +69,7 @@ The release-hardening path adds executable controls in addition to the agent per
 | Compatibility drift | `aiw validate-golden` checks versioned structured-only artifact contracts against `compatibility.json`, including operational contract versions. |
 | Runtime certification evidence | `aiw validate-runtime-certification` validates registered runtime identity, staged checks, capability decisions, sanitization, and prevents repository fixtures from being promoted as live certification. |
 | Runtime version drift | `aiw runtime-watch` performs read-only version checks for terminal runtimes, reports host/editor verification requirements, and strict preflight blocks an unsupported OpenCode version. |
+| Release-status handoff | `aiw release-status` emits only sanitized statuses, versions, paths, counts, and blocker categories; private output files are owner-only and must not contain credentials or raw sessions. |
 | Runtime capability enforcement | `scripts/lib/runtime-guards.js` rejects undeclared MCP capabilities before invocation and requires explicit approval for write or deployment capabilities. |
 | Runtime budget enforcement | `BudgetTracker` stops a run when retry, duration, estimated-token, or external-call limits are exceeded. |
 | Event contract | `skills/schema/execution-event.schema.json` and `aiw validate-events` enforce the sanitized event shape; raw prompts and MCP payloads remain excluded. |
@@ -112,3 +113,4 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 - Run `node scripts/security-check.js` after changing MCP definitions or GitHub Actions workflows.
 - Runtime-certification records must remain sanitized, capability-specific, independently reviewed, and blocked until real non-fixture evidence exists.
 - Compatibility maintenance must review version ranges, host boundaries, MCP side effects, projections, and deprecation status at every release and after major vendor changes.
+- Release handoff reports must be sanitized, tied to a reviewed commit, and treated as readiness evidence rather than production approval.

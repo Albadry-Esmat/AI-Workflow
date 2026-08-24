@@ -65,6 +65,7 @@ const requiredReleaseFiles = [
   "scripts/verify-documentation-policy.js",
   "scripts/validate-runtime-certification.js",
   "scripts/runtime-version-watch.js",
+  "scripts/release-status.js",
   "docs/documentation-policy.md",
 ];
 for (const relative of requiredReleaseFiles) {
@@ -129,6 +130,7 @@ run("golden artifact compatibility", process.execPath, ["scripts/validate-golden
 run("execution event schema", process.execPath, ["scripts/validate-events.js"]);
 run("pilot evidence contract", process.execPath, ["scripts/validate-pilot-evidence.js"]);
 run("runtime certification evidence", process.execPath, ["scripts/validate-runtime-certification.js"]);
+run("sanitized release-status handoff", process.execPath, ["scripts/release-status.js"]);
 run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]);
 run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);

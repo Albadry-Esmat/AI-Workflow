@@ -32,7 +32,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 39 tests passed in one suite after Phase 8 runtime-watch and adapter filesystem regression coverage was added. |
+| Jest conformance | PASS | 40 tests passed in one suite after release-status handoff coverage was added. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
 | Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full reachable-history scan passed. |
@@ -52,6 +52,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Runtime guards | PASS | MCP permission/approval guards, budget hard stops, checkpoint safety, and circuit-breaker transitions passed. |
 | Canary and evidence controls | PASS | Canary-only dry-run write plans, pilot-evidence validation, runtime-certification evidence validation, and artifact-quality review routing passed. |
 | Runtime version watch | PASS (informational) | Read-only report completed without starting sessions; terminal availability and host/editor verification remain operator-owned. |
+| Release-status handoff | PASS | Deterministic sanitized report covers repository checks, clean-tree state, runtime/host blockers, and operator next actions. |
 | Multi-runtime adapter foundation | PASS | Registry/matrix validation, nine descriptor dry-run certifications, deterministic projection generation, safe projection installation tests, aggregate certification, and compatibility CI YAML validation passed. |
 | Real runtime certification | BLOCKED / NOT RUN | OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider are unavailable in the sandbox; host/editor integrations are unavailable. Each runtime requires operator-owned preflight and a separate non-sensitive pilot; fixture certification is not live evidence. |
 | Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
@@ -60,7 +61,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 
 ## Required Operator Actions Before Pilot
 
-The remaining items are environment and governance prerequisites rather than unimplemented repository controls. Phase 8 maintenance procedures are documented in `docs/operations/compatibility-maintenance.md`; they require version watching on every release candidate, quarterly matrix review, sanitized evidence retention, incident/deprecation handling, and capability-specific release communication.
+The remaining items are environment and governance prerequisites rather than unimplemented repository controls. Phase 8 maintenance procedures are documented in `docs/operations/compatibility-maintenance.md`; they require version watching on every release candidate, quarterly matrix review, sanitized evidence retention, incident/deprecation handling, and capability-specific release communication. The handoff procedure is documented in `docs/production-readiness/release-status-handoff.md` and must be generated with `aiw release-status --json` before operator assignment.
 
 | Priority | Action |
 |---|---|
@@ -89,6 +90,7 @@ aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw runtime-watch
+aiw release-status
 aiw docs-check
 aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only
 aiw backup

@@ -50,6 +50,7 @@ Do not share raw state, session JSON, tokens, authorization headers, prompts, or
 | Adapter fixture passes but live runtime fails | Fixture contract is not proof of vendor runtime behavior. | Record the live result as blocked or failed; update the adapter limitation or version range instead of changing the evidence label. |
 | Runtime certification evidence fails | The record is missing a staged check, capability decision, registered target, or required sanitized metadata. | Run `aiw validate-runtime-certification <private-record.json>`, correct the record without adding raw content, and keep the status blocked until real evidence exists. |
 | Runtime version watch reports unavailable or unsupported | The terminal executable is missing, outside its declared range, or the range is still operator-defined. | Run `aiw runtime-watch --json`; install and verify the declared runtime version or update the reviewed compatibility matrix. Do not start a live session until the result is resolved. |
+| Release-status handoff reports dirty or failed | Uncommitted files, stale website data, missing affected docs, or a failed repository gate remain. | Run `aiw release-status --json`, inspect the named check, update all affected documentation, run `aiw sync`, and re-run the full handoff. Do not treat a dirty or failed report as a release decision. |
 
 ## Documentation-policy diagnosis
 
@@ -83,7 +84,7 @@ aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 
-Then run `aiw runtime-watch --runtime <id> --strict` for the named terminal runtime. Host/editor targets require operator verification rather than an executable version check. Do not pass live prompts or write requests until version, profile, budget, project classification, and approval boundaries are confirmed. If the runtime cannot expose a required operation, classify it as degraded or protocol-only. See [`compatibility-maintenance.md`](compatibility-maintenance.md) for quarterly review, retention, incident, and deprecation procedures.
+Then run `aiw runtime-watch --runtime <id> --strict` for the named terminal runtime. Host/editor targets require operator verification rather than an executable version check. Do not pass live prompts or write requests until version, profile, budget, project classification, and approval boundaries are confirmed. If the runtime cannot expose a required operation, classify it as degraded or protocol-only. See [`compatibility-maintenance.md`](compatibility-maintenance.md) for quarterly review, retention, incident, and deprecation procedures, and [`../production-readiness/release-status-handoff.md`](../production-readiness/release-status-handoff.md) for sanitized blocker ownership and release handoff semantics.
 
 ## Incident record minimum
 

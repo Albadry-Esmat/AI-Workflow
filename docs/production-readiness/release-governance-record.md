@@ -3,7 +3,7 @@
 **Release line:** `release/production-hardening`  
 **Release candidate:** Local production-hardening branch  
 **Status:** Governance template active; owner and independent reviewer must be assigned before pilot sign-off.  
-**Last verified commit:** `d79577f`  
+**Last verified commit:** See `aiw release-status --json` for the exact verified commit
 
 ## Ownership
 
@@ -15,8 +15,9 @@
 | MCP/integration owner | **Pending operator assignment** | Permission and credential review. |
 | Website publication owner | **Pending operator assignment** | Publication PR and rollback evidence. |
 | State recovery owner | **Pending operator assignment** | Backup/restore and recovery rehearsal evidence. |
+| Release-status handoff owner | **Pending operator assignment** | Sanitized `aiw release-status --json` report and assigned blocker register. |
 
-The release cannot be approved for general production while the release owner and independent reviewer remain unassigned.
+The release cannot be approved for general production while the release owner and independent reviewer remain unassigned. Before handoff, run `aiw release-status --json`, verify a clean tree, assign every listed operator blocker, and attach only sanitized evidence.
 
 ## Feature Freeze
 
@@ -50,6 +51,7 @@ Every change during the release window must record:
 4. Documentation and website-mirror impact.
 5. The rollback procedure.
 6. The reviewer and approval status.
+7. The sanitized `aiw release-status --json` report and ownership of every live-gate blocker.
 
 ## Current Exceptions
 

@@ -61,6 +61,7 @@ docs/
 | Review multi-runtime support tiers | `operations/multi-runtime-compatibility.md` and `.ai-workflow/runtime-capability-matrix.json` |
 | Validate runtime certification evidence | `operations/multi-runtime-compatibility.md`, `.ai-workflow/schemas/runtime-certification.schema.json`, and `aiw validate-runtime-certification` |
 | Maintain compatibility after release | `operations/compatibility-maintenance.md` |
+| Generate the release-status handoff | `production-readiness/release-status-handoff.md` and `aiw release-status` |
 | Record release ownership and exceptions | `production-readiness/release-governance-record.md` |
 | Write or optimize prompts | `prompt-engineering.md` |
 | Track what changed | `changelog.md` |
@@ -92,6 +93,7 @@ The complete machine-checkable rule is defined in [`documentation-policy.md`](do
 | Production hardening or release controls changed | `security.md`, `operations/production-runbook.md`, `changelog.md` |
 | Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `development-runtime-adapter-guide.md`, `.ai-workflow/schemas/runtime-certification.schema.json`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
 | Operational procedure or recovery control changed | `operations/operator-quickstart.md`, `operations/troubleshooting.md`, `operations/production-runbook.md`, `operations/compatibility-maintenance.md`, `changelog.md` |
+| Release-status handoff or blocker ownership changed | `production-readiness/release-status-handoff.md`, `production-readiness/final-go-no-go-report.md`, `production-readiness/release-governance-record.md`, `operations/release-checklist.md`, `changelog.md` |
 
 ## File Format Convention
 
