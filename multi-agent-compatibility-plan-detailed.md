@@ -1,9 +1,9 @@
 # AI Workflow Multi-Agent Compatibility Plan — Detailed Phases and Tasks
 
 **Author:** Manus AI  
-**Plan status:** Proposed for approval before implementation  
+**Plan status:** Approved by the user; repository-controlled implementation completed through the live-runtime gate
 **Scope:** Runtime portability, adapter contracts, certification, and safe configuration projections  
-**Current baseline:** OpenCode is the only reference runtime with repository-side production controls. The repository currently has a clean local release branch, deterministic conformance tests, MCP permission profiles, execution budgets, sanitized events, checkpoints, rollback, idempotency, canary planning, pilot evidence validation, and artifact-quality gates.
+**Current baseline:** OpenCode is the only reference runtime with repository-side production controls. The repository has a clean local release branch, deterministic conformance tests, MCP permission profiles, execution budgets, sanitized events, checkpoints, rollback, idempotency, canary planning, pilot evidence validation, artifact-quality gates, versioned runtime contracts, adapter projections, deterministic projection generation, and fixture certification. Real-runtime certification remains operator-owned and blocked in the sandbox.
 
 ## 1. Goal and definition of compatibility
 
