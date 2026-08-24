@@ -23,6 +23,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] `aiw self-test` passes without credentials or paid model calls.
 - [ ] `aiw docs-check` passes with all affected documentation and `docs/changelog.md` included.
 - [ ] `aiw validate-runtime-certification tests/fixtures/runtime-certification.json` passes; the fixture remains blocked for live promotion.
+- [ ] `aiw runtime-watch` passes informationally for the matrix; strict version watch passes for each runtime selected for live certification.
 - [ ] `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` creates a sanitized manifest and verified backup; actual live execution is recorded separately.
 - [ ] `npm run validate:budget` passes and the selected run has explicit retry, duration, token, and API-call limits.
 - [ ] `npm run validate:golden` passes against the compatibility manifest.
@@ -79,6 +80,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] Release tag is created from the passing commit.
 - [ ] Release notes include upgrade, rollback, compatibility, and known-limitations guidance.
 - [ ] A second person or independent review confirms security and rollback readiness.
+- [ ] The capability matrix, version ranges, adapter deprecation status, evidence retention, incident path, and release communication have been reviewed according to [`compatibility-maintenance.md`](compatibility-maintenance.md).
 
 ## Sign-off
 

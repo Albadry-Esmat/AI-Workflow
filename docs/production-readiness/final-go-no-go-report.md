@@ -32,7 +32,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 
 | Check | Result |
 |---|---:|
-| Jest conformance | **PASS — 36 tests** |
+| Jest conformance | **PASS — 39 tests** |
 | Structural and semantic validation | **PASS — 187 structural checks and 22 pipeline validations** |
 | MCP policy validation | **PASS** |
 | Execution-budget validation | **PASS** |
@@ -40,10 +40,12 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Execution-event schema validation | **PASS** |
 | Pilot-evidence contract validation | **PASS** |
 | Runtime-certification evidence validation | **PASS — fixture-only record correctly remains blocked for live promotion** |
+| Runtime version watch | **PASS — informational, no sessions started; live terminal/host verification remains operator-owned** |
 | Artifact-quality scoring | **PASS** |
 | Canary write-plan behavior | **PASS** |
 | Runtime permission/budget guards, checkpoints, and circuit breaker | **PASS** |
 | Multi-runtime adapter descriptors and dry-run certification | **PASS — 9 target adapters** |
+| Phase 8 maintenance documentation | **PASS — version watch, matrix review, retention, incident, deprecation, release communication, and security review procedures documented** |
 | Projection installation safety | **PASS — dry-run, conflict blocking, explicit overwrite backup** |
 | Real runtime probes | **BLOCKED — OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider unavailable; host integrations unavailable** |
 | Deterministic runtime projection generation | **PASS** |
@@ -75,4 +77,4 @@ The strict preflight remains expected to report environment blockers when the Op
 
 Run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`, create the private sanitized runtime-certification record, and validate it with `aiw validate-runtime-certification <private-runtime-certification.json>`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
 
-The multi-runtime compatibility work is maintained on `release/production-hardening`; it provides experimental adapter projections and evidence-validation scaffolding, not an unconditional claim that every target runtime is production-certified.
+The multi-runtime compatibility work is maintained on `release/production-hardening`; it provides experimental adapter projections, evidence-validation scaffolding, and Phase 8 maintenance controls, not an unconditional claim that every target runtime is production-certified.

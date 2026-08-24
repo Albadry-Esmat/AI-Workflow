@@ -11,6 +11,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Phase 8 compatibility maintenance controls** — Added the read-only `aiw runtime-watch` command, strict OpenCode version-range enforcement in preflight, a canonical compatibility-maintenance guide for quarterly review, retention, incidents, deprecation, release communication, and security review, plus coverage for host and terminal adapter filesystem operations.
 - **Production hardening baseline** — Added `docs/production-readiness/release-candidate-baseline.md` to record the release branch, baseline commit, exit criteria, severity definitions, and initial P0/P1 findings.
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.
 - **Delegate skill (SKL-120)** — formal protocol for intra-pipeline task delegation with scoped context, success criteria, turn limits, and audit trail. Prevents ad-hoc agent-to-agent handoff sprawl.

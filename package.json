@@ -29,6 +29,7 @@
     "validate:events": "node scripts/validate-events.js",
     "validate:pilot-evidence": "node scripts/validate-pilot-evidence.js",
     "validate:runtime-certification": "node scripts/validate-runtime-certification.js",
+    "runtime:watch": "node scripts/runtime-version-watch.js",
     "write-plan": "node scripts/write-plan.js",
     "score-artifact": "node scripts/score-artifact.js",
     "validate:adapters": "node scripts/validate-adapter-config.js",

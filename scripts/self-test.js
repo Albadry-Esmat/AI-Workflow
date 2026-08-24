@@ -52,6 +52,7 @@ for (const [label, script] of [
   ["execution event schema passes", "scripts/validate-events.js"],
   ["pilot evidence contract passes", "scripts/validate-pilot-evidence.js"],
   ["runtime certification evidence passes", "scripts/validate-runtime-certification.js"],
+  ["runtime version watch completes", "scripts/runtime-version-watch.js"],
 ]) {
   check(label, () => { command([script]); });
 }

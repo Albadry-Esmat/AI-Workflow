@@ -64,6 +64,7 @@ const requiredReleaseFiles = [
   "scripts/documentation-policy.json",
   "scripts/verify-documentation-policy.js",
   "scripts/validate-runtime-certification.js",
+  "scripts/runtime-version-watch.js",
   "docs/documentation-policy.md",
 ];
 for (const relative of requiredReleaseFiles) {
@@ -104,9 +105,10 @@ else pass(`Node.js ${process.version} is supported`);
 if (!fs.existsSync(path.join(root, "package-lock.json"))) fail("package-lock.json is missing");
 else pass("package-lock.json is present");
 
-const opencode = spawnSync("opencode", ["--version"], { encoding: "utf8" });
+const opencode = spawnSync(process.env.AIW_OPENCODE_BIN || "opencode", ["--version"], { encoding: "utf8" });
 if (opencode.status !== 0) fail("OpenCode CLI is missing or cannot report its version");
 else pass(`OpenCode CLI is available (${(opencode.stdout || "").trim()})`);
+run("strict OpenCode runtime-version watch", process.execPath, ["scripts/runtime-version-watch.js", "--runtime", "opencode", "--strict"]);
 
 const envPath = path.join(root, ".env");
 if (!fs.existsSync(envPath)) fail(".env is missing; run aiw setup and configure credentials");

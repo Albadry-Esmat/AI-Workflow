@@ -311,10 +311,13 @@ Operate compatibility as a maintained product surface instead of a one-time inte
 | 8.8 | Security review | Reassess token scopes, MCP side effects, generated projections, hooks, plugins, and host trust boundaries. | At least each release and after any security event. |
 
 ### Exit criteria
-
 The support statement identifies certified runtime versions and capability-specific limitations; compatibility changes are covered by CI and release governance; operators have a repeatable incident and rollback procedure.
 
+### Repository-safe implementation status
+The repository now provides `aiw runtime-watch` for read-only terminal version checks and host/editor verification reporting, strict OpenCode version-range enforcement in preflight, and `docs/operations/compatibility-maintenance.md` covering quarterly matrix review, evidence retention, incident response, adapter deprecation, release communication, and security review. These controls do not install runtimes, start sessions, access credentials, or create live certification evidence.
+
 ## 5. Testing strategy
+
 
 ### Schema and static tests
 

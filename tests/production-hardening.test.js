@@ -189,6 +189,60 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("runtime version watch is read-only and verifies strict terminal ranges", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-runtime-watch-"));
+    const fake = path.join(directory, "opencode");
+    fs.writeFileSync(fake, "#!/usr/bin/env bash\necho '1.2.3'\n", { mode: 0o700 });
+    try {
+      const result = spawnSync(process.execPath, ["scripts/runtime-version-watch.js", "--runtime", "opencode", "--strict"], {
+        cwd: root,
+        encoding: "utf8",
+        env: { ...process.env, AIW_OPENCODE_BIN: fake },
+      });
+      expect(result.status).toBe(0);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/opencode: available/);
+      const host = spawnSync(process.execPath, ["scripts/runtime-version-watch.js", "--runtime", "cursor", "--strict"], { cwd: root, encoding: "utf8" });
+      expect(host.status).toBe(1);
+      expect(`${host.stdout}${host.stderr}`).toMatch(/host-verification-required/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("runtime version watch is read-only and checks terminal ranges", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-runtime-watch-"));
+    const fake = path.join(directory, "opencode");
+    fs.writeFileSync(fake, "#!/usr/bin/env bash\necho '1.2.3'\n", { mode: 0o700 });
+    try {
+      const terminal = spawnSync(process.execPath, ["scripts/runtime-version-watch.js", "--runtime", "opencode", "--strict"], {
+        cwd: root,
+        encoding: "utf8",
+        env: { ...process.env, AIW_OPENCODE_BIN: fake },
+      });
+      expect(terminal.status).toBe(0);
+      expect(`${terminal.stdout}${terminal.stderr}`).toMatch(/opencode: available/);
+      const host = spawnSync(process.execPath, ["scripts/runtime-version-watch.js", "--runtime", "cursor", "--strict"], { cwd: root, encoding: "utf8" });
+      expect(host.status).toBe(1);
+      expect(`${host.stdout}${host.stderr}`).toMatch(/host-verification-required/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("terminal and host adapter filesystem helpers are safe", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-adapter-files-"));
+    fs.writeFileSync(path.join(directory, "artifact.json"), "{}\n", "utf8");
+    try {
+      for (const id of ["claude-code", "cursor"]) {
+        const adapter = require(path.join(root, "adapters", id, "index.js"));
+        expect(adapter.collectArtifacts(directory)).toHaveLength(1);
+        if (id === "cursor") expect(adapter.preflight({ project: directory }).status).toBe("requires-operator-verification");
+      }
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("structured event retention removes only expired records", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-retention-"));
     const eventsFile = path.join(directory, "events.jsonl");

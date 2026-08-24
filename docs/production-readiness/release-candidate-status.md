@@ -25,14 +25,14 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Conformance | Added a deterministic black-box harness plus Jest tests without live credentials or paid model calls. Coverage includes routing, retries, HITL approval/rejection, async reconciliation, artifact readiness, redaction, persistence, retention, semantic validation, manifest integrity, atomic recovery, locking, backup/restore, version output, support bundles, secure initialization, runtime capability denial, budget hard stops, checkpoints, circuit breakers, write reconciliation, canary plans, pilot evidence, and artifact quality routing. |
 | Security and supply chain | Removed the unused unpinned fetch MCP entry, verified all retained MCP versions, pinned GitHub Actions to immutable SHAs, added current-tree and full-history secret-like file/token checks, added high-severity npm audit checks, and replaced broad token guidance with fine-grained repository-scoped guidance. |
 | Release operations | Added `compatibility.json`, `aiw self-test`, `aiw preflight`, `aiw pilot-preflight`, `aiw version --json`, `aiw security-history`, `aiw support-bundle`, sanitized event reporting and formal event-schema validation, execution-budget validation and runtime accounting, MCP capability guards, circuit breakers, checkpoints, idempotency reconciliation, canary write plans, pilot-evidence validation, runtime-certification evidence validation, artifact quality scoring, rollback rehearsal, golden artifact compatibility checks, the `.ai-workflow/` canonical config boundary, adapter registry, capability matrix, versioned runtime schemas, adapter certification harness, deterministic projections, compatibility CI, a machine-readable branch-protection policy, `docs/operations/production-runbook.md`, `docs/operations/live-smoke-test.md`, `docs/operations/multi-runtime-compatibility.md`, `docs/operations/release-checklist.md`, GitHub repository settings guidance, and complete documentation synchronization policy. |
-| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, live smoke procedure, runtime-certification status, release checklist, complete documentation policy, and website-generated content to match the implementation. |
+| Documentation | Updated README, developer guide, security, governance, MCP, navigation, changelog, live smoke procedure, runtime-certification status, release checklist, compatibility-maintenance guide, complete documentation policy, and website-generated content to match the implementation. |
 
 ## Verification Evidence
 
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 36 tests passed in one suite after runtime-certification evidence coverage was added. |
+| Jest conformance | PASS | 39 tests passed in one suite after Phase 8 runtime-watch and adapter filesystem regression coverage was added. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
 | Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full reachable-history scan passed. |
@@ -51,6 +51,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Execution event schema | PASS | Formal schema validator, redaction checks, support-bundle summaries, and retention pruning passed. |
 | Runtime guards | PASS | MCP permission/approval guards, budget hard stops, checkpoint safety, and circuit-breaker transitions passed. |
 | Canary and evidence controls | PASS | Canary-only dry-run write plans, pilot-evidence validation, runtime-certification evidence validation, and artifact-quality review routing passed. |
+| Runtime version watch | PASS (informational) | Read-only report completed without starting sessions; terminal availability and host/editor verification remain operator-owned. |
 | Multi-runtime adapter foundation | PASS | Registry/matrix validation, nine descriptor dry-run certifications, deterministic projection generation, safe projection installation tests, aggregate certification, and compatibility CI YAML validation passed. |
 | Real runtime certification | BLOCKED / NOT RUN | OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider are unavailable in the sandbox; host/editor integrations are unavailable. Each runtime requires operator-owned preflight and a separate non-sensitive pilot; fixture certification is not live evidence. |
 | Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
@@ -59,7 +60,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 
 ## Required Operator Actions Before Pilot
 
-The remaining items are environment and governance prerequisites rather than unimplemented repository controls.
+The remaining items are environment and governance prerequisites rather than unimplemented repository controls. Phase 8 maintenance procedures are documented in `docs/operations/compatibility-maintenance.md`; they require version watching on every release candidate, quarterly matrix review, sanitized evidence retention, incident/deprecation handling, and capability-specific release communication.
 
 | Priority | Action |
 |---|---|
@@ -87,6 +88,7 @@ aiw preflight
 aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw runtime-watch
 aiw docs-check
 aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only
 aiw backup

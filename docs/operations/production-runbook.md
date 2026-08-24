@@ -24,6 +24,7 @@ aiw rollback-rehearsal
 aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw runtime-watch
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -51,6 +52,10 @@ The installer is a dry-run by default. Existing target files require both `--con
 Every implementation, configuration, schema, pipeline, adapter, security, test, operational, website, or workflow change must update all affected documentation and `docs/changelog.md`. Run `aiw docs-check` to enforce the path-aware rule. The policy is defined in [`../documentation-policy.md`](../documentation-policy.md) and `scripts/documentation-policy.json`; CI applies the same check against the pull request or push range.
 
 The website mirror must be synchronized after every authoritative documentation or configuration change. Run `aiw sync`, review the generated diff, then run `aiw website-check` and `aiw sync --check` before committing. CI runs the same guard and rejects a change when `website/data/` is stale. Commit authoritative sources and their generated website data together.
+
+## Compatibility Maintenance
+
+Use [`compatibility-maintenance.md`](compatibility-maintenance.md) for the Phase 8 cadence. Run `aiw runtime-watch` at every release candidate, review the capability matrix quarterly and after major vendor changes, retain only sanitized evidence, block or deprecate invalidated adapters, and update release communication with capability-specific support statements.
 
 ## Before Running a Pipeline
 

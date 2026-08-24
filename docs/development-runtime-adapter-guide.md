@@ -80,14 +80,16 @@ Implement tests in this order:
 2. Validate normalized request, approval, event, checkpoint, and artifact contracts.
 3. Prove read-only and dry-run behavior without invoking a vendor runtime.
 4. Prove unauthorized capability, missing approval, budget exhaustion, circuit-open, malformed output, timeout, cancellation, duplicate write, ambiguous outcome, and corrupt checkpoint behavior.
-5. Run the aggregate fixture certification command:
+5. Verify read-only runtime discovery and filesystem-backed event/artifact operations do not raise uncaught reference errors. Host/editor discovery must remain operator-verification-only.
+
+6. Run the aggregate fixture certification command:
 
 ```bash
 aiw validate-adapters
 aiw certify-adapters
 ```
 
-6. Generate projections twice and compare manifests:
+7. Generate projections twice and compare manifests:
 
 ```bash
 aiw generate-projections --output /tmp/aiw-projections-a --profile pilot-read-only
@@ -95,7 +97,7 @@ aiw generate-projections --output /tmp/aiw-projections-b --profile pilot-read-on
 cmp /tmp/aiw-projections-a/manifest.json /tmp/aiw-projections-b/manifest.json
 ```
 
-7. Perform real version preflight, MCP verification, constrained smoke, approval stop, canary, recovery, artifact review, and controlled pilot only on a disposable or non-sensitive project.
+8. Perform real version preflight, MCP verification, constrained smoke, approval stop, canary, recovery, artifact review, and controlled pilot only on a disposable or non-sensitive project.
 
 ## Evidence requirements
 
@@ -114,6 +116,7 @@ aiw validate
 aiw validate-adapters
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw runtime-watch
 aiw website-check
 aiw sync --check
 npm test -- --runInBand

@@ -16,7 +16,7 @@ Entry criteria are a clean checkout of the release branch, a non-sensitive dispo
 
 ## Phase 2 — Run repository and environment preflight
 
-From the clean release branch, run `npm ci`, `aiw health`, `aiw self-test`, `aiw validate`, `node scripts/security-check.js --history`, `aiw docs-check`, `aiw sync --check`, `aiw version --json`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw validate-runtime-certification tests/fixtures/runtime-certification.json`, `aiw rollback-rehearsal`, and `aiw preflight`. Then run `aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only`.
+From the clean release branch, run `npm ci`, `aiw health`, `aiw self-test`, `aiw runtime-watch`, `aiw validate`, `node scripts/security-check.js --history`, `aiw docs-check`, `aiw sync --check`, `aiw version --json`, `aiw validate-mcp`, `aiw validate-budget`, `aiw validate-golden`, `aiw validate-events`, `aiw validate-pilot-evidence`, `aiw validate-runtime-certification tests/fixtures/runtime-certification.json`, `aiw rollback-rehearsal`, and `aiw preflight`. Then run `aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-only`.
 
 The expected result is a fully passing strict preflight and a sanitized pilot manifest containing a correlation ID, verified backup reference, selected pipeline, MCP profile, and budget policy. The command must not execute OpenCode or MCP itself. Any failure is recorded as a blocker and corrected before continuing.
 
@@ -62,7 +62,7 @@ For the initial release window, monitor sanitized event summaries, budget consum
 
 ## Assumptions and open risks
 
-This plan assumes the operator can install and run a supported OpenCode CLI and can provide credentials through the local `.env` file without sharing them. It also assumes access to a disposable non-sensitive repository or project. The sandbox cannot perform these user-owned actions or provide live-runtime evidence. GitHub branch protection may remain unavailable under the current private-repository plan; if so, the documented review-and-CI compensating control must be explicitly accepted by the release owner. No general-production approval should be inferred from repository tests alone.
+This plan assumes the operator can install and run a supported OpenCode CLI and can provide credentials through the local `.env` file without sharing them. It also assumes access to a disposable non-sensitive repository or project. The sandbox cannot perform these user-owned actions or provide live-runtime evidence. Phase 8 maintenance requires `docs/operations/compatibility-maintenance.md` to be followed for version watch, quarterly matrix review, sanitized evidence retention, incident response, adapter deprecation, release communication, and security review. GitHub branch protection may remain unavailable under the current private-repository plan; if so, the documented review-and-CI compensating control must be explicitly accepted by the release owner. No general-production approval should be inferred from repository tests alone.
 
 ## Completion criteria
 

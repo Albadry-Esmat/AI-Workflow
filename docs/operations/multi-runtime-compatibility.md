@@ -25,6 +25,7 @@ aiw validate-adapters
 aiw certify-opencode
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw runtime-watch
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 
@@ -88,4 +89,4 @@ A runtime cannot be promoted from experimental to certified solely because it su
 
 ## Release rules
 
-Every adapter change must update the registry, capability matrix, compatibility evidence, and relevant documentation. CI runs adapter configuration validation, runtime-certification evidence validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review.
+Every adapter change must update the registry, capability matrix, compatibility evidence, and relevant documentation. CI runs adapter configuration validation, runtime-certification evidence validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite. Run `aiw runtime-watch` on every release candidate; use `aiw runtime-watch --runtime <id> --strict` before live certification of a named terminal runtime. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review. See [`compatibility-maintenance.md`](compatibility-maintenance.md) for quarterly review, retention, incident, deprecation, and release-communication procedures.

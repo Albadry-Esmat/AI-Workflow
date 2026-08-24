@@ -35,6 +35,7 @@ aiw validate-golden
 aiw validate-events
 aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw runtime-watch
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -116,4 +117,4 @@ Review and commit the source files and generated `website/data/` files together.
 
 ## Go/no-go rule
 
-A repository-side green test suite is not a general production approval. General release requires real runtime preflight, live MCP verification, constrained smoke evidence, controlled-pilot evidence, recovery evidence, independent review, and no unresolved P0/P1 issue. See the [production runbook](production-runbook.md), [live smoke-test procedure](live-smoke-test.md), and [release checklist](release-checklist.md).
+A repository-side green test suite is not a general production approval. General release requires real runtime preflight, live MCP verification, constrained smoke evidence, controlled-pilot evidence, recovery evidence, independent review, and no unresolved P0/P1 issue. See the [production runbook](production-runbook.md), [live smoke-test procedure](live-smoke-test.md), [release checklist](release-checklist.md), and [compatibility maintenance guide](compatibility-maintenance.md).
