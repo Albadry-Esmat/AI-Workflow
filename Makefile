@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence validate-runtime-certification runtime-watch release-status write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections website-check docs-check self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence validate-runtime-certification runtime-watch release-status validate-release-approval write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections website-check docs-check self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -76,6 +76,9 @@ runtime-watch: ## Inspect runtime versions and host verification status without 
 
 release-status: ## Generate the sanitized repository/live-gate handoff report
 	@node scripts/release-status.js
+
+validate-release-approval: ## Validate sanitized release approval and blocker ownership evidence
+	@node scripts/validate-release-approval.js
 
 write-plan: ## Create a canary-only dry-run plan for a write-capable operation
 	@node scripts/write-plan.js

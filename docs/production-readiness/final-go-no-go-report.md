@@ -32,7 +32,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 
 | Check | Result |
 |---|---:|
-| Jest conformance | **PASS — 40 tests** |
+| Jest conformance | **PASS — 41 tests** |
 | Structural and semantic validation | **PASS — 187 structural checks and 22 pipeline validations** |
 | MCP policy validation | **PASS** |
 | Execution-budget validation | **PASS** |
@@ -54,6 +54,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 | High-severity dependency audit | **PASS — 0 vulnerabilities** |
 | Website mirror check | **PASS — 140 files current** |
 | Release-status handoff report | **PASS when repository-side checks are green; live gates remain operator-owned** |
+| Release-approval contract | **PASS — fixture no-go record validates; live conditional-go/go decisions remain operator-owned** |
 | Shell syntax and `git diff --check` | **PASS** |
 | Final working-tree state | **PASS — clean** |
 | Strict preflight | **BLOCKED — expected in sandbox** |
@@ -76,6 +77,6 @@ The strict preflight remains expected to report environment blockers when the Op
 
 ## Operator handoff
 
-Run `aiw release-status --json` first to produce the sanitized repository/live-gate handoff and assign its blockers. Then run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`, create the private sanitized runtime-certification record, and validate it with `aiw validate-runtime-certification <private-runtime-certification.json>`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
+Run `aiw release-status --json` first to produce the sanitized repository/live-gate handoff and assign its blockers. Validate the private decision record with `aiw validate-release-approval <private-release-approval.json>` before sign-off. Then run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` only after configuring the real environment. If it passes, follow the complete sequence in `docs/operations/live-smoke-test.md`, create the private sanitized runtime-certification record, and validate it with `aiw validate-runtime-certification <private-runtime-certification.json>`. Do not record raw prompts, MCP payloads, tokens, authorization headers, personal data, or full session JSON. A passing repository test or temporary fake executable is not live-runtime evidence.
 
 The multi-runtime compatibility work is maintained on `release/production-hardening`; it provides experimental adapter projections, evidence-validation scaffolding, and Phase 8 maintenance controls, not an unconditional claim that every target runtime is production-certified.

@@ -25,6 +25,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] `aiw validate-runtime-certification tests/fixtures/runtime-certification.json` passes; the fixture remains blocked for live promotion.
 - [ ] `aiw runtime-watch` passes informationally for the matrix; strict version watch passes for each runtime selected for live certification.
 - [ ] `aiw release-status --json` reports all repository checks passing, a clean tree, and every live-gate blocker assigned to an owner.
+- [ ] `aiw validate-release-approval tests/fixtures/release-approval.json` passes; fixture scope remains `no-go` and cannot authorize live release.
 - [ ] `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` creates a sanitized manifest and verified backup; actual live execution is recorded separately.
 - [ ] `npm run validate:budget` passes and the selected run has explicit retry, duration, token, and API-call limits.
 - [ ] `npm run validate:golden` passes against the compatibility manifest.
@@ -83,6 +84,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] A second person or independent review confirms security and rollback readiness.
 - [ ] The capability matrix, version ranges, adapter deprecation status, evidence retention, incident path, and release communication have been reviewed according to [`compatibility-maintenance.md`](compatibility-maintenance.md).
 - [ ] The sanitized handoff report is retained privately or summarized without secrets according to [`release-status-handoff.md`](../production-readiness/release-status-handoff.md).
+- [ ] Any private approval record passes `aiw validate-release-approval`; `conditional-go` and `go` meet their evidence, owner, review, blocker, scope, and non-fixture requirements.
 
 ## Sign-off
 

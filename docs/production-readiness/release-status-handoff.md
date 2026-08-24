@@ -44,9 +44,16 @@ Then complete `docs/operations/live-smoke-test.md` on a disposable or non-sensit
 ```bash
 aiw validate-pilot-evidence <private-pilot-record.json>
 aiw validate-runtime-certification <private-runtime-certification.json>
+aiw validate-release-approval <private-release-approval.json>
 ```
 
-The release owner compares the report with `docs/operations/release-checklist.md`, assigns every operator blocker, obtains independent review, and records a GO or NO-GO decision. A repository-side green result cannot promote a fixture, fake executable, or unavailable runtime to production-certified status.
+The release owner compares the report with `docs/operations/release-checklist.md`, assigns every operator blocker, validates the private approval record with `aiw validate-release-approval`, obtains independent review, and records a GO or NO-GO decision. A repository-side green result cannot promote a fixture, fake executable, or unavailable runtime to production-certified status.
+
+## Release-approval contract
+
+The versioned contract at `.ai-workflow/schemas/release-approval.schema.json` separates repository-side readiness from internal-pilot and general-production decisions. A repository fixture may validate a `no-go` record, but `conditional-go` requires assigned owners, passing repository checks, non-fixture operator-verified or pilot-certified evidence, and a passing live runtime state. `go` additionally requires general-production scope, no open blockers, independent review, rollback review, pilot-certified evidence, and a non-fixture source commit.
+
+Approval records must identify every blocker, priority, status, owner, and sanitized evidence reference. Pending ownership remains a blocker. Do not put names, private URLs, credentials, raw session content, or unbounded logs into tracked fixtures.
 
 ## Sandbox result policy
 

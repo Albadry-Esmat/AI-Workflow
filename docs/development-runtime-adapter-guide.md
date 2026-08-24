@@ -27,7 +27,8 @@ adapters/<adapter-id>/
     ├── approval-request.schema.json
     ├── checkpoint.schema.json
     ├── artifact-envelope.schema.json
-    └── runtime-certification.schema.json
+    ├── runtime-certification.schema.json
+    └── release-approval.schema.json
 ```
 
 The adapter ID must be lowercase, stable, and independent of a user’s local executable alias. Do not encode credentials, installation paths, machine names, or user identity in the descriptor.
@@ -109,13 +110,14 @@ Keep fixture evidence and real-runtime evidence in separate records. A temporary
 
 ## Pull request checklist
 
-Before requesting review, confirm that the adapter has a registry entry, capability matrix entry, compatibility version, descriptor tests, negative safety tests, deterministic projection support, documentation, and changelog entry. Run the full repository checks and synchronize the website mirror after authoritative documentation or configuration changes:
+Before requesting review, confirm that the adapter has a registry entry, capability matrix entry, compatibility version, descriptor tests, negative safety tests, deterministic projection support, documentation, changelog entry, and no release-approval or evidence change that could overstate runtime support. Run the full repository checks and synchronize the website mirror after authoritative documentation or configuration changes:
 
 ```bash
 aiw validate
 aiw validate-adapters
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw validate-release-approval tests/fixtures/release-approval.json
 aiw runtime-watch
 aiw website-check
 aiw sync --check

@@ -54,6 +54,7 @@ for (const [label, script] of [
   ["runtime certification evidence passes", "scripts/validate-runtime-certification.js"],
   ["runtime version watch completes", "scripts/runtime-version-watch.js"],
   ["sanitized release-status handoff completes", "scripts/release-status.js"],
+  ["release approval evidence passes", "scripts/validate-release-approval.js"],
 ]) {
   check(label, () => { command([script]); });
 }

@@ -260,6 +260,22 @@ describe("production hardening conformance", () => {
     }
   });
 
+  test("release approval validator blocks fixture promotion", () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-release-approval-"));
+    const fixture = JSON.parse(fs.readFileSync(path.join(root, "tests/fixtures/release-approval.json"), "utf8"));
+    const promoted = path.join(directory, "promoted.json");
+    fixture.decision = "go";
+    fixture.decision_scope = "general-production";
+    fs.writeFileSync(promoted, `${JSON.stringify(fixture, null, 2)}\n`, "utf8");
+    try {
+      const result = spawnSync(process.execPath, ["scripts/validate-release-approval.js", promoted], { cwd: root, encoding: "utf8" });
+      expect(result.status).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/fixture evidence cannot support go|go cannot use repository-fixture/);
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   test("structured event retention removes only expired records", () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-retention-"));
     const eventsFile = path.join(directory, "events.jsonl");

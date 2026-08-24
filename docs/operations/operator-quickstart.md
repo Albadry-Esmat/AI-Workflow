@@ -37,6 +37,7 @@ aiw validate-pilot-evidence
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw runtime-watch
 aiw release-status
+aiw validate-release-approval tests/fixtures/release-approval.json
 aiw validate-adapters
 aiw certify-adapters
 aiw docs-check
@@ -102,7 +103,7 @@ After any implementation, configuration, schema, pipeline, adapter, security, te
 aiw docs-check
 ```
 
-Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard. Generate the sanitized handoff with `aiw release-status --json` before assigning operator blockers or requesting approval. For runtime promotion, use the sanitized evidence contract at `.ai-workflow/schemas/runtime-certification.schema.json`; fixture evidence cannot certify a live runtime.
+Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard. Generate the sanitized handoff with `aiw release-status --json` before assigning operator blockers or requesting approval. Validate any private decision record with `aiw validate-release-approval <private-release-approval.json>`. For runtime promotion, use the sanitized evidence contract at `.ai-workflow/schemas/runtime-certification.schema.json`; fixture evidence cannot certify a live runtime.
 
 ## Website synchronization rule
 

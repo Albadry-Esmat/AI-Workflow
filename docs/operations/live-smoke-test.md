@@ -22,6 +22,8 @@ aiw pilot-preflight --project-id disposable-smoke-001 --pipeline requirements-on
 aiw validate-events
 aiw validate-pilot-evidence tests/fixtures/pilot-evidence.json
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
+aiw release-status
+aiw validate-release-approval tests/fixtures/release-approval.json
 aiw rollback-rehearsal
 ```
 
@@ -83,6 +85,6 @@ decision: "pilot-ready|blocked"
 notes: "<sanitized failure categories or limitations>"
 ```
 
-Validate the sanitized event record with `aiw validate-events`, the pilot evidence record with `aiw validate-pilot-evidence <private-record.json>`, and the per-runtime certification record with `aiw validate-runtime-certification <private-runtime-certification.json>`. The runtime-certification record must list every staged check and capability-level decision. A `pilot-certified` decision is valid only when all required checks pass on a non-fixture environment and an independent reviewer has signed off. Score important outputs with `aiw score-artifact`; any `needs_human_review` or `reject` result must be reviewed before promotion.
+Validate the sanitized event record with `aiw validate-events`, the pilot evidence record with `aiw validate-pilot-evidence <private-record.json>`, the per-runtime certification record with `aiw validate-runtime-certification <private-runtime-certification.json>`, and the private release decision with `aiw validate-release-approval <private-release-approval.json>`. The runtime-certification record must list every staged check and capability-level decision. A `pilot-certified` decision is valid only when all required checks pass on a non-fixture environment and an independent reviewer has signed off. Score important outputs with `aiw score-artifact`; any `needs_human_review` or `reject` result must be reviewed before promotion.
 
 The final decision remains **blocked** until the actual OpenCode executable, reviewed credentials, MCP startup, and this live sequence have been exercised on the operator machine. Sandbox fixture runs validate CLI logic only and cannot satisfy live acceptance criteria.

@@ -77,6 +77,7 @@ Before merging or releasing a compatibility maintenance change, generate the san
 ```bash
 aiw runtime-watch
 aiw release-status
+aiw validate-release-approval tests/fixtures/release-approval.json
 aiw validate-adapters
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
@@ -90,4 +91,4 @@ aiw validate
 node scripts/security-check.js --history
 ```
 
-The handoff report must remain tied to the reviewed commit and must not be used as a production approval. A successful repository run does not close the live-runtime gate. The real executable or host integration, credentials, MCP startup, constrained smoke, recovery sequence, private evidence, independent review, and release decision remain operator-owned.
+The handoff report must remain tied to the reviewed commit, and the release-approval record must be validated for scope, owners, blockers, reviews, and non-fixture evidence. Neither artifact may be used as a production approval by itself. A successful repository run does not close the live-runtime gate. The real executable or host integration, credentials, MCP startup, constrained smoke, recovery sequence, private evidence, independent review, and release decision remain operator-owned.

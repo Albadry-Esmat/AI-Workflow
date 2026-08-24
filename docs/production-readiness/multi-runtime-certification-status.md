@@ -34,7 +34,7 @@ The following controls passed without credentials or paid model calls:
 | Aggregate `aiw certify-adapters` | PASS |
 | Deterministic projection generation | PASS |
 | Projection dry-run, conflict blocking, and explicit overwrite backup | PASS |
-| Existing production conformance suite | PASS — 40 tests |
+| Existing production conformance suite | PASS — 41 tests |
 | Structural and semantic pipeline validation | PASS — 187 structural checks and 22 pipelines |
 | Security history scan | PASS — current tree and reachable history |
 | Dependency audit | PASS — 0 high-severity vulnerabilities |

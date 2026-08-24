@@ -31,6 +31,7 @@
     "validate:runtime-certification": "node scripts/validate-runtime-certification.js",
     "runtime:watch": "node scripts/runtime-version-watch.js",
     "release:status": "node scripts/release-status.js",
+    "validate:release-approval": "node scripts/validate-release-approval.js",
     "write-plan": "node scripts/write-plan.js",
     "score-artifact": "node scripts/score-artifact.js",
     "validate:adapters": "node scripts/validate-adapter-config.js",

@@ -37,6 +37,7 @@ aiw docs-check             # require changelog and affected docs for every chang
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw runtime-watch
 aiw release-status
+aiw validate-release-approval tests/fixtures/release-approval.json
 aiw security-history       # scan reachable history for credential-like patterns
 aiw sync --check           # verify generated website data is current
 aiw start                 # start the AI workflow
@@ -50,7 +51,7 @@ Type `aiw help` for a full list of available commands.
 
 Read [`docs/documentation-policy.md`](docs/documentation-policy.md) first. Every implementation, configuration, schema, pipeline, adapter, security, test, operational, website, or workflow change must include all affected documentation and a `docs/changelog.md` entry. Run `aiw docs-check`; it fails when the path-aware documentation requirements are incomplete. Then run `aiw sync`, review the generated website diff, `aiw website-check`, and `aiw sync --check`.
 
-Run `npm test -- --runInBand`, `aiw self-test`, `aiw validate-runtime-certification tests/fixtures/runtime-certification.json`, `aiw runtime-watch`, `aiw release-status`, `aiw validate`, `aiw security-history`, `node scripts/security-check.js`, and the documentation and website checks above. If a check fails, include the sanitized `aiw support-bundle` output only when requesting help; never attach raw state or `.env`.
+Run `npm test -- --runInBand`, `aiw self-test`, `aiw validate-runtime-certification tests/fixtures/runtime-certification.json`, `aiw runtime-watch`, `aiw release-status`, `aiw validate-release-approval tests/fixtures/release-approval.json`, `aiw validate`, `aiw security-history`, `node scripts/security-check.js`, and the documentation and website checks above. If a check fails, include the sanitized `aiw support-bundle` output only when requesting help; never attach raw state or `.env`.
 
 ## Branching strategy
 

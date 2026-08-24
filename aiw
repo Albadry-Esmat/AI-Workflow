@@ -70,6 +70,7 @@ show_help() {
   echo -e "    ${CYAN}validate-runtime-certification${NC} Validate sanitized per-runtime certification evidence"
   echo -e "    ${CYAN}runtime-watch${NC}     Inspect runtime versions without starting sessions"
   echo -e "    ${CYAN}release-status${NC}   Generate sanitized release/live-gate handoff report"
+  echo -e "    ${CYAN}validate-release-approval${NC} Validate release decision and blocker ownership evidence"
   echo -e "    ${CYAN}write-plan${NC}         Create a canary-only dry-run write plan"
   echo -e "    ${CYAN}score-artifact${NC}    Score an artifact and route low quality to review"
   echo -e "    ${CYAN}validate-adapters${NC} Validate runtime adapter registry and capability matrix"
@@ -221,6 +222,10 @@ cmd_runtime_watch() {
 
 cmd_release_status() {
   node "$ROOT/scripts/release-status.js" "$@"
+}
+
+cmd_validate_release_approval() {
+  node "$ROOT/scripts/validate-release-approval.js" "$@"
 }
 
 cmd_write_plan() {
@@ -569,6 +574,7 @@ case "$COMMAND" in
   validate-runtime-certification) cmd_validate_runtime_certification "$@" ;;
   runtime-watch)    cmd_runtime_watch "$@" ;;
   release-status)   cmd_release_status "$@" ;;
+  validate-release-approval) cmd_validate_release_approval "$@" ;;
   write-plan)       cmd_write_plan "$@" ;;
   score-artifact)   cmd_score_artifact "$@" ;;
   validate-adapters) cmd_validate_adapters "$@" ;;

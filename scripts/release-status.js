@@ -39,6 +39,7 @@ const checks = {
   documentation_policy: run("documentation policy", process.execPath, ["scripts/verify-documentation-policy.js"]),
   website_sync: run("website synchronization", process.execPath, ["scripts/verify-website-sync.js"]),
   runtime_certification_fixture: run("runtime certification fixture", process.execPath, ["scripts/validate-runtime-certification.js", "tests/fixtures/runtime-certification.json"]),
+  release_approval_fixture: run("release approval fixture", process.execPath, ["scripts/validate-release-approval.js", "tests/fixtures/release-approval.json"]),
   adapter_configuration: run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]),
   runtime_version_watch: run("runtime version watch", process.execPath, ["scripts/runtime-version-watch.js", ...(strict ? ["--strict"] : [])]),
 };
