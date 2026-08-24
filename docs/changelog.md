@@ -19,6 +19,9 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Multi-runtime compatibility foundation** — Added a runtime-neutral `.ai-workflow/` configuration boundary, versioned adapter/request/event/approval/checkpoint/artifact schemas, a capability matrix and adapter registry, supervised terminal projections for Claude Code, Codex CLI, Gemini CLI, and Aider, host/editor projections for Cursor, GitHub Copilot, Cline/Roo Code, and Windsurf, deterministic projection generation, and a credential-free adapter certification harness. All non-OpenCode adapters remain experimental until real runtime evidence exists.
 - **Detailed compatibility execution controls** — Added an OpenCode coupling inventory, aggregate `aiw certify-adapters`, explicit dry-run projection installation with conflict blocking and backups, installation documentation, and expanded release/preflight checks. Projection installation never overwrites existing user files without both `--confirm` and `--overwrite`.
 - **Mandatory website synchronization gate** — Added `aiw website-check` and a shared read-only guard used by local release checks, strict preflight, and CI. Authoritative documentation/configuration changes must be synchronized into `website/data/` and reviewed before commit.
+- **Operator quickstart and troubleshooting** — Added a concise safe-execution path, failure diagnosis table, recovery decision tree, incident-record minimum, and explicit website synchronization sequence for operators.
+- **Runtime adapter developer guide** — Added the canonical adapter boundary, normalized operation contract, safety rules, testing ladder, evidence requirements, and pull-request review standard for future runtime integrations.
+- **Documentation navigation** — Updated the documentation index to surface the new operator, troubleshooting, and adapter-development guides.
 
 ### Changed
 

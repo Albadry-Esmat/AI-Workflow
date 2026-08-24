@@ -1,6 +1,6 @@
 # AI Workflow — Documentation System
 
-**Version:** 1.0.0 | **Last updated:** 2026-06-16
+**Version:** 1.0.0 | **Last updated:** 2026-08-24
 
 The single source of truth for the AI Agent ecosystem. This documentation is modular, version-controlled, and optimized for both human developers and AI agents.
 
@@ -29,9 +29,12 @@ docs/
 ├── monitoring.md              ← Observability, metrics, cost tracking
 ├── governance.md              ← Approval gates, quality enforcement
 ├── versioning.md              ← Version strategy, changelog rules
+├── operations/operator-quickstart.md ← Shortest safe operator path
+├── operations/troubleshooting.md ← Failure diagnosis and recovery guidance
 ├── operations/production-runbook.md ← Production operations and recovery
 ├── operations/release-checklist.md ← Release-candidate sign-off checklist
 ├── operations/multi-runtime-compatibility.md ← Runtime adapter tiers and certification
+├── development-runtime-adapter-guide.md ← Adapter implementation and certification contract
 ├── operations/github-repository-settings.md ← Branch protection and CI policy
 ├── production-readiness/release-governance-record.md ← Ownership, freeze, and change-control record
 ├── changelog.md               ← Full update history
@@ -48,8 +51,11 @@ docs/
 | Add a new agent | `how-to-use.md` → `agents.md` |
 | Understand security rules | `security.md` |
 | Deploy the system | `deployment.md` → `operations/production-runbook.md` |
+| Get started as an operator | `operations/operator-quickstart.md` |
+| Diagnose a failed or blocked run | `operations/troubleshooting.md` |
 | Prepare a release candidate | `operations/production-runbook.md` and `operations/release-checklist.md` |
-| Check compatibility | Root `compatibility.json` |
+| Check compatibility | Root `compatibility.json` and `operations/multi-runtime-compatibility.md` |
+| Add or review a runtime adapter | `development-runtime-adapter-guide.md` |
 | Configure GitHub release controls | `operations/github-repository-settings.md` |
 | Review MCP permissions | Root `mcp-permission-policy.json` and `npm run validate:mcp` |
 | Review multi-runtime support tiers | `operations/multi-runtime-compatibility.md` and `.ai-workflow/runtime-capability-matrix.json` |
@@ -79,7 +85,8 @@ docs/
 | Security changed | `security.md`, `changelog.md` |
 | Version bumped | `versioning.md`, `changelog.md` |
 | Production hardening or release controls changed | `security.md`, `operations/production-runbook.md`, `changelog.md` |
-| Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
+| Runtime compatibility or adapter changed | `operations/multi-runtime-compatibility.md`, `development-runtime-adapter-guide.md`, `compatibility.json`, adapter registry, capability matrix, `changelog.md` |
+| Operational procedure or recovery control changed | `operations/operator-quickstart.md`, `operations/troubleshooting.md`, `operations/production-runbook.md`, `changelog.md` |
 
 ## File Format Convention
 
