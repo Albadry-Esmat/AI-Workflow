@@ -21,10 +21,25 @@ aiw validate-golden
 aiw rollback-rehearsal
 aiw validate-events
 aiw validate-pilot-evidence
+aiw validate-adapters
+aiw certify-adapters
 aiw score-artifact --type requirements --input tests/fixtures/requirements-artifact.json
+aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
 
-`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
+`aiw preflight` is intentionally strict. It fails when `.env`, OpenCode, validation dependencies, tests, or the website mirror are unavailable. Never weaken the command to obtain a green result; fix the underlying prerequisite or record an approved exception. `aiw validate-adapters` checks the registry, capability matrix, implementation descriptors, and compatibility versions. `aiw certify-adapters` proves fixture-only contract behavior for the registered adapters; it does not prove that any external runtime is installed or production-certified. Before a live smoke test, run `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>`. It creates a sanitized correlation manifest and checksum-backed backup but never invokes OpenCode or MCP; a blocked result is an honest environment finding.
+
+## Runtime Projection Installation
+
+Generate projections into an isolated directory and review the generated diff before installing them into a user project:
+
+```bash
+aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
+aiw install-projections --source /tmp/aiw-projections --target /path/to/project
+aiw install-projections --source /tmp/aiw-projections --target /path/to/project --confirm
+```
+
+The installer is a dry-run by default. Existing target files require both `--confirm` and `--overwrite`; explicitly overwritten files are backed up under the target’s `.ai-workflow/projection-backups/` directory. Never install a projection into a production project before reviewing its contents and confirming the target path.
 
 ## Before Running a Pipeline
 

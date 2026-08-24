@@ -56,6 +56,8 @@ const requiredReleaseFiles = [
   "adapters/github-copilot/index.js",
   "adapters/cline-roo/index.js",
   "adapters/windsurf/index.js",
+  "scripts/adapter-certification.js",
+  "scripts/certify-adapters.js",
   "scripts/generate-projections.js",
 ];
 for (const relative of requiredReleaseFiles) {
@@ -121,6 +123,7 @@ run("pilot evidence contract", process.execPath, ["scripts/validate-pilot-eviden
 run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]);
 run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);
+run("all adapter fixture certification", process.execPath, ["scripts/certify-adapters.js"]);
 run("deterministic runtime projections", process.execPath, ["scripts/generate-projections.js", "--output", path.join(os.tmpdir(), "aiw-preflight-projections"), "--profile", "pilot-read-only"]);
 run("security and supply-chain history check", process.execPath, ["scripts/security-check.js", "--history"]);
 run("dependency vulnerability audit", "npm", ["audit", "--audit-level=high", "--omit=optional"]);

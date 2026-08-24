@@ -23,8 +23,19 @@ From the repository root:
 ```bash
 aiw validate-adapters
 aiw certify-opencode
+aiw certify-adapters
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
 ```
+
+To install a reviewed projection set, use a disposable target first. Generation is isolated, and installation is a dry-run unless explicitly confirmed:
+
+```bash
+aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only
+aiw install-projections --source /tmp/aiw-projections --target /path/to/project
+aiw install-projections --source /tmp/aiw-projections --target /path/to/project --confirm
+```
+
+Existing target files are never overwritten unless `--overwrite` is also supplied. When overwriting is explicitly approved, the installer creates a mode-700 backup directory under the target’s `.ai-workflow/projection-backups/` path. Review generated diffs before installation.
 
 To certify a fixture adapter without invoking a live runtime:
 
@@ -39,7 +50,7 @@ node scripts/adapter-certification.js cline-roo
 node scripts/adapter-certification.js windsurf
 ```
 
-These commands prove descriptor validity, normalized requests, policy denial, event sanitization, and dry-run behavior only. They do not prove that the vendor runtime is installed, authenticated, or capable of safe live execution.
+These commands prove descriptor validity, normalized requests, policy denial, event sanitization, and dry-run behavior only. The aggregate command reports every registered adapter as `fixture-certified` only when those local checks pass. They do not prove that the vendor runtime is installed, authenticated, or capable of safe live execution.
 
 ## Installation and projection policy
 

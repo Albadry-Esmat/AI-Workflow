@@ -71,7 +71,9 @@ show_help() {
   echo -e "    ${CYAN}score-artifact${NC}    Score an artifact and route low quality to review"
   echo -e "    ${CYAN}validate-adapters${NC} Validate runtime adapter registry and capability matrix"
   echo -e "    ${CYAN}certify-opencode${NC}  Run credential-free OpenCode adapter certification"
+  echo -e "    ${CYAN}certify-adapters${NC}   Run fixture-only certification for all adapters"
   echo -e "    ${CYAN}generate-projections${NC} Generate deterministic runtime projections"
+  echo -e "    ${CYAN}install-projections${NC} Install reviewed projections (requires explicit confirmation)"
   echo -e "    ${CYAN}events${NC}             Show recent sanitized execution events"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
@@ -220,8 +222,16 @@ cmd_certify_opencode() {
   node "$ROOT/scripts/adapter-certification.js" opencode
 }
 
+cmd_certify_adapters() {
+  node "$ROOT/scripts/certify-adapters.js" "$@"
+}
+
 cmd_generate_projections() {
   node "$ROOT/scripts/generate-projections.js" "$@"
+}
+
+cmd_install_projections() {
+  node "$ROOT/scripts/install-projections.js" "$@"
 }
 
 cmd_events() {
@@ -535,7 +545,9 @@ case "$COMMAND" in
   score-artifact)   cmd_score_artifact "$@" ;;
   validate-adapters) cmd_validate_adapters "$@" ;;
   certify-opencode) cmd_certify_opencode "$@" ;;
+  certify-adapters) cmd_certify_adapters "$@" ;;
   generate-projections) cmd_generate_projections "$@" ;;
+  install-projections) cmd_install_projections "$@" ;;
   events)           cmd_events "$@" ;;
   sync)             cmd_sync "$@" ;;
   graph)            cmd_graph "$@" ;;

@@ -9,7 +9,7 @@
 
 ## Executive decision
 
-The approved expert production plan, enhancement roadmap, and multi-runtime compatibility foundation have been implemented as far as repository-side controls can be completed without operator-owned credentials or real agent runtimes. The project now has a repeatable constrained-pilot preparation path, runtime MCP capability and approval guards, live budget accounting, formal event-schema validation, circuit-breaker behavior, sanitized checkpoints, deterministic website-publication idempotency and reconciliation, canary-only write planning, pilot-evidence validation, artifact quality scoring, disposable rollback rehearsal, compatibility-aware golden artifact contracts, a runtime-neutral adapter boundary, nine adapter projections, deterministic runtime projections, and a compatibility-matrix CI job.
+The approved expert production plan, enhancement roadmap, and detailed multi-runtime compatibility plan have been implemented as far as repository-side controls can be completed without operator-owned credentials or real agent runtimes. The project now has a repeatable constrained-pilot preparation path, runtime MCP capability and approval guards, live budget accounting, formal event-schema validation, circuit-breaker behavior, sanitized checkpoints, deterministic website-publication idempotency and reconciliation, canary-only write planning, pilot-evidence validation, artifact quality scoring, disposable rollback rehearsal, compatibility-aware golden artifact contracts, a runtime-neutral adapter boundary, nine adapter projections, deterministic runtime projections, an explicit projection installer, aggregate adapter certification, and a compatibility-matrix CI job.
 
 The project must **not** be described as general-production-ready yet. The sandbox cannot honestly provide evidence for the actual OpenCode executable, real credentials, MCP startup, live model execution, non-sensitive pilot completion, independent security review, or operator recovery in the real environment. Those remain release gates rather than simulated test results.
 
@@ -32,7 +32,7 @@ The project must **not** be described as general-production-ready yet. The sandb
 
 | Check | Result |
 |---|---:|
-| Jest conformance | **PASS — 33 tests** |
+| Jest conformance | **PASS — 34 tests** |
 | Structural and semantic validation | **PASS — 187 structural checks and 22 pipeline validations** |
 | MCP policy validation | **PASS** |
 | Execution-budget validation | **PASS** |
@@ -43,6 +43,8 @@ The project must **not** be described as general-production-ready yet. The sandb
 | Canary write-plan behavior | **PASS** |
 | Runtime permission/budget guards, checkpoints, and circuit breaker | **PASS** |
 | Multi-runtime adapter descriptors and dry-run certification | **PASS — 9 target adapters** |
+| Projection installation safety | **PASS — dry-run, conflict blocking, explicit overwrite backup** |
+| Real runtime probes | **BLOCKED — OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider unavailable; host integrations unavailable** |
 | Deterministic runtime projection generation | **PASS** |
 | Adapter compatibility CI workflow YAML | **PASS** |
 | Full reachable-history security scan | **PASS — 126 reachable commits** |

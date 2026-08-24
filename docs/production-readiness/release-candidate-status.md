@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The approved production-readiness plan, enhancement roadmap, and multi-runtime compatibility foundation have been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles and event logs, machine-readable version output, full-history secret scanning, immutable CI action references, explicit MCP capability and approval guards, runtime budget enforcement, circuit breakers, sanitized checkpoints, deterministic publication idempotency and reconciliation, canary write planning, pilot-evidence validation, artifact quality scoring, golden compatibility contracts, a runtime-neutral adapter boundary, nine experimental adapters, deterministic runtime projections, strict preflight, reviewed website PR publication, and operational release documentation.
+The approved production-readiness plan, enhancement roadmap, and detailed multi-runtime compatibility plan have been implemented as a local, traceable release-candidate change set. The project now has a clean-clone setup path, secure template-only initialization, manifest-driven website synchronization, semantic pipeline and condition validation, a deterministic black-box conformance harness, atomic state and lock primitives, checksum-backed backup/restore, sanitized support bundles and event logs, machine-readable version output, full-history secret scanning, immutable CI action references, explicit MCP capability and approval guards, runtime budget enforcement, circuit breakers, sanitized checkpoints, deterministic publication idempotency and reconciliation, canary write planning, pilot-evidence validation, artifact quality scoring, golden compatibility contracts, a runtime-neutral adapter boundary, nine experimental adapters, deterministic runtime projections, strict preflight, reviewed website PR publication, and operational release documentation.
 
 The branch is **ready for constrained pilot preparation after the operator supplies real production prerequisites**. It is not yet a general-production release from this sandbox because the real OpenCode CLI and a configured GitHub token were intentionally not installed or supplied here, and no live model/MCP pipeline was executed.
 
@@ -32,7 +32,7 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Check | Result | Evidence |
 |---|---:|---|
 | Root `npm ci` | PASS | Lockfile install completed successfully. |
-| Jest conformance | PASS | 33 tests passed in one suite after the multi-runtime compatibility additions. |
+| Jest conformance | PASS | 34 tests passed in one suite after the detailed multi-runtime compatibility and projection-installation additions. |
 | `aiw self-test` | PASS | Compatibility, manifest, semantic, state recovery, locking, and secure init checks passed. |
 | `aiw validate` | PASS | 187 structural checks passed; semantic validator passed all 22 pipeline templates. |
 | Security check | PASS | MCP pins, immutable action SHAs, tracked-file scan, current-tree token-pattern scan, and full-history scan across 125 reachable commits passed. |
@@ -51,8 +51,8 @@ The branch is **ready for constrained pilot preparation after the operator suppl
 | Execution event schema | PASS | Formal schema validator, redaction checks, support-bundle summaries, and retention pruning passed. |
 | Runtime guards | PASS | MCP permission/approval guards, budget hard stops, checkpoint safety, and circuit-breaker transitions passed. |
 | Canary and evidence controls | PASS | Canary-only dry-run write plans, pilot-evidence validation, and artifact-quality review routing passed. |
-| Multi-runtime adapter foundation | PASS | Registry/matrix validation, nine descriptor dry-run certifications, deterministic projection generation, and compatibility CI YAML validation passed. |
-| Real non-OpenCode runtime certification | NOT RUN | Requires each operator-owned runtime/host integration and a separate non-sensitive pilot; fixture certification is not live evidence. |
+| Multi-runtime adapter foundation | PASS | Registry/matrix validation, nine descriptor dry-run certifications, deterministic projection generation, safe projection installation tests, aggregate certification, and compatibility CI YAML validation passed. |
+| Real runtime certification | BLOCKED / NOT RUN | OpenCode, Claude Code, Codex CLI, Gemini CLI, and Aider are unavailable in the sandbox; host/editor integrations are unavailable. Each runtime requires operator-owned preflight and a separate non-sensitive pilot; fixture certification is not live evidence. |
 | Strict preflight with real prerequisites | BLOCKED IN SANDBOX | Correctly fails because real OpenCode and `.env`/`GITHUB_TOKEN` are absent. The pass path was separately verified with temporary test-only prerequisites. |
 | Strict preflight pass path | PASS | Passed with a temporary fake OpenCode executable and test-only token; no production secret was used. |
 | Live OpenCode/MCP pipeline | NOT RUN | Requires user-owned OpenCode installation, credentials, and a non-critical pilot repository. |

@@ -38,6 +38,13 @@ check("dry-run step does not execute", () => {
   const result = adapter.sendStep(session, { task_id: "dry-run", dryRun: true });
   if (result.executed !== false) throw new Error("dry-run executed");
 });
+check("host lifecycle limitation is explicit", () => {
+  if (adapter.descriptor.runtime_family !== "editor-agent" && adapter.descriptor.runtime_family !== "editor-cloud-agent") return;
+  const session = adapter.startSession({ pipeline_id: "certification", task_id: "host-live", required_capabilities: ["read:repository"], dry_run: true, mode: "read-only" });
+  let blocked = false;
+  try { adapter.sendStep(session, { task_id: "host-live", dryRun: false }); } catch (error) { blocked = error.code === "HOST_LIFECYCLE_UNAVAILABLE"; }
+  if (!blocked) throw new Error("host adapter did not block unsupported live lifecycle");
+});
 if (failures.length) { console.error(`Adapter certification failed (${failures.length} issue(s)).`); failures.forEach((failure) => console.error(`  FAIL ${failure}`)); process.exit(1); }
 console.log(`Adapter certification passed (${adapterId}; ${checks.length} checks).`);
 checks.forEach((item) => console.log(`  ${item}`));

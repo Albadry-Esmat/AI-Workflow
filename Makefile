@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode generate-projections self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
+.PHONY: help setup health validate validate-semantic validate-mcp validate-budget validate-golden validate-events validate-pilot-evidence write-plan score-artifact validate-adapters certify-opencode certify-adapters generate-projections install-projections self-test preflight pilot-preflight rollback-rehearsal support-bundle security-history events clean reset sync sync-push website sessions sessions-delete update graph install-cli backup restore doctor lint start status
 
 .DEFAULT_GOAL := help
 
@@ -80,8 +80,14 @@ validate-adapters: ## Validate the canonical adapter registry and capability mat
 certify-opencode: ## Run credential-free OpenCode reference-adapter certification
 	@node scripts/adapter-certification.js opencode
 
+certify-adapters: ## Run fixture-only certification across every registered adapter
+	@node scripts/certify-adapters.js
+
 generate-projections: ## Generate deterministic runtime-specific configuration projections
 	@node scripts/generate-projections.js --output /tmp/aiw-projections --profile pilot-read-only
+
+install-projections: ## Install reviewed projections only with explicit --confirm --overwrite
+	@node scripts/install-projections.js --source /tmp/aiw-projections --target . --confirm --overwrite
 
 self-test: ## Run credential-free production conformance tests
 	@node scripts/self-test.js

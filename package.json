@@ -32,7 +32,9 @@
     "score-artifact": "node scripts/score-artifact.js",
     "validate:adapters": "node scripts/validate-adapter-config.js",
     "certify:opencode": "node scripts/adapter-certification.js opencode",
+    "certify:adapters": "node scripts/certify-adapters.js",
     "generate:projections": "node scripts/generate-projections.js",
+    "install:projections": "node scripts/install-projections.js",
     "events": "node scripts/events.js"
   },
   "devDependencies": {
