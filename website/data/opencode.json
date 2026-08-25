@@ -24,12 +24,6 @@
       "enabled": true
     },
 
-    "fetch": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
-      "enabled": false
-    },
-
     "context7": {
       "type": "local",
       "command": ["npx", "-y", "@upstash/context7-mcp@3.2.2"],
