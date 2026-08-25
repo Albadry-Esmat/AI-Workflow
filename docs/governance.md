@@ -156,6 +156,7 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 | Guard skill added/modified | `governance.md`, `skills-registry.md`, `changelog.md` |
 | Runtime evidence or promotion rule changed | `operations/multi-runtime-compatibility.md`, `testing.md`, `operations/production-runbook.md`, `production-readiness/multi-runtime-certification-status.md`, `changelog.md` |
 | Compatibility maintenance changed | `operations/compatibility-maintenance.md`, `operations/multi-runtime-compatibility.md`, `operations/production-runbook.md`, `production-readiness/release-candidate-status.md`, `changelog.md` |
+| Adapter lifecycle or deprecation changed | `operations/multi-runtime-compatibility.md`, `development-runtime-adapter-guide.md`, `operations/compatibility-maintenance.md`, `testing.md`, `security.md`, `changelog.md` |
 | Release-status command or handoff changed | `production-readiness/release-status-handoff.md`, `production-readiness/release-governance-record.md`, `production-readiness/next-release-gate-status.md`, `operations/release-checklist.md`, `changelog.md` |
 
 ### Change Approval Process
@@ -168,7 +169,7 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 5. Run quality checks (lint, test, validate).
 6. Submit the PR with source, docs, changelog, and website data together.
 7. Review: verify docs match code changes and no support-tier or security claim is stale.
-8. For compatibility changes, run `aiw runtime-watch` and confirm the capability-specific evidence and deprecation statement are current.
+8. For compatibility changes, run `aiw runtime-watch`, `aiw validate-adapter-lifecycle`, and confirm the capability-specific evidence and deprecation statement are current.
 9. For release handoff, run `aiw release-status --json`, assign every operator blocker, and retain only sanitized output.
 10. Merge only after all documentation and CI gates pass.
 ```
@@ -186,6 +187,7 @@ The complete rule is defined in [`documentation-policy.md`](documentation-policy
 - [ ] Website data synchronized and `aiw website-check` passes
 - [ ] Version bumped if applicable
 - [ ] Registry updated if skill changed
+- [ ] Adapter lifecycle validation passes and blocked/deprecated claims have current migration or unblock metadata
 - [ ] All guard verdicts are `pass` (or block resolved with human approval)
 
 ### Pre-Deploy Checklist

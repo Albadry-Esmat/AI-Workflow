@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 
@@ -137,6 +138,7 @@ run("sanitized release-status handoff", process.execPath, ["scripts/release-stat
 run("release approval evidence", process.execPath, ["scripts/validate-release-approval.js"]);
 run("artifact quality policy", process.execPath, ["scripts/score-artifact.js", "--type", "requirements", "--input", "tests/fixtures/requirements-artifact.json"]);
 run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]);
+run("adapter lifecycle policy", process.execPath, ["scripts/validate-adapter-lifecycle.js"]);
 run("OpenCode reference adapter certification", process.execPath, ["scripts/adapter-certification.js", "opencode"]);
 run("all adapter fixture certification", process.execPath, ["scripts/certify-adapters.js"]);
 run("deterministic runtime projections", process.execPath, ["scripts/generate-projections.js", "--output", path.join(os.tmpdir(), "aiw-preflight-projections"), "--profile", "pilot-read-only"]);

@@ -71,6 +71,7 @@ The release-hardening path adds executable controls in addition to the agent per
 | Runtime version drift | `aiw runtime-watch` performs read-only version checks for terminal runtimes, reports host/editor verification requirements, and strict preflight blocks an unsupported OpenCode version. |
 | Release-status handoff | `aiw release-status` emits only sanitized statuses, versions, paths, counts, and blocker categories; private output files are owner-only and must not contain credentials or raw sessions. |
 | Release approval evidence | `aiw validate-release-approval` requires scope-specific owners, blockers, review states, documentation gates, and non-fixture evidence before any conditional or general-production decision. |
+| Adapter lifecycle safety | `aiw validate-adapter-lifecycle` enforces registry/matrix alignment, assigned review ownership, truthful active/blocked/deprecated claims, and complete deprecation migration metadata; blocked and deprecated adapters cannot be treated as supported. |
 | Runtime capability enforcement | `scripts/lib/runtime-guards.js` rejects undeclared MCP capabilities before invocation and requires explicit approval for write or deployment capabilities. |
 | Runtime budget enforcement | `BudgetTracker` stops a run when retry, duration, estimated-token, or external-call limits are exceeded. |
 | Event contract | `skills/schema/execution-event.schema.json` and `aiw validate-events` enforce the sanitized event shape; raw prompts and MCP payloads remain excluded. |
@@ -113,6 +114,6 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 - Production publication credentials must be separate from local development credentials and must never be copied by `aiw init`.
 - Run `node scripts/security-check.js` after changing MCP definitions or GitHub Actions workflows.
 - Runtime-certification records must remain sanitized, capability-specific, independently reviewed, and blocked until real non-fixture evidence exists.
-- Compatibility maintenance must review version ranges, host boundaries, MCP side effects, projections, and deprecation status at every release and after major vendor changes.
+- Compatibility maintenance must review version ranges, host boundaries, MCP side effects, projections, and deprecation status at every release and after major vendor changes; run `aiw validate-adapter-lifecycle` before release communication.
 - Release handoff reports must be sanitized, tied to a reviewed commit, and treated as readiness evidence rather than production approval.
 - Release approval records must not promote repository fixtures, fake executables, or unavailable runtimes to conditional or general-production approval.

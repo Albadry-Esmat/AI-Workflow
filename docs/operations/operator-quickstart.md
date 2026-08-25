@@ -39,6 +39,7 @@ aiw runtime-watch
 aiw release-status
 aiw validate-release-approval tests/fixtures/release-approval.json
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-adapters
 aiw docs-check
 aiw website-check
@@ -47,7 +48,7 @@ node scripts/security-check.js --history
 aiw sync --check
 ```
 
-`aiw certify-adapters` is fixture-only evidence. It validates normalized contracts and dry-run behavior but does not prove that a vendor runtime is installed or safe for live execution.
+`aiw certify-adapters` is fixture-only evidence. It validates normalized contracts and dry-run behavior but does not prove that a vendor runtime is installed or safe for live execution. `aiw validate-adapter-lifecycle` separately enforces that every registered adapter has an assigned review owner, a truthful lifecycle state, and complete blocker or deprecation migration metadata. A `blocked` adapter must not execute; a `deprecated` adapter must not be selected for a new run.
 
 ## Prepare a first pilot
 
@@ -103,7 +104,8 @@ After any implementation, configuration, schema, pipeline, adapter, security, te
 aiw docs-check
 ```
 
-Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard. Generate the sanitized handoff with `aiw release-status --json` before assigning operator blockers or requesting approval. Validate any private decision record with `aiw validate-release-approval <private-release-approval.json>`. For runtime promotion, use the sanitized evidence contract at `.ai-workflow/schemas/runtime-certification.schema.json`; fixture evidence cannot certify a live runtime.
+Read [`../documentation-policy.md`](../documentation-policy.md) for the path-aware mapping and review standard. Generate the sanitized handoff with `aiw release-status --json` before assigning operator blockers or requesting approval. The report includes lifecycle validation and sanitized per-state counts; it remains repository-readiness evidence, never a production approval.
+ Validate any private decision record with `aiw validate-release-approval <private-release-approval.json>`. For runtime promotion, use the sanitized evidence contract at `.ai-workflow/schemas/runtime-certification.schema.json`; fixture evidence cannot certify a live runtime.
 
 ## Website synchronization rule
 

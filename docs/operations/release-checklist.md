@@ -24,6 +24,7 @@ Use this checklist for every release candidate. A checked box must have evidence
 - [ ] `aiw docs-check` passes with all affected documentation and `docs/changelog.md` included.
 - [ ] `aiw validate-runtime-certification tests/fixtures/runtime-certification.json` passes; the fixture remains blocked for live promotion.
 - [ ] `aiw runtime-watch` passes informationally for the matrix; strict version watch passes for each runtime selected for live certification.
+- [ ] `aiw validate-adapter-lifecycle` passes; every blocked or deprecated adapter has a truthful claim, assigned owner, reason, and required unblock or migration metadata.
 - [ ] `aiw release-status --json` reports all repository checks passing, a clean tree, and every live-gate blocker assigned to an owner.
 - [ ] `aiw validate-release-approval tests/fixtures/release-approval.json` passes; fixture scope remains `no-go` and cannot authorize live release.
 - [ ] `aiw pilot-preflight --project-id <disposable-id> --pipeline <pipeline>` creates a sanitized manifest and verified backup; actual live execution is recorded separately.

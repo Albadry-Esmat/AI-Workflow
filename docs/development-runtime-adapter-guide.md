@@ -19,6 +19,7 @@ adapters/<adapter-id>/
 .ai-workflow/
 ├── adapter-registry.json    # canonical adapter registration
 ├── runtime-capability-matrix.json
+├── adapter-lifecycle.json     # lifecycle state, support claim, owner, and migration metadata
 ├── config.json
 └── schemas/
     ├── runtime-adapter.schema.json
@@ -28,6 +29,7 @@ adapters/<adapter-id>/
     ├── checkpoint.schema.json
     ├── artifact-envelope.schema.json
     ├── runtime-certification.schema.json
+    ├── adapter-lifecycle.schema.json
     └── release-approval.schema.json
 ```
 
@@ -67,6 +69,19 @@ Implement or explicitly reject these normalized operations:
 
 If the runtime cannot support an operation, return a typed unsupported result and lower the tier or force wrapper-required mode. Do not silently emulate a success.
 
+## Lifecycle and deprecation contract
+
+Lifecycle state is maintained in `.ai-workflow/adapter-lifecycle.json`, rather than inferred from whether a runtime happens to be installed on the contributor’s machine. An `active` entry may retain the registry’s `reference` or `experimental` claim. A `blocked` entry must use the `blocked` claim, include a reason and unblock criteria, and must not be selected for execution. A `deprecated` entry must use the `deprecated` claim, include a reason, effective date, migration guidance, and either a registered successor or an explicit statement that no successor exists. Deprecated adapters are retained for historical compatibility but are not valid targets for new runs.
+
+Run the validator whenever registry, descriptor, matrix, lifecycle, or vendor-compatibility assumptions change:
+
+```bash
+aiw validate-adapters
+aiw validate-adapter-lifecycle
+```
+
+Do not mark an adapter deprecated solely because a real executable or host integration is unavailable in a sandbox. That condition remains an evidence or operator-verification blocker until a reviewed vendor change invalidates the adapter’s safety assumptions.
+
 ## Safety implementation rules
 
 All runtime requests pass through the central capability and budget guards. A write or deployment capability requires the correct MCP profile, explicit approval, canary plan, budget allowance, deterministic idempotency key, and post-operation reconciliation. A host adapter that cannot block before a side effect must not expose that capability as native support.
@@ -77,7 +92,7 @@ Subprocess adapters must bound the working directory, environment, stdout/stderr
 
 Implement tests in this order:
 
-1. Validate the descriptor and registry/matrix alignment.
+1. Validate the descriptor, registry/matrix alignment, and lifecycle/deprecation contract.
 2. Validate normalized request, approval, event, checkpoint, and artifact contracts.
 3. Prove read-only and dry-run behavior without invoking a vendor runtime.
 4. Prove unauthorized capability, missing approval, budget exhaustion, circuit-open, malformed output, timeout, cancellation, duplicate write, ambiguous outcome, and corrupt checkpoint behavior.
@@ -87,6 +102,7 @@ Implement tests in this order:
 
 ```bash
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-adapters
 ```
 
@@ -115,6 +131,7 @@ Before requesting review, confirm that the adapter has a registry entry, capabil
 ```bash
 aiw validate
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw validate-release-approval tests/fixtures/release-approval.json

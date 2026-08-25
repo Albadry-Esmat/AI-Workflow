@@ -30,6 +30,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Managed documentation-aware pre-commit hook** — `aiw setup` now installs or refreshes the versioned hook when no custom hook exists; it blocks local commits with incomplete documentation, stale website data, or failed structural validation while preserving CI as the authoritative gate.
 - **Hook maintenance guidance** — Added troubleshooting and setup guidance for absent, stale, or intentionally customized local hooks, with explicit preservation of custom hooks and continued CI enforcement.
 - **Phase 7 runtime-certification evidence contract** — Added a versioned sanitized evidence schema, registered runtime-certification validator, repository-fixture record, capability-specific promotion rules, strict-preflight/self-test coverage, and operator documentation. No live runtime evidence was created; all real-runtime certification remains operator-owned and blocked in the sandbox.
+- **Phase 8.6 adapter lifecycle enforcement** — Added the versioned adapter-lifecycle schema and manifest, `aiw validate-adapter-lifecycle`, registry/matrix alignment checks, required review ownership, blocked/deprecated reason and migration controls, negative fixture coverage, lifecycle integration into self-test, preflight, release-status, CI, and synchronized operator, security, governance, testing, and compatibility documentation. Existing adapters remain active reference or experimental/fixture-only; no live support claim was created.
 
 ### Changed
 

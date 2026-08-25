@@ -23,17 +23,19 @@ The optional output file is written with owner-only permissions when the operati
 |---|---|---|
 | `branch` and `commit` | Source revision used for the report. | Confirm the report is tied to the intended release branch and reviewed commit. |
 | `working_tree` | Whether uncommitted files were present when the report ran. | A release candidate must be `clean`; a dirty report is for diagnosis only. |
-| `checks` | Documentation, website, evidence, adapter, and runtime-watch results. | All repository checks must pass before handoff. |
+| `checks` | Documentation, website, evidence, adapter, lifecycle, and runtime-watch results. | All repository checks must pass before handoff. |
 | `live_certification` | Whether operator-owned runtime work is still blocked or required. | It never means that live certification occurred. |
 | `operator_blockers` | Sanitized missing-runtime, host-verification, or environment prerequisites. | Assign each blocker to an operator and do not bypass it. |
 | `decision` | Repository-side readiness plus live-gate state. | `repository-side-ready-live-gate-blocked` is the expected sandbox result. |
 | `next_action` | Sanitized handoff instruction. | Follow the operator procedure and record evidence privately. |
+| `compatibility.lifecycle_version` and `compatibility.lifecycle_states` | Version and per-state counts from the adapter lifecycle manifest. | Confirm lifecycle metadata was evaluated; counts are repository metadata, not live certification. |
 
 The report records only statuses, versions, paths, counts, and sanitized categories. It never includes credentials, token values, authorization headers, raw prompts, MCP payloads, personal data, session transcripts, or unbounded model output.
 
 ## Required handoff sequence
 
-Run `aiw release-status` after the release branch is clean and after the documentation and website gates pass. For a named terminal runtime, also run:
+Run `aiw validate-adapter-lifecycle` and `aiw release-status` after the release branch is clean and after the documentation and website gates pass. The handoff’s `checks.adapter_lifecycle` result must pass before operator-owned runtime work begins.
+ For a named terminal runtime, also run:
 
 ```bash
 aiw runtime-watch --runtime <id> --strict

@@ -449,6 +449,9 @@ jobs:
       - name: Validate canonical adapter configuration
         run: node scripts/validate-adapter-config.js
 
+      - name: Validate adapter lifecycle and deprecation contract
+        run: node scripts/validate-adapter-lifecycle.js
+
       - name: Certify adapter descriptors and dry-run behavior
         run: |
           set -euo pipefail

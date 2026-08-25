@@ -50,6 +50,8 @@ Do not share raw state, session JSON, tokens, authorization headers, prompts, or
 | Adapter fixture passes but live runtime fails | Fixture contract is not proof of vendor runtime behavior. | Record the live result as blocked or failed; update the adapter limitation or version range instead of changing the evidence label. |
 | Runtime certification evidence fails | The record is missing a staged check, capability decision, registered target, or required sanitized metadata. | Run `aiw validate-runtime-certification <private-record.json>`, correct the record without adding raw content, and keep the status blocked until real evidence exists. |
 | Runtime version watch reports unavailable or unsupported | The terminal executable is missing, outside its declared range, or the range is still operator-defined. | Run `aiw runtime-watch --json`; install and verify the declared runtime version or update the reviewed compatibility matrix. Do not start a live session until the result is resolved. |
+| Adapter lifecycle validation fails | The lifecycle manifest is missing an entry, contradicts the registry or matrix, lacks review ownership, or has incomplete blocked/deprecated metadata. | Run `aiw validate-adapter-lifecycle`, correct the state, support claim, reason, effective date, successor or migration limitation, and rerun `aiw release-status --json`. Do not call an unavailable fixture-only runtime deprecated without a reviewed vendor or safety change. |
+| An adapter is `blocked` or `deprecated` | The recorded lifecycle state prevents normal selection; deprecated adapters are retained for history but cannot be selected for new runs. | Stop new runs, inspect `block_reason` or `deprecation_reason`, follow `unblock_criteria` or `migration`, and use only a validated successor after its own lifecycle and evidence checks pass. |
 | Release-status handoff reports dirty or failed | Uncommitted files, stale website data, missing affected docs, or a failed repository gate remain. | Run `aiw release-status --json`, inspect the named check, update all affected documentation, run `aiw sync`, and re-run the full handoff. Do not treat a dirty or failed report as a release decision. |
 | Release-approval validation rejects a decision | Scope, owner, blocker, review, documentation, or non-fixture evidence requirements are inconsistent with `go` or `conditional-go`. | Keep the decision `no-go`, correct the private record, rerun `aiw validate-release-approval`, and do not relabel fixture or fake-runtime evidence. |
 
@@ -80,6 +82,7 @@ For a runtime-specific diagnosis, start with descriptor, fixture, and evidence c
 
 ```bash
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw generate-projections --output /tmp/aiw-projections --profile pilot-read-only

@@ -306,7 +306,7 @@ Operate compatibility as a maintained product surface instead of a one-time inte
 | 8.3 | Contract regression | Run schema, fixture, security, projection, and fault suites on every change. | Every pull request and release. |
 | 8.4 | Pilot evidence retention | Keep sanitized evidence with retention and reviewer ownership; prune raw operational logs according to policy. | Per evidence policy. |
 | 8.5 | Incident response | Use event reports, support bundles, checkpoints, rollback, idempotency reconciliation, and circuit state. | On failed or ambiguous run. |
-| 8.6 | Adapter deprecation | Mark runtimes blocked or deprecated when vendor changes invalidate safety assumptions. | On incompatibility or security finding. |
+| 8.6 | Adapter deprecation | Mark runtimes blocked or deprecated when vendor changes invalidate safety assumptions; validate the lifecycle state, support claim, reason, effective date, successor or migration limitation, and review ownership. | On incompatibility or security finding. |
 | 8.7 | Release communication | Publish support tiers, certified versions, degraded features, and known limitations. | Every compatibility release. |
 | 8.8 | Security review | Reassess token scopes, MCP side effects, generated projections, hooks, plugins, and host trust boundaries. | At least each release and after any security event. |
 
@@ -314,7 +314,7 @@ Operate compatibility as a maintained product surface instead of a one-time inte
 The support statement identifies certified runtime versions and capability-specific limitations; compatibility changes are covered by CI and release governance; operators have a repeatable incident and rollback procedure.
 
 ### Repository-safe implementation status
-The repository now provides `aiw runtime-watch` for read-only terminal version checks and host/editor verification reporting, strict OpenCode version-range enforcement in preflight, and `docs/operations/compatibility-maintenance.md` covering quarterly matrix review, evidence retention, incident response, adapter deprecation, release communication, and security review. These controls do not install runtimes, start sessions, access credentials, or create live certification evidence.
+The repository now provides `aiw runtime-watch` for read-only terminal version checks and host/editor verification reporting, strict OpenCode version-range enforcement in preflight, and the versioned `.ai-workflow/adapter-lifecycle.json` plus `aiw validate-adapter-lifecycle` for registry/matrix-aligned active, blocked, and deprecated states. The validator requires assigned review ownership and complete blocker/deprecation migration metadata, and is integrated into self-test, preflight, release-status, CI, and release documentation. Existing runtimes remain active reference or experimental/fixture-only; these controls do not install runtimes, start sessions, access credentials, or create live certification evidence.
 
 ## 5. Testing strategy
 

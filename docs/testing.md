@@ -62,6 +62,7 @@ The system uses a risk-based testing strategy: higher-risk components (domain lo
 | Runtime version watch | Version-only terminal checks enforce declared ranges in strict mode; host/editor targets require operator verification; no session or side effect is started |
 | Release-status handoff | JSON output contains sanitized repository/live-gate states, reports operator blockers, and writes optional private reports with owner-only permissions |
 | Release approval evidence | Fixture `no-go` records validate safely; `conditional-go` and `go` require assigned owners, passing reviews, non-fixture evidence, resolved blockers, and the correct decision scope |
+| Adapter lifecycle | The canonical lifecycle manifest aligns with the registry and matrix; incomplete blocked/deprecated metadata, unsupported successors, contradictory claims, and sensitive fields are rejected |
 
 ## Testing Skill
 
@@ -74,11 +75,12 @@ The `testing-strategy` skill (`skills/testing/testing-strategy.md`) generates th
 
 ## Runtime-certification evidence tests
 
-The fixture at `tests/fixtures/runtime-certification.json` is deliberately repository-fixture-only and blocked for live promotion. Validate it with `aiw validate-runtime-certification`. The validator must also be exercised against negative fixtures or isolated temporary repositories for missing changelog/documentation, unregistered runtimes, duplicate checks, incomplete staged evidence, invalid capability decisions, unsupported promotion states, and credential-like content. `runtime-version-watch` must be tested with a temporary version-only fixture and a host/editor strict-mode block. `release-status` must be tested for JSON parsing, sanitized output, dirty/clean-state reporting, blocker mapping, and owner-only output-file permissions. `validate-release-approval` must be tested with the repository-fixture no-go record and isolated negative records for fixture-backed `go`, open P0/P1 blockers, pending owners, failed documentation gates, and incomplete review. A fixture or fake executable can validate control flow but never proves a real runtime.
+The fixture at `tests/fixtures/runtime-certification.json` is deliberately repository-fixture-only and blocked for live promotion.
+ Validate it with `aiw validate-runtime-certification`. The validator must also be exercised against negative fixtures or isolated temporary repositories for missing changelog/documentation, unregistered runtimes, duplicate checks, incomplete staged evidence, invalid capability decisions, unsupported promotion states, and credential-like content. `runtime-version-watch` must be tested with a temporary version-only fixture and a host/editor strict-mode block. `validate-adapter-lifecycle` must pass the canonical manifest and reject an isolated manifest that marks an adapter deprecated without a reason, effective date, migration guidance, and successor or explicit limitation. `release-status` must be tested for JSON parsing, sanitized output, dirty/clean-state reporting, blocker mapping, lifecycle-check reporting, and owner-only output-file permissions. `validate-release-approval` must be tested with the repository-fixture no-go record and isolated negative records for fixture-backed `go`, open P0/P1 blockers, pending owners, failed documentation gates, and incomplete review. A fixture or fake executable can validate control flow but never proves a real runtime.
 
 ## Testing Change Rules
 
 - Changes to testing strategy require updating this file AND `changelog.md`.
-- Changes to runtime-certification schemas or validators require updating this file, the compatibility guide, the operator runbook, and `changelog.md`.
+- Changes to runtime-certification or adapter-lifecycle schemas and validators require updating this file, the compatibility guide, the developer adapter guide, the operator runbook, and `changelog.md`.
 - New test types must be added to the testing skill's execution logic.
 - Coverage threshold changes require updating quality gates in deployment.

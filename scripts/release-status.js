@@ -32,6 +32,7 @@ function readJson(relative) {
 
 const compatibility = readJson("compatibility.json");
 const registry = readJson(".ai-workflow/adapter-registry.json");
+const lifecycle = readJson(".ai-workflow/adapter-lifecycle.json");
 const branch = git(["branch", "--show-current"]);
 const commit = git(["rev-parse", "HEAD"]);
 const statusLines = git(["status", "--short"]).split(/\r?\n/).filter(Boolean);
@@ -41,6 +42,7 @@ const checks = {
   runtime_certification_fixture: run("runtime certification fixture", process.execPath, ["scripts/validate-runtime-certification.js", "tests/fixtures/runtime-certification.json"]),
   release_approval_fixture: run("release approval fixture", process.execPath, ["scripts/validate-release-approval.js", "tests/fixtures/release-approval.json"]),
   adapter_configuration: run("adapter configuration", process.execPath, ["scripts/validate-adapter-config.js"]),
+  adapter_lifecycle: run("adapter lifecycle", process.execPath, ["scripts/validate-adapter-lifecycle.js"]),
   runtime_version_watch: run("runtime version watch", process.execPath, ["scripts/runtime-version-watch.js", ...(strict ? ["--strict"] : [])]),
 };
 
@@ -67,6 +69,11 @@ const report = {
     manifest_version: compatibility.manifest_version || "unavailable",
     cli_version: compatibility.cli_version || "unavailable",
     registered_adapters: Object.keys(registry.adapters || {}).length,
+    lifecycle_version: lifecycle.lifecycle_version || "unavailable",
+    lifecycle_states: Object.values(lifecycle.adapters || {}).reduce((counts, entry) => {
+      counts[entry.state] = (counts[entry.state] || 0) + 1;
+      return counts;
+    }, {}),
   },
   checks,
   live_certification: operatorBlockers.length ? "operator-owned-blocked" : "operator-required",

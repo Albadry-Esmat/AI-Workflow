@@ -55,6 +55,7 @@ for (const [label, script] of [
   ["runtime version watch completes", "scripts/runtime-version-watch.js"],
   ["sanitized release-status handoff completes", "scripts/release-status.js"],
   ["release approval evidence passes", "scripts/validate-release-approval.js"],
+  ["adapter lifecycle policy passes", "scripts/validate-adapter-lifecycle.js"],
 ]) {
   check(label, () => { command([script]); });
 }
@@ -65,6 +66,21 @@ check("artifact quality policy passes representative fixture", () => {
 
 check("adapter registry and capability matrix pass", () => {
   command(["scripts/validate-adapter-config.js"]);
+});
+
+check("adapter lifecycle rejects incomplete deprecation metadata", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "aiw-adapter-lifecycle-"));
+  const fixture = path.join(directory, "lifecycle.json");
+  try {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, ".ai-workflow/adapter-lifecycle.json"), "utf8"));
+    manifest.adapters.opencode = { state: "deprecated", support_claim: "deprecated", review_owner: "compatibility-maintainer", last_reviewed_at: "2026-08-25T00:00:00.000Z" };
+    fs.writeFileSync(fixture, `${JSON.stringify(manifest, null, 2)}\n`, { mode: 0o600 });
+    const result = spawnSync(process.execPath, ["scripts/validate-adapter-lifecycle.js", fixture], { cwd: root, encoding: "utf8" });
+    if (result.status === 0) throw new Error("incomplete deprecation metadata was accepted");
+    if (!/deprecation_reason|effective_at|migration/.test(`${result.stdout}${result.stderr}`)) throw new Error("deprecation failure was not explained");
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 check("OpenCode reference adapter certification passes", () => {

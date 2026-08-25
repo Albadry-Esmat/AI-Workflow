@@ -18,6 +18,7 @@ Compatibility is a maintained product surface, not a one-time adapter installati
 | Contract regression | Every pull request and release | Run schema, registry, adapter fixture, projection, security, documentation, and conformance checks. | Any drift or malformed evidence blocks merge or release. |
 | Evidence retention | Per retention policy and after each pilot | Keep sanitized certification metadata with reviewer ownership; prune raw operational logs and never retain secrets or raw sessions. | Unbounded or sensitive retention blocks closure. |
 | Incident response | Failed, ambiguous, unsafe, or incompatible run | Preserve correlation ID, sanitized diagnostics, backup/checksum references, decision state, and recovery action. | Bypass, credential exposure, ambiguous write, or corrupt checkpoint blocks closure. |
+| Adapter lifecycle enforcement | Every adapter change and every compatibility release | Validate `.ai-workflow/adapter-lifecycle.json`; keep state, support claim, review owner, and evidence aligned with the registry and matrix. | Missing lifecycle metadata, contradictory claims, or unreviewed state blocks release. |
 | Adapter deprecation | Safety assumption invalidated or vendor behavior changes | Mark the adapter blocked or deprecated, record the successor or limitation, update projections and release notes. | Silent continued use is prohibited. |
 | Release communication | Every compatibility release | Publish support tier, verified versions, capability-specific limitations, known blockers, and operator prerequisites. | Unsupported production claims block release. |
 | Security review | Each compatibility release and after a security event | Reassess scopes, MCP side effects, hooks, plugins, projections, host trust boundaries, and evidence sanitization. | Unreviewed security-impacting changes block release. |
@@ -38,6 +39,15 @@ aiw runtime-watch --runtime opencode --strict
 ```
 
 A terminal runtime with a semver range is reported as `available` only when the version-only response satisfies that range. A runtime whose range is `operator-defined` is reported as `range-unpinned` and requires a reviewed compatibility update before a production statement. A missing executable is `unavailable`. Host/editor targets remain `host-verification-required` until their actual surface, plan, version, lifecycle boundary, and projection are verified by the operator.
+
+The lifecycle manifest at `.ai-workflow/adapter-lifecycle.json` is the machine-readable record for adapter state. `active` means the adapter may be evaluated at its declared tier; `blocked` means execution must stop until the recorded unblock criteria are met; and `deprecated` means the adapter must not be selected for new runs. The validator requires blocked/deprecated claims to match the lifecycle state, requires a reason and effective date for deprecation, and requires either a registered successor or an explicit migration limitation. It does not deprecate an adapter merely because the sandbox lacks its real executable.
+
+Validate the contract directly or through the release handoff:
+
+```bash
+aiw validate-adapter-lifecycle
+aiw release-status --json
+```
 
 ## Quarterly capability-matrix review
 
@@ -66,7 +76,7 @@ Close the incident only after the target state is verified, the recovery evidenc
 
 ## Deprecation and release communication
 
-Deprecation is a safety control. When a vendor changes lifecycle behavior, a host loses a pre-action boundary, a version exits its supported range, or a security review invalidates an assumption, mark the adapter `blocked` or `deprecated` before changing the public support statement. State the affected capabilities, migration path or replacement, evidence state, and effective date. Do not delete historical evidence or claim that a projection is equivalent to a native adapter.
+Deprecation is a safety control. When a vendor changes lifecycle behavior, a host loses a pre-action boundary, a version exits its supported range, or a security review invalidates an assumption, mark the adapter `blocked` or `deprecated` before changing the public support statement. State the affected capabilities, migration path or replacement, evidence state, and effective date. Record the transition in `.ai-workflow/adapter-lifecycle.json`, run `aiw validate-adapter-lifecycle`, and ensure release-status reports the lifecycle state. Do not delete historical evidence or claim that a projection is equivalent to a native adapter.
 
 Every compatibility release must state the current support tiers, certified runtime versions and capabilities, degraded operations, unsupported operations, fixture-only status, operator-owned prerequisites, and unresolved blockers. Release communication must be generated from reviewed repository data and must pass the complete documentation and website synchronization gates.
 
@@ -79,6 +89,7 @@ aiw runtime-watch
 aiw release-status
 aiw validate-release-approval tests/fixtures/release-approval.json
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
 aiw docs-check

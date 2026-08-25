@@ -74,6 +74,7 @@ show_help() {
   echo -e "    ${CYAN}write-plan${NC}         Create a canary-only dry-run write plan"
   echo -e "    ${CYAN}score-artifact${NC}    Score an artifact and route low quality to review"
   echo -e "    ${CYAN}validate-adapters${NC} Validate runtime adapter registry and capability matrix"
+  echo -e "    ${CYAN}validate-adapter-lifecycle${NC} Enforce adapter lifecycle and deprecation metadata"
   echo -e "    ${CYAN}certify-opencode${NC}  Run credential-free OpenCode adapter certification"
   echo -e "    ${CYAN}certify-adapters${NC}   Run fixture-only certification for all adapters"
   echo -e "    ${CYAN}generate-projections${NC} Generate deterministic runtime projections"
@@ -238,6 +239,10 @@ cmd_score_artifact() {
 
 cmd_validate_adapters() {
   node "$ROOT/scripts/validate-adapter-config.js"
+}
+
+cmd_validate_adapter_lifecycle() {
+  node "$ROOT/scripts/validate-adapter-lifecycle.js" "$@"
 }
 
 cmd_certify_opencode() {
@@ -578,6 +583,7 @@ case "$COMMAND" in
   write-plan)       cmd_write_plan "$@" ;;
   score-artifact)   cmd_score_artifact "$@" ;;
   validate-adapters) cmd_validate_adapters "$@" ;;
+  validate-adapter-lifecycle) cmd_validate_adapter_lifecycle "$@" ;;
   certify-opencode) cmd_certify_opencode "$@" ;;
   certify-adapters) cmd_certify_adapters "$@" ;;
   generate-projections) cmd_generate_projections "$@" ;;

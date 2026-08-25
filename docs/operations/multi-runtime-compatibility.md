@@ -22,6 +22,7 @@ From the repository root:
 
 ```bash
 aiw validate-adapters
+aiw validate-adapter-lifecycle
 aiw certify-opencode
 aiw certify-adapters
 aiw validate-runtime-certification tests/fixtures/runtime-certification.json
@@ -54,6 +55,8 @@ node scripts/adapter-certification.js windsurf
 ```
 
 These commands prove descriptor validity, normalized requests, policy denial, event sanitization, and dry-run behavior only. The aggregate command reports every registered adapter as `fixture-certified` only when those local checks pass. They do not prove that the vendor runtime is installed, authenticated, or capable of safe live execution.
+
+Adapter lifecycle is tracked separately in `.ai-workflow/adapter-lifecycle.json`. The `active` state preserves the registry’s current reference or experimental claim; `blocked` stops execution until its recorded unblock criteria are satisfied; and `deprecated` prevents selection for new runs. `blocked` and `deprecated` entries cannot claim supported matrix status. Deprecation requires a reason, effective date, and either a registered successor or an explicit migration limitation. The lifecycle validator enforces these invariants and does not infer deprecation from sandbox unavailability.
 
 ## Sanitized runtime-certification evidence
 
@@ -90,4 +93,5 @@ A runtime cannot be promoted from experimental to certified solely because it su
 
 ## Release rules
 
-Every adapter change must update the registry, capability matrix, compatibility evidence, release-approval implications, and relevant documentation. CI runs adapter configuration validation, runtime-certification evidence validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite. Run `aiw runtime-watch` on every release candidate; use `aiw runtime-watch --runtime <id> --strict` before live certification of a named terminal runtime. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review. See [`compatibility-maintenance.md`](compatibility-maintenance.md) for quarterly review, retention, incident, deprecation, and release-communication procedures.
+Every adapter change must update the registry, lifecycle manifest, capability matrix, compatibility evidence, release-approval implications, and relevant documentation. CI runs adapter configuration and lifecycle validation, runtime-certification evidence validation, dry-run certification for every target, deterministic projection generation, and the existing conformance suite.
+ Run `aiw runtime-watch` on every release candidate; use `aiw runtime-watch --runtime <id> --strict` before live certification of a named terminal runtime. New write-capable integrations require a canary plan, explicit human approval, budget enforcement, idempotency, reconciliation, and an independent review. See [`compatibility-maintenance.md`](compatibility-maintenance.md) for quarterly review, retention, incident, deprecation, and release-communication procedures.

@@ -35,6 +35,7 @@
     "write-plan": "node scripts/write-plan.js",
     "score-artifact": "node scripts/score-artifact.js",
     "validate:adapters": "node scripts/validate-adapter-config.js",
+    "validate:adapter-lifecycle": "node scripts/validate-adapter-lifecycle.js",
     "certify:opencode": "node scripts/adapter-certification.js opencode",
     "certify:adapters": "node scripts/certify-adapters.js",
     "generate:projections": "node scripts/generate-projections.js",
