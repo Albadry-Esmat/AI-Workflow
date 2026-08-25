@@ -1,5 +1,6 @@
 {
   "name": "ai-workflow",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "setup": "bash scripts/setup.sh",
@@ -9,6 +10,7 @@
     "validate:sync": "node scripts/verify-website-sync.js --target website/data --check",
     "validate:security": "node scripts/validate-security-policy.js",
     "validate:all": "npm run validate && npm run validate:pipelines && npm run validate:security && npm run validate:sync",
+    "test:hardening": "node --test tests/production-hardening.test.js",
     "clean": "bash scripts/clean.sh",
     "reset": "bash scripts/reset.sh",
     "sync": "bash scripts/sync-website-data.sh",

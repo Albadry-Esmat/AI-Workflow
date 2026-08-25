@@ -29,7 +29,7 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false
         }
       ]
     },
@@ -205,7 +205,7 @@
     },
     {
       "id": "phase-10-docs",
-      "label": "Documentation (synchronous \u2014 must complete before deployment)",
+      "label": "Documentation (synchronous — must complete before deployment)",
       "async": false,
       "skills": [
         {
@@ -253,13 +253,13 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate developer portal requirements \u2014 confirm API surface, SDK targets, and guide scope",
+      "label": "Validate developer portal requirements — confirm API surface, SDK targets, and guide scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
-      "label": "Sign off on architecture \u2014 confirm API versioning strategy and documentation structure",
+      "label": "Sign off on architecture — confirm API versioning strategy and documentation structure",
       "timeout": 3600
     },
     {
@@ -271,7 +271,7 @@
     {
       "after_phase": "phase-2c-design-system",
       "type": "human_approval",
-      "label": "Approve design system \u2014 confirm developer-appropriate token set and component stubs",
+      "label": "Approve design system — confirm developer-appropriate token set and component stubs",
       "timeout": 3600
     },
     {
@@ -295,7 +295,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
-      "label": "Approve security and coverage \u2014 important: developer portals expose API keys and auth flows",
+      "label": "Approve security and coverage — important: developer portals expose API keys and auth flows",
       "timeout": 3600
     },
     {
@@ -313,13 +313,13 @@
     {
       "after_phase": "phase-10-docs",
       "type": "human_approval",
-      "label": "Approve documentation \u2014 developer portals require complete and accurate docs before deployment",
+      "label": "Approve documentation — developer portals require complete and accurate docs before deployment",
       "timeout": 7200
     },
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -329,9 +329,7 @@
     "max_repair_iterations": 3,
     "rollback_scope": "pipeline_stage"
   },
-  "async_skills": [
-    "adr-generator"
-  ],
+  "async_skills": [],
   "token_policy": {
     "auto_compress": true,
     "trigger_at_percent": 85,

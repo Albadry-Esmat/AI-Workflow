@@ -39,7 +39,7 @@
         "--isolated",
         "--browser", "chromium"
       ],
-      "enabled": true
+      "enabled": false
     },
 
     "slack": {

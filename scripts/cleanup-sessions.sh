@@ -25,7 +25,7 @@ source "$ROOT/scripts/lib/common.sh"
 # Load .env for SESSION_RETENTION_DAYS
 load_env "$ROOT/.env"
 
-SESSIONS_DIR=".opencode/state/sessions"
+SESSIONS_DIR="${AIW_SESSIONS_DIR:-.opencode/state/sessions}"
 # CLI --days overrides env var which overrides default
 RETENTION_DAYS="${SESSION_RETENTION_DAYS:-30}"
 DRY_RUN=true
@@ -103,7 +103,7 @@ else
   ok "Deleted $COUNT expired session file(s)."
 
   # Clear last_session.txt if the referenced session was deleted
-  LAST_SESSION_FILE=".opencode/state/last_session.txt"
+  LAST_SESSION_FILE="${AIW_LAST_SESSION_FILE:-.opencode/state/last_session.txt}"
   if [[ -f "$LAST_SESSION_FILE" ]]; then
     LAST_ID=$(cat "$LAST_SESSION_FILE")
     if [[ ! -f "$SESSIONS_DIR/$LAST_ID.json" ]]; then

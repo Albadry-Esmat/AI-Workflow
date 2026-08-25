@@ -2,7 +2,7 @@
   "$schema": "../schema/pipeline-schema.json",
   "name": "change-request",
   "version": "1.1.0",
-  "description": "Change request intake \u2192 impact analysis \u2192 HITL approval \u2192 re-planning \u2192 execution \u2192 completeness validation \u2192 closure. Triggered by change_request.created event or direct invocation.",
+  "description": "Change request intake → impact analysis → HITL approval → re-planning → execution → completeness validation → closure. Triggered by change_request.created event or direct invocation.",
   "mode": "sequential",
   "phases": [
     {
@@ -116,7 +116,7 @@
       "after_phase": "phase-1-intake",
       "type": "human_approval",
       "condition": "cr.new_requirements.length > 0",
-      "label": "Confirm scope: new requirements identified by this CR \u2014 review and approve before re-planning begins",
+      "label": "Confirm scope: new requirements identified by this CR — review and approve before re-planning begins",
       "timeout": 3600
     },
     {
@@ -139,8 +139,7 @@
   },
   "async_skills": [
     "work-item-exporter",
-    "doc-maintainer",
-    "adr-generator"
+    "doc-maintainer"
   ],
   "token_policy": {
     "auto_compress": true,

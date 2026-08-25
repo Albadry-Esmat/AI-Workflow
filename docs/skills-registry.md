@@ -4,6 +4,8 @@
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
+**Publication integrity:** AI-Workflow is the authoritative source for skill specifications, registry data, graph data, and pipeline references. Website publication is exact rather than additive: the generated artifact is validated by relative-path and SHA-256 comparison, and destination-only files are removed during synchronization. Run `npm run validate:all` before publishing a registry change.
+
 ## Two-Layer Architecture
 
 | Layer | File(s) | Purpose |

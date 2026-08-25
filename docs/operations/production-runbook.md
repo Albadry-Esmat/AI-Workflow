@@ -161,3 +161,7 @@ Never place secrets in `opencode.json`, pipeline JSON, skill Markdown, generated
 ## Pilot Sign-off
 
 A pilot is complete only when one or two non-critical repositories have completed a constrained pipeline and one full pipeline using non-sensitive data, all required gates were reviewed by a human, artifacts were recoverable, logs were sanitized, pilot evidence passes `aiw validate-pilot-evidence`, weak artifacts were routed through quality review, and no P0/P1 issue remains open.
+
+## Repository hardening and publication controls
+
+AI-Workflow is the source of truth for framework data. Before a release or website publication, run npm run validate:all and the relevant production-hardening checks. The website artifact is an exact SHA-256-verified mirror; destination-only files are deleted rather than retained. Populated source .env files are never copied by aiw init, and external MCP packages must be pinned and explicitly enabled. Deployment approval gates are non-bypassable where required, and generated metadata must use the canonical HTTPS site URL.

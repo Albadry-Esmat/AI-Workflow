@@ -9,6 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Security and Reliability Hardening
+
+- Website publication is now exact and deletion-safe, with SHA-256 manifest verification that detects missing, extra, and modified files.
+- `aiw init` never copies populated source `.env` files; targets receive only `.env.example` with restrictive permissions.
+- Changelog and skill Markdown rendering now use React escaping or centralized sanitization rather than unsanitized HTML injection.
+- Validation runs through pinned local Node dependencies, with semantic pipeline, MCP policy, URL, and secret-safety checks.
+- Production-hardening pipelines use synchronous gated ADR generation and non-bypassable indefinite deployment approval.
+
 ### Added
 
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.

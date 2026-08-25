@@ -110,7 +110,7 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": true
+          "async": false
         }
       ]
     },
@@ -518,7 +518,10 @@
       "re_invoke_on_pattern": {
         "pattern": "^OVERRIDE\\s+(.+)$",
         "skill": "cross-artifact-consistency",
-        "inject": { "override_approved": true, "override_reason": "$1" }
+        "inject": {
+          "override_approved": true,
+          "override_reason": "$1"
+        }
       }
     },
     {
@@ -537,13 +540,13 @@
       "after_phase": "phase-8d-defect-management",
       "type": "human_approval",
       "condition": "defects_detected === true OR missings_count > 0",
-      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional \u2014 only when defects or missings detected)",
+      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional — only when defects or missings detected)",
       "timeout": 3600
     },
     {
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "Mandatory deployment approval — non-bypassable",
       "bypass_on_timeout": false,
       "timeout": 0
     }
@@ -556,7 +559,6 @@
   "async_skills": [
     "documentation-generator",
     "doc-maintainer",
-    "adr-generator",
     "work-item-exporter",
     "cost-estimator"
   ],

@@ -284,7 +284,7 @@
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
       "label": "Approve deployment",
-      "timeout": 3600,
+      "timeout": 0,
       "bypass_on_timeout": false
     },
     {
