@@ -1,0 +1,92 @@
+{
+  "version": "1.0.0",
+  "always_required": [
+    "docs/changelog.md"
+  ],
+  "ignored_paths": [
+    ".git/**",
+    "node_modules/**",
+    ".opencode/state/**",
+    ".opencode/generated/**",
+    ".ai-workflow/generated/**",
+    "website/.next/**",
+    "website/node_modules/**",
+    "website/dist/**",
+    "website/data/**"
+  ],
+  "rules": [
+    {
+      "id": "skills",
+      "paths": ["skills/**", ".opencode/skills/**"],
+      "required_docs": ["docs/skills-registry.md", "docs/how-to-use.md"]
+    },
+    {
+      "id": "agents",
+      "paths": ["agents/**", ".opencode/agents/**"],
+      "required_docs": ["docs/agents.md", "docs/workflows.md"]
+    },
+    {
+      "id": "pipelines",
+      "paths": ["skills/pipelines/**", "opencode.json"],
+      "required_docs": ["docs/workflows.md", "docs/architecture.md"]
+    },
+    {
+      "id": "runtime-adapters",
+      "paths": [
+        "adapters/**",
+        ".ai-workflow/**",
+        "scripts/lib/adapter-*.js",
+        "scripts/lib/host-adapter.js",
+        "scripts/lib/terminal-adapter.js",
+        "scripts/adapter-certification.js",
+        "scripts/certify-adapters.js",
+        "scripts/generate-projections.js",
+        "scripts/install-projections.js",
+        "scripts/validate-adapter-config.js"
+      ],
+      "required_docs": [
+        "docs/operations/multi-runtime-compatibility.md",
+        "docs/development-runtime-adapter-guide.md"
+      ]
+    },
+    {
+      "id": "execution-controls",
+      "paths": [
+        "aiw",
+        "Makefile",
+        "scripts/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "required_docs": [
+        "docs/operations/production-runbook.md",
+        "docs/operations/operator-quickstart.md",
+        "docs/operations/troubleshooting.md"
+      ]
+    },
+    {
+      "id": "security-and-governance",
+      "paths": [
+        ".env.example",
+        "mcp-permission-policy.json",
+        "compatibility.json",
+        ".github/**"
+      ],
+      "required_docs": [
+        "docs/security.md",
+        "docs/governance.md",
+        "docs/operations/production-runbook.md"
+      ]
+    },
+    {
+      "id": "tests",
+      "paths": ["tests/**"],
+      "required_docs": ["docs/testing.md"]
+    },
+    {
+      "id": "website",
+      "paths": ["website/**", "scripts/website-data-manifest.*", "scripts/sync-website-data.sh"],
+      "required_docs": ["docs/README.md", "docs/operations/production-runbook.md"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Authoritative source-to-website data mirror manifest.",
+  "files": [
+    { "source": "skills/index.yaml", "destination": "skills/index.yaml" },
+    { "source": "skills/registry.json", "destination": "skills/registry.json" },
+    { "source": "skills/graph/skill-graph.yaml", "destination": "skills/graph/skill-graph.yaml" },
+    { "source": "docs/changelog.md", "destination": "docs/changelog.md" },
+    { "source": "opencode.json", "destination": "opencode.json" }
+  ],
+  "directories": [
+    { "source": "skills/pipelines", "destination": "skills/pipelines", "pattern": "*.json" },
+    { "source": ".opencode/skills", "destination": ".opencode/skills", "pattern": "SKILL.md" }
+  ]
+}

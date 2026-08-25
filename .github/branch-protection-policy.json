@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/branch-protection.json",
+  "repository": "Albadry-Esmat/AI-Workflow",
+  "branch": "main",
+  "policy_version": "1.0.0",
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1,
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "require_last_push_approval": true
+  },
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "Skill Validation",
+      "Docs Broken-Link Check",
+      "Website Data Sync Check"
+    ]
+  },
+  "enforce_admins": true,
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "restrictions": null,
+  "release_policy": {
+    "release_tags_from_passing_commit_only": true,
+    "direct_push_to_main": false
+  }
+}

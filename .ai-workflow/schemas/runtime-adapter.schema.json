@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/runtime-adapter.schema.json",
+  "title": "AI Workflow Runtime Adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["adapter_id", "display_name", "runtime_family", "tier", "status", "supported_operations", "supported_capabilities", "version_range"],
+  "properties": {
+    "adapter_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "runtime_family": { "type": "string", "enum": ["terminal-agent", "editor-agent", "editor-cloud-agent", "remote-agent", "test-fixture"] },
+    "tier": { "type": "integer", "enum": [1, 2, 3] },
+    "status": { "type": "string", "enum": ["reference", "planned", "experimental", "certified", "blocked", "deprecated"] },
+    "entrypoint": { "type": "string", "pattern": "^[a-zA-Z0-9._/-]+$" },
+    "supported_operations": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["discover", "preflight", "start_session", "send_step", "read_events", "request_approval", "checkpoint", "cancel", "resume", "collect_artifacts", "close_session"] } },
+    "supported_capabilities": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9-]+$" } },
+    "version_range": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "real_evidence": { "type": "string", "enum": ["not-certified", "repository-fixtures-only", "operator-smoke-pass", "controlled-pilot-pass"] }
+  }
+}

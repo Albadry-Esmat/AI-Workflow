@@ -1,0 +1,20 @@
+{
+  "id": "self-test-pipeline",
+  "triggers": ["self-test"],
+  "phases": [
+    {
+      "id": "phase-1",
+      "label": "Fixture producer",
+      "tasks": [
+        { "id": "produce", "output": "requirements" }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "label": "Fixture approval",
+      "tasks": [
+        { "id": "approve", "type": "hitl_gate", "requires": ["requirements"], "decision": "approve" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "record_version": "1.0.0",
+  "runtime_id": "opencode",
+  "adapter_id": "opencode",
+  "release_commit": "fixture-1234567",
+  "tested_at": "2026-01-01T00:00:00.000Z",
+  "environment": {
+    "execution_surface": "repository-fixture",
+    "runtime_version": "fixture-runtime",
+    "adapter_version": "fixture-adapter",
+    "project_classification": "repository-fixture"
+  },
+  "evidence_state": "repository-fixtures-only",
+  "checks": [
+    { "id": "version-preflight", "result": "not-run", "detail": "No vendor executable was invoked by the fixture harness." },
+    { "id": "mcp-profile", "result": "pass", "detail": "The pilot-read-only profile passed repository policy validation." },
+    { "id": "read-only-smoke", "result": "pass", "detail": "The credential-free adapter fixture completed a bounded dry-run." },
+    { "id": "approval-stop", "result": "pass", "detail": "The fixture denied a write request without approval." },
+    { "id": "approved-canary", "result": "not-run", "detail": "No external write was performed by the fixture harness." },
+    { "id": "recovery", "result": "not-run", "detail": "Live runtime recovery was not exercised by the fixture harness." },
+    { "id": "artifact-review", "result": "pass", "detail": "The fixture artifact contract and sanitization checks passed." },
+    { "id": "independent-review", "result": "not-run", "detail": "Independent live-runtime review is operator-owned and not represented here." }
+  ],
+  "capability_decisions": [
+    { "capability": "read:repository", "decision": "degraded", "evidence_ref": "fixture-read-only" },
+    { "capability": "write:repository", "decision": "blocked", "evidence_ref": "fixture-no-approval" }
+  ],
+  "decision": "blocked",
+  "operator": "fixture-operator",
+  "independent_reviewer": "fixture-reviewer",
+  "secret_exposure": "none",
+  "limitations": [
+    "This record is repository-fixture evidence only.",
+    "No vendor runtime, live MCP server, host integration, or external write was executed."
+  ]
+}

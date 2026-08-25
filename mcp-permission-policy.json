@@ -1,0 +1,99 @@
+{
+  "policy_version": "1.1.0",
+  "default_profile": "pilot-read-only",
+  "capability_vocabulary": [
+    "read:repository",
+    "read:public-web",
+    "read:memory",
+    "write:memory",
+    "write:repository",
+    "write:external",
+    "deploy"
+  ],
+  "profiles": {
+    "pilot-read-only": {
+      "description": "Non-sensitive smoke tests and pilots with no external writes or deployments.",
+      "enabled_servers": ["github", "memory", "context7", "brave-search"],
+      "disabled_servers": ["slack", "vercel", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory"],
+      "allowed_external_writes": false,
+      "required_approval": "human_before_any_write"
+    },
+    "repository-write": {
+      "description": "Explicitly approved repository issue and pull-request operations.",
+      "enabled_servers": ["github", "memory", "context7", "brave-search"],
+      "disabled_servers": ["slack", "vercel", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory", "write:repository"],
+      "allowed_external_writes": true,
+      "required_approval": "human_before_each_write",
+      "credential_requirements": ["dedicated_repository_scoped_token"]
+    },
+    "deployment": {
+      "description": "Explicit deployment work after a separate release approval.",
+      "enabled_servers": ["github", "memory", "context7", "brave-search", "vercel"],
+      "disabled_servers": ["slack", "playwright"],
+      "allowed_capabilities": ["read:repository", "read:public-web", "read:memory", "write:memory", "write:repository", "write:external", "deploy"],
+      "allowed_external_writes": true,
+      "required_approval": "human_before_deployment",
+      "credential_requirements": ["dedicated_repository_scoped_token", "dedicated_deployment_token"]
+    }
+  },
+  "servers": {
+    "github": {
+      "purpose": "Repository metadata, contents, issues, pull requests, and reviewed repository operations.",
+      "credential": "GITHUB_TOKEN",
+      "pilot_access": "read_only",
+      "write_access": "disabled_by_policy",
+      "owner": "operator",
+      "failure_mode": "block_and_report"
+    },
+    "brave-search": {
+      "purpose": "Current public documentation and security/reference searches.",
+      "credential": "BRAVE_API_KEY",
+      "pilot_access": "read_only",
+      "write_access": "none",
+      "owner": "operator",
+      "failure_mode": "degrade_with_explicit_warning"
+    },
+    "memory": {
+      "purpose": "Local workflow memory for the selected run.",
+      "credential": "none",
+      "pilot_access": "local_only",
+      "write_access": "local_state_only",
+      "owner": "operator",
+      "failure_mode": "block_if_state_integrity_is_uncertain"
+    },
+    "context7": {
+      "purpose": "Current public library documentation.",
+      "credential": "CONTEXT7_API_KEY",
+      "pilot_access": "read_only",
+      "write_access": "none",
+      "owner": "operator",
+      "failure_mode": "degrade_with_explicit_warning"
+    },
+    "playwright": {
+      "purpose": "Isolated browser interaction for approved browser tasks.",
+      "credential": "none_by_default",
+      "pilot_access": "disabled",
+      "write_access": "potential_external_side_effects",
+      "owner": "operator",
+      "failure_mode": "disabled_until_explicit_browser_approval"
+    },
+    "slack": {
+      "purpose": "Notifications and workspace operations.",
+      "credential": "SLACK_BOT_TOKEN",
+      "pilot_access": "disabled",
+      "write_access": "message_and_workspace_side_effects",
+      "owner": "operator",
+      "failure_mode": "disabled"
+    },
+    "vercel": {
+      "purpose": "Deployment and hosting operations.",
+      "credential": "VERCEL_TOKEN",
+      "pilot_access": "disabled",
+      "write_access": "deployment_side_effects",
+      "owner": "operator",
+      "failure_mode": "disabled_until_release_approval"
+    }
+  }
+}

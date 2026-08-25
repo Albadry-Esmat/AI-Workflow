@@ -1,0 +1,68 @@
+{
+  "lifecycle_version": "1.0.0",
+  "adapters": {
+    "opencode": {
+      "state": "active",
+      "support_claim": "reference",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Reference adapter remains the canonical implementation; live certification is still operator-owned."
+    },
+    "claude-code": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the supervised terminal projection only after runtime-specific verification."
+    },
+    "codex-cli": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the supervised terminal projection only after runtime-specific verification."
+    },
+    "gemini-cli": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the supervised terminal projection only after runtime-specific verification."
+    },
+    "aider": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the supervised terminal projection only after runtime-specific verification."
+    },
+    "cursor": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the host projection only with operator-controlled lifecycle and explicit verification."
+    },
+    "github-copilot": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the host projection only after surface and enterprise-policy verification."
+    },
+    "cline-roo": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the host projection only after extension and hook lifecycle verification."
+    },
+    "windsurf": {
+      "state": "active",
+      "support_claim": "experimental",
+      "review_owner": "compatibility-maintainer",
+      "last_reviewed_at": "2026-08-25T00:00:00.000Z",
+      "migration": "Use the host projection only after surface lifecycle verification."
+    }
+  }
+}

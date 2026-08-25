@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow Release Approval Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approval_version",
+    "release_id",
+    "source_commit",
+    "branch",
+    "decision",
+    "decision_scope",
+    "issued_at",
+    "release_owner",
+    "independent_reviewer",
+    "blockers",
+    "evidence",
+    "documentation_sync",
+    "sanitized"
+  ],
+  "properties": {
+    "approval_version": { "const": "1.0.0" },
+    "release_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$" },
+    "source_commit": { "type": "string", "pattern": "^(repository-fixture|[A-Fa-f0-9]{7,64})$" },
+    "branch": { "type": "string", "pattern": "^[A-Za-z0-9._/-]{1,160}$" },
+    "decision": { "enum": ["no-go", "conditional-go", "go"] },
+    "decision_scope": { "enum": ["repository-side", "internal-pilot", "general-production"] },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "release_owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "independent_reviewer": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "priority", "status", "owner", "evidence_ref"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]{2,80}$" },
+          "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+          "status": { "enum": ["open", "resolved", "accepted"] },
+          "owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "evidence_ref": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_checks", "runtime_certification_state", "live_runtime_state", "independent_review_status", "rollback_review_status"],
+      "properties": {
+        "repository_checks": { "enum": ["pass", "fail"] },
+        "runtime_certification_state": { "enum": ["repository-fixtures-only", "operator-verified", "pilot-certified", "blocked", "not-run"] },
+        "live_runtime_state": { "enum": ["pass", "blocked", "not-run"] },
+        "independent_review_status": { "enum": ["pass", "pending", "fail"] },
+        "rollback_review_status": { "enum": ["pass", "pending", "fail"] },
+        "report_ref": { "type": "string", "maxLength": 200 }
+      }
+    },
+    "documentation_sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "website"],
+      "properties": {
+        "policy": { "enum": ["pass", "fail"] },
+        "website": { "enum": ["pass", "fail"] }
+      }
+    },
+    "sanitized": { "const": true },
+    "fixture": { "type": "boolean" }
+  }
+}

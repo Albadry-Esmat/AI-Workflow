@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow.local/schema/checkpoint.schema.json",
+  "title": "AI Workflow Runtime Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["checkpoint_version", "saved_at", "correlation_id", "pipeline_id", "status", "completed_tasks", "artifact_names", "budget", "policy_versions", "raw_content_included"],
+  "properties": {
+    "checkpoint_version": { "const": "1.0.0" },
+    "saved_at": { "type": "string", "format": "date-time" },
+    "correlation_id": { "type": "string", "maxLength": 160 },
+    "pipeline_id": { "type": "string", "maxLength": 160 },
+    "phase_id": { "type": ["string", "integer"] },
+    "status": { "type": "string", "enum": ["running", "paused", "rejected", "timed_out", "failed", "completed", "cancelled"] },
+    "completed_tasks": { "type": "array", "uniqueItems": true, "items": { "type": "string", "maxLength": 160 } },
+    "artifact_names": { "type": "array", "uniqueItems": true, "items": { "type": "string", "maxLength": 160 } },
+    "gate_decisions": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["task_id", "decision"], "properties": { "task_id": { "type": "string" }, "decision": { "type": "string", "enum": ["approve", "reject", "timeout", "pending"] } } } },
+    "budget": { "type": "object" },
+    "circuit": { "type": "object" },
+    "policy_versions": { "type": "object", "additionalProperties": { "type": "string" } },
+    "raw_content_included": { "const": false }
+  }
+}

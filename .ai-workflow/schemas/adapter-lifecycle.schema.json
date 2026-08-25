@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow Adapter Lifecycle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lifecycle_version", "adapters"],
+  "properties": {
+    "lifecycle_version": { "const": "1.0.0" },
+    "adapters": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["state", "support_claim", "review_owner", "last_reviewed_at"],
+        "properties": {
+          "state": { "enum": ["active", "blocked", "deprecated"] },
+          "support_claim": { "enum": ["reference", "experimental", "degraded", "blocked", "deprecated"] },
+          "review_owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "last_reviewed_at": { "type": "string", "format": "date-time" },
+          "deprecation_reason": { "type": "string", "maxLength": 500 },
+          "effective_at": { "type": "string", "format": "date-time" },
+          "successor": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+          "migration": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "block_reason": { "type": "string", "maxLength": 500 },
+          "unblock_criteria": { "type": "string", "maxLength": 500 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "approval_version": "1.0.0",
+  "release_id": "repository-fixture-handoff",
+  "source_commit": "repository-fixture",
+  "branch": "release/production-hardening",
+  "decision": "no-go",
+  "decision_scope": "repository-side",
+  "issued_at": "2026-08-25T00:00:00.000Z",
+  "release_owner": "pending-operator-assignment",
+  "independent_reviewer": "pending-operator-assignment",
+  "blockers": [
+    {
+      "id": "runtime-prerequisites",
+      "priority": "P0",
+      "status": "open",
+      "owner": "operator-assignment-required",
+      "evidence_ref": "docs/production-readiness/next-release-gate-status.md"
+    },
+    {
+      "id": "independent-review",
+      "priority": "P1",
+      "status": "open",
+      "owner": "operator-assignment-required",
+      "evidence_ref": "docs/production-readiness/release-governance-record.md"
+    }
+  ],
+  "evidence": {
+    "repository_checks": "pass",
+    "runtime_certification_state": "repository-fixtures-only",
+    "live_runtime_state": "blocked",
+    "independent_review_status": "pending",
+    "rollback_review_status": "pending",
+    "report_ref": "docs/production-readiness/release-status-handoff.md"
+  },
+  "documentation_sync": {
+    "policy": "pass",
+    "website": "pass"
+  },
+  "sanitized": true,
+  "fixture": true
+}

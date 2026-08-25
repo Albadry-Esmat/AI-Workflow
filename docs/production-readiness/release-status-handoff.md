@@ -1,0 +1,66 @@
+# Release-Status Handoff
+
+**Version:** 1.0.0
+**Audience:** Release owners, operators, independent reviewers, and support maintainers
+
+## Purpose
+
+The release-status handoff report provides one deterministic, sanitized summary of repository readiness and operator-owned live gates. It is a coordination artifact, not a production approval and not a substitute for live runtime evidence.
+
+Generate the report from the repository root:
+
+```bash
+aiw release-status
+aiw release-status --json
+aiw release-status --json --output /path/to/private/release-status.json
+```
+
+The optional output file is written with owner-only permissions when the operating system supports them. Do not commit a private report containing operator identity, internal project identifiers, or environment-specific details.
+
+## Report semantics
+
+| Field | Meaning | Safe interpretation |
+|---|---|---|
+| `branch` and `commit` | Source revision used for the report. | Confirm the report is tied to the intended release branch and reviewed commit. |
+| `working_tree` | Whether uncommitted files were present when the report ran. | A release candidate must be `clean`; a dirty report is for diagnosis only. |
+| `checks` | Documentation, website, evidence, adapter, lifecycle, and runtime-watch results. | All repository checks must pass before handoff. |
+| `live_certification` | Whether operator-owned runtime work is still blocked or required. | It never means that live certification occurred. |
+| `operator_blockers` | Sanitized missing-runtime, host-verification, or environment prerequisites. | Assign each blocker to an operator and do not bypass it. |
+| `decision` | Repository-side readiness plus live-gate state. | `repository-side-ready-live-gate-blocked` is the expected sandbox result. |
+| `next_action` | Sanitized handoff instruction. | Follow the operator procedure and record evidence privately. |
+| `compatibility.lifecycle_version` and `compatibility.lifecycle_states` | Version and per-state counts from the adapter lifecycle manifest. | Confirm lifecycle metadata was evaluated; counts are repository metadata, not live certification. |
+
+The report records only statuses, versions, paths, counts, and sanitized categories. It never includes credentials, token values, authorization headers, raw prompts, MCP payloads, personal data, session transcripts, or unbounded model output.
+
+## Required handoff sequence
+
+Run `aiw validate-adapter-lifecycle` and `aiw release-status` after the release branch is clean and after the documentation and website gates pass. The handoff’s `checks.adapter_lifecycle` result must pass before operator-owned runtime work begins.
+ For a named terminal runtime, also run:
+
+```bash
+aiw runtime-watch --runtime <id> --strict
+```
+
+Then complete `docs/operations/live-smoke-test.md` on a disposable or non-sensitive project. Validate the private pilot and runtime-certification records with:
+
+```bash
+aiw validate-pilot-evidence <private-pilot-record.json>
+aiw validate-runtime-certification <private-runtime-certification.json>
+aiw validate-release-approval <private-release-approval.json>
+```
+
+The release owner compares the report with `docs/operations/release-checklist.md`, assigns every operator blocker, validates the private approval record with `aiw validate-release-approval`, obtains independent review, and records a GO or NO-GO decision. A repository-side green result cannot promote a fixture, fake executable, or unavailable runtime to production-certified status.
+
+## Release-approval contract
+
+The versioned contract at `.ai-workflow/schemas/release-approval.schema.json` separates repository-side readiness from internal-pilot and general-production decisions. A repository fixture may validate a `no-go` record, but `conditional-go` requires assigned owners, passing repository checks, non-fixture operator-verified or pilot-certified evidence, and a passing live runtime state. `go` additionally requires general-production scope, no open blockers, independent review, rollback review, pilot-certified evidence, and a non-fixture source commit.
+
+Approval records must identify every blocker, priority, status, owner, and sanitized evidence reference. Pending ownership remains a blocker. Do not put names, private URLs, credentials, raw session content, or unbounded logs into tracked fixtures.
+
+## Sandbox result policy
+
+In the sandbox, the report is expected to identify unavailable terminal executables, host/editor verification requirements, and a missing `.env` when those prerequisites are absent. This is a truthful blocked handoff. Do not replace those statuses with fake versions or fixture labels.
+
+## Change-management rule
+
+Changes to the report schema, validator, release gate, operator blocker mapping, or output semantics require updates to this guide, the relevant production runbook and compatibility-maintenance guide, `docs/changelog.md`, and the website mirror. Run `aiw docs-check`, `aiw sync`, `aiw website-check`, and `aiw sync --check` before commit.

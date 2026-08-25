@@ -1,0 +1,14 @@
+{
+  "policy_version": "1.0.0",
+  "pass_score": 80,
+  "human_review_score": 60,
+  "prohibited_key_patterns": ["prompt", "payload", "token", "secret", "authorization", "password"],
+  "artifact_types": {
+    "requirements": { "required_fields": ["requirements", "acceptance_criteria"] },
+    "adr": { "required_fields": ["decision", "status", "alternatives"] },
+    "task-dag": { "required_fields": ["tasks", "dependencies"] },
+    "rtm": { "required_fields": ["requirements", "coverage"] },
+    "guard-verdict": { "required_fields": ["decision", "findings"] },
+    "deployment-plan": { "required_fields": ["approval_required", "rollback"] }
+  }
+}
