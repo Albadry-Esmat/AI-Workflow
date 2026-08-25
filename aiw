@@ -369,13 +369,25 @@ cmd_init() {
     "$ROOT/.opencode/" "$TARGET/.opencode/" 2>/dev/null || \
     cp -R "$ROOT/.opencode" "$TARGET/.opencode"
 
-  # Never copy populated source credentials implicitly. A target receives only
-  # the template and must be configured independently by its owner.
+  # Install plugin deps in the target
+  if [[ -f "$TARGET/.opencode/package.json" ]]; then
+    echo "  Installing .opencode/ plugin dependencies..."
+    npm install --prefix "$TARGET/.opencode" --silent
+  fi
+
+  # Never propagate populated secrets into another project. Provision only the
+  # template and require the target owner to configure credentials explicitly.
   if [[ ! -f "$TARGET/.env" ]]; then
+    if [[ ! -f "$ROOT/.env.example" ]]; then
+      echo -e "${RED}Error:${NC} $ROOT/.env.example not found — cannot create target .env."
+      exit 1
+    fi
     cp "$ROOT/.env.example" "$TARGET/.env"
     chmod 600 "$TARGET/.env"
-    echo -e "  ${YELLOW}Created .env from template — no source credentials copied.${NC}"
-    echo "  Set GITHUB_TOKEN and any optional integration keys in the target .env."
+    echo -e "  ${YELLOW}Created target .env from template — set credentials manually.${NC}"
+    if [[ -f "$ROOT/.env" ]]; then
+      echo -e "  ${YELLOW}Source .env was intentionally not copied because it may contain secrets.${NC}"
+    fi
   else
     echo "  .env already exists in target — skipped."
   fi

@@ -29,8 +29,7 @@
           "name": "adr-generator",
           "version": "^1.0.0",
           "max_retries": 1,
-          "async": false,
-          "note": "Must complete before downstream gated phases consume architecture decisions."
+          "async": false
         }
       ]
     },

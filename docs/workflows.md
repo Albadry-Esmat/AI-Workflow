@@ -259,3 +259,7 @@ Triggered by: "change request", "modify this requirement", "scope change", `chan
  work-item-    doc-maintainer        adr-generator
  exporter
 ```
+
+## Repository hardening and publication controls
+
+AI-Workflow is the source of truth for framework data. Before a release or website publication, run npm run validate:all and the relevant production-hardening checks. The website artifact is an exact SHA-256-verified mirror; destination-only files are deleted rather than retained. Populated source .env files are never copied by aiw init, and external MCP packages must be pinned and explicitly enabled. Deployment approval gates are non-bypassable where required, and generated metadata must use the canonical HTTPS site URL.

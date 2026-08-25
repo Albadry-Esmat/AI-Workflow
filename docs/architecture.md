@@ -300,3 +300,7 @@ Export is **one-way (outbound only)**. No status read-back from external platfor
 ### Lifecycle State Machine
 
 All work item types have a defined state machine enforced by `work-item-lifecycle-guard` (SKL-058). Terminal states (`closed`, `cancelled`, `rejected`) are permanently blocked. HITL-gated transitions (e.g., `BUG: reported → triaged`) require orchestrator confirmation. See `docs/work-item-foundation.md §4` for the full state machine.
+
+## Repository hardening and publication controls
+
+AI-Workflow is the source of truth for framework data. Before a release or website publication, run npm run validate:all and the relevant production-hardening checks. The website artifact is an exact SHA-256-verified mirror; destination-only files are deleted rather than retained. Populated source .env files are never copied by aiw init, and external MCP packages must be pinned and explicitly enabled. Deployment approval gates are non-bypassable where required, and generated metadata must use the canonical HTTPS site URL.

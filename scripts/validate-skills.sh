@@ -16,8 +16,7 @@
 #   9. index.yaml version field matches SKILL.md frontmatter version
 #   10. Community skill SHA-256 hash verification
 #
-# Requires: node (checks 5, 7, 8), python3 (checks 0, 9, 10)
-# Optional: ajv-cli (check 1) — install with: npm install -g ajv-cli ajv-formats
+# Requires: node and the pinned root npm dependencies
 
 set -euo pipefail
 
@@ -40,27 +39,18 @@ _skip()   { info "SKIP: $1"; }
 
 # ── 0. YAML syntax check ───────────────────────────────────────────────────────
 header "0/10 — YAML syntax check (skills/index.yaml)"
-if command -v python3 &>/dev/null; then
-  python3 -c "
-import yaml, sys
-try:
-    with open('skills/index.yaml') as f:
-        yaml.safe_load(f.read())
-    print('  PASS: skills/index.yaml parses as valid YAML')
-except yaml.YAMLError as e:
-    print(f'  FAIL: skills/index.yaml YAML parse error: {e}', file=sys.stderr)
-    sys.exit(1)
-" && _ok "skills/index.yaml is valid YAML" || { _fail "skills/index.yaml has YAML parse errors — run: python3 -c \"import yaml; yaml.safe_load(open('skills/index.yaml'))\" to debug"; }
+if node scripts/validate-yaml.js; then
+  _ok "skills/index.yaml is valid YAML"
 else
-  _skip "python3 not found — fix: https://python.org"
+  _fail "skills/index.yaml has YAML parse errors"
 fi
 
 # ── 1. Pipeline JSON schema validation ────────────────────────────────────────
 header "1/10 — Pipeline configs vs pipeline-schema.json"
-if command -v ajv &>/dev/null; then
+if [[ -x node_modules/.bin/ajv ]]; then
   for f in skills/pipelines/*.json; do
-    [[ -f "$f" ]] || continue   # guard: skip if glob did not expand (empty dir)
-    if ajv validate \
+    [[ -f "$f" ]] || continue
+    if npx --no-install ajv validate \
         -s skills/schema/pipeline-schema.json \
         -d "$f" \
         --spec=draft7 \
@@ -71,7 +61,7 @@ if command -v ajv &>/dev/null; then
     fi
   done
 else
-  _skip "ajv-cli not found — fix: npm install -g ajv-cli ajv-formats"
+  _fail "ajv-cli is not installed locally — run: npm ci"
 fi
 
 # ── 2. SKILL.md required sections ─────────────────────────────────────────────
@@ -303,108 +293,16 @@ fi
 
 # ── 9. index.yaml version vs SKILL.md frontmatter ─────────────────────────────
 header "9/10 — index.yaml version vs SKILL.md frontmatter version"
-if command -v python3 &>/dev/null; then
-  python3 - <<'PYEOF' && PASS=$((PASS+1)) || { FAIL=$((FAIL+1)); echo "         Fix: sync the version field in the failing SKILL.md frontmatter to match index.yaml"; }
-import re, sys
-
-with open("skills/index.yaml") as f:
-    raw = f.read()
-
-blocks = raw.split("\n- id:")
-mismatches = []
-passes = []
-
-for block in blocks[1:]:
-    skill_match   = re.search(r'executable_skill:\s*(.+)', block)
-    version_match = re.search(r'(?m)^  version:\s*(.+)', block)
-    if not skill_match or not version_match:
-        continue
-    skill_path = skill_match.group(1).strip()
-    idx_ver    = version_match.group(1).strip()
-
-    try:
-        with open(skill_path) as sf:
-            content = sf.read()
-        m = re.search(r'^version:\s*(.+)$', content, re.MULTILINE)
-        skill_ver = m.group(1).strip().strip('"\'') if m else "MISSING"
-    except FileNotFoundError:
-        skill_ver = "FILE_NOT_FOUND"
-
-    if idx_ver != skill_ver:
-        mismatches.append(
-            f"  FAIL: {skill_path}  index.yaml={idx_ver}  SKILL.md={skill_ver}"
-        )
-    else:
-        passes.append(skill_path)
-
-for p in passes:
-    print(f"  PASS: {p}")
-for m in mismatches:
-    print(m)
-
-sys.exit(1 if mismatches else 0)
-PYEOF
+if node scripts/validate-skill-metadata.js; then
+  PASS=$((PASS+1))
 else
-  _skip "python3 not found — fix: https://python.org"
+  FAIL=$((FAIL+1))
+  echo "         Fix: synchronize index.yaml and SKILL.md metadata"
 fi
 
 # ── 10. Community skill SHA-256 hash verification ─────────────────────────────
 header "10/10 — Community skill SHA-256 hash verification"
-
-python3 - <<'PYEOF'
-import sys, hashlib, yaml
-from pathlib import Path
-
-root = Path(".")
-index_path = root / "skills" / "index.yaml"
-
-try:
-    with open(index_path) as f:
-        data = yaml.safe_load(f)
-except Exception as e:
-    print(f"  SKIP: Could not read skills/index.yaml: {e}")
-    sys.exit(0)
-
-skills = data.get("skills", []) if isinstance(data, dict) else data
-community_skills = [s for s in skills if
-    isinstance(s.get("origin_metadata"), dict) and
-    s["origin_metadata"].get("source") == "community"]
-
-if not community_skills:
-    print("  PASS: No community skills installed")
-    sys.exit(0)
-
-fail_count = 0
-for skill in community_skills:
-    skill_id   = skill.get("id", "?")
-    skill_name = skill.get("name", "?")
-    skill_path = skill.get("executable_skill") or skill.get("reference_path", "")
-    expected_sha = skill.get("origin_metadata", {}).get("sha256")
-
-    if not expected_sha:
-        print(f"  FAIL [{skill_id} {skill_name}]: origin_metadata.sha256 missing")
-        fail_count += 1
-        continue
-
-    skill_file = root / skill_path
-    if not skill_file.exists():
-        print(f"  FAIL [{skill_id} {skill_name}]: SKILL.md not found at {skill_path}")
-        fail_count += 1
-        continue
-
-    actual_sha = hashlib.sha256(skill_file.read_bytes()).hexdigest()
-    if actual_sha == expected_sha:
-        print(f"  PASS [{skill_id} {skill_name}]: SHA-256 verified")
-    else:
-        print(f"  FAIL [{skill_id} {skill_name}]: SHA-256 mismatch")
-        print(f"    expected: {expected_sha}")
-        print(f"    actual:   {actual_sha}")
-        fail_count += 1
-
-sys.exit(1 if fail_count > 0 else 0)
-PYEOF
-
-if [ $? -eq 0 ]; then
+if node scripts/validate-skill-metadata.js; then
   _ok "Community skill SHA-256 verification"
 else
   _fail "Community skill SHA-256 verification — see FAIL lines above"

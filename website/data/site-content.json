@@ -1,7 +1,7 @@
 {
   "$schema": "site-content-schema",
   "$version": "5.3.0",
-  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website --confirm-website`. Last synced: pipeline v4.0.0 — 113 skills, 19 agents, 22 pipelines, 27 phases.",
+  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 113 skills, 19 agents, 22 pipelines, 27 phases.",
   "meta": {
     "title": "ASE-OS — AI Software Engineering Operating System",
     "titleTemplate": "%s — ASE-OS",
@@ -46,7 +46,11 @@
       "Pipeline Phases",
       "Agents"
     ],
-    "statsValues": ["113", "27", "19"]
+    "statsValues": [
+      "113",
+      "27",
+      "19"
+    ]
   },
   "features": {
     "sectionTitle": "What ASE-OS Does For You",
@@ -289,7 +293,7 @@
       {
         "id": "full-pipeline",
         "name": "Full Pipeline",
-        "description": "Complete idea-to-production flow: requirements → architecture → planning → dual-model review → contract freeze → code generation → testing → deployment. 37 phases, 5 gates. The master template for any new feature.",
+        "description": "Complete idea-to-production flow: requirements → architecture → planning → dual-model review → contract freeze → code generation → testing → deployment. 27 phases, 16 gates. The master template for any new feature.",
         "trigger": "full pipeline, new feature, build this, idea to production",
         "color": "violet"
       },
