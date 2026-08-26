@@ -4,8 +4,8 @@
 # Run from the project root:  make health  OR  bash scripts/health-check.sh
 #
 # Checks:
-#   1. Required tools (git, node, python3, opencode)
-#   2. Optional tools (ajv-cli, graphify)
+#   1. Required tools (git, node, npm, opencode)
+#   2. Optional tools (graphify) and local validation dependencies
 #   3. .env file exists
 #   4. GITHUB_TOKEN is set (required)
 #   5. Optional env vars (with warnings, not failures)
@@ -46,14 +46,13 @@ banner "Health Check"
 # ── 1. Required tools ─────────────────────────────────────────────────────────
 header "Required tools"
 
-for tool in git node python3; do
+for tool in git node npm; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool  →  $(command -v "$tool")"
   else
     _fail "$tool not found"
     case "$tool" in
       node)   echo "       Install Node.js at: https://nodejs.org" ;;
-      python3) echo "       Install Python at: https://python.org" ;;
       git)    echo "       Install Git at: https://git-scm.com" ;;
     esac
   fi
@@ -65,14 +64,13 @@ else
   _fail "opencode not found — install at: https://opencode.ai"
 fi
 
-# ── 2. Optional tools ─────────────────────────────────────────────────────────
-header "Optional tools"
+# ── 2. Optional tools and local validation dependencies ───────────────────────
+header "Optional tools and local validation dependencies"
 
-if command -v ajv &>/dev/null; then
-  _ok "ajv-cli  →  $(command -v ajv)"
+if [[ -x "$ROOT/node_modules/.bin/ajv" ]] && [[ -d "$ROOT/node_modules/js-yaml" ]]; then
+  _ok "Local validation dependencies are installed"
 else
-  _warn "ajv-cli not found — pipeline schema validation will be skipped"
-  echo "       Fix: npm install -g ajv-cli ajv-formats"
+  _fail "Local validation dependencies missing — run: ./aiw setup or npm ci"
 fi
 
 if command -v graphify &>/dev/null; then
@@ -130,7 +128,7 @@ for mcp_var in CONTEXT7_API_KEY BRAVE_API_KEY; do
   fi
 done
 
-# ── 6. .opencode/ plugin ──────────────────────────────────────────────────────
+# ── 6. .opencode/ plugin dependencies ──────────────────────────────────────────────────────
 header ".opencode/ plugin dependencies"
 
 if [[ -d "$ROOT/.opencode/node_modules" ]]; then

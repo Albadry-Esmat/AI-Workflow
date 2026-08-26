@@ -239,13 +239,19 @@ cmd_init() {
     npm install --prefix "$TARGET/.opencode" --silent
   fi
 
-  # Copy .env if target doesn't have one
-  if [[ ! -f "$TARGET/.env" ]] && [[ -f "$ROOT/.env" ]]; then
-    cp "$ROOT/.env" "$TARGET/.env"
-    echo "  Copied .env (tokens included)."
-  elif [[ ! -f "$TARGET/.env" ]]; then
+  # Never propagate populated secrets into another project. Provision only the
+  # template and require the target owner to configure credentials explicitly.
+  if [[ ! -f "$TARGET/.env" ]]; then
+    if [[ ! -f "$ROOT/.env.example" ]]; then
+      echo -e "${RED}Error:${NC} $ROOT/.env.example not found — cannot create target .env."
+      exit 1
+    fi
     cp "$ROOT/.env.example" "$TARGET/.env"
-    echo -e "  ${YELLOW}Created .env from template — remember to set GITHUB_TOKEN.${NC}"
+    chmod 600 "$TARGET/.env"
+    echo -e "  ${YELLOW}Created target .env from template — set credentials manually.${NC}"
+    if [[ -f "$ROOT/.env" ]]; then
+      echo -e "  ${YELLOW}Source .env was intentionally not copied because it may contain secrets.${NC}"
+    fi
   else
     echo "  .env already exists in target — skipped."
   fi
