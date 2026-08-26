@@ -111,9 +111,7 @@ See [Skills Registry](skills-registry.md#6-security-review) for details.
 - Changes to authoritative docs or configuration require `aiw sync`, `aiw website-check`, and `aiw sync --check` before commit.
 - Security skill changes require re-running threat modeling.
 - New integration points require security review before pipeline inclusion.
-- Production publication credentials must be separate from local development credentials and must never be copied by `aiw init`.
-- Run `node scripts/security-check.js` after changing MCP definitions or GitHub Actions workflows.
-- Runtime-certification records must remain sanitized, capability-specific, independently reviewed, and blocked until real non-fixture evidence exists.
-- Compatibility maintenance must review version ranges, host boundaries, MCP side effects, projections, and deprecation status at every release and after major vendor changes; run `aiw validate-adapter-lifecycle` before release communication.
-- Release handoff reports must be sanitized, tied to a reviewed commit, and treated as readiness evidence rather than production approval.
-- Release approval records must not promote repository fixtures, fake executables, or unavailable runtimes to conditional or general-production approval.
+
+## Repository hardening and publication controls
+
+AI-Workflow is the source of truth for framework data. Before a release or website publication, run npm run validate:all and the relevant production-hardening checks. The website artifact is an exact SHA-256-verified mirror; destination-only files are deleted rather than retained. Populated source .env files are never copied by aiw init, and external MCP packages must be pinned and explicitly enabled. Deployment approval gates are non-bypassable where required, and generated metadata must use the canonical HTTPS site URL.

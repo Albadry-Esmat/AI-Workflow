@@ -1,321 +1,191 @@
 #!/usr/bin/env bash
-# scripts/sync-website-data.sh — Sync website/data/ from authoritative source files.
+# scripts/sync-website-data.sh — build and verify the authoritative website data artifact.
 #
-# Run from the project root:  aiw sync             (sync this repo's website/data/)
-#                             aiw sync --website   (sync + publish to ASE-OS-Website repo)
+# Run from the project root:
+#   aiw sync                    Build and apply the local website/data mirror.
+#   aiw sync --dry-run          Show additions, changes, and deletions only.
+#   aiw sync --check            Fail if the local mirror is not exact.
+#   aiw sync --website           Also mirror the validated artifact to ASE-OS-Website.
 #
-# The website reads from website/data/ at build time. This script keeps that
-# directory in sync with the source-of-truth files in the project root.
-#
-# Syncs:
-#   skills/index.yaml              → website/data/skills/index.yaml
-#   skills/registry.json           → website/data/skills/registry.json
-#   skills/graph/skill-graph.yaml  → website/data/skills/graph/skill-graph.yaml
-#   skills/pipelines/              → website/data/skills/pipelines/  (all *.json)
-#   docs/changelog.md              → website/data/docs/changelog.md
-#   opencode.json                  → website/data/opencode.json
-#   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
-#   website/data/site-content.json → (already in website/data/, synced via rsync)
-#
-# Flags:
-#   --dry-run    Show what would be synced without writing anything
-#   --check      Exit 1 if any file is out of sync (for CI use)
-#   --website    After syncing website/data/, also publish to ASE-OS-Website repo
-#   --confirm-website  Explicitly confirm local publication when used with --website
-
-WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
-WEBSITE_REPO_DIR=""   # set below if --website is passed
+# The source files in AI-Workflow are authoritative. The destination is treated
+# as an exact mirror: destination-only files are removed, not retained.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-# Load shared utilities
 # shellcheck source=scripts/lib/common.sh
 source "$ROOT/scripts/lib/common.sh"
 
+WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
 DATA_DIR="$ROOT/website/data"
 DRY_RUN=false
 CHECK_MODE=false
 PUSH_WEBSITE=false
-CONFIRM_WEBSITE=false
-SYNCED=0
-UP_TO_DATE=0
-ERRORS=0
 
 for arg in "$@"; do
   case "$arg" in
-    --dry-run)  DRY_RUN=true       ;;
-    --check)    CHECK_MODE=true    ;;
-    --website)  PUSH_WEBSITE=true       ;;
-    --confirm-website|--confirm) CONFIRM_WEBSITE=true ;;
+    --dry-run) DRY_RUN=true ;;
+    --check) CHECK_MODE=true ;;
+    --website) PUSH_WEBSITE=true ;;
     --help|-h)
-      echo "Usage: $0 [--dry-run] [--check] [--website] [--confirm-website]"
-      echo "  --dry-run          Show what would be synced without writing anything"
-      echo "  --check            Exit 1 if any file is out of sync (for CI use)"
-      echo "  --website          Sync website/data/ then prepare to publish to ASE-OS-Website"
-      echo "  --confirm-website  Required with --website for local publication"
+      cat <<'HELP'
+Usage: aiw sync [--dry-run] [--check] [--website]
+
+  --dry-run    Build a temporary artifact and show additions, changes, and deletions.
+  --check      Fail unless website/data/ exactly matches the authoritative source.
+  --website    Mirror the validated artifact into ASE-OS-Website (explicit operation).
+HELP
       exit 0
+      ;;
+    *)
+      fail "Unknown option: $arg"
+      exit 2
       ;;
   esac
 done
 
+if [[ ! -d "$DATA_DIR" ]]; then
+  fail "Destination directory not found: $DATA_DIR"
+  exit 1
+fi
+
+copy_matching() {
+  local source_dir="$1"
+  local destination_dir="$2"
+  local pattern="$3"
+  mkdir -p "$destination_dir"
+  while IFS= read -r -d '' source_file; do
+    local relative="${source_file#"$source_dir/"}"
+    mkdir -p "$destination_dir/$(dirname "$relative")"
+    cp -a "$source_file" "$destination_dir/$relative"
+  done < <(find "$source_dir" -type f -name "$pattern" -print0)
+}
+
+mirror_exact() {
+  local source_dir="$1"
+  local destination_dir="$2"
+  mkdir -p "$destination_dir"
+
+  while IFS= read -r -d '' destination_file; do
+    local relative="${destination_file#"$destination_dir/"}"
+    if [[ ! -f "$source_dir/$relative" ]]; then
+      if [[ "$DRY_RUN" == "true" ]]; then
+        echo "  DELETE: $relative"
+      else
+        rm -f "$destination_file"
+      fi
+    fi
+  done < <(find "$destination_dir" -type f -print0)
+
+  while IFS= read -r -d '' source_file; do
+    local relative="${source_file#"$source_dir/"}"
+    local destination_file="$destination_dir/$relative"
+    if [[ ! -f "$destination_file" ]]; then
+      if [[ "$DRY_RUN" == "true" ]]; then
+        echo "  ADD: $relative"
+      else
+        mkdir -p "$(dirname "$destination_file")"
+        cp -a "$source_file" "$destination_file"
+      fi
+    elif ! cmp -s "$source_file" "$destination_file"; then
+      if [[ "$DRY_RUN" == "true" ]]; then
+        echo "  MODIFY: $relative"
+      else
+        cp -a "$source_file" "$destination_file"
+      fi
+    fi
+  done < <(find "$source_dir" -type f -print0)
+
+  if [[ "$DRY_RUN" != "true" ]]; then
+    find "$destination_dir" -type d -empty -delete
+  fi
+}
+
+VERIFY="$ROOT/scripts/verify-website-sync.js"
+PATCHER="$ROOT/scripts/patch-site-content.js"
+if [[ ! -f "$VERIFY" ]]; then
+  fail "Missing publication verifier: $VERIFY"
+  exit 1
+fi
+
 banner "Sync Website Data"
 
-if [[ "$DRY_RUN" == "true" ]]; then
-  info "Dry-run mode — no files will be written"
-elif [[ "$CHECK_MODE" == "true" ]]; then
-  info "Check mode — will exit 1 if any file is out of sync"
-fi
-
-# ── Pre-sync: patch site-content.json with live-derived counts ────────────────
-if [[ "$DRY_RUN" != "true" ]] && command -v node &>/dev/null; then
-  header "Check site-content.json (live counts)"
-  if [[ "$CHECK_MODE" == "true" ]]; then
-    if ! node "$ROOT/scripts/patch-site-content.js" --check; then
-      fail "website/data/site-content.json has stale derived content"
-      ERRORS=$((ERRORS+1))
-    fi
-  elif ! node "$ROOT/scripts/patch-site-content.js"; then
-    fail "Could not update website/data/site-content.json"
-    ERRORS=$((ERRORS+1))
-  fi
-fi
-
-# ── Guard: website/data must exist ────────────────────────────────────────────
-if [[ ! -d "$DATA_DIR" ]]; then
-  warn "website/data/ not found — skipping sync"
-  echo "  Expected path: $DATA_DIR"
-  echo "  This directory is the data mirror for the ASE-OS Website."
-  echo "  It should already exist in the repo. If it was deleted, restore it with:"
-  echo "    git checkout HEAD -- website/data/"
-  echo ""
-  echo "  Website source repo: https://github.com/Albadry-Esmat/ASE-OS-Website"
-  echo "  Live site:           https://ase-os.vercel.app"
+if [[ "$CHECK_MODE" == "true" ]]; then
+  header "Checking source-generated content"
+  node "$PATCHER" --check
+  header "Checking exact local mirror"
+  node "$VERIFY" --target "$DATA_DIR" --check
+  ok "Local website/data mirror is exact"
   exit 0
 fi
 
-# ── Helper: sync a single file ─────────────────────────────────────────────────
-sync_file() {
-  local src="$1"
-  local dst="$2"
-
-  if [[ ! -f "$src" ]]; then
-    fail "Source not found: $src"
-    ERRORS=$((ERRORS+1))
-    return
-  fi
-
-  mkdir -p "$(dirname "$dst")"
-
-  if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
-    info "Up to date: ${src#"$ROOT/"}"
-    UP_TO_DATE=$((UP_TO_DATE+1))
-    return
-  fi
-
-  if [[ "$DRY_RUN" == "true" ]] || [[ "$CHECK_MODE" == "true" ]]; then
-    if [[ "$CHECK_MODE" == "true" ]]; then
-      fail "Out of sync: ${src#"$ROOT/"} → ${dst#"$ROOT/"}"
-    else
-      ok "Would sync: ${src#"$ROOT/"} → ${dst#"$ROOT/"}"
-    fi
-    SYNCED=$((SYNCED+1))
-  else
-    cp "$src" "$dst"
-    ok "Synced: ${src#"$ROOT/"} → ${dst#"$ROOT/"}"
-    SYNCED=$((SYNCED+1))
-  fi
-}
-
-# ── Helper: sync a directory (recursive copy of matching files) ────────────────
-sync_dir() {
-  local src_dir="$1"
-  local dst_dir="$2"
-  local pattern="${3:-*}"
-
-  if [[ ! -d "$src_dir" ]]; then
-    warn "Source directory not found: $src_dir — skipping"
-    return
-  fi
-
-  mkdir -p "$dst_dir"
-
-  while IFS= read -r -d '' src_file; do
-    rel="${src_file#"$src_dir/"}"
-    dst_file="$dst_dir/$rel"
-    sync_file "$src_file" "$dst_file"
-  done < <(find "$src_dir" -name "$pattern" -type f -print0 2>/dev/null || true)
-
-  # A mirror must not retain files removed from the authoritative source.
-  if [[ -d "$dst_dir" ]]; then
-    while IFS= read -r -d '' dst_file; do
-      rel="${dst_file#"$dst_dir/"}"
-      if [[ ! -f "$src_dir/$rel" ]]; then
-        if [[ "$CHECK_MODE" == "true" ]]; then
-          fail "Stale mirror file: ${dst_file#"$ROOT/"}"
-          SYNCED=$((SYNCED+1))
-        elif [[ "$DRY_RUN" == "true" ]]; then
-          ok "Would remove stale mirror file: ${dst_file#"$ROOT/"}"
-          SYNCED=$((SYNCED+1))
-        else
-          rm -f "$dst_file"
-          ok "Removed stale mirror file: ${dst_file#"$ROOT/"}"
-          SYNCED=$((SYNCED+1))
-        fi
-      fi
-    done < <(find "$dst_dir" -name "$pattern" -type f -print0 2>/dev/null || true)
-  fi
-}
-
-# ── Sync from the single authoritative manifest ────────────────────────────────
-MANIFEST_READER="$ROOT/scripts/website-data-manifest.js"
-PLAN_FILE="$(mktemp)"
-_cleanup() {
-  rm -f "${PLAN_FILE:-}"
-  if [[ -n "${WEBSITE_REPO_DIR:-}" ]]; then
-    rm -rf "$WEBSITE_REPO_DIR"
-  fi
-}
-trap _cleanup EXIT
-
-if [[ ! -f "$MANIFEST_READER" ]] || ! command -v node &>/dev/null; then
-  fail "Website data manifest reader is unavailable"
-  exit 1
-fi
-if ! node "$MANIFEST_READER" > "$PLAN_FILE"; then
-  fail "Website data manifest is invalid"
-  exit 1
+if [[ "$DRY_RUN" == "true" ]]; then
+  info "Dry-run mode — no files will be written"
 fi
 
-header "Manifest-driven website data sync"
-while IFS=$'\t' read -r kind source destination pattern; do
-  case "$kind" in
-    file)
-      sync_file "$ROOT/$source" "$DATA_DIR/$destination"
-      ;;
-    directory)
-      sync_dir "$ROOT/$source" "$DATA_DIR/$destination" "$pattern"
-      ;;
-    *)
-      fail "Unknown manifest entry type: $kind"
-      ERRORS=$((ERRORS+1))
-      ;;
-  esac
-done < "$PLAN_FILE"
-
-# ── Summary ───────────────────────────────────────────────────────────────────
-echo
-echo -e "${BOLD}════════════════════════════════════════${NC}"
-if [[ "$CHECK_MODE" == "true" ]]; then
-  if [[ "$SYNCED" -gt 0 ]] || [[ "$ERRORS" -gt 0 ]]; then
-    echo -e "  ${RED}${BOLD}Sync check FAILED${NC} — $SYNCED file(s) out of sync, $ERRORS source file(s) missing"
-    echo "  Run 'make sync' to update website/data/"
-    echo -e "${BOLD}════════════════════════════════════════${NC}"
-    exit 1
-  else
-    echo -e "  ${GREEN}${BOLD}Sync check PASSED${NC} — all $UP_TO_DATE file(s) are up to date"
-  fi
-elif [[ "$DRY_RUN" == "true" ]]; then
-  echo -e "  Dry-run: $SYNCED file(s) would be synced, $UP_TO_DATE already up to date"
-else
-  if [[ "$SYNCED" -gt 0 ]]; then
-    echo -e "  ${GREEN}Sync complete${NC} — $SYNCED file(s) updated, $UP_TO_DATE already up to date"
-    echo
-    echo "  Tip: commit website/data/ changes along with the source files"
-  else
-    echo -e "  ${GREEN}Nothing to sync${NC} — all $UP_TO_DATE file(s) are up to date"
-  fi
+# Patch the authoritative source content only during a real sync. The patcher
+# validates and atomically writes JSON; the temporary artifact is then built
+# from the resulting source files.
+if [[ "$DRY_RUN" != "true" ]]; then
+  header "Updating generated site content"
+  node "$PATCHER"
 fi
-echo -e "${BOLD}════════════════════════════════════════${NC}"
-echo
 
-# ── Push to ASE-OS-Website repo (--website flag) ──────────────────────────────
-if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY_RUN" == "false" ]]; then
-  if [[ "$CONFIRM_WEBSITE" != "true" ]]; then
-    fail "External website publication requires --confirm-website"
-    echo "  Local data sync completed; no external repository was modified."
-    exit 2
-  fi
-  header "Pushing to ASE-OS-Website"
+STAGE="$(mktemp -d)"
+WEBSITE_REPO_DIR=""
+cleanup() {
+  rm -rf "$STAGE"
+  if [[ -n "$WEBSITE_REPO_DIR" ]]; then rm -rf "$WEBSITE_REPO_DIR"; fi
+}
+trap cleanup EXIT
 
-  # Clone into a temp dir
+header "Building validated publication artifact"
+mkdir -p "$STAGE/skills/graph" "$STAGE/skills/pipelines" "$STAGE/docs" "$STAGE/.opencode/skills"
+cp "$ROOT/skills/index.yaml" "$STAGE/skills/index.yaml"
+cp "$ROOT/skills/registry.json" "$STAGE/skills/registry.json"
+cp "$ROOT/skills/graph/skill-graph.yaml" "$STAGE/skills/graph/skill-graph.yaml"
+cp "$ROOT/docs/changelog.md" "$STAGE/docs/changelog.md"
+cp "$ROOT/opencode.json" "$STAGE/opencode.json"
+cp "$ROOT/website/data/site-content.json" "$STAGE/site-content.json"
+copy_matching "$ROOT/skills/pipelines" "$STAGE/skills/pipelines" "*.json"
+copy_matching "$ROOT/.opencode/skills" "$STAGE/.opencode/skills" "SKILL.md"
+
+node "$VERIFY" --target "$STAGE" --check --report "$ROOT/website/data/.publication-verification.json"
+
+header "Comparing staged artifact with local mirror"
+mirror_exact "$STAGE" "$DATA_DIR"
+
+if [[ "$DRY_RUN" == "true" ]]; then
+  ok "Dry-run complete"
+  exit 0
+fi
+
+header "Applying exact local mirror"
+mirror_exact "$STAGE" "$DATA_DIR"
+node "$VERIFY" --target "$DATA_DIR" --check --report "$DATA_DIR/.publication-verification.json"
+rm -f "$DATA_DIR/.publication-verification.json"
+ok "Local website/data mirror is synchronized exactly"
+
+if [[ "$PUSH_WEBSITE" == "true" ]]; then
+  header "Mirroring validated artifact to ASE-OS-Website"
   WEBSITE_REPO_DIR="$(mktemp -d)"
-  step "Cloning $WEBSITE_REPO ..."
-  if ! git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
-    fail "Could not clone ASE-OS-Website — check repository access, WEBSITE_DEPLOY_TOKEN/credential helper, and network."
-    exit 1
-  fi
-  ok "Cloned into $WEBSITE_REPO_DIR"
+  git clone --depth 1 "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet
+  mirror_exact "$STAGE" "$WEBSITE_REPO_DIR/data"
+  node "$VERIFY" --target "$WEBSITE_REPO_DIR/data" --check
 
-  TARGET_BRANCH=$(git -C "$WEBSITE_REPO_DIR" branch --show-current)
-  if [[ "$TARGET_BRANCH" != "main" ]]; then
-    fail "Refusing publication: target repository checked out '$TARGET_BRANCH', expected 'main'."
-    exit 1
-  fi
-  if [[ -n "$(git -C "$WEBSITE_REPO_DIR" status --porcelain)" ]]; then
-    fail "Refusing publication: target repository checkout is not clean."
-    exit 1
-  fi
-  if ! git -C "$WEBSITE_REPO_DIR" pull --ff-only origin main --quiet; then
-    fail "Refusing publication: target main branch could not be fast-forwarded safely."
-    exit 1
-  fi
-
-  # Mirror website/data/ → data/ in the website repo
-  step "Copying data files..."
-  rsync -a --delete "$DATA_DIR/" "$WEBSITE_REPO_DIR/data/"
-
-  # Check if anything actually changed
   cd "$WEBSITE_REPO_DIR"
-  CHANGED=$(git status --short | wc -l | tr -d ' ')
-
-  PUBLICATION_DIGEST=""
-  if [[ "$CHANGED" -gt 0 ]]; then
-    PUBLICATION_DIGEST=$(find "$DATA_DIR" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | awk '{print $1}')
-    if ! node "$ROOT/scripts/idempotency-guard.js" --operation website-data-publication --material "$PUBLICATION_DIGEST" --claim; then
-      fail "Refusing publication: this deterministic website-data operation is already claimed; inspect the target repository and idempotency ledger before retrying."
-      exit 3
-    fi
+  if [[ -z "$(git status --short)" ]]; then
+    ok "ASE-OS-Website is already synchronized"
+    exit 0
   fi
 
-  if [[ "$CHANGED" -eq 0 ]]; then
-    ok "ASE-OS-Website is already up to date — nothing to push"
-  else
-    # Detect version from changelog for commit message
-    VERSION=$(grep -m1 '## \[' "$ROOT/docs/changelog.md" 2>/dev/null \
-              | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
-
-    step "Committing $CHANGED changed file(s)..."
-    git add data/
-    git commit -m "sync: update data/ from AI-Workflow v${VERSION}
-
-Automated sync from AI-Workflow repository.
-Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
-
-    step "Pushing to origin/main..."
-    if git push origin main --quiet; then
-      if [[ -n "$PUBLICATION_DIGEST" ]]; then
-        node "$ROOT/scripts/idempotency-guard.js" --operation website-data-publication --material "$PUBLICATION_DIGEST" --complete --status published --result-category "commit-and-push"
-      fi
-      ok "Pushed $CHANGED file(s) to ASE-OS-Website"
-      echo ""
-      echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"
-      echo -e "  Live site will rebuild automatically: ${CYAN}https://ase-os.vercel.app${NC}"
-      echo ""
-      echo -e "  ${YELLOW}Note:${NC} this sync covers all data files including site-content.json."
-      echo -e "  All website prose, features, agents, pipeline phases, and section content"
-      echo -e "  are driven from ${CYAN}website/data/site-content.json${NC}."
-    else
-      fail "Push failed — check the dedicated publication credential has write access to ASE-OS-Website."
-      exit 1
-    fi
-  fi
-
-  echo ""
-  echo -e "${BOLD}════════════════════════════════════════${NC}"
-  echo
+  VERSION="$(node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync("data/skills/registry.json","utf8")); process.stdout.write(x.version || "unreleased")')"
+  git config user.name "github-actions[bot]"
+  git config user.email "github-actions[bot]@users.noreply.github.com"
+  git add data/
+  git commit -m "sync: update data/ from AI-Workflow v${VERSION}" --quiet
+  git push origin main --quiet
+  ok "Pushed validated website data to ASE-OS-Website"
 fi
-
-[[ "$ERRORS" -eq 0 ]]

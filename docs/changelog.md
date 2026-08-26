@@ -9,6 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Security and Reliability Hardening
+
+- Website publication is now exact and deletion-safe, with SHA-256 manifest verification that detects missing, extra, and modified files.
+- `aiw init` never copies populated source `.env` files; targets receive only `.env.example` with restrictive permissions.
+- Changelog and skill Markdown rendering now use React escaping or centralized sanitization rather than unsanitized HTML injection.
+- Validation runs through pinned local Node dependencies, with semantic pipeline, MCP policy, URL, and secret-safety checks.
+- Production-hardening pipelines use synchronous gated ADR generation and non-bypassable indefinite deployment approval.
+
 ### Added
 
 - **Release-approval evidence controls** — Added the versioned release-approval schema, sanitized validator, repository-fixture no-go record, scope-specific promotion rules, blocker ownership requirements, review-state checks, and integration into release-status, preflight, self-test, and release documentation.

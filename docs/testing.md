@@ -84,3 +84,7 @@ The fixture at `tests/fixtures/runtime-certification.json` is deliberately repos
 - Changes to runtime-certification or adapter-lifecycle schemas and validators require updating this file, the compatibility guide, the developer adapter guide, the operator runbook, and `changelog.md`.
 - New test types must be added to the testing skill's execution logic.
 - Coverage threshold changes require updating quality gates in deployment.
+
+## Repository hardening and publication controls
+
+AI-Workflow is the source of truth for framework data. Before a release or website publication, run npm run validate:all and the relevant production-hardening checks. The website artifact is an exact SHA-256-verified mirror; destination-only files are deleted rather than retained. Populated source .env files are never copied by aiw init, and external MCP packages must be pinned and explicitly enabled. Deployment approval gates are non-bypassable where required, and generated metadata must use the canonical HTTPS site URL.

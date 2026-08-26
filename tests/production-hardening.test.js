@@ -1,5 +1,39 @@
 const fs = require("fs");
 const os = require("os");
+const { describe: nodeDescribe, it: nodeIt } = require("node:test");
+const assert = require("node:assert/strict");
+
+function createExpectation(received, negated = false) {
+  const check = (condition, message) => {
+    const shouldFail = negated ? condition : !condition;
+    if (shouldFail) throw new assert.AssertionError({ message });
+  };
+  return {
+    get not() { return createExpectation(received, !negated); },
+    toBe(expected) { check(Object.is(received, expected), `Expected ${received} ${negated ? "not " : ""}to be ${expected}`); },
+    toBeTruthy() { check(Boolean(received), `Expected value ${negated ? "not " : ""}to be truthy`); },
+    toBeDefined() { check(received !== undefined, `Expected value ${negated ? "not " : ""}to be defined`); },
+    toHaveLength(expected) { check(received != null && received.length === expected, `Expected length ${negated ? "not " : ""}to be ${expected}`); },
+    toContain(expected) { check(received != null && received.includes(expected), `Expected value ${negated ? "not " : ""}to contain ${expected}`); },
+    toMatch(expected) { check(typeof received === "string" && (expected instanceof RegExp ? expected.test(received) : received.includes(expected)), `Expected value ${negated ? "not " : ""}to match ${expected}`); },
+    toEqual(expected) {
+      const matches = expected && expected.__arrayContaining
+        ? expected.__arrayContaining.every((item) => received.includes(item))
+        : (() => { try { assert.deepStrictEqual(received, expected); return true; } catch { return false; } })();
+      check(matches, `Expected values ${negated ? "not " : ""}to be deeply equal`);
+    },
+    toThrow(expected) {
+      let error;
+      try { received(); } catch (caught) { error = caught; }
+      const matches = Boolean(error) && (!expected || (expected instanceof RegExp ? expected.test(error.message) : error.message.includes(expected)));
+      check(matches, `Expected function ${negated ? "not " : ""}to throw ${expected || "an error"}`);
+    },
+  };
+}
+function expect(received) { return createExpectation(received); }
+expect.arrayContaining = (items) => ({ __arrayContaining: items });
+global.describe = nodeDescribe;
+global.test = nodeIt;
 const path = require("path");
 const { execFileSync, spawnSync } = require("child_process");
 const {

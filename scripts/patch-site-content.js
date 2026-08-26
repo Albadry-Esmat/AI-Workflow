@@ -1,17 +1,10 @@
 #!/usr/bin/env node
 /**
- * scripts/patch-site-content.js
- *
- * Auto-patches website/data/site-content.json with live-derived counts from
- * the authoritative source files (skills/index.yaml, skills/registry.json,
- * skills/pipelines/, opencode.json, docs/changelog.md).
- *
- * Run before sync to ensure site-content.json never has stale numbers.
- * Called automatically by sync-website-data.sh and the CI sync workflow.
+ * Update generated site-content.json from authoritative repository statistics.
  *
  * Usage:
- *   node scripts/patch-site-content.js           # patch in place
- *   node scripts/patch-site-content.js --check   # exit 1 if patch would change anything
+ *   node scripts/patch-site-content.js
+ *   node scripts/patch-site-content.js --check
  */
 
 const fs = require("fs");
@@ -19,119 +12,155 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const SITE_CONTENT_PATH = path.join(ROOT, "website", "data", "site-content.json");
-
-// ── Derive live stats ────────────────────────────────────────────────────────
+const checkMode = process.argv.includes("--check");
 
 function countSkills() {
   const raw = fs.readFileSync(path.join(ROOT, "skills", "index.yaml"), "utf8");
-  // Each skill entry starts with "- id:" at the top level
   return (raw.match(/^- id:/gm) || []).length;
 }
 
 function getRegistryVersion() {
-  const raw = fs.readFileSync(path.join(ROOT, "skills", "registry.json"), "utf8");
-  const parsed = JSON.parse(raw);
-  return parsed.version || "0.0.0";
+  const parsed = JSON.parse(fs.readFileSync(path.join(ROOT, "skills", "registry.json"), "utf8"));
+  if (typeof parsed.version !== "string" || !parsed.version) throw new Error("registry.json has no valid version");
+  return parsed.version;
 }
 
 function countPipelines() {
-  const dir = path.join(ROOT, "skills", "pipelines");
-  return fs.readdirSync(dir).filter(f => f.endsWith(".json")).length;
+  return fs.readdirSync(path.join(ROOT, "skills", "pipelines")).filter((file) => file.endsWith(".json")).length;
+}
+
+function fullPipeline() {
+  const parsed = JSON.parse(fs.readFileSync(path.join(ROOT, "skills", "pipelines", "full-pipeline.json"), "utf8"));
+  if (!Array.isArray(parsed.phases)) throw new Error("full-pipeline.json has no phases array");
+  if (!Array.isArray(parsed.gates)) throw new Error("full-pipeline.json has no gates array");
+  return parsed;
 }
 
 function countPipelinePhases() {
-  const raw = fs.readFileSync(path.join(ROOT, "skills", "pipelines", "full-pipeline.json"), "utf8");
-  const parsed = JSON.parse(raw);
-  return (parsed.phases || []).length;
+  return fullPipeline().phases.length;
+}
+
+function countPipelineGates() {
+  return fullPipeline().gates.length;
 }
 
 function countAgents() {
-  const raw = fs.readFileSync(path.join(ROOT, "opencode.json"), "utf8");
-  const parsed = JSON.parse(raw);
-  return Object.keys(parsed.agent || {}).length;
+  const parsed = JSON.parse(fs.readFileSync(path.join(ROOT, "opencode.json"), "utf8"));
+  if (!parsed.agent || typeof parsed.agent !== "object") throw new Error("opencode.json has no agent object");
+  return Object.keys(parsed.agent).length;
 }
 
 function getLatestVersion() {
   const raw = fs.readFileSync(path.join(ROOT, "docs", "changelog.md"), "utf8");
-  const match = raw.match(/## \[(\d+\.\d+\.\d+)\]/);
+  const match = raw.match(/^## \[(\d+\.\d+\.\d+)\]/m);
   return match ? match[1] : getRegistryVersion();
 }
 
-// ── Patch logic ──────────────────────────────────────────────────────────────
-
-function main() {
-  const checkMode = process.argv.includes("--check");
-
-  if (!fs.existsSync(SITE_CONTENT_PATH)) {
-    console.log("  INFO: website/data/site-content.json not found — skipping patch");
-    process.exit(0);
+function requireObject(root, pathParts) {
+  let current = root;
+  for (const part of pathParts) {
+    if (!current || typeof current !== "object" || !(part in current)) {
+      throw new Error(`site-content.json is missing required field: ${pathParts.join(".")}`);
+    }
+    current = current[part];
   }
+  return current;
+}
 
+function requireString(root, pathParts) {
+  const value = requireObject(root, pathParts);
+  if (typeof value !== "string") throw new Error(`site-content.json field must be a string: ${pathParts.join(".")}`);
+  return value;
+}
+
+function requireArray(root, pathParts) {
+  const value = requireObject(root, pathParts);
+  if (!Array.isArray(value)) throw new Error(`site-content.json field must be an array: ${pathParts.join(".")}`);
+  return value;
+}
+
+function validateShape(content) {
+  requireString(content, ["$schema"]);
+  requireString(content, ["$version"]);
+  requireString(content, ["$description"]);
+  requireString(content, ["meta", "description"]);
+  requireString(content, ["meta", "openGraph", "description"]);
+  requireString(content, ["meta", "twitter", "description"]);
+  requireString(content, ["hero", "badge"]);
+  const statsValues = requireArray(content, ["hero", "statsValues"]);
+  if (statsValues.length !== 3 || statsValues.some((value) => typeof value !== "string")) {
+    throw new Error("site-content.json hero.statsValues must contain three strings");
+  }
+}
+
+function stats() {
   const skills = countSkills();
   const agents = countAgents();
   const pipelines = countPipelines();
   const phases = countPipelinePhases();
+  const gates = countPipelineGates();
   const version = getLatestVersion();
   const registryVersion = getRegistryVersion();
+  return { skills, agents, pipelines, phases, gates, version, registryVersion };
+}
 
-  let raw = fs.readFileSync(SITE_CONTENT_PATH, "utf8");
-  const original = raw;
+function apply(content, values) {
+  validateShape(content);
+  content["$version"] = values.registryVersion;
+  content["$description"] = `Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via \`aiw sync --website\`. Last synced: pipeline v${values.version} — ${values.skills} skills, ${values.agents} agents, ${values.pipelines} pipelines, ${values.phases} phases.`;
+  content.meta.description = `A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. ${values.skills} skills · ${values.agents} agents · ${values.pipelines} pipeline templates · v${values.version}.`;
+  content.meta.openGraph.description = `A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. ${values.skills} skills, ${values.agents} agents, ${values.pipelines} pipeline templates.`;
+  content.meta.twitter.description = `Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v${values.version} — ${values.skills} skills, ${values.agents} agents.`;
+  content.hero.badge = `v${values.version} — Skill System`;
+  content.hero.statsValues = [String(values.skills), String(values.phases), String(values.agents)];
 
-  // Replace stats patterns wherever they appear
-  // Pattern: "N skills" (case insensitive within the JSON strings)
-  raw = raw.replace(
-    /"\$description":\s*"[^"]*"/,
-    `"$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via \`aiw sync --website --confirm-website\`. Last synced: pipeline v${version} — ${skills} skills, ${agents} agents, ${pipelines} pipelines, ${phases} phases."`
-  );
+  const templates = content.pipelineTemplates?.templates;
+  const fullTemplate = Array.isArray(templates) ? templates.find((template) => template?.id === "full-pipeline") : null;
+  if (fullTemplate && typeof fullTemplate.description === "string") {
+    fullTemplate.description = fullTemplate.description.replace(/\d+ phases, \d+ gates/, `${values.phases} phases, ${values.gates} gates`);
+  }
+  validateShape(content);
+  return content;
+}
 
-  // meta.description
-  raw = raw.replace(
-    /("meta"[\s\S]*?"description":\s*)"[^"]*"/,
-    `$1"A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. ${skills} skills · ${agents} agents · ${pipelines} pipeline templates · v${version}."`
-  );
+function main() {
+  if (!fs.existsSync(SITE_CONTENT_PATH)) {
+    console.log("  INFO: website/data/site-content.json not found — skipping patch");
+    return;
+  }
 
-  // openGraph.description
-  raw = raw.replace(
-    /("openGraph"[\s\S]*?"description":\s*)"[^"]*"/,
-    `$1"A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. ${skills} skills, ${agents} agents, ${pipelines} pipeline templates."`
-  );
+  let content;
+  try {
+    content = JSON.parse(fs.readFileSync(SITE_CONTENT_PATH, "utf8"));
+  } catch (error) {
+    throw new Error(`site-content.json is invalid JSON: ${error.message}`);
+  }
 
-  // twitter.description
-  raw = raw.replace(
-    /("twitter"[\s\S]*?"description":\s*)"[^"]*"/,
-    `$1"Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v${version} — ${skills} skills, ${agents} agents."`
-  );
+  const before = JSON.stringify(content, null, 2);
+  const values = stats();
+  const updated = apply(content, values);
+  const after = `${JSON.stringify(updated, null, 2)}\n`;
 
-  // hero.badge
-  raw = raw.replace(
-    /("badge":\s*)"[^"]*"/,
-    `$1"v${version} — Skill System"`
-  );
-
-  // hero.statsValues
-  raw = raw.replace(
-    /("statsValues":\s*)\[[^\]]*\]/,
-    `$1["${skills}", "${phases}", "${agents}"]`
-  );
-
-  // $version at top level
-  raw = raw.replace(
-    /("\$version":\s*)"[^"]*"/,
-    `$1"${registryVersion}"`
-  );
-
-  if (raw === original) {
+  if (before === after.trimEnd()) {
     console.log("  ✓ site-content.json is already up to date");
-    process.exit(0);
+    return;
   }
 
   if (checkMode) {
-    console.log(`  FAIL: site-content.json has stale counts (skills=${skills}, agents=${agents}, pipelines=${pipelines}, phases=${phases}, version=${version})`);
-    process.exit(1);
+    console.error(`  FAIL: site-content.json has stale generated values (skills=${values.skills}, agents=${values.agents}, pipelines=${values.pipelines}, phases=${values.phases}, gates=${values.gates}, version=${values.version})`);
+    process.exitCode = 1;
+    return;
   }
 
-  fs.writeFileSync(SITE_CONTENT_PATH, raw, "utf8");
-  console.log(`  ✓ Patched site-content.json: ${skills} skills, ${agents} agents, ${pipelines} pipelines, ${phases} phases, v${version}`);
+  const temporary = `${SITE_CONTENT_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(temporary, after, { encoding: "utf8", mode: 0o644 });
+  fs.renameSync(temporary, SITE_CONTENT_PATH);
+  console.log(`  ✓ Patched site-content.json: ${values.skills} skills, ${values.agents} agents, ${values.pipelines} pipelines, ${values.phases} phases, ${values.gates} gates, v${values.version}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(`  FAIL: ${error.message}`);
+  process.exitCode = 1;
+}
