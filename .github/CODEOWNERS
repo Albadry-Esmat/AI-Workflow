@@ -1,0 +1,13 @@
+# Repository-wide ownership. GitHub uses this file when branch rules require review.
+* @Albadry-Esmat
+
+# Changes that can alter CI privileges, releases, or published artifacts.
+/.github/ @Albadry-Esmat
+/.github/workflows/ @Albadry-Esmat
+/.github/dependabot.yml @Albadry-Esmat
+/package.json @Albadry-Esmat
+/package-lock.json @Albadry-Esmat
+/scripts/ @Albadry-Esmat
+/website/data/ @Albadry-Esmat
+/skills/ @Albadry-Esmat
+/opencode.json @Albadry-Esmat
