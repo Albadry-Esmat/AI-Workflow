@@ -18,7 +18,7 @@ cd AI-Workflow
 
 ```bash
 # Edit .env and set your GITHUB_TOKEN
-# (get one at https://github.com/settings/tokens — classic token, no expiration, scopes: repo + read:org)
+# Use a fine-grained, expiring token with only the repository permissions you need.
 aiw health                       # verify everything is configured
 aiw start /path/to/your-project  # launch on your project
 ```
@@ -105,6 +105,17 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | `aiw validate` | Run the full 11-check skill validation suite |
 | `aiw lint` | Quick YAML + schema syntax check (checks 0-1 only) |
 | `aiw doctor` | Comprehensive diagnostic: health + validation + git status |
+
+### Planning
+
+| Command | What it does |
+|---------|-------------|
+| `aiw plan [request]` | Show a deterministic, side-effect-free execution plan using the default pipeline |
+| `aiw plan [request] --pipeline <name>` | Plan a specific pipeline and display its phases, agents, gates, retries, and warnings |
+| `aiw plan [request] --json` | Emit the execution manifest for CI, editors, or automation |
+| `aiw plan [request] --dry-run` | Explicitly select the same side-effect-free planning behavior |
+
+See [`docs/planning.md`](docs/planning.md) for the manifest contract and safety guarantees.
 
 ### Development
 

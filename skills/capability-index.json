@@ -1,0 +1,4316 @@
+{
+  "schema_version": "1.0.0",
+  "generated_by": "scripts/build-capability-index.js",
+  "catalog_version": "3.7.0",
+  "catalog_last_updated": "2026-07-09",
+  "registry_entry_count": 4,
+  "agent_count": 19,
+  "pipeline_count": 22,
+  "skill_count": 113,
+  "classifications": {
+    "catalog-only": 16,
+    "pipeline-routed": 28,
+    "runtime-registry": 4,
+    "agent-owned": 49,
+    "event-or-utility": 16
+  },
+  "skills": [
+    {
+      "id": "SKL-067",
+      "name": "acceptance-criteria-generator",
+      "display_name": "Acceptance Criteria Generator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/acceptance-criteria-generator/SKILL.md",
+      "reference_path": ".opencode/skills/acceptance-criteria-generator/SKILL.md",
+      "tags": [
+        "acceptance-criteria",
+        "bdd",
+        "gherkin",
+        "requirements",
+        "testing",
+        "traceability",
+        "phase-7"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-051",
+      "name": "adaptation-applicator",
+      "display_name": "Adaptation Applicator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/adaptation-applicator/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "adaptation",
+        "apply",
+        "hitl-approved",
+        "rollback",
+        "validation",
+        "build",
+        "self-improvement",
+        "system-update"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-050",
+        "SKL-012",
+        "SKL-011"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "insights-adaptation-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-050",
+      "name": "adaptive-proposal-generator",
+      "display_name": "Adaptive Proposal Generator",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/adaptive-proposal-generator/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "adaptive",
+        "proposals",
+        "self-improvement",
+        "telemetry",
+        "patterns",
+        "hitl-gated",
+        "suggestion-only"
+      ],
+      "mastery_level": "advanced",
+      "classification": "runtime-registry",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-048",
+        "SKL-015"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "insights-adaptation-pipeline"
+      ],
+      "directly_routable": true,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-027",
+      "name": "adr-generator",
+      "display_name": "ADR Generator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/adr-generator/SKILL.md",
+      "reference_path": "skills/knowledge/adr-generator.md",
+      "tags": [
+        "adr",
+        "architecture",
+        "decisions",
+        "tradeoffs",
+        "documentation",
+        "records"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "change-request",
+        "cloud-migration",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-043",
+      "name": "ai-agent-specialist",
+      "display_name": "AI Agent Specialist",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/ai-agent-specialist/SKILL.md",
+      "reference_path": "skills/knowledge/ai-agent-specialist.md",
+      "tags": [
+        "ai",
+        "llm",
+        "rag",
+        "multi-agent",
+        "prompt-engineering",
+        "vector-database",
+        "safety",
+        "evaluation",
+        "langchain",
+        "openai",
+        "anthropic"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "ai-agent-system"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-081",
+      "name": "analytics-schema-designer",
+      "display_name": "Analytics Schema Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/analytics-schema-designer/SKILL.md",
+      "reference_path": ".opencode/skills/analytics-schema-designer/SKILL.md",
+      "tags": [
+        "analytics",
+        "dimensional-modeling",
+        "star-schema",
+        "dbt",
+        "bi",
+        "data-warehouse",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-078",
+        "SKL-032"
+      ],
+      "owner_agents": [
+        {
+          "agent": "data-engineer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "data-engineering"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-071",
+      "name": "api-deprecation-manager",
+      "display_name": "API Deprecation Manager",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/api-deprecation-manager/SKILL.md",
+      "reference_path": ".opencode/skills/api-deprecation-manager/SKILL.md",
+      "tags": [
+        "api",
+        "deprecation",
+        "versioning",
+        "lifecycle",
+        "migration",
+        "breaking-changes",
+        "phase-7"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-024",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-083",
+      "name": "api-design-architect",
+      "display_name": "API Design Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/api-design-architect/SKILL.md",
+      "reference_path": ".opencode/skills/api-design-architect/SKILL.md",
+      "tags": [
+        "api-design",
+        "openapi",
+        "rest",
+        "versioning",
+        "rate-limiting",
+        "sdk",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "api-designer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "api-first",
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-002",
+      "name": "architecture-design",
+      "display_name": "Architecture Design",
+      "version": "1.3.0",
+      "executable_skill": ".opencode/skills/architecture-design/SKILL.md",
+      "reference_path": "skills/knowledge/architecture-design.md",
+      "tags": [
+        "architecture",
+        "ddd",
+        "solid",
+        "modules",
+        "design",
+        "boundaries",
+        "clean-architecture"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "architect",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "architecture-only",
+        "cloud-migration",
+        "compliance-first",
+        "consumer-website",
+        "data-engineering",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-069",
+      "name": "architecture-evolution-planner",
+      "display_name": "Architecture Evolution Planner",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/architecture-evolution-planner/SKILL.md",
+      "reference_path": ".opencode/skills/architecture-evolution-planner/SKILL.md",
+      "tags": [
+        "architecture",
+        "migration",
+        "refactoring",
+        "strangler-fig",
+        "evolution",
+        "planning",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-027",
+        "SKL-023"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-047",
+      "name": "behavioral-telemetry-collector",
+      "display_name": "Behavioral Telemetry Collector",
+      "version": "1.3.0",
+      "executable_skill": ".opencode/skills/behavioral-telemetry-collector/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "telemetry",
+        "observability",
+        "pii-scrubbing",
+        "ring-buffer",
+        "events",
+        "pipeline",
+        "monitoring"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-014",
+        "SKL-021"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "insights-adaptation-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": 2000,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-104",
+      "name": "caching-strategy-designer",
+      "display_name": "Caching Strategy Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/caching-strategy-designer/SKILL.md",
+      "reference_path": ".opencode/skills/caching-strategy-designer/SKILL.md",
+      "tags": [
+        "caching",
+        "redis",
+        "cdn",
+        "http-cache",
+        "cache-invalidation",
+        "stampede-prevention",
+        "performance",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-032"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-024",
+      "name": "change-impact-analyzer",
+      "display_name": "Change Impact Analyzer",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/change-impact-analyzer/SKILL.md",
+      "reference_path": "skills/knowledge/change-impact-analyzer.md",
+      "tags": [
+        "impact",
+        "change",
+        "blast-radius",
+        "api",
+        "tests",
+        "security",
+        "modules"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-023",
+        "SKL-021"
+      ],
+      "owner_agents": [
+        {
+          "agent": "impact-analyzer",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "compliance-first",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-056",
+      "name": "change-request-manager",
+      "display_name": "Change Request Manager",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/change-request-manager/SKILL.md",
+      "reference_path": "docs/work-item-foundation.md",
+      "tags": [
+        "change-request",
+        "lifecycle",
+        "impact-analysis",
+        "task-delta",
+        "work-items",
+        "hitl",
+        "scope-change"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-021",
+        "SKL-024",
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "change-request"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-099",
+      "name": "chaos-engineering-designer",
+      "display_name": "Chaos Engineering Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/chaos-engineering-designer/SKILL.md",
+      "reference_path": ".opencode/skills/chaos-engineering-designer/SKILL.md",
+      "tags": [
+        "chaos-engineering",
+        "fault-injection",
+        "litmus",
+        "gremlin",
+        "aws-fis",
+        "gameday",
+        "resilience",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-088",
+        "SKL-097"
+      ],
+      "owner_agents": [
+        {
+          "agent": "sre",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-042",
+      "name": "ci-pipeline-generator",
+      "display_name": "CI Pipeline Generator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/ci-pipeline-generator/SKILL.md",
+      "reference_path": "skills/knowledge/deployment-strategy.md",
+      "tags": [
+        "ci-cd",
+        "github-actions",
+        "gitlab-ci",
+        "dockerfile",
+        "kubernetes",
+        "deployment",
+        "pipeline",
+        "scaffolding",
+        "devops",
+        "iac"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-007",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "ai-agent-system",
+        "cloud-migration",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-109",
+      "name": "clarify",
+      "display_name": "Clarify",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/clarify/SKILL.md",
+      "reference_path": ".opencode/skills/clarify/SKILL.md",
+      "tags": [
+        "requirements",
+        "clarification",
+        "ambiguity",
+        "hitl",
+        "pipeline-entry",
+        "feature-012"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "compliance-first",
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-004",
+      "name": "clean-code-review",
+      "display_name": "Clean Code Review",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/clean-code-review/SKILL.md",
+      "reference_path": "skills/knowledge/clean-code.md",
+      "tags": [
+        "code-quality",
+        "solid",
+        "clean-code",
+        "refactoring",
+        "review",
+        "readability",
+        "smells"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-003"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "quick-review",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-089",
+      "name": "cloud-architecture-reviewer",
+      "display_name": "Cloud Architecture Reviewer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
+      "reference_path": ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
+      "tags": [
+        "cloud",
+        "well-architected",
+        "aws",
+        "gcp",
+        "azure",
+        "cost-optimization",
+        "cloud-review",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "cloud-platform",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-026",
+      "name": "code-generator",
+      "display_name": "Code Generator",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/code-generator/SKILL.md",
+      "reference_path": "skills/knowledge/code-generator.md",
+      "tags": [
+        "code-generation",
+        "scaffolding",
+        "implementation",
+        "boilerplate",
+        "stubs",
+        "modules"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [
+        {
+          "agent": "builder",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "change-request",
+        "compliance-first",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-029",
+      "name": "code-repair",
+      "display_name": "Code Repair",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/code-repair/SKILL.md",
+      "reference_path": "skills/knowledge/code-repair.md",
+      "tags": [
+        "repair",
+        "debugging",
+        "fix",
+        "test-failure",
+        "compile-error",
+        "type-error",
+        "lint"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-004",
+        "SKL-026"
+      ],
+      "owner_agents": [
+        {
+          "agent": "builder",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "compliance-first",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-117",
+      "name": "compliance-gate",
+      "display_name": "Compliance Gate",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/compliance-gate/SKILL.md",
+      "reference_path": ".opencode/skills/compliance-gate/SKILL.md",
+      "tags": [
+        "governance",
+        "guard",
+        "compliance",
+        "coverage",
+        "soc2",
+        "hipaa",
+        "gdpr",
+        "iso27001",
+        "feature-017"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-116"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "compliance-first"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-070",
+      "name": "compliance-mapper",
+      "display_name": "Compliance Mapper",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/compliance-mapper/SKILL.md",
+      "reference_path": ".opencode/skills/compliance-mapper/SKILL.md",
+      "tags": [
+        "compliance",
+        "gdpr",
+        "hipaa",
+        "pci-dss",
+        "soc2",
+        "iso27001",
+        "governance",
+        "traceability",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-006"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-116",
+      "name": "compliance-profiler",
+      "display_name": "Compliance Profiler",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/compliance-profiler/SKILL.md",
+      "reference_path": ".opencode/skills/compliance-profiler/SKILL.md",
+      "tags": [
+        "governance",
+        "compliance",
+        "soc2",
+        "hipaa",
+        "gdpr",
+        "iso27001",
+        "feature-017"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "compliance-first"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-091",
+      "name": "container-orchestration-architect",
+      "display_name": "Container Orchestration Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/container-orchestration-architect/SKILL.md",
+      "reference_path": ".opencode/skills/container-orchestration-architect/SKILL.md",
+      "tags": [
+        "kubernetes",
+        "helm",
+        "gitops",
+        "autoscaling",
+        "rbac",
+        "container-orchestration",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-093"
+      ],
+      "owner_agents": [
+        {
+          "agent": "cloud-platform",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration",
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-022",
+      "name": "context-compressor",
+      "display_name": "Context Compressor",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/context-compressor/SKILL.md",
+      "reference_path": "skills/knowledge/context-compressor.md",
+      "tags": [
+        "context",
+        "compression",
+        "token-budget",
+        "summarization",
+        "truncation",
+        "memory",
+        "cascade",
+        "auto-compress",
+        "pipeline-state",
+        "session-history"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-013",
+      "name": "context-memory",
+      "display_name": "Context Memory",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/context-memory/SKILL.md",
+      "reference_path": "skills/knowledge/context-memory.md",
+      "tags": [
+        "session",
+        "context",
+        "state",
+        "persistence",
+        "multi-turn",
+        "resumption",
+        "compression"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-118",
+      "name": "cost-estimator",
+      "display_name": "Cost Estimator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/cost-estimator/SKILL.md",
+      "reference_path": ".opencode/skills/cost-estimator/SKILL.md",
+      "tags": [
+        "utility",
+        "cost",
+        "tokens",
+        "estimate",
+        "pre-run",
+        "feature-018"
+      ],
+      "mastery_level": "beginner",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-010"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-020",
+      "name": "create-sub-agent",
+      "display_name": "Sub-Agent Creation",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/create-sub-agent/SKILL.md",
+      "reference_path": "skills/knowledge/create-sub-agent.md",
+      "tags": [
+        "sub-agent",
+        "agent-design",
+        "scaffolding",
+        "meta",
+        "automation",
+        "spec-generation"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-009"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-054",
+      "name": "creative-experience-architect",
+      "display_name": "Creative Experience Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/creative-experience-architect/SKILL.md",
+      "reference_path": "skills/knowledge/creative-experience-architect.md",
+      "tags": [
+        "creative-design",
+        "premium-ux",
+        "bento-layout",
+        "storytelling",
+        "immersive",
+        "motion-design",
+        "typography",
+        "visual-excellence"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-031"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-114",
+      "name": "cross-artifact-consistency",
+      "display_name": "Cross-Artifact Consistency",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/cross-artifact-consistency/SKILL.md",
+      "reference_path": ".opencode/skills/cross-artifact-consistency/SKILL.md",
+      "tags": [
+        "governance",
+        "guard",
+        "consistency",
+        "quality",
+        "cross-artifact",
+        "feature-010"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-003",
+        "SKL-028"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-082",
+      "name": "data-contract-enforcer",
+      "display_name": "Data Contract Enforcer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/data-contract-enforcer/SKILL.md",
+      "reference_path": ".opencode/skills/data-contract-enforcer/SKILL.md",
+      "tags": [
+        "data-contract",
+        "schema-enforcement",
+        "breaking-changes",
+        "producer-consumer",
+        "data-governance",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-079",
+        "SKL-078"
+      ],
+      "owner_agents": [
+        {
+          "agent": "data-engineer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "data-engineering"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-078",
+      "name": "data-pipeline-architect",
+      "display_name": "Data Pipeline Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/data-pipeline-architect/SKILL.md",
+      "reference_path": ".opencode/skills/data-pipeline-architect/SKILL.md",
+      "tags": [
+        "data-engineering",
+        "etl",
+        "streaming",
+        "batch",
+        "lakehouse",
+        "data-mesh",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-032"
+      ],
+      "owner_agents": [
+        {
+          "agent": "data-engineer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "data-engineering",
+        "ml-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-079",
+      "name": "data-quality-validator",
+      "display_name": "Data Quality Validator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/data-quality-validator/SKILL.md",
+      "reference_path": ".opencode/skills/data-quality-validator/SKILL.md",
+      "tags": [
+        "data-quality",
+        "dbt",
+        "great-expectations",
+        "freshness",
+        "monitoring",
+        "data-sla",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-078"
+      ],
+      "owner_agents": [
+        {
+          "agent": "data-engineer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "data-engineering",
+        "ml-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-032",
+      "name": "database-architect",
+      "display_name": "Database Architect",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/database-architect/SKILL.md",
+      "reference_path": "skills/knowledge/database-architect.md",
+      "tags": [
+        "database",
+        "schema",
+        "erd",
+        "normalization",
+        "indexing",
+        "migrations",
+        "audit-logging",
+        "soft-delete"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "architect",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "compliance-first",
+        "consumer-website",
+        "data-engineering",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "ml-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-034",
+      "name": "database-guard",
+      "display_name": "Database Guard",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/database-guard/SKILL.md",
+      "reference_path": "skills/knowledge/database-architect.md",
+      "tags": [
+        "guard",
+        "governance",
+        "database",
+        "migrations",
+        "pii",
+        "fk-index",
+        "schema-safety"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-032"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-103",
+      "name": "ddd-architect",
+      "display_name": "DDD Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/ddd-architect/SKILL.md",
+      "reference_path": ".opencode/skills/ddd-architect/SKILL.md",
+      "tags": [
+        "ddd",
+        "bounded-context",
+        "ubiquitous-language",
+        "aggregate",
+        "domain-events",
+        "strategic-design",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-110",
+      "name": "debate-synthesizer",
+      "display_name": "Debate Synthesizer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/debate-synthesizer/SKILL.md",
+      "reference_path": ".opencode/skills/debate-synthesizer/SKILL.md",
+      "tags": [
+        "requirements",
+        "multi-agent",
+        "debate",
+        "adversarial",
+        "synthesis",
+        "hitl",
+        "feature-013"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-001",
+        "SKL-109"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-055",
+      "name": "defect-manager",
+      "display_name": "Defect Manager",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/defect-manager/SKILL.md",
+      "reference_path": "docs/work-item-foundation.md",
+      "tags": [
+        "defect",
+        "bug-tracking",
+        "lifecycle",
+        "task-chain",
+        "work-items",
+        "triage",
+        "code-repair"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-021",
+        "SKL-003",
+        "SKL-029"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "defect-lifecycle",
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-023",
+      "name": "dependency-analyzer",
+      "display_name": "Dependency Analyzer",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/dependency-analyzer/SKILL.md",
+      "reference_path": "skills/knowledge/dependency-analyzer.md",
+      "tags": [
+        "dependencies",
+        "graph",
+        "cycles",
+        "ripple-effect",
+        "impact",
+        "modules"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "impact-analyzer",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-007",
+      "name": "deployment-strategy",
+      "display_name": "Deployment Strategy",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/deployment-strategy/SKILL.md",
+      "reference_path": "skills/knowledge/deployment-strategy.md",
+      "tags": [
+        "deployment",
+        "ci-cd",
+        "environments",
+        "rollback",
+        "feature-flags",
+        "blue-green",
+        "canary"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-005"
+      ],
+      "owner_agents": [
+        {
+          "agent": "deployer",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "cloud-migration",
+        "compliance-first",
+        "consumer-website",
+        "data-engineering",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-038",
+      "name": "design-system-generator",
+      "display_name": "Design System Generator",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/design-system-generator/SKILL.md",
+      "reference_path": "skills/knowledge/frontend-ux-architect.md",
+      "tags": [
+        "design-system",
+        "tokens",
+        "components",
+        "storybook",
+        "tailwind",
+        "css-variables",
+        "scaffolding",
+        "theming",
+        "motion-tokens",
+        "multi-theme",
+        "glass-effects"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-031"
+      ],
+      "owner_agents": [
+        {
+          "agent": "builder",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-094",
+      "name": "devsecops-pipeline-designer",
+      "display_name": "DevSecOps Pipeline Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/devsecops-pipeline-designer/SKILL.md",
+      "reference_path": ".opencode/skills/devsecops-pipeline-designer/SKILL.md",
+      "tags": [
+        "devsecops",
+        "sast",
+        "dast",
+        "sca",
+        "sbom",
+        "slsa",
+        "supply-chain-security",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-006",
+        "SKL-092"
+      ],
+      "owner_agents": [
+        {
+          "agent": "security-specialist",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-088",
+      "name": "distributed-resilience-architect",
+      "display_name": "Distributed Resilience Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/distributed-resilience-architect/SKILL.md",
+      "reference_path": ".opencode/skills/distributed-resilience-architect/SKILL.md",
+      "tags": [
+        "resilience",
+        "circuit-breaker",
+        "retry",
+        "bulkhead",
+        "saga",
+        "fmea",
+        "distributed-systems",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-086"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-011",
+      "name": "doc-maintainer",
+      "display_name": "Documentation Maintenance",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/doc-maintainer/SKILL.md",
+      "reference_path": "skills/knowledge/doc-maintenance.md",
+      "tags": [
+        "documentation",
+        "maintenance",
+        "consistency",
+        "drift-detection",
+        "auto-update"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-008",
+        "SKL-009"
+      ],
+      "owner_agents": [
+        {
+          "agent": "doc-maintainer",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "change-request",
+        "cloud-migration",
+        "compliance-first",
+        "consumer-website",
+        "data-engineering",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "insights-adaptation-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-008",
+      "name": "documentation-generator",
+      "display_name": "Documentation Generation",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/documentation-generator/SKILL.md",
+      "reference_path": "skills/knowledge/documentation-generation.md",
+      "tags": [
+        "documentation",
+        "api-docs",
+        "adr",
+        "readme",
+        "auto-generation",
+        "openapi"
+      ],
+      "mastery_level": "beginner",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-004"
+      ],
+      "owner_agents": [
+        {
+          "agent": "documenter",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "cloud-migration",
+        "consumer-website",
+        "data-engineering",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-076",
+      "name": "domain-knowledge-extractor",
+      "display_name": "Domain Knowledge Extractor",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/domain-knowledge-extractor/SKILL.md",
+      "reference_path": ".opencode/skills/domain-knowledge-extractor/SKILL.md",
+      "tags": [
+        "domain-knowledge",
+        "learning",
+        "cross-project",
+        "context",
+        "patterns",
+        "system",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-006",
+        "SKL-032",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-115",
+      "name": "drift-detector",
+      "display_name": "Drift Detector",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/drift-detector/SKILL.md",
+      "reference_path": ".opencode/skills/drift-detector/SKILL.md",
+      "tags": [
+        "quality",
+        "drift",
+        "living-spec",
+        "ci",
+        "artifacts",
+        "feature-015"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-010",
+        "SKL-021"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-049",
+      "name": "enhancement-dashboard",
+      "display_name": "Enhancement Dashboard",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/enhancement-dashboard/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "dashboard",
+        "reporting",
+        "insights",
+        "visualization",
+        "human-review",
+        "suggestions",
+        "read-only"
+      ],
+      "mastery_level": "beginner",
+      "classification": "pipeline-routed",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-048"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "insights-adaptation-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-025",
+      "name": "event-router",
+      "display_name": "Event Router",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/event-router/SKILL.md",
+      "reference_path": "skills/knowledge/event-router.md",
+      "tags": [
+        "events",
+        "routing",
+        "dispatch",
+        "event-driven",
+        "bus",
+        "deduplication"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-010",
+        "SKL-021"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-085",
+      "name": "event-schema-designer",
+      "display_name": "Event Schema Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/event-schema-designer/SKILL.md",
+      "reference_path": ".opencode/skills/event-schema-designer/SKILL.md",
+      "tags": [
+        "event-driven",
+        "asyncapi",
+        "kafka",
+        "schema-registry",
+        "dlq",
+        "messaging",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-086",
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "api-designer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "api-first",
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-087",
+      "name": "event-sourcing-designer",
+      "display_name": "Event Sourcing Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/event-sourcing-designer/SKILL.md",
+      "reference_path": ".opencode/skills/event-sourcing-designer/SKILL.md",
+      "tags": [
+        "event-sourcing",
+        "cqrs",
+        "aggregate",
+        "event-store",
+        "projection",
+        "temporal-queries",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-086",
+        "SKL-103"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-003",
+      "name": "feature-planning",
+      "display_name": "Feature Planning",
+      "version": "2.2.0",
+      "executable_skill": ".opencode/skills/feature-planning/SKILL.md",
+      "reference_path": "skills/knowledge/feature-planning.md",
+      "tags": [
+        "planning",
+        "tasks",
+        "roadmap",
+        "story-points",
+        "agile",
+        "milestones",
+        "dependencies"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "planner",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "change-request",
+        "compliance-first",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-031",
+      "name": "frontend-ux-architect",
+      "display_name": "Frontend UI/UX Architect",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/frontend-ux-architect/SKILL.md",
+      "reference_path": "skills/knowledge/frontend-ux-architect.md",
+      "tags": [
+        "ui-ux",
+        "design",
+        "components",
+        "accessibility",
+        "wcag",
+        "design-tokens",
+        "navigation",
+        "responsive",
+        "motion",
+        "visual-excellence",
+        "creative-layouts"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [
+        {
+          "agent": "architect",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "compliance-first",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-065",
+      "name": "gap-to-skill-pipeline",
+      "display_name": "Gap-to-Skill Pipeline",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/gap-to-skill-pipeline/SKILL.md",
+      "reference_path": ".opencode/skills/gap-to-skill-pipeline/SKILL.md",
+      "tags": [
+        "reactive",
+        "gap-detection",
+        "skill-generation",
+        "hitl",
+        "pipeline",
+        "meta",
+        "phase-6"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-047",
+        "SKL-012",
+        "SKL-015"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "gap-to-skill"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-084",
+      "name": "graphql-architect",
+      "display_name": "GraphQL Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/graphql-architect/SKILL.md",
+      "reference_path": ".opencode/skills/graphql-architect/SKILL.md",
+      "tags": [
+        "graphql",
+        "apollo-federation",
+        "resolver",
+        "subscription",
+        "schema-first",
+        "dataloader",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "api-designer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "api-first"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-033",
+      "name": "implementation-completeness-auditor",
+      "display_name": "Implementation Completeness Auditor",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/implementation-completeness-auditor/SKILL.md",
+      "reference_path": "skills/knowledge/implementation-completeness-auditor.md",
+      "tags": [
+        "completeness",
+        "audit",
+        "traceability",
+        "readiness-score",
+        "gap-analysis",
+        "requirements-coverage"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-003",
+        "SKL-026"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "change-request",
+        "compliance-first",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-037",
+      "name": "implementation-completeness-guard",
+      "display_name": "Implementation Completeness Guard",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/implementation-completeness-guard/SKILL.md",
+      "reference_path": "skills/knowledge/implementation-completeness-auditor.md",
+      "tags": [
+        "guard",
+        "governance",
+        "completeness",
+        "readiness-score",
+        "release-gate",
+        "threshold"
+      ],
+      "mastery_level": "beginner",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-033"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "change-request",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-072",
+      "name": "infrastructure-cost-estimator",
+      "display_name": "Infrastructure Cost Estimator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/infrastructure-cost-estimator/SKILL.md",
+      "reference_path": ".opencode/skills/infrastructure-cost-estimator/SKILL.md",
+      "tags": [
+        "cost",
+        "infrastructure",
+        "aws",
+        "gcp",
+        "azure",
+        "deployment",
+        "estimation",
+        "phase-7"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "catalog-only",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-007",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-095",
+      "name": "load-test-designer",
+      "display_name": "Load Test Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/load-test-designer/SKILL.md",
+      "reference_path": ".opencode/skills/load-test-designer/SKILL.md",
+      "tags": [
+        "load-testing",
+        "performance",
+        "k6",
+        "gatling",
+        "locust",
+        "slo",
+        "benchmarking",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-005",
+        "SKL-097"
+      ],
+      "owner_agents": [
+        {
+          "agent": "sre",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-105",
+      "name": "localization-architect",
+      "display_name": "Localization Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/localization-architect/SKILL.md",
+      "reference_path": ".opencode/skills/localization-architect/SKILL.md",
+      "tags": [
+        "i18n",
+        "l10n",
+        "localization",
+        "rtl",
+        "icu-messages",
+        "translation",
+        "multi-locale",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-101",
+      "name": "micro-frontend-architect",
+      "display_name": "Micro-Frontend Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/micro-frontend-architect/SKILL.md",
+      "reference_path": ".opencode/skills/micro-frontend-architect/SKILL.md",
+      "tags": [
+        "micro-frontend",
+        "module-federation",
+        "single-spa",
+        "shell-app",
+        "multi-team",
+        "frontend-composition",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-086",
+      "name": "microservices-architect",
+      "display_name": "Microservices Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/microservices-architect/SKILL.md",
+      "reference_path": ".opencode/skills/microservices-architect/SKILL.md",
+      "tags": [
+        "microservices",
+        "ddd",
+        "bounded-context",
+        "saga",
+        "strangler-fig",
+        "conways-law",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-103"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-080",
+      "name": "ml-pipeline-architect",
+      "display_name": "ML Pipeline Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/ml-pipeline-architect/SKILL.md",
+      "reference_path": ".opencode/skills/ml-pipeline-architect/SKILL.md",
+      "tags": [
+        "machine-learning",
+        "feature-store",
+        "mlflow",
+        "model-serving",
+        "mlops",
+        "drift-monitoring",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-078"
+      ],
+      "owner_agents": [
+        {
+          "agent": "data-engineer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "ml-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-044",
+      "name": "mobile-platform-specialist",
+      "display_name": "Mobile Platform Specialist",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/mobile-platform-specialist/SKILL.md",
+      "reference_path": "skills/knowledge/mobile-platform-specialist.md",
+      "tags": [
+        "mobile",
+        "ios",
+        "android",
+        "react-native",
+        "flutter",
+        "maui",
+        "app-store",
+        "play-store",
+        "push-notifications",
+        "offline-first",
+        "certificate-pinning",
+        "in-app-purchases",
+        "accessibility"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "mobile-app"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-052",
+      "name": "motion-design-architect",
+      "display_name": "Motion Design Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/motion-design-architect/SKILL.md",
+      "reference_path": "skills/knowledge/motion-design-architect.md",
+      "tags": [
+        "motion",
+        "animation",
+        "design",
+        "framer-motion",
+        "spring-physics",
+        "choreography",
+        "transitions",
+        "accessibility"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-031"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-108",
+      "name": "multi-agent-debate",
+      "display_name": "Multi-Agent Debate",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/multi-agent-debate/SKILL.md",
+      "reference_path": ".opencode/skills/multi-agent-debate/SKILL.md",
+      "tags": [
+        "multi-agent",
+        "debate",
+        "architecture",
+        "adversarial",
+        "consensus",
+        "hitl",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "runtime-registry",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": true,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-075",
+      "name": "multi-repo-coordinator",
+      "display_name": "Multi-Repo Coordinator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/multi-repo-coordinator/SKILL.md",
+      "reference_path": ".opencode/skills/multi-repo-coordinator/SKILL.md",
+      "tags": [
+        "multi-repo",
+        "polyrepo",
+        "microservices",
+        "cross-repo",
+        "dependency",
+        "coordination",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-024",
+        "SKL-023",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-073",
+      "name": "mutation-test-generator",
+      "display_name": "Mutation Test Generator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/mutation-test-generator/SKILL.md",
+      "reference_path": ".opencode/skills/mutation-test-generator/SKILL.md",
+      "tags": [
+        "mutation-testing",
+        "test-quality",
+        "coverage",
+        "assertions",
+        "static-analysis",
+        "testing",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-028",
+        "SKL-026"
+      ],
+      "owner_agents": [
+        {
+          "agent": "tester",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-014",
+      "name": "observability",
+      "display_name": "Observability",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/observability/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "metrics",
+        "monitoring",
+        "observability",
+        "logging",
+        "telemetry",
+        "pipeline"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-010",
+      "name": "orchestrator",
+      "display_name": "Orchestration",
+      "version": "2.5.0",
+      "executable_skill": ".opencode/skills/orchestrator/SKILL.md",
+      "reference_path": "skills/knowledge/orchestration.md",
+      "tags": [
+        "orchestration",
+        "pipeline",
+        "routing",
+        "hitl",
+        "meta-skill",
+        "retry",
+        "feedback-loop"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-003",
+        "SKL-004",
+        "SKL-005",
+        "SKL-006",
+        "SKL-007",
+        "SKL-009"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": 6000,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-035",
+      "name": "performance-guard",
+      "display_name": "Performance Guard",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/performance-guard/SKILL.md",
+      "reference_path": "skills/knowledge/architecture-design.md",
+      "tags": [
+        "guard",
+        "governance",
+        "performance",
+        "n-plus-one",
+        "indexes",
+        "bulk-operations",
+        "blocking"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-004"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "cloud-migration",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-077",
+      "name": "pipeline-branching",
+      "display_name": "Pipeline Branching",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/pipeline-branching/SKILL.md",
+      "reference_path": ".opencode/skills/pipeline-branching/SKILL.md",
+      "tags": [
+        "branching",
+        "a-b-testing",
+        "architecture",
+        "comparison",
+        "orchestration",
+        "decision-support",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003",
+        "SKL-006",
+        "SKL-005",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-106",
+      "name": "product-analytics-designer",
+      "display_name": "Product Analytics Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/product-analytics-designer/SKILL.md",
+      "reference_path": ".opencode/skills/product-analytics-designer/SKILL.md",
+      "tags": [
+        "product-analytics",
+        "event-taxonomy",
+        "funnel",
+        "a-b-testing",
+        "metrics",
+        "privacy",
+        "amplitude",
+        "mixpanel",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-003",
+        "SKL-001"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-096",
+      "name": "profiling-advisor",
+      "display_name": "Profiling Advisor",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/profiling-advisor/SKILL.md",
+      "reference_path": ".opencode/skills/profiling-advisor/SKILL.md",
+      "tags": [
+        "profiling",
+        "flamegraph",
+        "heap-dump",
+        "query-plan",
+        "gc-tuning",
+        "n-plus-one",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-095"
+      ],
+      "owner_agents": [
+        {
+          "agent": "sre",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-040",
+      "name": "prompt-normalizer",
+      "display_name": "Prompt Normalizer",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/prompt-normalizer/SKILL.md",
+      "reference_path": "skills/knowledge/prompt-normalizer.md",
+      "tags": [
+        "prompt-normalization",
+        "intent-extraction",
+        "domain-classification",
+        "routing",
+        "meta",
+        "pre-processing",
+        "disambiguation"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-015",
+      "name": "quality-scoring",
+      "display_name": "Quality Scoring",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/quality-scoring/SKILL.md",
+      "reference_path": "skills/knowledge/quality-scoring.md",
+      "tags": [
+        "quality",
+        "scoring",
+        "evaluation",
+        "rubric",
+        "governance",
+        "registration"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "gap-to-skill"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-107",
+      "name": "realtime-system-architect",
+      "display_name": "Realtime System Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/realtime-system-architect/SKILL.md",
+      "reference_path": ".opencode/skills/realtime-system-architect/SKILL.md",
+      "tags": [
+        "realtime",
+        "websocket",
+        "webrtc",
+        "crdt",
+        "operational-transform",
+        "presence",
+        "fan-out",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "runtime-registry",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-002",
+        "SKL-088"
+      ],
+      "owner_agents": [
+        {
+          "agent": "distributed-systems",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [],
+      "directly_routable": true,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-001",
+      "name": "requirement-analyzer",
+      "display_name": "Requirement Analysis",
+      "version": "1.2.0",
+      "executable_skill": ".opencode/skills/requirement-analyzer/SKILL.md",
+      "reference_path": "skills/knowledge/requirement-analysis.md",
+      "tags": [
+        "requirements",
+        "analysis",
+        "ambiguity",
+        "clarification",
+        "normalization",
+        "invest"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "runtime-registry",
+      "risk_tier": "low",
+      "depends_on": [],
+      "owner_agents": [
+        {
+          "agent": "analyzer",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "architecture-only",
+        "cloud-migration",
+        "compliance-first",
+        "consumer-website",
+        "data-engineering",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "requirements-only",
+        "saas-platform"
+      ],
+      "directly_routable": true,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-112",
+      "name": "research-artifact",
+      "display_name": "Research Artifact",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/research-artifact/SKILL.md",
+      "reference_path": ".opencode/skills/research-artifact/SKILL.md",
+      "tags": [
+        "requirements",
+        "research",
+        "technology-evaluation",
+        "build-vs-buy",
+        "artifacts",
+        "feature-009"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-109"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-030",
+      "name": "rollback-manager",
+      "display_name": "Rollback Manager",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/rollback-manager/SKILL.md",
+      "reference_path": "skills/knowledge/rollback-manager.md",
+      "tags": [
+        "rollback",
+        "recovery",
+        "snapshot",
+        "revert",
+        "deployment",
+        "pipeline-safety"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-021",
+        "SKL-025"
+      ],
+      "owner_agents": [
+        {
+          "agent": "recovery",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-098",
+      "name": "runbook-generator",
+      "display_name": "Runbook Generator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/runbook-generator/SKILL.md",
+      "reference_path": ".opencode/skills/runbook-generator/SKILL.md",
+      "tags": [
+        "runbooks",
+        "incident-response",
+        "on-call",
+        "escalation",
+        "postmortem",
+        "operational-docs",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-097",
+        "SKL-014"
+      ],
+      "owner_agents": [
+        {
+          "agent": "sre",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration",
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-045",
+      "name": "saas-enterprise-architect",
+      "display_name": "SaaS & Enterprise Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/saas-enterprise-architect/SKILL.md",
+      "reference_path": "skills/knowledge/saas-enterprise-architect.md",
+      "tags": [
+        "saas",
+        "enterprise",
+        "multi-tenant",
+        "b2b",
+        "rbac",
+        "sso",
+        "saml",
+        "oidc",
+        "scim",
+        "billing",
+        "stripe",
+        "soc2",
+        "iso27001",
+        "hipaa",
+        "gdpr",
+        "pci-dss",
+        "fedramp",
+        "white-label",
+        "audit-logging"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-009",
+      "name": "schema-validator",
+      "display_name": "Schema Validation",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/schema-validator/SKILL.md",
+      "reference_path": "skills/knowledge/schema-validation.md",
+      "tags": [
+        "validation",
+        "json-schema",
+        "contracts",
+        "schema",
+        "utility",
+        "draft-07"
+      ],
+      "mastery_level": "beginner",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-093",
+      "name": "secrets-management-architect",
+      "display_name": "Secrets Management Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/secrets-management-architect/SKILL.md",
+      "reference_path": ".opencode/skills/secrets-management-architect/SKILL.md",
+      "tags": [
+        "secrets-management",
+        "vault",
+        "pki",
+        "rotation",
+        "dynamic-secrets",
+        "kubernetes-secrets",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-092"
+      ],
+      "owner_agents": [
+        {
+          "agent": "security-specialist",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration",
+        "microservices-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-041",
+      "name": "security-guard",
+      "display_name": "Security Guard",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/security-guard/SKILL.md",
+      "reference_path": "skills/knowledge/security-review.md",
+      "tags": [
+        "guard",
+        "governance",
+        "security",
+        "cvss",
+        "owasp",
+        "compliance",
+        "block",
+        "findings",
+        "pci-dss",
+        "hipaa"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-006"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "ai-agent-system",
+        "api-first",
+        "cloud-migration",
+        "consumer-website",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-006",
+      "name": "security-review",
+      "display_name": "Security Review",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/security-review/SKILL.md",
+      "reference_path": "skills/knowledge/security-review.md",
+      "tags": [
+        "security",
+        "owasp",
+        "stride",
+        "threat-modeling",
+        "vulnerabilities",
+        "cwe",
+        "authentication"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-004"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "cloud-migration",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "microservices-platform",
+        "ml-platform",
+        "mobile-app",
+        "pre-deploy",
+        "quick-review",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-066",
+      "name": "semantic-diff-analyzer",
+      "display_name": "Semantic Diff Analyzer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/semantic-diff-analyzer/SKILL.md",
+      "reference_path": ".opencode/skills/semantic-diff-analyzer/SKILL.md",
+      "tags": [
+        "diff",
+        "behavioral-analysis",
+        "security",
+        "impact",
+        "code-change",
+        "architecture",
+        "phase-7"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-024"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-039",
+      "name": "seo-optimizer",
+      "display_name": "SEO Optimizer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/seo-optimizer/SKILL.md",
+      "reference_path": "skills/knowledge/frontend-ux-architect.md",
+      "tags": [
+        "seo",
+        "sitemap",
+        "structured-data",
+        "open-graph",
+        "meta-tags",
+        "core-web-vitals",
+        "robots-txt",
+        "json-ld"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-031"
+      ],
+      "owner_agents": [
+        {
+          "agent": "builder",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "consumer-website",
+        "developer-portal"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-090",
+      "name": "serverless-architect",
+      "display_name": "Serverless Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/serverless-architect/SKILL.md",
+      "reference_path": ".opencode/skills/serverless-architect/SKILL.md",
+      "tags": [
+        "serverless",
+        "lambda",
+        "cloud-functions",
+        "cold-start",
+        "event-driven",
+        "faas",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-089"
+      ],
+      "owner_agents": [
+        {
+          "agent": "cloud-platform",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-048",
+      "name": "session-insights",
+      "display_name": "Session Insights",
+      "version": "1.3.0",
+      "executable_skill": ".opencode/skills/session-insights/SKILL.md",
+      "reference_path": "skills/knowledge/observability.md",
+      "tags": [
+        "insights",
+        "analysis",
+        "anomaly-detection",
+        "hitl",
+        "performance",
+        "session",
+        "telemetry"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-047"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "insights-adaptation-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": 3000,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-012",
+      "name": "skill-authoring",
+      "display_name": "Skill Authoring",
+      "version": "1.2.0",
+      "executable_skill": ".opencode/skills/skill-authoring/SKILL.md",
+      "reference_path": "skills/knowledge/skill-authoring.md",
+      "tags": [
+        "meta",
+        "skill-design",
+        "graph",
+        "validation",
+        "lifecycle",
+        "compiler",
+        "governance"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-009",
+        "SKL-011"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "gap-to-skill"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-016",
+      "name": "skill-lifecycle",
+      "display_name": "Skill Lifecycle",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/skill-lifecycle/SKILL.md",
+      "reference_path": "skills/knowledge/skill-lifecycle.md",
+      "tags": [
+        "lifecycle",
+        "governance",
+        "deprecation",
+        "promotion",
+        "stages",
+        "meta"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-119",
+      "name": "skill-registry-client",
+      "display_name": "Skill Registry Client",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/skill-registry-client/SKILL.md",
+      "reference_path": ".opencode/skills/skill-registry-client/SKILL.md",
+      "tags": [
+        "platform",
+        "registry",
+        "community",
+        "install",
+        "publish",
+        "search",
+        "feature-019"
+      ],
+      "mastery_level": "advanced",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-021"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-074",
+      "name": "skill-simulator",
+      "display_name": "Skill Simulator",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/skill-simulator/SKILL.md",
+      "reference_path": ".opencode/skills/skill-simulator/SKILL.md",
+      "tags": [
+        "simulation",
+        "dry-run",
+        "preview",
+        "pipeline",
+        "safety",
+        "orchestration",
+        "phase-7"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-010",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-097",
+      "name": "slo-sla-designer",
+      "display_name": "SLO/SLA Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/slo-sla-designer/SKILL.md",
+      "reference_path": ".opencode/skills/slo-sla-designer/SKILL.md",
+      "tags": [
+        "slo",
+        "sli",
+        "sla",
+        "error-budget",
+        "reliability",
+        "toil",
+        "site-reliability",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "sre",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "cloud-migration",
+        "data-engineering",
+        "microservices-platform",
+        "ml-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-100",
+      "name": "state-management-architect",
+      "display_name": "State Management Architect",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/state-management-architect/SKILL.md",
+      "reference_path": ".opencode/skills/state-management-architect/SKILL.md",
+      "tags": [
+        "state-management",
+        "redux",
+        "zustand",
+        "jotai",
+        "tanstack-query",
+        "offline",
+        "frontend",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-021",
+      "name": "state-manager",
+      "display_name": "State Manager",
+      "version": "1.1.0",
+      "executable_skill": ".opencode/skills/state-manager/SKILL.md",
+      "reference_path": "skills/knowledge/state-manager.md",
+      "tags": [
+        "state",
+        "persistence",
+        "snapshot",
+        "restore",
+        "session",
+        "shared-state"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "defect-lifecycle"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-046",
+      "name": "systems-specialist",
+      "display_name": "Systems Specialist",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/systems-specialist/SKILL.md",
+      "reference_path": "skills/knowledge/systems-specialist.md",
+      "tags": [
+        "embedded",
+        "iot",
+        "rtos",
+        "freertos",
+        "zephyr",
+        "bare-metal",
+        "real-time",
+        "mqtt",
+        "ble",
+        "lorawan",
+        "can-bus",
+        "ota",
+        "firmware",
+        "misra-c",
+        "iec-62443",
+        "iso-26262",
+        "game-dev",
+        "ecs",
+        "unity",
+        "unreal",
+        "godot",
+        "netcode"
+      ],
+      "mastery_level": "advanced",
+      "classification": "pipeline-routed",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "iot-embedded"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-113",
+      "name": "task-dag",
+      "display_name": "Task DAG",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/task-dag/SKILL.md",
+      "reference_path": ".opencode/skills/task-dag/SKILL.md",
+      "tags": [
+        "planning",
+        "dag",
+        "parallel",
+        "critical-path",
+        "artifacts",
+        "feature-016"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-003"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-068",
+      "name": "technical-debt-tracker",
+      "display_name": "Technical Debt Tracker",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/technical-debt-tracker/SKILL.md",
+      "reference_path": ".opencode/skills/technical-debt-tracker/SKILL.md",
+      "tags": [
+        "technical-debt",
+        "quality",
+        "cross-session",
+        "code-review",
+        "remediation",
+        "maintenance",
+        "phase-7"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-004",
+        "SKL-026"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-028",
+      "name": "test-generator",
+      "display_name": "Test Generator",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/test-generator/SKILL.md",
+      "reference_path": "skills/knowledge/test-generator.md",
+      "tags": [
+        "testing",
+        "unit-tests",
+        "integration-tests",
+        "coverage",
+        "edge-cases",
+        "test-generation",
+        "property-based",
+        "pbt",
+        "contract-testing",
+        "parameterized",
+        "bdd",
+        "aaa",
+        "vitest",
+        "factory",
+        "mutation-gaps"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-005",
+        "SKL-026"
+      ],
+      "owner_agents": [
+        {
+          "agent": "test-generator",
+          "model": "github-copilot/claude-haiku-4.5",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "api-first",
+        "compliance-first",
+        "consumer-website",
+        "defect-lifecycle",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-005",
+      "name": "testing-strategy",
+      "display_name": "Testing Strategy",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/testing-strategy/SKILL.md",
+      "reference_path": "skills/knowledge/testing-strategy.md",
+      "tags": [
+        "testing",
+        "tdd",
+        "bdd",
+        "coverage",
+        "quality-gates",
+        "unit-tests",
+        "integration",
+        "pyramid",
+        "property-based",
+        "pbt",
+        "contract-testing",
+        "mutation",
+        "flakiness",
+        "naming-convention"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-003"
+      ],
+      "owner_agents": [
+        {
+          "agent": "tester",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "ai-agent-system",
+        "compliance-first",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "iot-embedded",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-092",
+      "name": "threat-model-designer",
+      "display_name": "Threat Model Designer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/threat-model-designer/SKILL.md",
+      "reference_path": ".opencode/skills/threat-model-designer/SKILL.md",
+      "tags": [
+        "threat-modeling",
+        "stride",
+        "mitre",
+        "attack-surface",
+        "trust-boundary",
+        "risk-matrix",
+        "phase-8"
+      ],
+      "mastery_level": "advanced",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-002",
+        "SKL-001"
+      ],
+      "owner_agents": [
+        {
+          "agent": "security-specialist",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "deny",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "api-first",
+        "cloud-migration"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-111",
+      "name": "traceability-matrix",
+      "display_name": "Traceability Matrix",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/traceability-matrix/SKILL.md",
+      "reference_path": ".opencode/skills/traceability-matrix/SKILL.md",
+      "tags": [
+        "quality",
+        "traceability",
+        "rtm",
+        "requirements",
+        "coverage",
+        "completeness",
+        "feature-014"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-001",
+        "SKL-002",
+        "SKL-003",
+        "SKL-028"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-017",
+      "name": "trigger-engineering",
+      "display_name": "Trigger Engineering",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/trigger-engineering/SKILL.md",
+      "reference_path": "skills/knowledge/trigger-engineering.md",
+      "tags": [
+        "triggers",
+        "routing",
+        "activation",
+        "disambiguation",
+        "meta",
+        "skill-design"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "event-or-utility",
+      "risk_tier": "low",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-036",
+      "name": "ui-ux-compliance-guard",
+      "display_name": "UI/UX Compliance Guard",
+      "version": "2.0.0",
+      "executable_skill": ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
+      "reference_path": "skills/knowledge/frontend-ux-architect.md",
+      "tags": [
+        "guard",
+        "governance",
+        "ui-ux",
+        "design-system",
+        "accessibility",
+        "component-contracts",
+        "visual-quality",
+        "ux-quality",
+        "motion-quality"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "agent-owned",
+      "risk_tier": "high",
+      "depends_on": [
+        "SKL-031"
+      ],
+      "owner_agents": [
+        {
+          "agent": "reviewer",
+          "model": "github-copilot/claude-sonnet-4.6",
+          "permission": {
+            "edit": "ask",
+            "bash": "deny"
+          }
+        }
+      ],
+      "pipeline_reachability": [
+        "admin-panel",
+        "consumer-website",
+        "developer-portal",
+        "full-pipeline",
+        "mobile-app",
+        "pre-deploy",
+        "saas-platform"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-053",
+      "name": "ux-research-synthesizer",
+      "display_name": "UX Research Synthesizer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/ux-research-synthesizer/SKILL.md",
+      "reference_path": "skills/knowledge/ux-research-synthesizer.md",
+      "tags": [
+        "ux-research",
+        "journey-mapping",
+        "heuristics",
+        "friction-detection",
+        "accessibility",
+        "usability",
+        "information-architecture"
+      ],
+      "mastery_level": "advanced",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-031"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-018",
+      "name": "validation-rules",
+      "display_name": "Validation Rules",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/validation-rules/SKILL.md",
+      "reference_path": "skills/knowledge/validation-rules.md",
+      "tags": [
+        "validation",
+        "index",
+        "rules",
+        "schema",
+        "governance",
+        "quality"
+      ],
+      "mastery_level": "beginner",
+      "classification": "catalog-only",
+      "risk_tier": "medium",
+      "depends_on": [
+        "SKL-009"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-019",
+      "name": "versioning",
+      "display_name": "Versioning",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/versioning/SKILL.md",
+      "reference_path": "skills/knowledge/versioning.md",
+      "tags": [
+        "versioning",
+        "semver",
+        "changelog",
+        "governance",
+        "compatibility",
+        "breaking-changes"
+      ],
+      "mastery_level": "beginner",
+      "classification": "catalog-only",
+      "risk_tier": "low",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-102",
+      "name": "web-performance-optimizer",
+      "display_name": "Web Performance Optimizer",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/web-performance-optimizer/SKILL.md",
+      "reference_path": ".opencode/skills/web-performance-optimizer/SKILL.md",
+      "tags": [
+        "web-performance",
+        "core-web-vitals",
+        "bundle-optimization",
+        "lcp",
+        "fid",
+        "cls",
+        "rendering",
+        "phase-8"
+      ],
+      "mastery_level": "intermediate",
+      "classification": "catalog-only",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-002",
+        "SKL-031"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-057",
+      "name": "work-item-exporter",
+      "display_name": "Work Item Exporter",
+      "version": "2.2.0",
+      "executable_skill": ".opencode/skills/work-item-exporter/SKILL.md",
+      "reference_path": "docs/work-item-foundation.md",
+      "tags": [
+        "export",
+        "jira",
+        "github",
+        "integration",
+        "work-items",
+        "async",
+        "outbound",
+        "jsonl",
+        "markdown"
+      ],
+      "mastery_level": "beginner",
+      "classification": "pipeline-routed",
+      "risk_tier": "low",
+      "depends_on": [
+        "SKL-021",
+        "SKL-055",
+        "SKL-056"
+      ],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "change-request",
+        "compliance-first",
+        "defect-lifecycle",
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    },
+    {
+      "id": "SKL-058",
+      "name": "work-item-lifecycle-guard",
+      "display_name": "Work Item Lifecycle Guard",
+      "version": "1.0.0",
+      "executable_skill": ".opencode/skills/work-item-lifecycle-guard/SKILL.md",
+      "reference_path": "docs/work-item-foundation.md",
+      "tags": [
+        "guard",
+        "governance",
+        "lifecycle",
+        "work-items",
+        "state-machine",
+        "validation",
+        "transition"
+      ],
+      "mastery_level": "beginner",
+      "classification": "pipeline-routed",
+      "risk_tier": "medium",
+      "depends_on": [],
+      "owner_agents": [],
+      "pipeline_reachability": [
+        "change-request",
+        "defect-lifecycle",
+        "full-pipeline"
+      ],
+      "directly_routable": false,
+      "max_output_tokens": null,
+      "has_use_when": true,
+      "has_do_not_use_when": true
+    }
+  ]
+}

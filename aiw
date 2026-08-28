@@ -58,6 +58,11 @@ show_help() {
   echo -e "    ${CYAN}lint${NC}               Quick YAML + schema syntax check (checks 0-1 only)"
   echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
   echo ""
+  echo -e "  ${BOLD}PLANNING${NC}"
+  echo -e "    ${CYAN}plan${NC}               Show a side-effect-free execution plan"
+  echo -e "    ${CYAN}plan --pipeline <name>${NC}  Plan a specific pipeline"
+  echo -e "    ${CYAN}plan --json${NC}       Emit the execution manifest as JSON"
+  echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
   echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
@@ -144,7 +149,9 @@ cmd_start() {
 cmd_validate() {
   bash "$ROOT/scripts/validate-skills.sh" "$@"
 }
-
+cmd_plan() {
+  node "$ROOT/scripts/plan-workflow.js" "$@"
+}
 cmd_lint() {
   echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
   echo ""
@@ -418,6 +425,7 @@ case "$COMMAND" in
   start|run)        cmd_start "$@" ;;
   init)             cmd_init "$@" ;;
   validate)         cmd_validate "$@" ;;
+  plan)             cmd_plan "$@" ;;
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;
   sync)             cmd_sync "$@" ;;

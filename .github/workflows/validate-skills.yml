@@ -7,24 +7,30 @@ on:
       - "skills/**"
       - ".opencode/skills/**"
       - "opencode.json"
+      - "aiw"
       - "docs/**"
       - "scripts/**"
       - "tests/**"
       - "package.json"
       - "package-lock.json"
+      - "README.md"
       - ".github/workflows/validate-skills.yml"
+      - ".github/workflows/secret-scan.yml"
   pull_request:
     branches: [main]
     paths:
       - "skills/**"
       - ".opencode/skills/**"
       - "opencode.json"
+      - "aiw"
       - "docs/**"
       - "scripts/**"
       - "tests/**"
       - "package.json"
       - "package-lock.json"
+      - "README.md"
       - ".github/workflows/validate-skills.yml"
+      - ".github/workflows/secret-scan.yml"
   workflow_dispatch:
 
 permissions:
@@ -62,6 +68,15 @@ jobs:
 
       - name: Validate exact website publication mirror
         run: npm run validate:sync
+
+      - name: Validate capability index
+        run: npm run validate:capabilities
+
+      - name: Run CLI regression tests
+        run: npm test
+
+      - name: Smoke-test planner JSON output
+        run: npm run --silent plan -- --pipeline requirements-only --json > /tmp/aiw-plan.json && node -e 'const p=require("/tmp/aiw-plan.json"); if (!p.dry_run || p.pipeline.name !== "requirements-only") process.exit(1);'
 
       - name: Validate CLI shell syntax
         run: bash -n aiw scripts/*.sh scripts/lib/*.sh
