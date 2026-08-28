@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "capability-index.schema.json",
+  "title": "AI Workflow Capability Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_by", "catalog_version", "registry_entry_count", "agent_count", "pipeline_count", "skill_count", "classifications", "skills"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "generated_by": { "type": "string", "const": "scripts/build-capability-index.js" },
+    "catalog_version": { "type": ["string", "null"] },
+    "catalog_last_updated": { "type": ["string", "null"] },
+    "registry_entry_count": { "type": "integer", "minimum": 0 },
+    "agent_count": { "type": "integer", "minimum": 0 },
+    "pipeline_count": { "type": "integer", "minimum": 0 },
+    "skill_count": { "type": "integer", "minimum": 0 },
+    "classifications": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/skill"
+      }
+    }
+  },
+  "$defs": {
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "model", "permission"],
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "model": { "type": ["string", "null"] },
+        "permission": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "edit": { "type": "string", "enum": ["allow", "ask", "deny"] },
+            "bash": { "type": "string", "enum": ["allow", "ask", "deny"] }
+          }
+        }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "display_name", "version", "executable_skill", "tags", "classification", "risk_tier", "depends_on", "owner_agents", "pipeline_reachability", "directly_routable", "has_use_when", "has_do_not_use_when"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SKL-\\d{3}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "executable_skill": { "type": "string", "pattern": "^\\.opencode/skills/.+/SKILL\\.md$" },
+        "reference_path": { "type": ["string", "null"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "mastery_level": { "type": ["string", "null"] },
+        "classification": { "type": "string", "enum": ["runtime-registry", "agent-owned", "pipeline-routed", "event-or-utility", "catalog-only"] },
+        "risk_tier": { "type": "string", "enum": ["low", "medium", "high"] },
+        "depends_on": { "type": "array", "items": { "type": "string", "pattern": "^SKL-\\d{3}$" } },
+        "owner_agents": { "type": "array", "items": { "$ref": "#/$defs/agent" } },
+        "pipeline_reachability": { "type": "array", "items": { "type": "string" } },
+        "directly_routable": { "type": "boolean" },
+        "max_output_tokens": { "type": ["integer", "null"], "minimum": 1 },
+        "has_use_when": { "type": "boolean" },
+        "has_do_not_use_when": { "type": "boolean" }
+      }
+    }
+  }
+}
