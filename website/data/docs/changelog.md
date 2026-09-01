@@ -11,6 +11,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Canonical live website** — README now links to `https://ase-workflow.vercel.app/`.
+- **MIT License** — clarified the framework's reuse terms in the root `LICENSE` file and linked it from the README.
 - **`aiw uninstall <path>`** — removes AI Workflow from a project (reverses `aiw init`). Supports `--force`, `--backup`, `--dry-run`, `--clean-graph` flags. Never deletes `.env`.
 - **Delegate skill (SKL-120)** — formal protocol for intra-pipeline task delegation with scoped context, success criteria, turn limits, and audit trail. Prevents ad-hoc agent-to-agent handoff sprawl.
 
