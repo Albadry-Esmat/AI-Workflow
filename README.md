@@ -349,7 +349,7 @@ To update the data mirror after changing skills or pipelines:
 aiw sync   # updates website/data/ in this repo
 ```
 
-The live site is at **https://ase-os.vercel.app**.
+The live site is at **https://ase-workflow.vercel.app/**.
 
 ---
 
@@ -372,3 +372,9 @@ Full system documentation lives in [`docs/`](docs/):
 | `docs/workflows.md` | End-to-end pipeline execution |
 | `docs/how-to-use.md` | Step-by-step guides for developers and agents |
 | `docs/changelog.md` | Version history |
+
+---
+
+## License
+
+AI Workflow is licensed under the [MIT License](LICENSE).
