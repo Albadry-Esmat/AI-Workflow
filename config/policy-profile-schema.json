@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/policy-profile.schema.json",
+  "title": "AI-Workflow Capability Policy Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "profile_version",
+    "pipeline_template",
+    "default_decision",
+    "enforcement_boundary",
+    "enforced",
+    "action_tiers",
+    "approval_required_tiers",
+    "required_policy_actions",
+    "allowed_actions",
+    "allowed_capabilities",
+    "denied_capabilities"
+  ],
+  "properties": {
+    "profile_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,100}$" },
+    "profile_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "pipeline_template": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "default_decision": { "type": "string", "enum": ["allow", "deny", "require_approval"] },
+    "enforcement_boundary": { "type": "string", "enum": ["local-adapter", "tool-wrapper", "mcp-gateway", "runtime-native"] },
+    "enforced": { "type": "boolean", "const": true },
+    "action_tiers": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+    },
+    "approval_required_tiers": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+      "uniqueItems": true
+    },
+    "required_policy_actions": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["write", "delete", "commit", "push", "deploy", "publish", "credential-access"] },
+      "uniqueItems": true
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["read", "write", "edit", "delete", "execute", "publish", "merge", "commit", "push", "deploy", "credential-access", "external-request"] },
+      "uniqueItems": true
+    },
+    "allowed_capabilities": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["filesystem-read", "filesystem-write", "shell", "network", "browser", "github-read", "github-write", "deployment", "credential-use", "external-mcp"] },
+      "uniqueItems": true
+    },
+    "denied_capabilities": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["filesystem-read", "filesystem-write", "shell", "network", "browser", "github-read", "github-write", "deployment", "credential-use", "external-mcp"] },
+      "uniqueItems": true
+    },
+    "resource_scope": { "type": "string", "enum": ["declared-project-root", "repository", "organization", "external"] },
+    "notes": { "type": "array", "items": { "type": "string", "maxLength": 500 }, "maxItems": 20 }
+  }
+}

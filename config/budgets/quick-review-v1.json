@@ -1,0 +1,39 @@
+{
+  "budget_id": "quick-review-v1",
+  "budget_version": "1.0.0",
+  "pipeline_template": "quick-review",
+  "per_run": {
+    "max_steps": 2,
+    "max_retries": 4,
+    "max_tool_calls": 4,
+    "max_elapsed_ms": 120000,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_estimated_cost_usd": 0
+  },
+  "per_step": {
+    "max_attempts": 3,
+    "max_tool_calls": 1,
+    "max_elapsed_ms": 60000,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_estimated_cost_usd": 0
+  },
+  "retry_policy": {
+    "max_attempts": 3,
+    "retryable_categories": ["dependency", "timeout", "tool"],
+    "non_retryable_categories": ["validation", "authorization", "budget", "cancelled", "unknown"],
+    "backoff_ms": 0,
+    "jitter_ms": 0
+  },
+  "cancellation": {
+    "supported": true,
+    "trigger": "budget-exceeded",
+    "terminal_status": "cancelled"
+  },
+  "notes": [
+    "The local adapter uses deterministic zero token and zero spend accounting because it does not invoke an LLM.",
+    "Any future runtime with token or spend accounting must fail or escalate when the configured limits are exceeded.",
+    "Budget exhaustion is terminal evidence and never silently converts to success."
+  ]
+}

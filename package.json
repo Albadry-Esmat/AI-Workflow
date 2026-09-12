@@ -5,12 +5,6 @@
     "setup": "bash scripts/setup.sh",
     "health": "bash scripts/health-check.sh",
     "validate": "bash scripts/validate-skills.sh",
-    "validate:pipelines": "node scripts/validate-pipeline-references.js",
-    "validate:sync": "node scripts/verify-website-sync.js --target website/data --check",
-    "validate:security": "node scripts/validate-security-policy.js",
-    "validate:all": "npm run validate && npm run validate:pipelines && npm run validate:security && npm run validate:sync && npm run validate:capabilities",
-    "plan": "node scripts/plan-workflow.js",
-    "test": "bash tests/test-cli-security.sh && bash tests/test-plan-workflow.sh",
     "clean": "bash scripts/clean.sh",
     "reset": "bash scripts/reset.sh",
     "sync": "bash scripts/sync-website-data.sh",
@@ -18,15 +12,10 @@
     "sessions": "bash scripts/cleanup-sessions.sh",
     "sessions:delete": "bash scripts/cleanup-sessions.sh --delete",
     "update": "npm install --prefix .opencode",
-    "graph": "graphify update .",
-    "validate:capabilities": "node scripts/build-capability-index.js --check && npx --no-install ajv validate -s skills/schema/capability-index.schema.json -d skills/capability-index.json --spec=draft7"
-  },
-  "overrides": {
-    "fast-json-patch": "3.1.1"
+    "graph": "graphify update ."
   },
   "devDependencies": {
-    "ajv-cli": "5.0.0",
-    "ajv-formats": "3.0.1",
-    "js-yaml": "5.4.0"
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

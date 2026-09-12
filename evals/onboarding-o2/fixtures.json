@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "fixtures": [
+    {"id": "setup-clean-check-only", "scenario": "clean repository check-only setup", "expected": {"verdict": "pass", "mutations": 0, "network": "disabled"}},
+    {"id": "setup-resume-after-failure", "scenario": "resume at first incomplete step", "expected": {"resumed": true, "replayed_passed_steps": false, "state_redacted": true}},
+    {"id": "setup-idempotent", "scenario": "second apply setup", "expected": {"unexpected_mutations": 0, "verdict": "pass"}},
+    {"id": "doctor-json", "scenario": "structured diagnostic output", "expected": {"has_error_codes": true, "has_redaction": true, "warnings_nonfatal": true}},
+    {"id": "detect-safe-probes", "scenario": "catalog probes run with --version only", "expected": {"raw_secrets": 0, "target_writes": 0, "selection_recorded": true}},
+    {"id": "explicit-missing-fails", "scenario": "explicit selection of missing adapter", "expected": {"verdict": "fail", "fallback": false}},
+    {"id": "auto-deterministic", "scenario": "automatic selection with multiple candidates", "expected": {"adapter_id": "opencode", "reason_recorded": true}},
+    {"id": "no-runtime-demo", "scenario": "demo with no runtimes installed and no credentials", "expected": {"verdict": "pass", "external_writes": 0, "secrets_seen": false}},
+    {"id": "auth-delegated", "scenario": "auth status with selected adapter", "expected": {"status_only": true, "raw_secret_values": 0, "login_started": false}},
+    {"id": "recover-owned-state", "scenario": "recover after failed owned step", "expected": {"owned_paths_only": true, "target_project_changes": 0, "runtime_changes": 0}},
+    {"id": "unknown-state-blocks", "scenario": "corrupt or unknown state schema", "expected": {"verdict": "fail", "automatic_repair": false}},
+    {"id": "target-untouched", "scenario": "O2 commands pointed at a target project", "expected": {"target_project_changes": 0, "secret_copy": false}}
+  ]
+}

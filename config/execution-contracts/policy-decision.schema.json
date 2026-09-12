@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/execution/policy-decision.schema.json",
+  "title": "AI-Workflow Policy Decision",
+  "description": "Deterministic authorization result for a requested capability, action, and resource. This records the decision and evidence references; it does not itself execute the action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "contract_version",
+    "policy_decision_id",
+    "run_id",
+    "action",
+    "resource",
+    "decision",
+    "risk_tier",
+    "requested_capabilities",
+    "policy_version",
+    "policy_profile_id",
+    "enforcement_boundary",
+    "enforcement_result",
+    "evaluated_at",
+    "approval_required",
+    "reasons"
+  ],
+  "properties": {
+    "contract_type": { "type": "string", "const": "policy-decision" },
+    "contract_version": { "type": "string", "const": "1.1.0" },
+    "policy_decision_id": { "type": "string", "pattern": "^POL-[0-9a-f]{12}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "action": { "type": "string", "enum": ["read", "write", "edit", "delete", "execute", "publish", "merge", "commit", "push", "deploy", "credential-access", "external-request"] },
+    "resource": { "type": "string", "minLength": 1, "maxLength": 1000 },
+    "decision": { "type": "string", "enum": ["allow", "deny", "require_approval"] },
+    "risk_tier": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "requested_capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "enum": ["filesystem-read", "filesystem-write", "shell", "network", "browser", "github-read", "github-write", "deployment", "credential-use", "external-mcp"] },
+      "uniqueItems": true
+    },
+    "policy_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "policy_profile_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,100}$" },
+    "enforcement_boundary": { "type": "string", "enum": ["local-adapter", "tool-wrapper", "mcp-gateway", "runtime-native"] },
+    "enforcement_result": { "type": "string", "enum": ["enforced", "disabled", "unavailable"] },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "approval_required": { "type": "boolean" },
+    "gate_id": { "type": ["string", "null"], "pattern": "^GATE-[0-9a-f]{12}$" },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 },
+      "maxItems": 20
+    },
+    "capability_denied": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["filesystem-read", "filesystem-write", "shell", "network", "browser", "github-read", "github-write", "deployment", "credential-use", "external-mcp"] },
+      "uniqueItems": true
+    },
+    "obligations": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "maxItems": 20
+    },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "risk_tier": { "enum": ["high", "critical"] } } },
+      "then": { "properties": { "approval_required": { "const": true }, "decision": { "enum": ["deny", "require_approval"] } }, "required": ["gate_id"] }
+    },
+    {
+      "if": { "properties": { "action": { "enum": ["delete", "publish", "merge", "commit", "push", "deploy", "credential-access"] } } },
+      "then": { "properties": { "approval_required": { "const": true } }, "required": ["gate_id"] }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "require_approval" } } },
+      "then": { "properties": { "approval_required": { "const": true } }, "required": ["gate_id"] }
+    }
+  ]
+}

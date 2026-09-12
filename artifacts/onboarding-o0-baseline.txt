@@ -1,0 +1,197 @@
+=== BATCH O0 BASELINE ===
+2026-08-17T15:33:18Z
+
+=== SOURCE REMOTE STATE ===
+Dev
+79464a0225e4be6d8ca8649d866c7101e4f203f9
+79464a0225e4be6d8ca8649d866c7101e4f203f9
+[31m??[m AI-Workflow-Comprehensive-Enhancement-Plan.md
+[31m??[m AI-Workflow-Enhanced-Implementation-Plan.md
+[31m??[m AI-Workflow-Enhancement-Research-Notes.md
+[31m??[m AI-Workflow-Gated-Batch-Implementation-Plan.md
+[31m??[m artifacts/onboarding-o0-baseline.txt
+
+=== WEBSITE REMOTE STATE ===
+Dev
+57b6e09f5234e62a24c39c94df79afab8365bffb
+57b6e09f5234e62a24c39c94df79afab8365bffb
+
+=== SOURCE ONBOARDING FILES ===
+/home/ubuntu/AI-Workflow/.env.example
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md
+/home/ubuntu/AI-Workflow/Makefile
+/home/ubuntu/AI-Workflow/README.md
+/home/ubuntu/AI-Workflow/aiw
+/home/ubuntu/AI-Workflow/artifacts/README.md
+/home/ubuntu/AI-Workflow/docs/README.md
+/home/ubuntu/AI-Workflow/docs/adr/README.md
+/home/ubuntu/AI-Workflow/docs/enhancements/README.md
+/home/ubuntu/AI-Workflow/examples/README.md
+/home/ubuntu/AI-Workflow/scripts/health-check.sh
+/home/ubuntu/AI-Workflow/scripts/setup.sh
+/home/ubuntu/AI-Workflow/skills/README.md
+
+=== CURRENT RUNTIME REFERENCES ===
+/home/ubuntu/AI-Workflow/README.md:20:# Edit .env and set your GITHUB_TOKEN
+/home/ubuntu/AI-Workflow/README.md:41:opencode   # all 113 skills + 19 agents, fully self-contained
+/home/ubuntu/AI-Workflow/README.md:46:**Option B** copies `opencode.json`, `.opencode/` (all skills + agents), and `.env` into your project. After that it works standalone — no dependency on the AI-Workflow folder.
+/home/ubuntu/AI-Workflow/README.md:76:| [opencode](https://opencode.ai) | **Yes** | Runs the AI agent runtime |
+/home/ubuntu/AI-Workflow/README.md:83:A GitHub Copilot subscription (or another LLM provider supported by opencode) is also required.
+/home/ubuntu/AI-Workflow/README.md:115:| `aiw update` | Update `.opencode/` plugin dependencies |
+/home/ubuntu/AI-Workflow/README.md:132:| `aiw backup` | Backup `.opencode/state/` to `backups/` directory |
+/home/ubuntu/AI-Workflow/README.md:162:| `GITHUB_TOKEN` | **Yes** | GitHub PAT — used by the `github` MCP server |
+/home/ubuntu/AI-Workflow/README.md:177:A **skill** is a markdown file (`SKILL.md`) with 12 sections that define exactly what an agent does: its purpose, inputs, outputs, quality gates, and composition rules. Skills live in `.opencode/skills/<name>/`.
+/home/ubuntu/AI-Workflow/README.md:180:.opencode/skills/
+/home/ubuntu/AI-Workflow/README.md:206:18 specialized subagents each own a set of skills. The primary agent orchestrates them, routes inputs, enforces HITL gates, and assembles the final response. Agent config lives in `opencode.json`.
+/home/ubuntu/AI-Workflow/README.md:259:├── opencode.json              ← agent config, model assignments, MCP servers
+/home/ubuntu/AI-Workflow/README.md:262:├── .opencode/
+/home/ubuntu/AI-Workflow/README.md:311:### `opencode: command not found`
+/home/ubuntu/AI-Workflow/README.md:312:Install opencode from [opencode.ai](https://opencode.ai).
+/home/ubuntu/AI-Workflow/README.md:314:### `GITHUB_TOKEN is not set`
+/home/ubuntu/AI-Workflow/README.md:318:Run: `npm install -g ajv-cli ajv-formats` (or just re-run `aiw setup`).
+/home/ubuntu/AI-Workflow/README.md:321:Every SKILL.md directory under `.opencode/skills/` must have a corresponding `- id:` entry in `skills/index.yaml`. Run `aiw validate` for the specific skill that is missing.
+/home/ubuntu/AI-Workflow/README.md:323:### `.opencode/node_modules missing`
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:30:This installs the `aiw` CLI and configures your environment. Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:61:Every skill lives at `.opencode/skills/<skill-name>/SKILL.md`. Copy the structure from the template:
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:64:cp skills/template/skill-template.md .opencode/skills/<skill-name>/SKILL.md
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:106:  executable_skill: .opencode/skills/your-skill-name/SKILL.md
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:178:1. **`opencode.json`** — model assignment, permission level, skill(s) list.
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:179:2. **`.opencode/agent/<name>.md`** — behavioral rules and execution constraints.
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:181:When you add a skill to an existing agent, update both `opencode.json` (add the skill path to `"skills"`) and `docs/agents.md` (update the agent's skill table).
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:184:1. Add it to `opencode.json` under `"agent"`.
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:185:2. Create `.opencode/agent/<name>.md` (follow the existing agent files as a template).
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:191:Use only verified model IDs from `opencode models`. Current assignments:
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:193:- **Standard tier** (`claude-sonnet-4.6`): architect, planner, reviewer, tester, builder, recovery, documenter, data-engineer, api-designer, distributed-systems, cloud-platform, security-specialist, sre
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:194:- **Lightweight tier** (`claude-haiku-4.5`): analyzer, impact-analyzer, test-generator, deployer, doc-maintainer
+/home/ubuntu/AI-Workflow/CONTRIBUTING.md:220:aiw website sync   # syncs website/data/ from skills/, docs/, .opencode/skills/, opencode.json
+/home/ubuntu/AI-Workflow/.env.example:8:# Then open .env and set at minimum GITHUB_TOKEN before running `make setup`
+/home/ubuntu/AI-Workflow/.env.example:9:# or `opencode`.
+/home/ubuntu/AI-Workflow/.env.example:28:# For CI, prefer GitHub Actions' built-in GITHUB_TOKEN or a repository-scoped,
+/home/ubuntu/AI-Workflow/.env.example:30:GITHUB_TOKEN=
+/home/ubuntu/AI-Workflow/.env.example:47:# by the vercel MCP server (disabled by default in opencode.json).
+/home/ubuntu/AI-Workflow/.env.example:63:# Do not reuse your personal GITHUB_TOKEN.
+/home/ubuntu/AI-Workflow/.env.example:84:# Slack integration — currently disabled by default in opencode.json.
+/home/ubuntu/AI-Workflow/.env.example:86:# server in opencode.json.
+/home/ubuntu/AI-Workflow/Makefile:45:start: ## Launch the AI Workflow (opens opencode session)
+/home/ubuntu/AI-Workflow/Makefile:159:update: ## Update opencode plugin dependencies in .opencode/
+/home/ubuntu/AI-Workflow/Makefile:162:backup: ## Backup .opencode/state/ to backups/ directory
+/home/ubuntu/AI-Workflow/Makefile:166:sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/) — CI does this automatically on push
+/home/ubuntu/AI-Workflow/aiw:88:  echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
+/home/ubuntu/AI-Workflow/aiw:98:  echo -e "    ${CYAN}backup${NC}             Backup .opencode/state/ to backups/"
+/home/ubuntu/AI-Workflow/aiw:124:  if ! command -v opencode &>/dev/null; then
+/home/ubuntu/AI-Workflow/aiw:125:    echo -e "${RED}Error:${NC} opencode is not installed."
+/home/ubuntu/AI-Workflow/aiw:126:    echo "  Install it from: https://opencode.ai"
+/home/ubuntu/AI-Workflow/aiw:143:    # Must run from ROOT so opencode.json and .opencode/ are found,
+/home/ubuntu/AI-Workflow/aiw:144:    # but pass the target project path so opencode's file tools use it.
+/home/ubuntu/AI-Workflow/aiw:146:    opencode "$TARGET"
+/home/ubuntu/AI-Workflow/aiw:163:    opencode
+/home/ubuntu/AI-Workflow/aiw:242:  # Guard: warn if opencode.json already exists
+/home/ubuntu/AI-Workflow/aiw:243:  if [[ -f "$TARGET/opencode.json" ]]; then
+/home/ubuntu/AI-Workflow/aiw:244:    echo -e "${YELLOW}Warning:${NC} $TARGET/opencode.json already exists."
+/home/ubuntu/AI-Workflow/aiw:251:  echo "  Copying opencode.json..."
+/home/ubuntu/AI-Workflow/aiw:252:  cp "$ROOT/opencode.json" "$TARGET/opencode.json"
+/home/ubuntu/AI-Workflow/aiw:254:  echo "  Copying .opencode/ (agents + skills)..."
+/home/ubuntu/AI-Workflow/aiw:256:    "$ROOT/.opencode/" "$TARGET/.opencode/" 2>/dev/null || \
+/home/ubuntu/AI-Workflow/aiw:257:    cp -R "$ROOT/.opencode" "$TARGET/.opencode"
+/home/ubuntu/AI-Workflow/aiw:260:  if [[ -f "$TARGET/.opencode/package.json" ]]; then
+/home/ubuntu/AI-Workflow/aiw:261:    echo "  Installing .opencode/ plugin dependencies..."
+/home/ubuntu/AI-Workflow/aiw:262:    npm install --prefix "$TARGET/.opencode" --silent
+/home/ubuntu/AI-Workflow/aiw:271:    echo -e "  ${YELLOW}Created .env from template — remember to set GITHUB_TOKEN.${NC}"
+/home/ubuntu/AI-Workflow/aiw:282:  echo "    opencode"
+/home/ubuntu/AI-Workflow/aiw:404:  echo "→ Updating .opencode/ dependencies..."
+/home/ubuntu/AI-Workflow/aiw:405:  npm install --prefix "$ROOT/.opencode"
+/home/ubuntu/AI-Workflow/aiw:407:  echo "  Done. To update opencode CLI itself:"
+/home/ubuntu/AI-Workflow/aiw:408:  echo "  https://opencode.ai/docs/installation"
+/home/ubuntu/AI-Workflow/aiw:442:  if [[ -d "$ROOT/.opencode/state" ]]; then
+/home/ubuntu/AI-Workflow/aiw:443:    cp -R "$ROOT/.opencode/state/" "$BACKUP_DIR/"
+/home/ubuntu/AI-Workflow/aiw:499:  skill_count=$(find "$ROOT/.opencode/skills" -maxdepth 1 -type d | wc -l | tr -d ' ')
+/home/ubuntu/AI-Workflow/aiw:508:  session_count=$(find "$ROOT/.opencode/state/sessions" -name "*.json" -not -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+/home/ubuntu/AI-Workflow/aiw:520:  if command -v opencode &>/dev/null; then
+/home/ubuntu/AI-Workflow/aiw:521:    echo -e "    opencode: ${GREEN}installed${NC}"
+/home/ubuntu/AI-Workflow/aiw:523:    echo -e "    opencode: ${RED}not found${NC}"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:10:#   2. Checks optional tools (opencode, ajv-cli) and installs ajv-cli if missing
+/home/ubuntu/AI-Workflow/scripts/setup.sh:11:#   3. Installs .opencode/ npm plugin dependencies (skips if already done)
+/home/ubuntu/AI-Workflow/scripts/setup.sh:64:if command -v opencode &>/dev/null; then
+/home/ubuntu/AI-Workflow/scripts/setup.sh:65:  _ok "opencode found ($(command -v opencode))"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:67:  _warn "opencode not found — install at: https://opencode.ai"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:68:  echo "       The workflow requires opencode to run. Scripts and validation"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:76:  if sudo pip3 install jsonschema==4.23.0 --quiet; then
+/home/ubuntu/AI-Workflow/scripts/setup.sh:79:    _warn "jsonschema install failed — run manually: sudo pip3 install jsonschema==4.23.0"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:87:  if npm install -g ajv-cli ajv-formats --silent; then
+/home/ubuntu/AI-Workflow/scripts/setup.sh:90:    _warn "ajv-cli install failed — run manually: npm install -g ajv-cli ajv-formats"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:94:# ── 3. .opencode/ npm plugin ──────────────────────────────────────────────────
+/home/ubuntu/AI-Workflow/scripts/setup.sh:95:header "Setting up .opencode/ plugin dependencies"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:97:if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+/home/ubuntu/AI-Workflow/scripts/setup.sh:98:  _ok ".opencode/node_modules already present — skipping install"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:100:  step "Installing .opencode/ npm packages..."
+/home/ubuntu/AI-Workflow/scripts/setup.sh:101:  if npm install --prefix "$ROOT/.opencode" --silent; then
+/home/ubuntu/AI-Workflow/scripts/setup.sh:102:    _ok ".opencode/ packages installed"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:104:    _warn ".opencode/ npm install failed — run: npm install --prefix .opencode"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:113:  info "Edit .env to update values (especially GITHUB_TOKEN)"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:119:    echo -e "  ${BOLD}${YELLOW}Action required:${NC} Open .env and set your GITHUB_TOKEN."
+/home/ubuntu/AI-Workflow/scripts/setup.sh:134:  ".opencode/state/sessions"
+/home/ubuntu/AI-Workflow/scripts/setup.sh:224:echo "  1. Edit .env and set GITHUB_TOKEN (and any other keys you want)"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:7:#   1. Required tools (git, node, python3, opencode)
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:10:#   4. GITHUB_TOKEN is set (required)
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:12:#   6. .opencode/node_modules installed
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:13:#   7. Skill count sanity (index.yaml vs .opencode/skills/)
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:14:#   8. opencode.json skill paths exist on disk
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:62:if command -v opencode &>/dev/null; then
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:63:  _ok "opencode  →  $(command -v opencode)"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:65:  _fail "opencode not found — install at: https://opencode.ai"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:75:  echo "       Fix: npm install -g ajv-cli ajv-formats"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:97:if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:99:  MASKED="${GITHUB_TOKEN:0:4}********************"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:100:  _ok "GITHUB_TOKEN is set  ($MASKED)"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:102:  _fail "GITHUB_TOKEN is not set"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:103:    echo "       Add a short-lived fine-grained GITHUB_TOKEN to the ignored .env"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:133:# ── 6. .opencode/ plugin ──────────────────────────────────────────────────────
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:134:header ".opencode/ plugin dependencies"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:136:if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:137:  _ok ".opencode/node_modules exists"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:139:  _fail ".opencode/node_modules missing — run: make setup  (or: npm install --prefix .opencode)"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:147:  DIR_COUNT=$(find "$ROOT/.opencode/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:149:    _ok "index.yaml ($INDEX_COUNT) matches .opencode/skills/ ($DIR_COUNT)"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:151:    _fail "Skill count mismatch — index.yaml: $INDEX_COUNT, .opencode/skills/: $DIR_COUNT"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:158:# ── 8. opencode.json skill paths ──────────────────────────────────────────────
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:159:header "opencode.json skill path integrity"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:161:if command -v node &>/dev/null && [[ -f "$ROOT/opencode.json" ]]; then
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:164:    const cfg = JSON.parse(fs.readFileSync('opencode.json', 'utf8'));
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:178:    _ok "All skill paths in opencode.json exist on disk"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:186:  _warn "node not available or opencode.json missing — skipping path check"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:193:  ".opencode/state/sessions"
+/home/ubuntu/AI-Workflow/scripts/health-check.sh:212:  echo -e "  ${BOLD}Ready to run:${NC}  opencode"
+
+=== WEBSITE PACKAGE ===
+{
+  "name": "website",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}
+
+=== WEBSITE DATA / ROUTES ===
+/home/ubuntu/ASE-OS-Website/src/app/about/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/agents/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/architecture/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/changelog/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/getting-started/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/how-it-works/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/pipelines/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/reference/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/skills/[id]/page.tsx
+/home/ubuntu/ASE-OS-Website/src/app/skills/page.tsx
+website_data_files=29
+
+=== PRESERVED PLANNING ARTIFACTS ===
+AI-Workflow-Comprehensive-Enhancement-Plan.md
+AI-Workflow-Enhanced-Implementation-Plan.md
+AI-Workflow-Enhancement-Research-Notes.md
+AI-Workflow-Gated-Batch-Implementation-Plan.md

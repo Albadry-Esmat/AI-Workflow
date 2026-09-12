@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O6",
+  "title": "Offline Publisher Signature and Release Attestation Verification",
+  "state": {
+    "path": ".aiw/onboarding-o6/state.json",
+    "evidence_path": ".aiw/onboarding-o6/evidence.jsonl",
+    "owned_root": ".aiw/onboarding-o6",
+    "state_write_policy": "atomic-redacted"
+  },
+  "catalog": {
+    "path": "config/runtime-attestation-o6-catalog.json",
+    "schema_path": "config/runtime-attestation-o6-catalog-schema.json",
+    "trust_root_schema_path": "config/onboarding-o6-trust-root-schema.json",
+    "record_selection": "exact-attestation-id",
+    "artifact_selection": "exact-o5-installer-and-sha256",
+    "source_of_truth": "pinned-local-attestation-evidence"
+  },
+  "commands": {
+    "attestation_plan": {"syntax": "aiw onboarding attestation-plan [--agent <id|auto>] [--json]", "status": "implemented-in-o6"},
+    "attestation_verify": {"syntax": "aiw onboarding attestation-verify --attestation <o6-attestation-id> --artifact <path> [--json]", "status": "implemented-in-o6"},
+    "recover": {"syntax": "aiw onboarding recover --o6 [--reset-state] [--json]", "status": "implemented-in-o6"},
+    "auth_login": {"syntax": "aiw auth login", "status": "deferred-runtime-owned"},
+    "target_init": {"syntax": "aiw init <target>", "status": "deferred-guarded-batch"},
+    "start": {"syntax": "aiw start [--agent <adapter-id>] <target>", "status": "deferred-launch-adapter"}
+  },
+  "lifecycle": {
+    "plan": ["load-attestation-records", "show-artifact-digest", "show-trust-root", "show-claim-expectations", "show-network-and-execution-boundary"],
+    "verify": ["load-exact-record", "load-local-bundle", "load-local-trust-root", "hash-artifact", "verify-signature", "verify-subject-digest", "verify-identity", "verify-builder", "verify-source-repository", "verify-commit", "verify-build-type", "verify-predicate", "verify-external-parameters", "record-policy-verdict"],
+    "recover": ["load-owned-state", "reset-verification-state", "preserve-artifact", "preserve-runtime", "preserve-target"]
+  },
+  "verification": {
+    "offline_only": true,
+    "network": false,
+    "bundle_required": true,
+    "trust_root_required": true,
+    "signature_required": true,
+    "subject_digest_required": true,
+    "identity_required": true,
+    "builder_required": true,
+    "predicate_required": true,
+    "external_parameters_strict": true,
+    "transparency_mode": "local-evidence-only",
+    "unknown_claims": "fail-closed"
+  },
+  "execution": {
+    "installation": "not-authorized",
+    "execution": "not-authorized",
+    "authentication": "deferred",
+    "target_project_mutations": 0,
+    "launch": "deferred"
+  },
+  "authentication": {
+    "raw_secret_input": false,
+    "raw_secret_storage": false,
+    "login_automation": "deferred",
+    "status": "runtime-owned"
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "target_project_untouched": true,
+    "runtime_untouched": true
+  },
+  "diagnostics": {
+    "human_output": true,
+    "json_output": true,
+    "error_codes": true,
+    "redaction": true,
+    "warnings_nonfatal": true,
+    "claims_separately_reported": true
+  },
+  "non_goals": [
+    "Fetching or refreshing trust roots",
+    "Querying transparency logs",
+    "Installing verification tools",
+    "Downloading or executing artifacts",
+    "Authenticating to any provider",
+    "Mutating target projects",
+    "Launching provider runtimes",
+    "Treating signature validity as complete safety approval"
+  ]
+}

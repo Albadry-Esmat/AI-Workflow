@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/skill-scaffold.json",
+  "title": "SkillScaffoldManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "name", "version", "domain", "layer", "mastery_level", "description", "status", "created_at", "source", "registration", "metadata", "required_sections", "files"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "kind": {"type": "string", "const": "skill-scaffold"},
+    "name": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "domain": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "layer": {"type": "string", "enum": ["pipeline-entry", "pipeline-core", "pipeline-quality", "pipeline-release", "pipeline-support", "utility", "meta"]},
+    "mastery_level": {"type": "string", "enum": ["beginner", "intermediate", "advanced"]},
+    "description": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "const": "draft"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "source": {"type": "string", "const": "aiw-skill-create"},
+    "registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auto_register", "auto_promote", "requires_explicit_apply"],
+      "properties": {
+        "auto_register": {"type": "boolean", "const": false},
+        "auto_promote": {"type": "boolean", "const": false},
+        "requires_explicit_apply": {"type": "boolean", "const": true}
+      }
+    },
+    "metadata": {"$ref": "skill-metadata-schema.json"},
+    "required_sections": {"type": "array", "const": ["Purpose", "Inputs", "Required Context", "Execution Logic", "Outputs", "Rules", "Security", "Token Optim", "Quality Check", "Failure", "Human-in-the-Loop", "Skill Composition"]},
+    "files": {"type": "array", "const": ["SKILL.md", "skill-manifest.json", "contract-tests/contract.json", "eval-fixtures/index.json"]}
+  }
+}

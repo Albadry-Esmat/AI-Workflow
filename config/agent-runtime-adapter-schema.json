@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/agent-runtime-adapter.json",
+  "title": "AgentRuntimeAdapterCatalog",
+  "description": "Provider-neutral AI-agent runtime adapter contract for Onboarding Batch O0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "adapters"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "catalog_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "adapters": {
+      "type": "array",
+      "minItems": 4,
+      "items": {"$ref": "#/definitions/adapter"}
+    }
+  },
+  "definitions": {
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "display_name", "vendor", "status", "support_level",
+        "documentation", "detection", "installation", "authentication",
+        "project_context", "launch", "safety", "evidence", "recovery", "capabilities"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "display_name": {"type": "string", "minLength": 1},
+        "vendor": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["planned", "active", "deprecated", "disabled"]},
+        "support_level": {"type": "string", "enum": ["first-class", "compatible", "generic", "candidate"]},
+        "documentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["official_url", "reviewed_at", "verification_state"],
+          "properties": {
+            "official_url": {"type": "string", "format": "uri"},
+            "reviewed_at": {"type": "string", "format": "date"},
+            "verification_state": {"type": "string", "enum": ["documentation-reviewed", "fixture-pending", "fixture-verified", "unknown"]}
+          }
+        },
+        "detection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["executable", "version_args", "safe_probe", "version_output_required"],
+          "properties": {
+            "executable": {"type": "string", "minLength": 1},
+            "version_args": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "safe_probe": {"type": "boolean", "const": true},
+            "version_output_required": {"type": "boolean", "const": true}
+          }
+        },
+        "installation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["managed_by_aiw", "requires_explicit_consent", "channels"],
+          "properties": {
+            "managed_by_aiw": {"type": "boolean", "const": false},
+            "requires_explicit_consent": {"type": "boolean", "const": true},
+            "channels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind", "name", "user_action_required"],
+                "properties": {
+                  "kind": {"type": "string", "enum": ["native-installer", "package-manager", "binary", "container", "user-managed"]},
+                  "name": {"type": "string", "minLength": 1},
+                  "user_action_required": {"type": "boolean", "const": true}
+                }
+              }
+            }
+          }
+        },
+        "authentication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required_for_start", "modes", "credential_owner", "aiw_handles_secret_values", "status_probe"],
+          "properties": {
+            "required_for_start": {"type": "boolean"},
+            "modes": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["browser-device", "runtime-login", "external-cli", "api-key-env", "enterprise-gateway", "none"]}},
+            "credential_owner": {"type": "string", "enum": ["runtime", "provider", "github-cli", "user", "none"]},
+            "aiw_handles_secret_values": {"type": "boolean", "const": false},
+            "status_probe": {"type": "string", "enum": ["adapter-status", "runtime-status", "external-cli-status", "none"]}
+          }
+        },
+        "project_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target_directory_required", "initialization_required", "configuration_owner", "secret_copy_allowed"],
+          "properties": {
+            "target_directory_required": {"type": "boolean", "const": true},
+            "initialization_required": {"type": "boolean"},
+            "configuration_owner": {"type": "string", "enum": ["aiw", "runtime", "target-project", "user"]},
+            "secret_copy_allowed": {"type": "boolean", "const": false}
+          }
+        },
+        "launch": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["command", "target_cwd", "neutral_start_supported", "explicit_agent_selection_supported"],
+          "properties": {
+            "command": {"type": "string", "minLength": 1},
+            "target_cwd": {"type": "boolean", "const": true},
+            "neutral_start_supported": {"type": "boolean", "const": true},
+            "explicit_agent_selection_supported": {"type": "boolean", "const": true}
+          }
+        },
+        "safety": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["plan_or_review_mode", "approval_model", "external_write_claim", "fallback_behavior"],
+          "properties": {
+            "plan_or_review_mode": {"type": "string", "enum": ["native", "mapped", "unknown", "none"]},
+            "approval_model": {"type": "string", "enum": ["native", "mapped", "unknown", "none"]},
+            "external_write_claim": {"type": "string", "enum": ["declared-by-adapter", "not-claimed", "unknown"]},
+            "fallback_behavior": {"type": "string", "enum": ["fail-closed", "explicit-generic", "unknown"]}
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["run_manifest_adapter_id", "events", "evidence_level", "external_writes_default"],
+          "properties": {
+            "run_manifest_adapter_id": {"type": "boolean", "const": true},
+            "events": {"type": "array", "minItems": 3, "items": {"type": "string", "enum": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"]}},
+            "evidence_level": {"type": "string", "enum": ["full", "partial", "launch-only", "none"]},
+            "external_writes_default": {"type": "boolean", "const": false}
+          }
+        },
+        "recovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["supports_cancel", "supports_resume", "supports_undo", "rollback_claim"],
+          "properties": {
+            "supports_cancel": {"type": "boolean"},
+            "supports_resume": {"type": "boolean"},
+            "supports_undo": {"type": "boolean"},
+            "rollback_claim": {"type": "string", "enum": ["adapter-verified", "core-only", "not-claimed", "unknown"]}
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["plan_mode", "approval_gates", "sandboxing", "structured_output", "mcp", "streaming"],
+          "properties": {
+            "plan_mode": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]},
+            "approval_gates": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]},
+            "sandboxing": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]},
+            "structured_output": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]},
+            "mcp": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]},
+            "streaming": {"type": "string", "enum": ["native", "mapped", "unknown", "unsupported"]}
+          }
+        }
+      }
+    }
+  }
+}

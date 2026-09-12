@@ -1,0 +1,15 @@
+{
+  "contract_type": "policy-decision",
+  "contract_version": "1.0.0",
+  "policy_decision_id": "POL-000000000001",
+  "run_id": "RUN-000000000001",
+  "action": "deploy",
+  "resource": "https://production.example.invalid",
+  "decision": "allow",
+  "risk_tier": "critical",
+  "requested_capabilities": ["deployment", "network"],
+  "policy_version": "1.0.0",
+  "evaluated_at": "2026-08-16T22:00:05Z",
+  "approval_required": false,
+  "reasons": ["Convenience"]
+}

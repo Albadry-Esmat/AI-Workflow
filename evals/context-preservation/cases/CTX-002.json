@@ -1,0 +1,141 @@
+{
+  "case_id": "CTX-002",
+  "schema_version": "1.0.0",
+  "transition": "resume",
+  "protected_blocks": [
+    {
+      "block_key": "requirements",
+      "block_id": "REQ-SEC-001",
+      "content_hash": "sha256:8ab171246065071f0d98133a0df94a2adc701129028a9d4f2376390d9c85b68f",
+      "required": true
+    },
+    {
+      "block_key": "approvals",
+      "block_id": "GATE-004",
+      "content_hash": "sha256:d8b6e94fe79414a1c06e1be8a69cd0f5b17e6de1f558dd34e9d27e5c5ecb732b",
+      "required": true
+    },
+    {
+      "block_key": "security_findings",
+      "block_id": "FIND-001",
+      "content_hash": "sha256:4ee086423c3d26397390f54754e3b88aafa38536e1755dcc47e1137bfd19b43c",
+      "required": true
+    },
+    {
+      "block_key": "constraints",
+      "block_id": "CON-001",
+      "content_hash": "sha256:83e4b38f16e4f7bb442ae60a525c5add4f57d829017ee37b591efeba21ec9ef2",
+      "required": true
+    },
+    {
+      "block_key": "artifact_refs",
+      "block_id": "ART-001",
+      "content_hash": "sha256:2a658ffe822769e9f5d9d1f446072229abf67aad185a46da2079ea812e6d8277",
+      "required": true
+    }
+  ],
+  "before": {
+    "session_id": "session-before",
+    "project_id": "proj-batch7",
+    "blocks": {
+      "requirements": {
+        "block_id": "REQ-SEC-001",
+        "content_hash": "sha256:8ab171246065071f0d98133a0df94a2adc701129028a9d4f2376390d9c85b68f",
+        "payload": {
+          "priority": "critical",
+          "statement": "Do not expose credentials."
+        }
+      },
+      "approvals": {
+        "block_id": "GATE-004",
+        "content_hash": "sha256:d8b6e94fe79414a1c06e1be8a69cd0f5b17e6de1f558dd34e9d27e5c5ecb732b",
+        "payload": {
+          "decision": "approved",
+          "scope": "release"
+        }
+      },
+      "security_findings": {
+        "block_id": "FIND-001",
+        "content_hash": "sha256:4ee086423c3d26397390f54754e3b88aafa38536e1755dcc47e1137bfd19b43c",
+        "payload": {
+          "severity": "high",
+          "status": "open"
+        }
+      },
+      "constraints": {
+        "block_id": "CON-001",
+        "content_hash": "sha256:83e4b38f16e4f7bb442ae60a525c5add4f57d829017ee37b591efeba21ec9ef2",
+        "payload": {
+          "name": "read-only",
+          "value": true
+        }
+      },
+      "artifact_refs": {
+        "block_id": "ART-001",
+        "content_hash": "sha256:2a658ffe822769e9f5d9d1f446072229abf67aad185a46da2079ea812e6d8277",
+        "payload": {
+          "path": "artifacts/review.json",
+          "digest": "sha256:fixture"
+        }
+      }
+    }
+  },
+  "after": {
+    "session_id": "session-after",
+    "project_id": "proj-batch7",
+    "blocks": {
+      "requirements": {
+        "block_id": "REQ-SEC-001",
+        "content_hash": "sha256:8ab171246065071f0d98133a0df94a2adc701129028a9d4f2376390d9c85b68f",
+        "payload": {
+          "priority": "critical",
+          "statement": "Do not expose credentials."
+        }
+      },
+      "approvals": {
+        "block_id": "GATE-004",
+        "content_hash": "sha256:d8b6e94fe79414a1c06e1be8a69cd0f5b17e6de1f558dd34e9d27e5c5ecb732b",
+        "payload": {
+          "decision": "approved",
+          "scope": "release"
+        }
+      },
+      "security_findings": {
+        "block_id": "FIND-001",
+        "content_hash": "sha256:4ee086423c3d26397390f54754e3b88aafa38536e1755dcc47e1137bfd19b43c",
+        "payload": {
+          "severity": "high",
+          "status": "open"
+        }
+      },
+      "constraints": {
+        "block_id": "CON-001",
+        "content_hash": "sha256:83e4b38f16e4f7bb442ae60a525c5add4f57d829017ee37b591efeba21ec9ef2",
+        "payload": {
+          "name": "read-only",
+          "value": true
+        }
+      },
+      "artifact_refs": {
+        "block_id": "ART-001",
+        "content_hash": "sha256:2a658ffe822769e9f5d9d1f446072229abf67aad185a46da2079ea812e6d8277",
+        "payload": {
+          "path": "artifacts/review.json",
+          "digest": "sha256:fixture"
+        }
+      }
+    }
+  },
+  "expected": {
+    "preserved_block_ids": [
+      "REQ-SEC-001",
+      "GATE-004",
+      "FIND-001",
+      "CON-001",
+      "ART-001"
+    ],
+    "lost_block_ids": [],
+    "stale_block_ids": [],
+    "verdict": "pass"
+  }
+}

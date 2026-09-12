@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/context-preservation.schema.json",
+  "title": "AI-Workflow Context Preservation Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "schema_version", "transition", "protected_blocks", "before", "after", "expected"],
+  "properties": {
+    "case_id": { "type": "string", "pattern": "^CTX-[0-9]{3}$" },
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "transition": { "type": "string", "enum": ["compression", "resume", "gate-pause-resume", "cross-session-inherit", "stale-artifact"] },
+    "protected_blocks": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["block_key", "block_id", "content_hash", "required"],
+        "properties": {
+          "block_key": { "type": "string", "enum": ["requirements", "approvals", "security_findings", "constraints", "artifact_refs"] },
+          "block_id": { "type": "string", "minLength": 1 },
+          "content_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+          "required": { "type": "boolean", "const": true }
+        }
+      }
+    },
+    "before": { "type": "object", "additionalProperties": true },
+    "after": { "type": "object", "additionalProperties": true },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preserved_block_ids", "lost_block_ids", "verdict"],
+      "properties": {
+        "preserved_block_ids": { "type": "array", "items": { "type": "string" } },
+        "lost_block_ids": { "type": "array", "items": { "type": "string" } },
+        "stale_block_ids": { "type": "array", "items": { "type": "string" } },
+        "verdict": { "type": "string", "enum": ["pass", "block", "stale-rejected"] }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "transition": { "enum": ["compression", "resume", "gate-pause-resume", "cross-session-inherit"] } } },
+      "then": { "properties": { "expected": { "properties": { "lost_block_ids": { "maxItems": 0 } } } } }
+    },
+    {
+      "if": { "properties": { "transition": { "const": "stale-artifact" } } },
+      "then": { "properties": { "expected": { "properties": { "verdict": { "const": "stale-rejected" } } } } }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "contract_type": "policy-decision",
+  "contract_version": "1.1.0",
+  "policy_decision_id": "POL-000000000001",
+  "run_id": "RUN-000000000001",
+  "action": "read",
+  "resource": "file://workspace/project",
+  "decision": "allow",
+  "risk_tier": "low",
+  "requested_capabilities": ["filesystem-read"],
+  "policy_version": "1.0.0",
+  "policy_profile_id": "quick-review-read-only-v2",
+  "enforcement_boundary": "local-adapter",
+  "enforcement_result": "enforced",
+  "evaluated_at": "2026-08-16T22:00:05Z",
+  "approval_required": false,
+  "gate_id": null,
+  "reasons": ["Read-only review within the declared project boundary."],
+  "obligations": ["Record the output as an internal artifact."],
+  "expires_at": "2026-08-16T23:00:05Z"
+}

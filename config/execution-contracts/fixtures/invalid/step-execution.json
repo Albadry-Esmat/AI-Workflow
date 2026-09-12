@@ -1,0 +1,16 @@
+{
+  "contract_type": "step-execution",
+  "contract_version": "1.0.0",
+  "step_id": "STEP-000000000001",
+  "run_id": "RUN-000000000001",
+  "skill_id": "quick-review",
+  "skill_version": "1.0.0",
+  "phase": "review",
+  "sequence": 0,
+  "status": "success",
+  "started_at": "2026-08-16T22:00:10Z",
+  "input_artifact_ids": [],
+  "output_artifact_ids": [],
+  "policy_decision_id": "POL-000000000001",
+  "pii_scrubbed": true
+}

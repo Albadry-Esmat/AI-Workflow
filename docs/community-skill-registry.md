@@ -216,7 +216,7 @@ Share your skill with the community by publishing it to the registry.
 ### Prerequisites
 
 1. **A valid skill directory** with a `SKILL.md` that passes `validate-skills.sh`.
-2. **A GitHub Personal Access Token (PAT)** with `repo` scope for the registry repository (`AI-Workflow-Community/skills`). Store it in an environment variable (do **not** hardcode it).
+2. **A GitHub fine-grained token** restricted to the registry repository (`AI-Workflow-Community/skills`) with only the release and contents permissions required by publishing. Use a short expiry, store it in an environment variable or secret manager, and never hardcode it.
 3. **Your skill must pass all local validation checks** before it can be published.
 
 ### Step-by-Step
@@ -229,11 +229,13 @@ bash scripts/validate-skills.sh
 
 All checks must pass. A failing skill cannot be packaged.
 
-#### 2. Set your GitHub PAT environment variable
+#### 2. Set your short-lived fine-grained token environment variable
 
 ```bash
-export REGISTRY_GITHUB_TOKEN="ghp_your_token_here"
+export REGISTRY_GITHUB_TOKEN="github_fine_grained_token"
 ```
+
+Create it at [GitHub fine-grained tokens](https://github.com/settings/personal-access-tokens/fine-grained), restrict it to the registry repository, grant only the permissions required for releases and contents, and rotate it before expiry.
 
 #### 3. Run publish
 

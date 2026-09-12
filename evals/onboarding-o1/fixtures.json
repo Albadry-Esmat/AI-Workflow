@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "fixtures": [
+    {"id": "manifest-validates", "kind": "schema", "expected": "pass"},
+    {"id": "check-only-no-network", "kind": "verification", "expected": "pass", "check_only": true, "network": "disabled", "mutates": false},
+    {"id": "python-global-mutation-blocks", "kind": "policy", "expected": "block", "command": "sudo pip3 install"},
+    {"id": "node-global-mutation-blocks", "kind": "policy", "expected": "block", "command": "npm install -g"},
+    {"id": "lockfile-drift-blocks", "kind": "reproducibility", "expected": "block", "lockfile_required": true},
+    {"id": "unknown-core-version-blocks", "kind": "version", "expected": "block", "unknown_versions_fail_closed": true},
+    {"id": "runtime-install-requires-consent", "kind": "runtime", "expected": "block", "aiw_installs_by_default": false, "explicit_consent_required": true},
+    {"id": "local-environments-recreate", "kind": "recovery", "expected": "pass", "venv_recreatable": true, "node_modules_recreatable": true}
+  ]
+}

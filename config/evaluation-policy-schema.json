@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/evaluation-policy.schema.json",
+  "title": "AI-Workflow Evaluation Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policy_version", "policies"],
+  "properties": {
+    "policy_version": { "type": "string", "const": "1.0.0" },
+    "policies": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "trigger", "required_checks", "blocking", "external_writes_allowed"],
+        "properties": {
+          "name": { "type": "string", "enum": ["commit", "pull-request", "dev", "nightly", "release"] },
+          "trigger": { "type": "string", "minLength": 1 },
+          "required_checks": { "type": "array", "minItems": 1, "items": { "type": "string" }, "uniqueItems": true },
+          "blocking": { "type": "boolean", "const": true },
+          "external_writes_allowed": { "type": "boolean", "const": false },
+          "schedule": { "type": ["string", "null"] },
+          "promotion_requirements": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

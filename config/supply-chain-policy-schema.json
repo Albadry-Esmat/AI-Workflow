@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/supply-chain-policy.schema.json",
+  "title": "AI-Workflow Supply-Chain Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policy_version", "lockfiles", "sbom", "vulnerability_policy", "ci_action_policy", "verdict"],
+  "properties": {
+    "policy_version": { "type": "string", "const": "1.0.0" },
+    "lockfiles": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "manifest", "lockfile", "required"],
+        "properties": {
+          "repository": { "type": "string", "enum": ["AI-Workflow", "ASE-OS-Website"] },
+          "manifest": { "type": "string", "const": "package.json" },
+          "lockfile": { "type": "string", "const": "package-lock.json" },
+          "required": { "type": "boolean", "const": true }
+        }
+      }
+    },
+    "sbom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "spec_version", "components_source", "output", "required_fields"],
+      "properties": {
+        "format": { "type": "string", "const": "CycloneDX JSON" },
+        "spec_version": { "type": "string", "const": "1.5" },
+        "components_source": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "output": { "type": "string", "const": "artifacts/sbom.cdx.json" },
+        "required_fields": { "type": "array", "items": { "type": "string" }, "minItems": 5 }
+      }
+    },
+    "vulnerability_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["critical", "high", "medium", "unknown", "offline_behavior"],
+      "properties": {
+        "critical": { "type": "string", "const": "block" },
+        "high": { "type": "string", "const": "block" },
+        "medium": { "type": "string", "enum": ["warn", "block"] },
+        "unknown": { "type": "string", "const": "warn" },
+        "offline_behavior": { "type": "string", "const": "fail-closed-for-missing-lockfile; audit-only-for-unavailable-advisory" }
+      }
+    },
+    "ci_action_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["immutable_pins_required", "latest_tags_forbidden", "secret_scanning_required", "sbom_before_release"],
+      "properties": {
+        "immutable_pins_required": { "type": "boolean", "const": true },
+        "latest_tags_forbidden": { "type": "boolean", "const": true },
+        "secret_scanning_required": { "type": "boolean", "const": true },
+        "sbom_before_release": { "type": "boolean", "const": true }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["pass", "block"] }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/operational-evidence-bundle.schema.json",
+  "title": "AI-Workflow Operational Evidence Bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "pipeline_template", "run_manifest", "steps", "artifacts", "policy_decisions", "telemetry_events", "controls"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "pipeline_template": { "type": "string", "minLength": 1 },
+    "run_manifest": { "type": "object", "required": ["contract_type", "contract_version", "run_id", "pipeline_template", "status", "step_ids", "artifact_ids", "policy_decision_ids"] },
+    "steps": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["contract_type", "contract_version", "step_id", "run_id", "skill_id", "status", "phase", "sequence"] } },
+    "artifacts": { "type": "array", "items": { "type": "object", "required": ["artifact_id", "kind", "producer_step_id", "sha256", "classification", "contains_pii"] } },
+    "policy_decisions": { "type": "array", "items": { "type": "object", "required": ["policy_decision_id", "decision", "action", "enforcement_boundary", "reasons"] } },
+    "telemetry_events": { "type": "array", "items": { "type": "object", "required": ["schema_version", "event_id", "event_type", "session_id", "pipeline_template", "redaction_profile", "retention_class"] } },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dry_run", "external_writes", "redaction_profile", "retention_class"],
+      "properties": {
+        "dry_run": { "type": "boolean" },
+        "external_writes": { "type": "integer", "const": 0 },
+        "redaction_profile": { "type": "string", "enum": ["standard-v1", "strict-v1"] },
+        "retention_class": { "type": "string", "enum": ["operational-30d", "aggregate-90d"] }
+      }
+    },
+    "generated_at": { "type": "string", "format": "date-time" }
+  }
+}

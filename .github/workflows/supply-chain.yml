@@ -1,0 +1,59 @@
+name: Supply Chain Controls
+
+on:
+  push:
+    branches: [Dev]
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - "config/supply-chain-policy.json"
+      - "config/supply-chain-policy-schema.json"
+      - ".github/workflows/supply-chain.yml"
+      - "scripts/generate-sbom.py"
+      - "scripts/scan-supply-chain.py"
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - "config/supply-chain-policy.json"
+      - "config/supply-chain-policy-schema.json"
+      - ".github/workflows/supply-chain.yml"
+      - "scripts/generate-sbom.py"
+      - "scripts/scan-supply-chain.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  supply-chain:
+    name: Lockfile, SBOM, and immutable-action checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI-Workflow
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: Dev
+
+      - name: Checkout ASE-OS-Website Dev
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: Albadry-Esmat/ASE-OS-Website
+          ref: Dev
+          path: website-repo
+
+      - name: Generate CycloneDX SBOM
+        run: python3 scripts/generate-sbom.py --website-root website-repo
+
+      - name: Run offline-safe supply-chain scan
+        run: python3 scripts/scan-supply-chain.py --website-root website-repo
+
+      - name: Run AI-Workflow npm audit
+        run: npm audit --package-lock-only --audit-level=high
+
+      - name: Run ASE-OS-Website npm audit
+        working-directory: website-repo
+        run: npm audit --package-lock-only --audit-level=high
+
+      - name: Validate supply-chain policy and generated artifacts
+        run: python3 scripts/validate-batch8-controls.py --supply-chain-only

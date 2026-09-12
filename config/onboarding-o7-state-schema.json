@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow O7 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "adapter_id", "artifact", "network", "verification", "refresh", "evidence", "policy", "authentication", "target", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "workflow_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "mode": {"type": "string", "enum": ["plan", "verify", "refresh-plan", "refresh"]},
+    "adapter_id": {"type": ["string", "null"]},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "expected_sha256", "observed_sha256", "subject_match"],
+      "properties": {
+        "path": {"type": ["string", "null"]},
+        "expected_sha256": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "observed_sha256": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "subject_match": {"type": "boolean"}
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "consent", "performed", "allowed_hosts", "requests", "response_bytes", "timeout_seconds"],
+      "properties": {
+        "requested": {"type": "boolean"},
+        "consent": {"type": "boolean"},
+        "performed": {"type": "boolean"},
+        "allowed_hosts": {"type": "array", "items": {"type": "string"}},
+        "requests": {"type": "integer", "minimum": 0},
+        "response_bytes": {"type": "integer", "minimum": 0},
+        "timeout_seconds": {"type": "integer", "minimum": 0, "maximum": 60}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "tool_status", "bundle_present", "trust_root_present", "signature_valid", "claims_valid", "offline_result", "online_result"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["offline-bundle", "offline-key", "online-api", "online-registry", "not-run"]},
+        "tool_status": {"type": "string", "enum": ["available", "missing", "not-run", "blocked"]},
+        "bundle_present": {"type": "boolean"},
+        "trust_root_present": {"type": "boolean"},
+        "signature_valid": {"type": "boolean"},
+        "claims_valid": {"type": "boolean"},
+        "offline_result": {"type": "string", "enum": ["pass", "fail", "not-run"]},
+        "online_result": {"type": "string", "enum": ["pass", "fail", "not-run"]}
+      }
+    },
+    "refresh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_path", "candidate_sha256", "source_url", "source_host", "accepted", "active_root_overwritten", "stale_root_warning"],
+      "properties": {
+        "candidate_path": {"type": ["string", "null"]},
+        "candidate_sha256": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "source_url": {"type": ["string", "null"], "format": "uri"},
+        "source_host": {"type": ["string", "null"]},
+        "accepted": {"type": "boolean"},
+        "active_root_overwritten": {"type": "boolean"},
+        "stale_root_warning": {"type": "boolean"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_path", "response_digest", "raw_secret_values", "redacted", "source_provenance"],
+      "properties": {
+        "record_path": {"type": ["string", "null"]},
+        "response_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "raw_secret_values": {"type": "integer", "minimum": 0, "maximum": 0},
+        "redacted": {"type": "boolean", "const": true},
+        "source_provenance": {"type": "string", "enum": ["local", "network-refresh", "none"]}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "fail_closed", "reasons"],
+      "properties": {
+        "verdict": {"type": "string", "enum": ["pass", "fail", "blocked"]},
+        "fail_closed": {"type": "boolean", "const": true},
+        "reasons": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_started", "raw_secret_values"],
+      "properties": {
+        "status": {"type": "string", "enum": ["runtime-owned", "deferred"]},
+        "login_started": {"type": "boolean", "const": false},
+        "raw_secret_values": {"type": "integer", "minimum": 0, "maximum": 0}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch", "secret_copy"],
+      "properties": {
+        "initialization": {"type": "string", "enum": ["deferred"]},
+        "mutations": {"type": "integer", "minimum": 0, "maximum": 0},
+        "launch": {"type": "string", "enum": ["deferred"]},
+        "secret_copy": {"type": "boolean", "const": false}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

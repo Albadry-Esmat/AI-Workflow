@@ -1,0 +1,23 @@
+{
+  "policy_version": "1.0.0",
+  "services": [
+    { "service_name": "quick-review-adapter", "pipeline_template": "quick-review", "criticality": "tier2" },
+    { "service_name": "full-pipeline-evidence", "pipeline_template": "full-pipeline", "criticality": "tier2" },
+    { "service_name": "insights-adaptation-evidence", "pipeline_template": "insights-adaptation-pipeline", "criticality": "tier3" }
+  ],
+  "slos": [
+    { "slo_name": "quick-review.success-rate", "service_name": "quick-review-adapter", "sli_type": "availability", "target": 99.5, "window_days": 30, "error_budget_minutes": 216.0, "measurement_source": "operational-evidence-bundle.run_manifest.status" },
+    { "slo_name": "quick-review.evidence-validity", "service_name": "quick-review-adapter", "sli_type": "correctness", "target": 100.0, "window_days": 30, "error_budget_minutes": 0.0, "measurement_source": "execution-contract-validator" },
+    { "slo_name": "full-pipeline.evidence-completeness", "service_name": "full-pipeline-evidence", "sli_type": "correctness", "target": 99.0, "window_days": 30, "error_budget_minutes": 432.0, "measurement_source": "operational-evidence-bundle.step_coverage" },
+    { "slo_name": "insights-adaptation.evidence-completeness", "service_name": "insights-adaptation-evidence", "sli_type": "correctness", "target": 99.0, "window_days": 30, "error_budget_minutes": 432.0, "measurement_source": "operational-evidence-bundle.step_coverage" },
+    { "slo_name": "pipeline.run-latency", "service_name": "quick-review-adapter", "sli_type": "latency", "target": 95.0, "window_days": 30, "error_budget_minutes": 216.0, "measurement_source": "operational-evidence-bundle.step.duration_ms", "threshold": 120000 }
+  ],
+  "error_budget_policy": "pause_deploys",
+  "burn_rate_rules": [
+    { "window": "1h", "burn_rate_threshold": 14.4, "severity": "page", "budget_consumed_pct": 2.0 },
+    { "window": "6h", "burn_rate_threshold": 6.0, "severity": "page", "budget_consumed_pct": 5.0 },
+    { "window": "1d", "burn_rate_threshold": 3.0, "severity": "ticket", "budget_consumed_pct": 10.0 },
+    { "window": "3d", "burn_rate_threshold": 1.0, "severity": "ticket", "budget_consumed_pct": 10.0 }
+  ],
+  "measurement": { "sample_interval_seconds": 60, "retention_class": "aggregate-90d" }
+}

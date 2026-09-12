@@ -4,14 +4,16 @@
 # Run from the project root:  make health  OR  bash scripts/health-check.sh
 #
 # Checks:
-#   1. Required tools (git, node, npm, opencode)
-#   2. Optional tools (graphify) and local validation dependencies
-#   3. .env file exists
-#   4. GITHUB_TOKEN is set (optional — only for built-in github MCP)
-#   5. Optional env vars (with warnings, not failures)
-#   6. .opencode/node_modules (optional — only for local plugin)
-#   7. Skill count sanity (index.yaml vs .opencode/skills/)
-#   8. opencode.json skill paths exist on disk
+#   1. Required host tools (git, node, npm, python3)
+#   2. Project-local tools (.venv and scripts/validate-json-schema.mjs)
+#   3. Optional agent runtimes and graphify
+#   4. .env file exists
+#   5. Credentials are optional until a provider operation is requested
+#   6. Optional env vars (with warnings, not failures)
+#   7. .opencode plugin dependency state (optional — skip with external MCPs)
+#   8. Skill count sanity (index.yaml vs .opencode/skills/)
+#   9. opencode.json skill paths exist on disk
+#  10. Required runtime directories
 #
 # Exit code: 0 if all required checks pass (warnings are non-fatal)
 
@@ -30,6 +32,15 @@ fi
 # shellcheck source=scripts/lib/common.sh
 source "$COMMON_SH"
 
+PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/scripts/validate-json-schema.mjs}"
+if [[ ! -x "$AJV_BIN" ]]; then
+  AJV_BIN="$(command -v ajv || true)"
+fi
+
 # Load .env if present
 load_env "$ROOT/.env"
 
@@ -46,31 +57,46 @@ banner "Health Check"
 # ── 1. Required tools ─────────────────────────────────────────────────────────
 header "Required tools"
 
-for tool in git node npm; do
+for tool in git node npm python3; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool  →  $(command -v "$tool")"
   else
     _fail "$tool not found"
     case "$tool" in
       node)   echo "       Install Node.js at: https://nodejs.org" ;;
+      python3) echo "       Install Python at: https://python.org" ;;
       git)    echo "       Install Git at: https://git-scm.com" ;;
     esac
   fi
 done
 
-if command -v opencode &>/dev/null; then
-  _ok "opencode  →  $(command -v opencode)"
+# ── 2. Project-local tools ─────────────────────────────────────────────────────
+header "Project-local tools"
+
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]] && "$PYTHON_BIN" -c 'import jsonschema, yaml' &>/dev/null; then
+  _ok "project-local Python dependencies  →  $PYTHON_BIN"
 else
-  _fail "opencode not found — install at: https://opencode.ai"
+  _fail "project-local Python dependencies missing — run: make setup"
 fi
 
-# ── 2. Optional tools and local validation dependencies ───────────────────────
-header "Optional tools and local validation dependencies"
-
-if [[ -x "$ROOT/node_modules/.bin/ajv" ]] && [[ -d "$ROOT/node_modules/js-yaml" ]]; then
-  _ok "Local validation dependencies are installed"
+if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
+  _ok "project-local JSON Schema validator  →  $AJV_BIN"
 else
-  _fail "Local validation dependencies missing — run: ./aiw setup or npm ci"
+  _fail "project-local JSON Schema validator missing — run: make setup"
+fi
+
+# ── 3. Optional agent runtimes and tools ───────────────────────────────────────
+header "Optional agent runtimes and tools"
+
+RUNTIME_FOUND=0
+for runtime in opencode claude codex; do
+  if command -v "$runtime" &>/dev/null; then
+    _ok "$runtime  →  $(command -v "$runtime")"
+    RUNTIME_FOUND=$((RUNTIME_FOUND+1))
+  fi
+done
+if [[ "$RUNTIME_FOUND" -eq 0 ]]; then
+  _warn "No candidate agent runtime detected — core validation and no-secret demo remain available"
 fi
 
 if command -v graphify &>/dev/null; then
@@ -80,7 +106,7 @@ else
   echo "       See: https://github.com/graphify-ai/graphify"
 fi
 
-# ── 3. .env file ──────────────────────────────────────────────────────────────
+# ── 4. .env file ──────────────────────────────────────────────────────────────
 header "Environment file"
 
 if [[ -f "$ROOT/.env" ]]; then
@@ -89,23 +115,17 @@ else
   _fail ".env not found — run: make setup  (or: cp .env.example .env)"
 fi
 
-# ── 4. Optional env vars (GitHub) ─────────────────────────────────────────────
-header "GitHub token (optional)"
+# ── 5. Optional credentials ────────────────────────────────────────────────────
+header "Optional credentials"
 
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-  # Mask the token — show first 4 chars then fixed asterisks
   MASKED="${GITHUB_TOKEN:0:4}********************"
   _ok "GITHUB_TOKEN is set  ($MASKED)"
 else
-  _warn "GITHUB_TOKEN is not set — built-in github MCP will be unavailable"
-  echo "       Only needed for the built-in github MCP server."
-  echo "       Skip this if you connect to GitHub via an external MCP / desktop app."
-  echo "       To enable: add GITHUB_TOKEN=<your-token> to .env"
-  echo "       Create a token at: https://github.com/settings/tokens"
-  echo "       Required scopes: repo, read:org"
+  _warn "GITHUB_TOKEN is not set — optional provider/GitHub operations will request approved auth later; use short-lived, fine-grained credentials and rotate them"
 fi
 
-# ── 5. Optional env vars ──────────────────────────────────────────────────────
+# ── 6. Optional env vars ──────────────────────────────────────────────────────
 header "Optional environment variables"
 
 for var_pair in \
@@ -130,17 +150,19 @@ for mcp_var in CONTEXT7_API_KEY BRAVE_API_KEY; do
   fi
 done
 
-# ── 6. .opencode/ plugin dependencies ──────────────────────────────────────────────────────
+# ── 7. .opencode/ plugin ──────────────────────────────────────────────────────
 header ".opencode/ plugin dependencies"
 
-if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+if [[ ! -f "$ROOT/.opencode/package.json" ]]; then
+  _ok ".opencode has no plugin package manifest — no node_modules required"
+elif [[ -d "$ROOT/.opencode/node_modules" ]]; then
   _ok ".opencode/node_modules exists"
 else
   _warn ".opencode/node_modules missing — local plugin unavailable; skip if you connect via external MCPs / desktop app"
   echo "       To install: run make setup  (or: npm install --prefix .opencode)"
 fi
 
-# ── 7. Skill count sanity ─────────────────────────────────────────────────────
+# ── 8. Skill count sanity ─────────────────────────────────────────────────────
 header "Skill count consistency"
 
 if command -v grep &>/dev/null; then
@@ -156,7 +178,7 @@ else
   _warn "grep not available — skipping skill count check"
 fi
 
-# ── 8. opencode.json skill paths ──────────────────────────────────────────────
+# ── 9. opencode.json skill paths ──────────────────────────────────────────────
 header "opencode.json skill path integrity"
 
 if command -v node &>/dev/null && [[ -f "$ROOT/opencode.json" ]]; then
@@ -187,7 +209,7 @@ else
   _warn "node not available or opencode.json missing — skipping path check"
 fi
 
-# ── 9. Required runtime directories ──────────────────────────────────────────
+# ── 10. Required runtime directories ──────────────────────────────────────────
 header "Required runtime directories"
 
 REQUIRED_DIRS=(
@@ -210,8 +232,8 @@ echo -e "${BOLD}═════════════════════�
 if [[ "$FAILURES" -eq 0 ]]; then
   echo -e "  ${GREEN}${BOLD}Health check passed${NC} — $PASSES checks OK, $WARNINGS warning(s)"
   echo
-  echo -e "  ${BOLD}Ready to run:${NC}  opencode"
-  echo "  MCP servers will start automatically on first use."
+  echo -e "  ${BOLD}Ready to run:${NC}  aiw validate / aiw demo"
+  echo "  Select and authenticate an agent runtime only when you are ready."
   echo "  Servers with missing API keys start but return no results until keys are set."
 else
   echo -e "  ${RED}${BOLD}Health check failed${NC} — $FAILURES failure(s), $WARNINGS warning(s), $PASSES passed"

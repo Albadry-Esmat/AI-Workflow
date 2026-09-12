@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O5",
+  "title": "Digest-Bound Local Runtime Artifact Execution",
+  "state": {
+    "path": ".aiw/onboarding-o5/state.json",
+    "evidence_path": ".aiw/onboarding-o5/evidence.jsonl",
+    "owned_root": ".aiw/onboarding-o5",
+    "state_write_policy": "atomic-redacted"
+  },
+  "catalog": {
+    "path": "config/runtime-installer-o5-catalog.json",
+    "schema_path": "config/runtime-installer-o5-catalog-schema.json",
+    "record_selection": "exact-installer-id",
+    "artifact_selection": "exact-local-path-and-sha256",
+    "source_of_truth": "approved-local-fixture-or-publisher-digest"
+  },
+  "commands": {
+    "execute_plan": {"syntax": "aiw onboarding execute-plan [--agent <id|auto>] [--json]", "status": "implemented-in-o5"},
+    "artifact_hash": {"syntax": "aiw onboarding artifact-hash --installer <o5-installer-id> [--path <local-path>] [--json]", "status": "implemented-in-o5"},
+    "execute": {"syntax": "aiw onboarding execute --installer <o5-installer-id> --path <local-path> --reason <text> --yes [--json]", "status": "approved-local-only"},
+    "recover": {"syntax": "aiw onboarding recover --o5 [--reset-state] [--json]", "status": "implemented-in-o5"},
+    "auth_login": {"syntax": "aiw auth login", "status": "deferred-runtime-owned"},
+    "target_init": {"syntax": "aiw init <target>", "status": "deferred-guarded-batch"},
+    "start": {"syntax": "aiw start [--agent <adapter-id>] <target>", "status": "deferred-launch-adapter"}
+  },
+  "lifecycle": {
+    "plan": ["load-records", "filter-platform", "show-artifact-requirements", "show-approval-status", "show-blocked-reasons"],
+    "hash": ["load-exact-record", "resolve-local-path", "reject-symlink", "reject-path-traversal", "check-staging-root", "hash-sha256", "check-size", "record-redacted-evidence"],
+    "execute": ["load-exact-record", "require-explicit-yes", "require-reason", "require-approved-record", "require-exact-path", "require-digest-match", "require-platform-match", "validate-argv", "validate-closed-environment", "execute-one-bounded-command", "record-exit-code"],
+    "recover": ["load-owned-state", "reset-incomplete-record", "preserve-target", "preserve-auth", "preserve-external-runtime"]
+  },
+  "command_policy": {
+    "network": {"allowed": false, "reason": "O5 never downloads an artifact"},
+    "shell": {"allowed": false, "reason": "argv-only execution prevents expansion, pipes, and redirection"},
+    "elevated": {"allowed": false, "reason": "O5 cannot assume host privilege or rollback"},
+    "package_manager_mutation": {"allowed": false, "reason": "global package state is outside O5 ownership"},
+    "docker_mutation": {"allowed": false, "reason": "container state is outside O5 ownership"},
+    "target_project_mutation": {"allowed": false, "reason": "target initialization belongs to a later guarded batch"}
+  },
+  "approval": {
+    "exact_record": true,
+    "exact_path": true,
+    "exact_digest": true,
+    "platform_match": true,
+    "reason_required": true,
+    "explicit_yes_required": true,
+    "unapproved_fails_closed": true
+  },
+  "preflight": {
+    "read_only": true,
+    "network": "disabled",
+    "shell": false,
+    "elevated": false,
+    "stdin": "closed",
+    "environment_allowlist": [],
+    "timeout_seconds_max": 30,
+    "target_project_mutations": 0,
+    "secrets_seen": false
+  },
+  "execution": {
+    "status": "blocked-unless-approved",
+    "local_argv_only": true,
+    "max_commands": 1,
+    "stdout_capture": false,
+    "stderr_capture": false,
+    "target_project_mutations": 0,
+    "staging_root_only": true
+  },
+  "authentication": {
+    "raw_secret_input": false,
+    "raw_secret_storage": false,
+    "login_automation": "deferred",
+    "status": "runtime-owned"
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "quarantine_owned_only": true,
+    "target_project_untouched": true
+  },
+  "diagnostics": {
+    "human_output": true,
+    "json_output": true,
+    "error_codes": true,
+    "redaction": true,
+    "warnings_nonfatal": true
+  },
+  "non_goals": [
+    "Downloading or fetching artifacts",
+    "Executing network installers",
+    "Executing shell pipelines or PowerShell expressions",
+    "Running elevated, package-manager, Docker, or global-state commands",
+    "Automating authentication",
+    "Mutating target projects",
+    "Launching a provider runtime",
+    "Claiming unsupported rollback behavior"
+  ]
+}

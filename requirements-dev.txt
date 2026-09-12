@@ -1,0 +1,4 @@
+# AI-Workflow project-local validation dependencies.
+# Install only inside .venv; do not mutate the system Python installation.
+jsonschema==4.23.0
+PyYAML==6.0.3

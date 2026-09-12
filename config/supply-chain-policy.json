@@ -1,0 +1,28 @@
+{
+  "policy_version": "1.0.0",
+  "lockfiles": [
+    { "repository": "AI-Workflow", "manifest": "package.json", "lockfile": "package-lock.json", "required": true },
+    { "repository": "ASE-OS-Website", "manifest": "package.json", "lockfile": "package-lock.json", "required": true }
+  ],
+  "sbom": {
+    "format": "CycloneDX JSON",
+    "spec_version": "1.5",
+    "components_source": ["AI-Workflow/package-lock.json", "ASE-OS-Website/package-lock.json"],
+    "output": "artifacts/sbom.cdx.json",
+    "required_fields": ["bomFormat", "specVersion", "serialNumber", "metadata", "components", "dependencies"]
+  },
+  "vulnerability_policy": {
+    "critical": "block",
+    "high": "block",
+    "medium": "warn",
+    "unknown": "warn",
+    "offline_behavior": "fail-closed-for-missing-lockfile; audit-only-for-unavailable-advisory"
+  },
+  "ci_action_policy": {
+    "immutable_pins_required": true,
+    "latest_tags_forbidden": true,
+    "secret_scanning_required": true,
+    "sbom_before_release": true
+  },
+  "verdict": "pass"
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o4-state-schema.json",
+  "title": "AI-Workflow Onboarding O4 State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workflow_id", "mode", "installer_id", "consent", "verification", "installation", "authentication", "target", "rollback", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "mode": {"type": "string", "enum": ["plan", "verify", "install", "resume"]},
+    "installer_id": {"type": ["string", "null"], "pattern": "^INS-[A-Z0-9-]+$"},
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "explicit_yes", "record_exact_match", "raw_secret_allowed"],
+      "properties": {
+        "requested": {"type": "boolean"},
+        "explicit_yes": {"type": "boolean"},
+        "record_exact_match": {"type": "boolean"},
+        "raw_secret_allowed": {"type": "boolean", "const": false}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "version", "doctor_status", "read_only", "external_writes", "secrets_seen"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-run", "passed", "warned", "failed", "blocked"]},
+        "version": {"type": ["string", "null"]},
+        "doctor_status": {"type": "string", "enum": ["not-run", "passed", "not-defined", "failed"]},
+        "read_only": {"type": "boolean", "const": true},
+        "external_writes": {"type": "integer", "const": 0},
+        "secrets_seen": {"type": "boolean", "const": false}
+      }
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "commands_executed", "network_commands", "host_mutations", "target_project_mutations"],
+      "properties": {
+        "status": {"type": "string", "enum": ["manual-only", "eligible", "blocked", "not-run", "completed", "failed"]},
+        "commands_executed": {"type": "integer", "const": 0},
+        "network_commands": {"type": "integer", "const": 0},
+        "host_mutations": {"type": "integer", "const": 0},
+        "target_project_mutations": {"type": "integer", "const": 0}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_started", "raw_secret_values"],
+      "properties": {
+        "status": {"type": "string", "enum": ["not-requested", "runtime-owned", "deferred"]},
+        "login_started": {"type": "boolean", "const": false},
+        "raw_secret_values": {"type": "integer", "const": 0}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "supported", "guidance_url", "target_project_impact"],
+      "properties": {
+        "owner": {"type": ["string", "null"]},
+        "supported": {"type": "boolean"},
+        "guidance_url": {"type": ["string", "null"]},
+        "target_project_impact": {"type": "integer", "const": 0}
+      }
+    },
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

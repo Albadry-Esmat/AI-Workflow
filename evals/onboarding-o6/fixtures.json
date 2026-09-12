@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O6",
+  "fixtures": [
+    {"id": "plan-offline-only", "scenario": "Attestation plan is zero-write and no-network", "expected": {"verdict": "pass", "network": "disabled", "commands_executed": 0, "target_project_mutations": 0}},
+    {"id": "plan-execution-unauthorized", "scenario": "Attestation plan never authorizes installation or execution", "expected": {"installation_authorized": false, "execution_authorized": false}},
+    {"id": "plan-exact-record", "scenario": "Plan exposes exact attestation ID, O5 installer ID, bundle, and trust root", "expected": {"attestation_id": "O6-CONTROLLED-FIXTURE", "artifact_installer_id": "O5-FIXTURE-SAFE-RUNTIME-PROBE", "trust_root_id": "TRUST-O6-CONTROLLED-FIXTURE"}},
+    {"id": "subject-digest-match", "scenario": "Artifact digest matches attestation subject and catalog digest", "expected": {"subject_match": true}},
+    {"id": "signature-valid", "scenario": "Local Ed25519 signature validates against pinned trust root", "expected": {"signature_status": "passed", "signature_valid": true}},
+    {"id": "identity-match", "scenario": "Publisher identity matches expectation", "expected": {"identity_match": true}},
+    {"id": "builder-match", "scenario": "Builder identity matches expectation", "expected": {"builder_match": true}},
+    {"id": "repository-match", "scenario": "Source repository matches expectation", "expected": {"repository_match": true}},
+    {"id": "commit-match", "scenario": "Source commit matches expectation", "expected": {"commit_match": true}},
+    {"id": "build-type-match", "scenario": "Build type matches expectation", "expected": {"build_type_match": true}},
+    {"id": "predicate-match", "scenario": "Predicate type matches expectation", "expected": {"predicate_match": true}},
+    {"id": "external-parameters-strict", "scenario": "External parameters match exactly with strict checking", "expected": {"external_parameters_strict": true, "external_parameters_match": true}},
+    {"id": "trust-root-pinned", "scenario": "Pinned trust root is present and fingerprint matches", "expected": {"root_present": true, "root_fingerprint_match": true}},
+    {"id": "transparency-local-evidence", "scenario": "Transparency status is local evidence without network refresh", "expected": {"transparency_status": "local-evidence", "network": false}},
+    {"id": "artifact-mismatch", "scenario": "Artifact subject mismatch fails closed", "expected": {"verdict": "fail", "subject_match": false, "installation_authorized": false, "execution_authorized": false}},
+    {"id": "signature-tampered", "scenario": "Tampered signature fails closed", "expected": {"verdict": "fail", "signature_valid": false}},
+    {"id": "bundle-missing", "scenario": "Missing attestation bundle fails closed", "expected": {"verdict": "fail", "bundle_present": false}},
+    {"id": "trust-root-mismatch", "scenario": "Pinned trust-root mismatch fails closed", "expected": {"verdict": "fail", "root_fingerprint_match": false}},
+    {"id": "claim-mismatch", "scenario": "Unexpected builder or repository claim fails closed", "expected": {"verdict": "fail", "claims_match": false}},
+    {"id": "transparency-missing", "scenario": "Missing required local transparency evidence fails closed", "expected": {"verdict": "fail", "transparency_status": "missing"}},
+    {"id": "privacy-redaction", "scenario": "Verification state and evidence contain no raw secrets or payload/signature blobs", "expected": {"raw_secret_values": 0}},
+    {"id": "auth-deferred", "scenario": "Authentication remains runtime-owned", "expected": {"login_started": false, "raw_secret_values": 0}},
+    {"id": "target-deferred", "scenario": "Target initialization, mutation, and launch remain deferred", "expected": {"initialization": "deferred", "mutations": 0, "launch": "deferred"}},
+    {"id": "recovery-owned", "scenario": "O6 recovery resets only owned state and preserves artifacts", "expected": {"owned_paths_only": true, "artifact_preserved": true, "runtime_changes": 0, "target_project_changes": 0}}
+  ]
+}

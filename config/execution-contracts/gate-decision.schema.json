@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/execution/gate-decision.schema.json",
+  "title": "AI-Workflow Gate Decision",
+  "description": "Auditable human or system decision for a named pipeline gate. A gate decision never carries credentials or raw user content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "contract_version",
+    "gate_id",
+    "run_id",
+    "gate_type",
+    "subject",
+    "decision",
+    "requested_at",
+    "actor_type",
+    "evidence_artifact_ids",
+    "policy_decision_ids",
+    "irreversible_action"
+  ],
+  "properties": {
+    "contract_type": { "type": "string", "const": "gate-decision" },
+    "contract_version": { "type": "string", "const": "1.0.0" },
+    "gate_id": { "type": "string", "pattern": "^GATE-[0-9a-f]{12}$" },
+    "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+    "gate_type": { "type": "string", "enum": ["architecture", "security", "write", "delete", "publish", "merge", "deploy", "credential", "custom"] },
+    "subject": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "decision": { "type": "string", "enum": ["pending", "approved", "rejected", "modified", "timeout"] },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "decided_at": { "type": ["string", "null"], "format": "date-time" },
+    "actor_type": { "type": "string", "enum": ["human", "automation", "system"] },
+    "actor_id": { "type": ["string", "null"], "maxLength": 200 },
+    "evidence_artifact_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ART-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "policy_decision_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^POL-[0-9a-f]{12}$" },
+      "uniqueItems": true
+    },
+    "irreversible_action": { "type": "boolean" },
+    "approval_scope": { "type": "string", "maxLength": 500 },
+    "reason": { "type": "string", "maxLength": 2000 },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 500 },
+      "maxItems": 20
+    },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "pending" } } },
+      "then": { "properties": { "decided_at": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "decision": { "enum": ["approved", "rejected", "modified", "timeout"] } } },
+      "then": { "required": ["decided_at", "reason"] }
+    },
+    {
+      "if": { "properties": { "irreversible_action": { "const": true } } },
+      "then": { "properties": { "actor_type": { "const": "human" } }, "required": ["decided_at", "actor_id"] }
+    }
+  ]
+}

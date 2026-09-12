@@ -1,0 +1,17 @@
+{
+  "contract_type": "run-manifest",
+  "contract_version": "2.0.0",
+  "run_id": "RUN-000000000001",
+  "pipeline_template": "quick-review",
+  "pipeline_mode": "specialized_review",
+  "source_commit": "58fc73398d97ae97d8494dd572fdba253c6b8f20",
+  "requested_by": { "actor_id": "user:primary", "actor_type": "human" },
+  "started_at": "2026-08-16T22:00:00Z",
+  "status": "completed",
+  "step_ids": [],
+  "artifact_ids": [],
+  "gate_decision_ids": [],
+  "policy_decision_ids": [],
+  "pii_scrubbed": true,
+  "redaction_profile": "standard-v1"
+}

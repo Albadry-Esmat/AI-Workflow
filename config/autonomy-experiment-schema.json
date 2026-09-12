@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/autonomy-experiment.json",
+  "title": "AutonomyExperimentReport",
+  "description": "Bounded dry-run report for a controlled autonomy pattern; promotion is never implicit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "experiment_id", "pattern", "status", "duration_minutes", "external_writes", "baseline", "experiment", "metrics", "risk_assessment", "override_evidence", "rollback", "approval"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "experiment_id": {"type": "string", "pattern": "^EXP-[A-Z0-9-]+$"},
+    "pattern": {"type": "string", "enum": ["routing", "parallel-review", "evaluator-optimizer", "planner-executor-critic"]},
+    "status": {"type": "string", "enum": ["completed", "blocked", "rejected", "deleted"]},
+    "duration_minutes": {"type": "integer", "minimum": 0, "maximum": 120},
+    "external_writes": {"type": "integer", "const": 0},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_count", "success_rate", "latency_ms", "cost_units"],
+      "properties": {
+        "task_count": {"type": "integer", "minimum": 1},
+        "success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "latency_ms": {"type": "number", "minimum": 0},
+        "cost_units": {"type": "number", "minimum": 0}
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_count", "success_rate", "latency_ms", "cost_units"],
+      "properties": {
+        "task_count": {"type": "integer", "minimum": 1},
+        "success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "latency_ms": {"type": "number", "minimum": 0},
+        "cost_units": {"type": "number", "minimum": 0}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_metric", "delta", "improvement", "thresholds_met"],
+      "properties": {
+        "primary_metric": {"type": "string", "minLength": 1},
+        "delta": {"type": "number"},
+        "improvement": {"type": "boolean"},
+        "thresholds_met": {"type": "boolean"}
+      }
+    },
+    "risk_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["security", "budget", "latency", "traceability", "human_override", "summary"],
+      "properties": {
+        "security": {"type": "string", "enum": ["pass", "block"]},
+        "budget": {"type": "string", "enum": ["pass", "block"]},
+        "latency": {"type": "string", "enum": ["pass", "block"]},
+        "traceability": {"type": "string", "enum": ["pass", "block"]},
+        "human_override": {"type": "string", "enum": ["pass", "block"]},
+        "summary": {"type": "string", "minLength": 1}
+      }
+    },
+    "override_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "stop_condition", "override_tested"],
+      "properties": {
+        "available": {"type": "boolean"},
+        "stop_condition": {"type": "string", "minLength": 1},
+        "override_tested": {"type": "boolean"}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "tested", "reversible"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "tested": {"type": "boolean"},
+        "reversible": {"type": "boolean"}
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promotion_allowed", "approved_by", "approved_at"],
+      "properties": {
+        "promotion_allowed": {"type": "boolean"},
+        "approved_by": {"type": ["string", "null"]},
+        "approved_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    }
+  }
+}

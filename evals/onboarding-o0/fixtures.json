@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "fixtures": [
+    {
+      "id": "catalog-has-four-initial-adapters",
+      "kind": "catalog",
+      "expected": "pass",
+      "assertions": ["opencode", "claude-code", "codex", "generic-command"]
+    },
+    {
+      "id": "explicit-selection-missing-adapter-blocks",
+      "kind": "selection",
+      "expected": "block",
+      "requested": "missing-runtime",
+      "fallback_allowed": false
+    },
+    {
+      "id": "explicit-selection-does-not-fallback",
+      "kind": "selection",
+      "expected": "block",
+      "requested": "codex",
+      "detected": ["claude-code"],
+      "selected": null
+    },
+    {
+      "id": "no-secret-demo",
+      "kind": "authentication",
+      "expected": "pass",
+      "environment": {"GITHUB_TOKEN": null, "ANTHROPIC_API_KEY": null, "OPENAI_API_KEY": null},
+      "requires_auth": false
+    },
+    {
+      "id": "raw-secret-handling-blocks",
+      "kind": "authentication",
+      "expected": "block",
+      "aiw_handles_secret_values": true
+    },
+    {
+      "id": "generic-command-does-not-claim-safety",
+      "kind": "support-claim",
+      "expected": "pass",
+      "adapter": "generic-command",
+      "support_level": "generic",
+      "evidence_level": "none",
+      "external_write_claim": "not-claimed"
+    },
+    {
+      "id": "first-class-without-fixture-blocks",
+      "kind": "support-claim",
+      "expected": "block",
+      "support_level": "first-class",
+      "verification_state": "fixture-pending"
+    },
+    {
+      "id": "rollback-keeps-runtime-uninstalled",
+      "kind": "rollback",
+      "expected": "pass",
+      "aiw_installs_runtime_by_default": false,
+      "target_init_backup_required": true
+    }
+  ]
+}

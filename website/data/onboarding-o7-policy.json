@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O7",
+  "state": {
+    "owned_root": ".aiw/onboarding-o7",
+    "atomic_writes": true,
+    "redact_secrets": true,
+    "unknown_state_fails_closed": true
+  },
+  "adapters": {
+    "catalog_path": "config/verifier-adapter-o7-catalog.json",
+    "catalog_schema_path": "config/verifier-adapter-o7-catalog-schema.json",
+    "exact_record_required": true,
+    "unknown_adapter_fails_closed": true,
+    "vendor_neutral": true
+  },
+  "verification": {
+    "default_mode": "offline-bundle",
+    "offline_bundle_allowed": true,
+    "offline_key_allowed": true,
+    "online_requires_consent": true,
+    "claims_required": true,
+    "unknown_claims": "fail-closed",
+    "tool_installation": "manual-only"
+  },
+  "network_refresh": {
+    "default": "disabled",
+    "explicit_command": "refresh-plan-then-apply",
+    "consent_flag": "--yes",
+    "allowlist_required": true,
+    "timeout_seconds_max": 30,
+    "response_bytes_max": 1048576,
+    "candidate_owned_root": ".aiw/onboarding-o7/candidates",
+    "active_root_overwrite": false,
+    "source_digest_required": true,
+    "evidence_required": true,
+    "stale_root_fails_closed": true
+  },
+  "tooling": {
+    "auto_install": false,
+    "shell": false,
+    "elevated": false,
+    "stdin": "closed",
+    "environment": "empty",
+    "missing_tool": "fail-closed"
+  },
+  "claims": {
+    "subject_digest": true,
+    "identity": true,
+    "issuer": true,
+    "repository": true,
+    "signer": true,
+    "predicate_type": true,
+    "workflow_or_build": true,
+    "external_parameters": true,
+    "unknown_fields": "fail-closed"
+  },
+  "execution": {
+    "install_allowed": false,
+    "execute_allowed": false,
+    "network_default": "disabled",
+    "target_project_mutations": 0,
+    "authentication": "deferred",
+    "target_initialization": "deferred",
+    "launch": "deferred"
+  },
+  "authentication": {
+    "raw_secret_input": false,
+    "raw_secret_storage": false,
+    "login_automation": "deferred"
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "secret_copy": false,
+    "launch": "deferred"
+  },
+  "recovery": {
+    "owned_paths_only": true,
+    "candidate_preserved": true,
+    "active_root_untouched": true,
+    "target_project_untouched": true,
+    "recover_command": "aiw onboarding recover --o7"
+  }
+}

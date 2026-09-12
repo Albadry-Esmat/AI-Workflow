@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "state": {
+    "path": ".aiw/onboarding-o2/state.json",
+    "redact_secrets": true,
+    "resume_allowed": true,
+    "unknown_state_fails_closed": true
+  },
+  "selection": {
+    "catalog_path": "config/agent-runtime-catalog.json",
+    "auto_precedence": ["opencode", "claude-code", "codex", "generic-command"],
+    "explicit_missing_fails": true,
+    "silent_fallback": false
+  },
+  "authentication": {
+    "aiw_stores_raw_secrets": false,
+    "delegated_status_only": true,
+    "login_automation": "runtime-owned",
+    "redact_logs": true
+  },
+  "demo": {
+    "no_secret": true,
+    "external_writes": 0,
+    "network": "disabled",
+    "deterministic": true
+  },
+  "recovery": {
+    "owned_root": ".aiw/onboarding-o2",
+    "rollback_only_owned_paths": true,
+    "target_projects_untouched": true,
+    "backup_before_target_mutation": true
+  },
+  "commands": {
+    "setup": "aiw setup",
+    "doctor": "aiw doctor",
+    "agent_list": "aiw agent list",
+    "agent_detect": "aiw agent detect",
+    "agent_use": "aiw agent use <id|auto>",
+    "demo": "aiw demo",
+    "auth_status": "aiw auth status",
+    "recover": "aiw recover"
+  },
+  "non_goals": [
+    "Install an agent runtime",
+    "Automate provider or runtime login",
+    "Store raw runtime, provider, or GitHub secrets",
+    "Copy .env or secrets into a target project",
+    "Launch a runtime through a provider-specific adapter",
+    "Mutate target projects during setup, detection, selection, or demo"
+  ]
+}

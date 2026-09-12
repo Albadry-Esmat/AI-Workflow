@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/retry-reason-taxonomy.schema.json",
+  "title": "AI-Workflow Retry Reason Taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taxonomy_version", "reasons"],
+  "properties": {
+    "taxonomy_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "category", "retryable", "terminal_code"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z0-9_.-]+$" },
+          "category": { "type": "string", "enum": ["validation", "authorization", "dependency", "timeout", "tool", "budget", "cancelled", "unknown"] },
+          "retryable": { "type": "boolean" },
+          "terminal_code": { "type": "string", "pattern": "^[A-Z0-9_.-]+$" },
+          "description": { "type": "string", "maxLength": 500 }
+        }
+      }
+    }
+  }
+}

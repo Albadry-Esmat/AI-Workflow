@@ -1,0 +1,19 @@
+{
+  "contract_type": "artifact-reference",
+  "contract_version": "1.0.0",
+  "artifact_id": "ART-000000000001",
+  "run_id": "RUN-000000000001",
+  "kind": "test-report",
+  "uri": "artifact://RUN-000000000001/ART-000000000001",
+  "sha256": "3ac5b16420edbf54561517897d4d20b22827affedd4f062552445f213d44d38c",
+  "size_bytes": 2048,
+  "media_type": "application/json",
+  "classification": "internal",
+  "contains_pii": false,
+  "retention_class": "audit",
+  "created_at": "2026-08-16T22:01:55Z",
+  "producer_step_id": "STEP-000000000001",
+  "expires_at": null,
+  "label": "quick-review validation report",
+  "metadata": { "format_version": "1.0", "source": "quick-review" }
+}

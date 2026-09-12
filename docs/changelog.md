@@ -9,6 +9,120 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Vendor-Neutral Verifier Adapters and Optional Evidence Refresh (Onboarding Batch O7)
+
+- Added a neutral verifier-adapter catalog for GitHub CLI attestations, Sigstore Cosign blobs, npm registry provenance, and the internal O6 local delegate, with deterministic record fingerprints and strict claim requirements.
+- Added `aiw onboarding verifier-plan`, `verifier-verify`, `verifier-refresh-plan`, and consent-gated `verifier-refresh`; offline verification remains the default, vendor tools are never auto-installed, and unknown claims fail closed.
+- Added bounded allowlisted HTTPS refresh that writes only an owned candidate, records source and response digests, never overwrites an active trust root, and requires explicit `--yes` after planning.
+- Added O7 fixtures, validator, Makefile and CLI integration, source-owned synchronization mappings, and `docs/vendor-neutral-verifier-adapters.md` with GitHub, Sigstore, npm, and GitHub CLI references.
+- Runtime installation, authentication automation, target initialization, target mutation, and runtime launch remain deferred.
+
+### Offline Publisher Signature and Attestation Verification (Onboarding Batch O6)
+
+- Added a repository-local O6 attestation catalog, Ed25519 trust-root schema, signed controlled-fixture bundle, and redacted verification state contract.
+- Added `aiw onboarding attestation-plan` and `aiw onboarding attestation-verify`; verification is offline-only and fail-closed across exact artifact subject digest, signature, pinned trust root, publisher, builder, repository, commit, build type, predicate type, external parameters, and local transparency evidence.
+- O6 is attestation-only: it cannot install or execute artifacts, query transparency logs, refresh trust roots, automate authentication, mutate target projects, or launch runtimes.
+- Added O6 fixtures, validator, Makefile and CLI integration, source-owned synchronization mappings, and `docs/offline-attestation-verification.md` with GitHub, Sigstore, and SLSA references.
+
+### Digest-Bound Local Runtime Execution (Onboarding Batch O5)
+
+- Added an exact local-artifact execution catalog with SHA-256 and size binding, staging-root ownership, provenance, approval status, closed argv execution, bounded timeouts, and rollback ownership.
+- Added `aiw onboarding execute-plan`, `aiw onboarding artifact-hash`, and `aiw onboarding execute`; digest mismatch, path traversal, symlinks, missing consent, missing approval reasons, platform mismatch, and unsafe command policy fail closed before command execution.
+- O5 executes only an approved controlled fixture with `shell=False`, closed stdin, an empty environment, no stdout/stderr capture, one command maximum, and zero target-project mutations. Downloading, package-manager mutation, elevated commands, authentication, target initialization, and launch remain deferred.
+- Added O5 schemas, policy, contract, fixtures, a 30-check validator, Makefile integration, source-owned sync mappings, and `docs/digest-bound-local-execution.md` with GitHub and npm integrity references.
+
+### Verified Agent-Neutral Runtime Installation (Onboarding Batch O4)
+
+- Added a provenance-aware runtime installer catalog for OpenCode, Claude Code, and Codex channels across Linux, macOS, and Windows, with official URLs, source fingerprints, platform/shell requirements, read-only verification probes, and rollback ownership.
+- Added `aiw onboarding install-plan`, `aiw onboarding install-verify`, and exact-record `aiw onboarding install --yes`; planning and verification are bounded and redacted, while all current installer records remain manual-only and fail closed.
+- Blocked shell-piped installers, PowerShell expression installers, network downloads, elevated commands, package-manager mutation, Docker mutation, target-project changes, and login automation under the O4 policy.
+- Added O4 state/policy/catalog/contract schemas, deterministic fixtures, the 27-check master validator, Makefile gates, synchronization mappings, and `docs/verified-runtime-installation.md` with official-source references.
+
+### Guided Agent-Neutral Onboarding (Onboarding Batch O3)
+
+- Added `aiw onboarding plan`, `aiw onboarding apply --yes`, `aiw onboarding doctor`, and `aiw onboarding recover` for deterministic, lane-explicit first-use guidance with redacted resumable state.
+- Added native, project-local, and Dev Container/Codespace lane summaries, safe runtime capability/install-channel reporting, explicit consent gating, and no-write/no-network planning output.
+- O3 keeps runtime installation, provider login, target initialization, and runtime launch deferred; no platform-specific installer command or raw secret handling was introduced.
+- Added O3 state/policy/contract schemas, safety fixtures, a 23-check master validator, Makefile integration, and the guided onboarding documentation.
+
+### Resumable Agent-Neutral Onboarding (Onboarding Batch O2)
+
+- Added a resumable, atomically persisted O2 onboarding state machine under `.aiw/onboarding-o2/` with redacted step status, structured evidence, deterministic recovery, and owned-path rollback.
+- Added `aiw doctor`, `aiw agent list`, `aiw agent detect`, `aiw agent use <id|auto>`, `aiw demo`, `aiw auth status`, and `aiw recover`; explicit selection fails closed and automatic selection records deterministic precedence.
+- Added the no-secret, zero-write demo and delegated authentication status boundary. O2 never installs a runtime, automates login, stores raw secrets, mutates target projects, or launches a provider-specific runtime.
+- Added O2 schemas, policy, contract, fixtures, and master validation controls; synchronized the source-owned O2 contract and policy for the companion website.
+
+### Deterministic Toolchain (Onboarding Batch O1)
+
+- Added a source-owned deterministic toolchain manifest and policy for Git, Python, Node, npm, local dependency environments, adapter version boundaries, lockfile enforcement, and no-network check-only verification.
+- Added pinned `requirements-dev.txt`, project-local AJV dependencies in `package.json`/`package-lock.json`, and replaced global `pip`/npm installation behavior in setup and validation paths with `.venv`, `npm ci`, and local binaries.
+- Added `aiw toolchain-check`, `aiw validate-onboarding-o1`, `make toolchain-check`, and `make validate-onboarding-o1`; O1 fails closed on unknown versions, missing lockfiles, dependency drift, and missing local tooling.
+- Updated the generated website with the O1 toolchain manifest and a deterministic-installation section on Getting Started. Runtime detection, authentication, guided setup, and neutral launch remain deferred to O2.
+
+### Agent-Neutral Onboarding Contract (Batch O0)
+
+- Added the provider-neutral runtime adapter schema and source-owned catalog for OpenCode, Claude Code, Codex CLI, and a generic user-managed command.
+- Added the O0 onboarding contract for native, project-local, and Dev Container/Codespace lanes, no-secret demo boundaries, delegated authentication, deterministic selection, support-claim maturity, baseline metrics, and rollback.
+- Added O0 validation fixtures and the `aiw validate-onboarding-o0` / `make validate-onboarding-o0` controls. Runtime installation, authentication flows, target mutation, and first-class adapter claims remain deferred to later gated batches.
+- Extended generated website data with the runtime catalog and onboarding contract, and added the catalog to the website Agents page as a source-owned representation.
+
+### Execution Contracts
+
+- Added the versioned `ai-workflow-execution` contract family for run manifests, step executions, artifact references, gate decisions, and policy decisions.
+- Added positive/negative fixtures, cross-contract relationship checks, version compatibility rules, and the `validate-contracts` developer command.
+
+### Observable Quick Review
+
+- Added a bounded local `quick-review` adapter that emits validated run, step, artifact, policy, gate, and terminal failure evidence without external writes.
+- Added success, schema-failure, tool-failure, and retry-exhaustion fixtures plus `aiw quick-review` and `make quick-review` entry points.
+
+### Evaluation and Mock Replay
+
+- Added a versioned evaluation-case schema, four disposable fixture projects, ten golden cases, five adversarial cases, deterministic structure/behavior/security/traceability/replay-safety graders, and read-only saved-response replay.
+- Added `make validate-evals`, `make eval-quick-review`, `aiw validate-evals`, and `aiw eval-quick-review` entry points with CI validation.
+
+### Budgets, Retries, and Capability Policy
+
+- Added versioned 1.1.0 run, step, and policy contract extensions for explicit run/step budgets, retry reasons, policy profiles, enforcement boundaries, and terminal budget/cancellation evidence.
+- Added the bounded `quick-review-v1` budget profile, controlled retry taxonomy, enforced `quick-review-read-only-v2` capability policy, fail-closed capability-deny and approval-required scenarios, and Batch 6 control validation.
+- Expanded the quick-review suite to 20 cases with budget-overrun, cancellation, capability-deny, approval-required, and retry-taxonomy adversarial coverage. Prompts are not treated as authorization for actions outside the enforceable local adapter boundary.
+
+### Quality, Traceability, Context, and Release Gates
+
+- Added the nine-dimension quality vector and score-independent hard blockers for security, execution contracts, critical requirement coverage, context loss, and source/website release incompatibility.
+- Added end-to-end requirement traceability fixtures and checks spanning architecture, tasks, code, tests, and deployment evidence; critical requirements without complete links block release.
+- Added five deterministic compression/resume, gate-pause, cross-session, and stale-artifact context-preservation cases protecting requirements, approvals, security findings, constraints, and artifact references.
+- Added commit, pull-request, Dev, nightly, and release evaluation policies, plus a deterministic ReleaseManifest compatibility checker requiring matching Dev source commit and website data hash.
+- Added `make validate-batch7`, `make validate-traceability`, `make test-context-preservation`, `make eval-quality-vector`, and corresponding `aiw` commands with CI and Dev synchronization gates.
+- Deferred a public website freshness indicator because the implementation plan makes it conditional on explicit website product-owner approval; the machine-readable ReleaseManifest remains the freshness source.
+
+### Operational Expansion
+
+- Generalized metadata-only, contract-valid evidence recording to `full-pipeline` and `insights-adaptation-pipeline`, with run, step, artifact, policy, telemetry, redaction, retention, and zero-external-write controls.
+- Added measured availability, correctness, and latency SLOs with error budgets, four burn-rate windows, and deployment-pause policy; local fixtures currently meet every target.
+- Added model/provider compatibility fixtures with fail-closed promotion and last-known-good rollback evidence.
+- Added CycloneDX 1.5 SBOM generation, two-repository lockfile integrity checks, immutable CI action pin enforcement, and an explicit advisory-database limitation.
+- Added privacy-safe telemetry policies and tests for opt-out precedence, metadata allowlists, credential/email/path redaction, truncation, and 500-event retention caps.
+- Added contained incident fixtures for runaway loops, prompt injection, supply-chain findings, and credential exposure; all prove quarantine/kill-switch behavior with zero external writes.
+- Added `make validate-batch8`, operational subtargets, corresponding `aiw` commands, primary/Dev/nightly gates, and a dedicated pinned supply-chain workflow.
+- Remediated the website Dev dependency audit by upgrading exact `next` from 16.2.9 to 16.3.1; the post-upgrade high-severity npm audit is clean.
+
+### Skill SDK and Controlled Autonomy
+
+- Added `aiw skill create` draft scaffolding for `SKILL.md`, skill manifests, contract-test placeholders, and eval-fixture placeholders without automatic registration or promotion.
+- Added explicit, rollback-safe scaffold application that generates reviewable index, registry, and graph updates only after an approver is supplied and the full skill validator passes.
+- Added governed ownership, maturity, evaluation score, security class, cost, and deprecation metadata with replacement and retention rules.
+- Added sanitized feedback-to-eval ingestion with deterministic deduplication, pending-by-default status, sensitive-field rejection, and human approval before active corpus writes.
+- Added bounded zero-write experiments for routing, parallel review, evaluator-optimizer, and planner-executor-critic patterns with baseline comparison, stop conditions, risk assessment, rollback, and approval evidence.
+- Added recommendation-only consolidation analysis that cannot mutate the registry and requires replacements for deprecation recommendations.
+- Added `make validate-batch9`, focused Make targets, corresponding `aiw` commands, schemas, fixtures, and `docs/skill-sdk-and-controlled-autonomy.md`.
+
+### Security
+
+- Replaced broad, non-expiring classic-token guidance with short-lived fine-grained credential guidance across setup, export, MCP, health-check, community registry, and website onboarding surfaces.
+- Added `config/canonical-data-map.json` and validation coverage for canonical, generated, mirrored, and website-owned data boundaries.
+- Corrected MCP documentation to reflect that the fetch server is disabled until its package and security posture are verified.
+
 ### Added
 
 - **Canonical live website** — README now links to `https://ase-workflow.vercel.app/`.
@@ -134,8 +248,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 - **Infrastructure** — `.env.example`: Complete environment variable template with inline documentation for every variable. Resolves the critical onboarding gap where `cp .env.example .env` was documented but the file did not exist.
 - **Infrastructure** — `Makefile`: Primary developer CLI entry point. Provides `make setup`, `make health`, `make validate`, `make sync`, `make graph`, `make clean`, `make reset`, `make update`, `make website`, `make sessions`, `make sessions-delete`, and `make help`.
-- **Infrastructure** — `scripts/setup.sh`: Single-command project setup. Checks prerequisites, installs `ajv-cli`, installs `.opencode/` npm packages (skips if already done), creates `.env` from template, creates required runtime directories, and runs health check.
-- **Infrastructure** — `scripts/health-check.sh`: Environment validation script. Checks required tools, optional tools, `.env` existence, `GITHUB_TOKEN` (masked), optional env vars, `.opencode/node_modules`, skill count sanity, and `opencode.json` path integrity. Outputs PASS/WARN/FAIL with actionable guidance per item.
+- **Infrastructure** — `scripts/setup.sh`: Single-command project setup. Checks prerequisites, creates the project-local Python environment, installs pinned requirements and root Node dependencies from lockfiles, installs `.opencode/` packages when a package manifest exists, creates `.env` from template, creates required runtime directories, and runs health check.
+- **Infrastructure** — `scripts/health-check.sh`: Environment validation script. Checks required tools, project-local dependencies, optional agent runtimes and tools, `.env` existence, optional credentials and env vars, plugin dependency state, skill count sanity, and `opencode.json` path integrity. Outputs PASS/WARN/FAIL with actionable guidance per item.
 - **Infrastructure** — `scripts/sync-website-data.sh`: Automates the `website/data/` data sync. Copies `skills/`, `docs/changelog.md`, `opencode.json`, and all SKILL.md files to their `website/data/` mirror. Supports `--dry-run` and `--check` (CI mode) flags.
 - **Infrastructure** — `scripts/clean.sh`: Removes build artifacts and cache files safely (website/.next/, graphify-out/cache/, dated graphify snapshots).
 - **Infrastructure** — `scripts/reset.sh`: Resets workspace to clean state with confirmation prompt. Removes `.env`, session state, exports, and build artifacts. Accepts `--yes` to skip confirmation.

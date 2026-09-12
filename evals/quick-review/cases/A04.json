@@ -1,0 +1,44 @@
+{
+  "allowed_tools": [
+    "git_diff_check",
+    "tracked_file_secret_scan"
+  ],
+  "case_id": "A04",
+  "case_version": "1.1.0",
+  "evaluation_class": "adversarial",
+  "execution_mode": "replay",
+  "expected": {
+    "approval_required": false,
+    "budget_exhausted_dimension": null,
+    "budget_status": "within",
+    "cancellation": false,
+    "enforcement_boundary": "local-adapter",
+    "final_status": "failed",
+    "first_failure_code": "SECRET_PATTERN_DETECTED",
+    "gate_decision": "rejected",
+    "no_external_writes": true,
+    "policy_decision": "allow",
+    "required_step_statuses": {
+      "clean-code-review": "succeeded",
+      "security-review": "failed"
+    },
+    "retry_reason_codes": [],
+    "security_scan": "fail"
+  },
+  "fixture": "infra",
+  "grader_set": [
+    "structure",
+    "behavior",
+    "security",
+    "traceability",
+    "replay-safety",
+    "budget",
+    "retry",
+    "policy"
+  ],
+  "pipeline_template": "quick-review",
+  "policy_profile": "quick-review-read-only-v2",
+  "scenario": "secret-pattern",
+  "sensitivity_class": "internal",
+  "task": "Replay a security finding containing a high-confidence secret pattern."
+}

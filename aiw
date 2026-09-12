@@ -26,6 +26,15 @@ _resolve_script_path() {
 }
 ROOT="$(_resolve_script_path)"
 
+PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/scripts/validate-json-schema.mjs}"
+if [[ ! -x "$AJV_BIN" ]]; then
+  AJV_BIN=""
+fi
+
 # ── Colors ────────────────────────────────────────────────────────────────────
 BOLD="\033[1m"
 NC="\033[0m"
@@ -47,16 +56,33 @@ show_help() {
   echo "    aiw <command> [options]"
   echo ""
   echo -e "  ${BOLD}GETTING STARTED${NC}"
-  echo -e "    ${CYAN}setup${NC}                        Install dependencies, create .env, validate environment"
+  echo -e "    ${CYAN}setup${NC}                        Resumable project setup and onboarding state"
+  echo -e "    ${CYAN}onboarding plan${NC}               Guided O3 plan (lane required; no writes)"
+  echo -e "    ${CYAN}onboarding apply${NC}              Apply guided O3 core setup after explicit --yes"
+  echo -e "    ${CYAN}onboarding doctor${NC}             Guided O3 runtime and setup diagnostics"
+  echo -e "    ${CYAN}onboarding recover${NC}            Recover or reset O3-owned guided state"
+  echo -e "    ${CYAN}onboarding install-plan${NC}       Show provenance-aware runtime installer options"
+  echo -e "    ${CYAN}onboarding install-verify${NC}     Run a read-only installed-runtime verification"
+  echo -e "    ${CYAN}onboarding install${NC}            Attempt only an eligible, explicitly approved installer record"
+  echo -e "    ${CYAN}onboarding execute-plan${NC}       Show digest-bound local execution options"
+  echo -e "    ${CYAN}onboarding artifact-hash${NC}      Verify an exact local artifact digest"
+  echo -e "    ${CYAN}onboarding execute${NC}            Execute one approved local artifact with evidence"
+  echo -e "    ${CYAN}onboarding attestation-plan${NC}   Show offline signature and provenance verification options"
+  echo -e "    ${CYAN}onboarding attestation-verify${NC} Verify an exact local attestation bundle"
+  echo -e "    ${CYAN}onboarding verifier-plan${NC}      Show vendor-neutral verifier adapters and trust boundaries"
+  echo -e "    ${CYAN}onboarding verifier-verify${NC}    Verify with one exact adapter and declared claims"
+  echo -e "    ${CYAN}onboarding verifier-refresh-plan${NC} Show bounded optional evidence refresh"
+  echo -e "    ${CYAN}onboarding verifier-refresh${NC}   Fetch only an explicit allowlisted candidate"
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
+  echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
+  echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
   echo -e "    ${CYAN}start${NC}                        Launch AI Workflow on this repo"
   echo -e "    ${CYAN}start${NC} ${DIM}<path>${NC}               Launch AI Workflow on any project on your machine"
   echo -e "    ${CYAN}init${NC}  ${DIM}<path>${NC}               Copy workflow into another project (makes it standalone)"
   echo ""
   echo -e "  ${BOLD}VALIDATION${NC}"
-  echo -e "    ${CYAN}validate${NC}           Run the full 11-check skill validation suite"
+  echo -e "    ${CYAN}validate${NC}           Run the full skill validation suite"
   echo -e "    ${CYAN}lint${NC}               Quick YAML + schema syntax check (checks 0-1 only)"
-  echo -e "    ${CYAN}doctor${NC}             Comprehensive environment + validation diagnostic"
   echo ""
   echo -e "  ${BOLD}PLANNING${NC}"
   echo -e "    ${CYAN}plan${NC}               Show a side-effect-free execution plan"
@@ -67,6 +93,40 @@ show_help() {
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
   echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
+  echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
+  echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
+  echo -e "    ${CYAN}validate-batch7${NC}              Validate quality, traceability, and context controls"
+  echo -e "    ${CYAN}validate-batch8${NC}              Validate operational evidence, SLO, privacy, incident, and supply chain controls"
+  echo -e "    ${CYAN}validate-batch9${NC}              Validate Skill SDK, feedback, consolidation, and autonomy controls"
+  echo -e "    ${CYAN}validate-onboarding-o0${NC}       Validate agent-neutral onboarding and runtime-adapter O0 contracts"
+  echo -e "    ${CYAN}validate-onboarding-o1${NC}       Validate deterministic core and adapter toolchain controls"
+  echo -e "    ${CYAN}validate-onboarding-o6${NC}       Validate offline signature and attestation controls"
+  echo -e "    ${CYAN}validate-onboarding-o7${NC}       Validate neutral verifier adapters and refresh controls"
+  echo -e "    ${CYAN}validate-onboarding-o2${NC}       Validate resumable agent-neutral onboarding controls"
+  echo -e "    ${CYAN}toolchain-check${NC}               Run non-mutating no-network toolchain verification"
+  echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
+  echo -e "    ${CYAN}agent detect${NC}                  Detect installed adapters with safe version probes"
+  echo -e "    ${CYAN}agent use${NC} ${DIM}<id|auto>${NC}             Select a runtime without silent fallback"
+  echo -e "    ${CYAN}auth status${NC}                   Show delegated, redacted runtime auth status"
+  echo -e "    ${CYAN}recover${NC}                      Recover or reset O2-owned onboarding state"
+  echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
+  echo -e "    ${CYAN}skill apply${NC}                  Apply an explicitly approved scaffold with rollback"
+  echo -e "    ${CYAN}feedback-to-eval${NC}             Ingest sanitized feedback with approval-gated eval promotion"
+  echo -e "    ${CYAN}autonomy-experiments${NC}         Run bounded zero-write autonomy experiments"
+  echo -e "    ${CYAN}consolidation-analysis${NC}       Recommend skill consolidation/deprecation without mutation"
+  echo -e "    ${CYAN}operational-evidence${NC}         Record generalized evidence for additional pipelines"
+  echo -e "    ${CYAN}measure-slos${NC}                 Measure local SLOs and error budgets"
+  echo -e "    ${CYAN}evaluate-model-compatibility${NC} Evaluate model/provider compatibility and rollback"
+  echo -e "    ${CYAN}test-telemetry-privacy${NC}       Test opt-out, redaction, allowlist, and retention"
+  echo -e "    ${CYAN}simulate-incident-containment${NC} Test kill-switch and quarantine fixtures"
+  echo -e "    ${CYAN}generate-sbom${NC}                Generate CycloneDX SBOM"
+  echo -e "    ${CYAN}scan-supply-chain${NC}            Check lockfiles and CI pins"
+  echo -e "    ${CYAN}validate-traceability${NC}        Validate requirement-to-deployment links"
+  echo -e "    ${CYAN}test-context-preservation${NC}   Test compression/resume context preservation"
+  echo -e "    ${CYAN}validate-evals${NC}               Validate Batch 5/6 evaluation definitions"
+  echo -e "    ${CYAN}eval-quick-review${NC}            Run Batch 5/6 golden/adversarial evaluation suite"
+  echo -e "    ${CYAN}eval-quality-vector${NC}          Aggregate the Batch 7 weighted quality vector"
+  echo -e "    ${CYAN}check-release-compatibility${NC} Compare source Dev with a website manifest"
   echo -e "    ${CYAN}update${NC}                       Update .opencode/ plugin dependencies"
   echo ""
   echo -e "  ${BOLD}SESSION MANAGEMENT${NC}"
@@ -95,7 +155,62 @@ show_help() {
 # ── Commands ──────────────────────────────────────────────────────────────────
 
 cmd_setup() {
-  bash "$ROOT/scripts/setup.sh"
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" setup "$@"
+}
+
+cmd_onboarding() {
+  local subcmd="${1:-plan}"
+  shift || true
+  case "$subcmd" in
+    install-plan|install-verify|install)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" "$subcmd" "$@"
+      ;;
+    execute-plan|artifact-hash|execute)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o5.py" "$subcmd" "$@"
+      ;;
+    attestation-plan|attestation-verify)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o6.py" "$subcmd" "$@"
+      ;;
+    verifier-plan|verifier-verify|verifier-refresh-plan|verifier-refresh)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o7.py" "$subcmd" "$@"
+      ;;
+    recover)
+      if [[ " $* " == *" --o7 "* ]]; then
+        local filtered_o7=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o7" ]] || filtered_o7+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o7.py" recover "${filtered_o7[@]}"
+      elif [[ " $* " == *" --o6 "* ]]; then
+        local filtered_o6=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o6" ]] || filtered_o6+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o6.py" recover "${filtered_o6[@]}"
+      elif [[ " $* " == *" --o5 "* ]]; then
+        local filtered_o5=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o5" ]] || filtered_o5+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o5.py" recover "${filtered_o5[@]}"
+      elif [[ " $* " == *" --o4 "* ]]; then
+        local filtered_o4=()
+        for arg in "$@"; do
+          [[ "$arg" == "--o4" ]] || filtered_o4+=("$arg")
+        done
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o4.py" recover "${filtered_o4[@]}"
+      else
+        "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" recover "$@"
+      fi
+      ;;
+    plan|apply|doctor)
+      "$PYTHON_BIN" "$ROOT/scripts/onboarding-o3.py" "$subcmd" "$@"
+      ;;
+    *)
+      echo "Usage: aiw onboarding [plan|apply|doctor|recover [--o4|--o5|--o6|--o7]|install-plan|install-verify|install|execute-plan|artifact-hash|execute|attestation-plan|attestation-verify|verifier-plan|verifier-verify|verifier-refresh-plan|verifier-refresh]"
+      return 2
+      ;;
+  esac
 }
 
 cmd_health() {
@@ -156,7 +271,7 @@ cmd_lint() {
   echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
   echo ""
   # Run only checks 0 and 1 from validate
-  python3 -c "
+  "$PYTHON_BIN" -c "
 import yaml, sys
 try:
     with open('$ROOT/skills/index.yaml') as f:
@@ -169,7 +284,7 @@ except Exception as e:
   echo ""
   # Pipeline schema validation
   for f in "$ROOT"/skills/pipelines/*.json; do
-    if ajv validate -s "$ROOT/skills/schema/pipeline-schema.json" -d "$f" --spec=draft7 -c ajv-formats 2>/dev/null; then
+    if "$AJV_BIN" validate -s "$ROOT/skills/schema/pipeline-schema.json" -d "$f" --spec=draft7 -c ajv-formats 2>/dev/null; then
       echo -e "  ${GREEN}PASS${NC} $(basename "$f")"
     else
       echo -e "  ${RED}FAIL${NC} $(basename "$f")"
@@ -178,6 +293,42 @@ except Exception as e:
 }
 
 cmd_doctor() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" doctor "$@"
+}
+
+cmd_demo() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" demo "$@"
+}
+
+cmd_agent() {
+  local subcmd="${1:-list}"
+  shift || true
+  case "$subcmd" in
+    list) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-list "$@" ;;
+    detect) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-detect "$@" ;;
+    use) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-use "$@" ;;
+    *) echo "Usage: aiw agent [list|detect|use <id|auto>]"; return 2 ;;
+  esac
+}
+
+cmd_auth() {
+  local subcmd="${1:-status}"
+  shift || true
+  case "$subcmd" in
+    status) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" auth-status "$@" ;;
+    login|logout)
+      echo "Authentication is runtime-owned; O2 does not automate login or logout."
+      return 2
+      ;;
+    *) echo "Usage: aiw auth [status|login|logout]"; return 2 ;;
+  esac
+}
+
+cmd_recover() {
+  "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" recover "$@"
+}
+
+cmd_doctor_legacy() {
   echo -e "${BOLD}╔══════════════════════════════════════╗${NC}"
   echo -e "${BOLD}║   AI Workflow — Full Diagnostic      ║${NC}"
   echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
@@ -278,6 +429,122 @@ cmd_init() {
 
 cmd_sync() {
   bash "$ROOT/scripts/sync-website-data.sh" "$@"
+}
+
+cmd_quick_review() {
+  "$PYTHON_BIN" "$ROOT/scripts/run-quick-review.py" "$@"
+}
+
+cmd_validate_batch6() {
+  "$PYTHON_BIN" "$ROOT/scripts/validate-batch6-controls.py" "$@"
+}
+
+cmd_validate_batch7() {
+  "$PYTHON_BIN" "$ROOT/scripts/validate-batch7-controls.py" "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/validate-traceability.py"
+  "$PYTHON_BIN" "$ROOT/scripts/test-context-preservation.py"
+}
+
+cmd_validate_batch8() {
+  make -C "$ROOT" validate-batch8 "$@"
+}
+
+cmd_validate_batch9() {
+  make -C "$ROOT" validate-batch9 "$@"
+}
+
+cmd_validate_onboarding_o0() {
+  make -C "$ROOT" validate-onboarding-o0 "$@"
+}
+
+cmd_validate_onboarding_o1() {
+  make -C "$ROOT" validate-onboarding-o1 "$@"
+}
+
+cmd_validate_onboarding_o2() {
+  make -C "$ROOT" validate-onboarding-o2 "$@"
+}
+
+cmd_toolchain_check() {
+  make -C "$ROOT" toolchain-check "$@"
+}
+
+cmd_skill() {
+  local subcmd="${1:-help}"
+  shift || true
+  case "$subcmd" in
+    create) "$PYTHON_BIN" "$ROOT/scripts/create-skill-scaffold.py" "$@" ;;
+    apply) "$PYTHON_BIN" "$ROOT/scripts/apply-skill-scaffold.py" "$@" ;;
+    *)
+      echo "Usage: aiw skill [create|apply]"
+      exit 1
+      ;;
+  esac
+}
+
+cmd_feedback_to_eval() {
+  "$PYTHON_BIN" "$ROOT/scripts/ingest-feedback-to-eval.py" "$@"
+}
+
+cmd_autonomy_experiments() {
+  "$PYTHON_BIN" "$ROOT/scripts/run-autonomy-experiments.py" "$@"
+}
+
+cmd_consolidation_analysis() {
+  "$PYTHON_BIN" "$ROOT/scripts/analyze-skill-consolidation.py" "$@"
+}
+
+cmd_operational_evidence() {
+  "$PYTHON_BIN" "$ROOT/scripts/run-operational-evidence.py" --pipeline full-pipeline "$@"
+  "$PYTHON_BIN" "$ROOT/scripts/run-operational-evidence.py" --pipeline insights-adaptation-pipeline "$@"
+}
+
+cmd_measure_slos() {
+  "$PYTHON_BIN" "$ROOT/scripts/measure-slos.py" "$@"
+}
+
+cmd_evaluate_model_compatibility() {
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-model-compatibility.py" "$@"
+}
+
+cmd_test_telemetry_privacy() {
+  "$PYTHON_BIN" "$ROOT/scripts/test-telemetry-privacy.py" "$@"
+}
+
+cmd_simulate_incident_containment() {
+  "$PYTHON_BIN" "$ROOT/scripts/simulate-incident-containment.py" "$@"
+}
+
+cmd_generate_sbom() {
+  "$PYTHON_BIN" "$ROOT/scripts/generate-sbom.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+}
+
+cmd_scan_supply_chain() {
+  "$PYTHON_BIN" "$ROOT/scripts/scan-supply-chain.py" --website-root "${WEBSITE_ROOT:-$ROOT/../ASE-OS-Website}" "$@"
+}
+
+cmd_validate_traceability() {
+  "$PYTHON_BIN" "$ROOT/scripts/validate-traceability.py" "$@"
+}
+
+cmd_test_context_preservation() {
+  "$PYTHON_BIN" "$ROOT/scripts/test-context-preservation.py" "$@"
+}
+
+cmd_eval_quality_vector() {
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-quality-vector.py" "$@"
+}
+
+cmd_check_release_compatibility() {
+  "$PYTHON_BIN" "$ROOT/scripts/check-release-compatibility.py" "$@"
+}
+
+cmd_validate_evals() {
+  "$PYTHON_BIN" "$ROOT/scripts/validate-quick-review-evals.py" "$@"
+}
+
+cmd_eval_quick_review() {
+  "$PYTHON_BIN" "$ROOT/scripts/evaluate-quick-review.py" "$@"
 }
 
 cmd_graph() {
@@ -421,6 +688,7 @@ shift || true
 
 case "$COMMAND" in
   setup)            cmd_setup "$@" ;;
+  onboarding)       cmd_onboarding "$@" ;;
   health)           cmd_health "$@" ;;
   start|run)        cmd_start "$@" ;;
   init)             cmd_init "$@" ;;
@@ -429,6 +697,36 @@ case "$COMMAND" in
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;
   sync)             cmd_sync "$@" ;;
+  quick-review|review) cmd_quick_review "$@" ;;
+  validate-batch6)  cmd_validate_batch6 "$@" ;;
+  validate-batch7)  cmd_validate_batch7 "$@" ;;
+    validate-batch8) cmd_validate_batch8 "$@" ;;
+  validate-batch9) cmd_validate_batch9 "$@" ;;
+  validate-onboarding-o0) cmd_validate_onboarding_o0 "$@" ;;
+  validate-onboarding-o1) cmd_validate_onboarding_o1 "$@" ;;
+  validate-onboarding-o2) cmd_validate_onboarding_o2 "$@" ;;
+  toolchain-check) cmd_toolchain_check "$@" ;;
+  demo)             cmd_demo "$@" ;;
+  agent)            cmd_agent "$@" ;;
+  auth)             cmd_auth "$@" ;;
+  recover)          cmd_recover "$@" ;;
+  skill)            cmd_skill "$@" ;;
+  feedback-to-eval) cmd_feedback_to_eval "$@" ;;
+  autonomy-experiments) cmd_autonomy_experiments "$@" ;;
+  consolidation-analysis) cmd_consolidation_analysis "$@" ;;
+  operational-evidence) cmd_operational_evidence "$@" ;;
+  measure-slos) cmd_measure_slos "$@" ;;
+  evaluate-model-compatibility) cmd_evaluate_model_compatibility "$@" ;;
+  test-telemetry-privacy) cmd_test_telemetry_privacy "$@" ;;
+  simulate-incident-containment) cmd_simulate_incident_containment "$@" ;;
+  generate-sbom) cmd_generate_sbom "$@" ;;
+  scan-supply-chain) cmd_scan_supply_chain "$@" ;;
+  validate-traceability) cmd_validate_traceability "$@" ;;
+  test-context-preservation) cmd_test_context_preservation "$@" ;;
+  validate-evals)   cmd_validate_evals "$@" ;;
+  eval-quick-review|evaluate) cmd_eval_quick_review "$@" ;;
+  eval-quality-vector|quality-vector) cmd_eval_quality_vector "$@" ;;
+  check-release-compatibility) cmd_check_release_compatibility "$@" ;;
   graph)            cmd_graph "$@" ;;
   update)           cmd_update "$@" ;;
   sessions|session) cmd_sessions "$@" ;;

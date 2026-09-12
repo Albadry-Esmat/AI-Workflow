@@ -1,0 +1,35 @@
+{
+  "case_id": "A04",
+  "replay_version": "1.0.0",
+  "result": {
+    "budget_exhausted_dimension": null,
+    "budget_status": "within",
+    "enforcement_boundary": "local-adapter",
+    "final_status": "failed",
+    "first_failure_code": "SECRET_PATTERN_DETECTED",
+    "gate_decision": "rejected",
+    "no_external_writes": true,
+    "policy_decision": "allow",
+    "retry_reason_codes": [],
+    "security_scan": "fail",
+    "step_statuses": {
+      "clean-code-review": "succeeded",
+      "security-review": "failed"
+    }
+  },
+  "tool_responses": [
+    {
+      "status": "pass",
+      "stdout": "",
+      "tool": "git_diff_check"
+    },
+    {
+      "hits": [
+        "fixture/infra/config.example:classic-pat"
+      ],
+      "redacted": true,
+      "status": "fail",
+      "tool": "tracked_file_secret_scan"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/release-compatibility.schema.json",
+  "title": "AI-Workflow Dev Release Compatibility",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_branch", "website_branch", "source_commit", "manifest_source_commit", "data_hash", "manifest_data_hash", "source_validation", "verdict"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "source_branch": { "type": "string", "const": "Dev" },
+    "website_branch": { "type": "string", "const": "Dev" },
+    "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "manifest_source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "data_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "manifest_data_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "source_validation": { "type": "string", "const": "pass" },
+    "website_validation": { "type": "string", "enum": ["pass", "not-run"] },
+    "website_build": { "type": "string", "enum": ["pass", "not-run"] },
+    "compatibility_checks": { "type": "array", "items": { "type": "string" } },
+    "verdict": { "type": "string", "enum": ["compatible", "block"] },
+    "violations": { "type": "array", "items": { "type": "string" } },
+    "checked_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "compatible" } } },
+      "then": { "properties": { "violations": { "maxItems": 0 } } }
+    }
+  ]
+}

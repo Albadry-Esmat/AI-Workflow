@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_version": "0.1.0",
+  "project": {
+    "id": "ai-workflow",
+    "source_of_truth": "AI-Workflow/Dev"
+  },
+  "core_tools": [
+    {"id": "git", "executable": "git", "version_args": ["--version"], "supported_range": ">=2.30.0", "required": true, "source": "host", "safe_probe": true},
+    {"id": "python", "executable": "python3", "version_args": ["--version"], "supported_range": ">=3.11,<3.13", "required": true, "source": "host", "safe_probe": true},
+    {"id": "node", "executable": "node", "version_args": ["--version"], "supported_range": ">=20,<25", "required": true, "source": "host", "safe_probe": true},
+    {"id": "npm", "executable": "npm", "version_args": ["--version"], "supported_range": ">=10,<12", "required": true, "source": "host", "safe_probe": true}
+  ],
+  "python": {
+    "venv_dir": ".venv",
+    "requirements_file": "requirements-dev.txt",
+    "install_command": ".venv/bin/python -m pip install --requirement requirements-dev.txt",
+    "no_network_install_command": ".venv/bin/python -m pip install --no-index --requirement requirements-dev.txt",
+    "system_install_forbidden": true,
+    "recreate_supported": true
+  },
+  "node": {
+    "package_json": "package.json",
+    "lockfile": "package-lock.json",
+    "package_manager": "npm",
+    "install_command": "npm ci --ignore-scripts --no-audit --no-fund",
+    "no_network_install_command": "npm ci --offline --ignore-scripts --no-audit --no-fund",
+    "local_bin_required": true,
+    "global_install_forbidden": true
+  },
+  "adapters": [
+    {
+      "adapter_id": "opencode",
+      "version_policy": "user-selected-exact",
+      "aiw_installs_runtime": false,
+      "requires_explicit_consent": true,
+      "version_probe": ["opencode", "--version"],
+      "supported_channels": ["native-installer", "package-manager", "container", "user-managed"]
+    },
+    {
+      "adapter_id": "claude-code",
+      "version_policy": "user-selected-exact",
+      "aiw_installs_runtime": false,
+      "requires_explicit_consent": true,
+      "version_probe": ["claude", "--version"],
+      "supported_channels": ["native-installer", "package-manager", "container", "user-managed"]
+    },
+    {
+      "adapter_id": "codex",
+      "version_policy": "user-selected-exact",
+      "aiw_installs_runtime": false,
+      "requires_explicit_consent": true,
+      "version_probe": ["codex", "--version"],
+      "supported_channels": ["native-installer", "package-manager", "binary", "container", "user-managed"]
+    },
+    {
+      "adapter_id": "generic-command",
+      "version_policy": "user-managed",
+      "aiw_installs_runtime": false,
+      "requires_explicit_consent": true,
+      "version_probe": ["<user-command>", "--version"],
+      "supported_channels": ["user-managed"]
+    }
+  ],
+  "verification": {
+    "check_only_mutates": false,
+    "check_only_network": "disabled",
+    "lockfiles_required": true,
+    "unknown_versions_fail_closed": true,
+    "manifest_recorded": true
+  }
+}

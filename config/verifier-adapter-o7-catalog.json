@@ -1,0 +1,244 @@
+{
+  "catalog_version": "1.0.0",
+  "records": [
+    {
+      "adapter_id": "GITHUB-CLI-ATTESTATION",
+      "argv_template": [
+        "attestation",
+        "verify",
+        "{artifact}",
+        "--repo",
+        "{repository}",
+        "--bundle",
+        "{bundle}",
+        "--custom-trusted-root",
+        "{trusted_root}",
+        "--predicate-type",
+        "{predicate_type}",
+        "--format",
+        "json"
+      ],
+      "authority": {
+        "authentication": "deferred",
+        "execution": false,
+        "installation": false,
+        "launch": "deferred",
+        "target_mutations": 0
+      },
+      "claim_requirements": {
+        "artifact_subject": true,
+        "external_parameters": true,
+        "identity": true,
+        "issuer": true,
+        "predicate_type": true,
+        "repository": true,
+        "signer": true,
+        "unknown_claims": "fail-closed",
+        "workflow_or_build": true
+      },
+      "display_name": "GitHub CLI artifact attestation verifier",
+      "evidence": {
+        "format": "json",
+        "json_output": true,
+        "redacted": true,
+        "response_digest_required": true,
+        "source_url_required": true
+      },
+      "executable": "gh",
+      "kind": "github-cli",
+      "network": {
+        "active_root_overwrite": false,
+        "allowed_hosts": [
+          "api.github.com",
+          "github.com"
+        ],
+        "candidate_root_path": ".aiw/onboarding-o7/candidates/github-trusted-root.jsonl",
+        "default": "disabled",
+        "evidence_required": true,
+        "max_response_bytes": 1048576,
+        "refresh_opt_in": true,
+        "timeout_seconds": 30
+      },
+      "record_fingerprint": "sha256:a397d58820202da6c396ef0f12a0b62ea9665d807cf05c8e49b10ec583df1ab1",
+      "status": "online-refresh-optional",
+      "vendor": "GitHub",
+      "verification_modes": [
+        "offline-bundle",
+        "online-api"
+      ]
+    },
+    {
+      "adapter_id": "COSIGN-BLOB-ATTESTATION",
+      "argv_template": [
+        "verify-blob",
+        "{artifact}",
+        "--bundle",
+        "{bundle}",
+        "--certificate-identity",
+        "{identity}",
+        "--certificate-oidc-issuer",
+        "{issuer}"
+      ],
+      "authority": {
+        "authentication": "deferred",
+        "execution": false,
+        "installation": false,
+        "launch": "deferred",
+        "target_mutations": 0
+      },
+      "claim_requirements": {
+        "artifact_subject": true,
+        "external_parameters": true,
+        "identity": true,
+        "issuer": true,
+        "predicate_type": true,
+        "repository": true,
+        "signer": true,
+        "unknown_claims": "fail-closed",
+        "workflow_or_build": true
+      },
+      "display_name": "Cosign signed blob verifier",
+      "evidence": {
+        "format": "json",
+        "json_output": true,
+        "redacted": true,
+        "response_digest_required": true,
+        "source_url_required": true
+      },
+      "executable": "cosign",
+      "kind": "cosign",
+      "network": {
+        "active_root_overwrite": false,
+        "allowed_hosts": [
+          "rekor.sigstore.dev",
+          "tuf-repo-cdn.sigstore.dev"
+        ],
+        "candidate_root_path": ".aiw/onboarding-o7/candidates/sigstore-trusted-root.jsonl",
+        "default": "disabled",
+        "evidence_required": true,
+        "max_response_bytes": 1048576,
+        "refresh_opt_in": true,
+        "timeout_seconds": 30
+      },
+      "record_fingerprint": "sha256:a03ac4e8ede1af0f4ea6cf8b062b6b5d4ffbf267d3df67981d9cacc61b13f925",
+      "status": "online-refresh-optional",
+      "vendor": "Sigstore",
+      "verification_modes": [
+        "offline-bundle",
+        "offline-key",
+        "online-api"
+      ]
+    },
+    {
+      "adapter_id": "NPM-REGISTRY-PROVENANCE",
+      "argv_template": [
+        "audit",
+        "signatures"
+      ],
+      "authority": {
+        "authentication": "deferred",
+        "execution": false,
+        "installation": false,
+        "launch": "deferred",
+        "target_mutations": 0
+      },
+      "claim_requirements": {
+        "artifact_subject": true,
+        "external_parameters": true,
+        "identity": true,
+        "issuer": true,
+        "predicate_type": true,
+        "repository": true,
+        "signer": true,
+        "unknown_claims": "fail-closed",
+        "workflow_or_build": true
+      },
+      "display_name": "npm registry signature and provenance verifier",
+      "evidence": {
+        "format": "json",
+        "json_output": true,
+        "redacted": true,
+        "response_digest_required": true,
+        "source_url_required": true
+      },
+      "executable": "npm",
+      "kind": "npm-cli",
+      "network": {
+        "active_root_overwrite": false,
+        "allowed_hosts": [
+          "registry.npmjs.org",
+          "www.npmjs.com"
+        ],
+        "candidate_root_path": ".aiw/onboarding-o7/candidates/npm-registry-evidence.json",
+        "default": "disabled",
+        "evidence_required": true,
+        "max_response_bytes": 1048576,
+        "refresh_opt_in": true,
+        "timeout_seconds": 30
+      },
+      "record_fingerprint": "sha256:4a8a5ef43c2c774b891f33971b10d243cdfc7dcc7375c840120b27a116bf62ef",
+      "status": "online-refresh-optional",
+      "vendor": "npm",
+      "verification_modes": [
+        "online-registry"
+      ]
+    },
+    {
+      "adapter_id": "LOCAL-FIXTURE-O6-DELEGATE",
+      "argv_template": [
+        "onboarding-o6.py",
+        "attestation-verify",
+        "--attestation",
+        "O6-CONTROLLED-FIXTURE",
+        "--artifact",
+        "{artifact}",
+        "--json"
+      ],
+      "authority": {
+        "authentication": "deferred",
+        "execution": false,
+        "installation": false,
+        "launch": "deferred",
+        "target_mutations": 0
+      },
+      "claim_requirements": {
+        "artifact_subject": true,
+        "external_parameters": true,
+        "identity": true,
+        "issuer": false,
+        "predicate_type": true,
+        "repository": true,
+        "signer": true,
+        "unknown_claims": "fail-closed",
+        "workflow_or_build": true
+      },
+      "display_name": "O6 local attestation verifier delegate",
+      "evidence": {
+        "format": "json",
+        "json_output": true,
+        "redacted": true,
+        "response_digest_required": true,
+        "source_url_required": true
+      },
+      "executable": "internal",
+      "kind": "local-fixture",
+      "network": {
+        "active_root_overwrite": false,
+        "allowed_hosts": [],
+        "candidate_root_path": ".aiw/onboarding-o7/candidates/local-fixture.json",
+        "default": "disabled",
+        "evidence_required": true,
+        "max_response_bytes": 65536,
+        "refresh_opt_in": false,
+        "timeout_seconds": 1
+      },
+      "record_fingerprint": "sha256:67c8d5b645e9abdf1de7f724d419e26a9deabfae95c241fcb6d9a81b1ea6ed51",
+      "status": "offline-ready",
+      "vendor": "AI-Workflow",
+      "verification_modes": [
+        "offline-bundle"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0"
+}

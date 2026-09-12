@@ -1,0 +1,47 @@
+{
+  "adversarial_count": 10,
+  "case_count": 20,
+  "cases": [
+    "G01",
+    "G02",
+    "G03",
+    "G04",
+    "G05",
+    "G06",
+    "G07",
+    "G08",
+    "G09",
+    "G10",
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10"
+  ],
+  "evaluation_suite": "quick-review",
+  "fixture_types": [
+    "web",
+    "api",
+    "data",
+    "infra"
+  ],
+  "golden_count": 10,
+  "grader_set": [
+    "structure",
+    "behavior",
+    "security",
+    "traceability",
+    "replay-safety",
+    "budget",
+    "retry",
+    "policy"
+  ],
+  "pipeline_template": "quick-review",
+  "replay_policy": "Replay reads saved tool responses and never invokes external tools or writes to a target project.",
+  "suite_version": "1.1.0"
+}

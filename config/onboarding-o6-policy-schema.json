@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/onboarding-o6-policy-schema.json",
+  "title": "AI-Workflow Onboarding O6 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "verification", "trust", "claims", "execution", "authentication", "target", "rollback", "commands", "non_goals"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "atomic_writes", "redact_secrets", "unknown_state_fails_closed"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o6"},
+        "atomic_writes": {"type": "boolean", "const": true},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offline_only", "network", "signature_required", "subject_digest_required", "identity_required", "builder_required", "predicate_required", "external_parameters_strict", "transparency_mode", "missing_bundle_fails_closed"],
+      "properties": {
+        "offline_only": {"type": "boolean", "const": true},
+        "network": {"type": "boolean", "const": false},
+        "signature_required": {"type": "boolean", "const": true},
+        "subject_digest_required": {"type": "boolean", "const": true},
+        "identity_required": {"type": "boolean", "const": true},
+        "builder_required": {"type": "boolean", "const": true},
+        "predicate_required": {"type": "boolean", "const": true},
+        "external_parameters_strict": {"type": "boolean", "const": true},
+        "transparency_mode": {"type": "string", "const": "local-evidence-only"},
+        "missing_bundle_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pinned_root_required", "root_fingerprint_required", "network_refresh", "unknown_root_fails_closed", "identity_allowlist_required"],
+      "properties": {
+        "pinned_root_required": {"type": "boolean", "const": true},
+        "root_fingerprint_required": {"type": "boolean", "const": true},
+        "network_refresh": {"type": "string", "const": "disabled"},
+        "unknown_root_fails_closed": {"type": "boolean", "const": true},
+        "identity_allowlist_required": {"type": "boolean", "const": true}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_repository_required", "commit_required", "build_type_required", "predicate_type_required", "external_parameters_strict", "unknown_fields_fail_closed"],
+      "properties": {
+        "source_repository_required": {"type": "boolean", "const": true},
+        "commit_required": {"type": "boolean", "const": true},
+        "build_type_required": {"type": "boolean", "const": true},
+        "predicate_type_required": {"type": "boolean", "const": true},
+        "external_parameters_strict": {"type": "boolean", "const": true},
+        "unknown_fields_fail_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["install_allowed", "execute_allowed", "network", "target_project_mutations", "authentication", "attestation_only"],
+      "properties": {
+        "install_allowed": {"type": "boolean", "const": false},
+        "execute_allowed": {"type": "boolean", "const": false},
+        "network": {"type": "boolean", "const": false},
+        "target_project_mutations": {"type": "integer", "const": 0},
+        "authentication": {"type": "string", "const": "deferred"},
+        "attestation_only": {"type": "boolean", "const": true}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "login_automation", "raw_secret_input", "raw_secret_storage"],
+      "properties": {
+        "status": {"type": "string", "const": "runtime-owned"},
+        "login_automation": {"type": "string", "const": "deferred"},
+        "raw_secret_input": {"type": "boolean", "const": false},
+        "raw_secret_storage": {"type": "boolean", "const": false}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialization", "mutations", "launch", "secret_copy"],
+      "properties": {
+        "initialization": {"type": "string", "const": "deferred"},
+        "mutations": {"type": "integer", "const": 0},
+        "launch": {"type": "string", "const": "deferred"},
+        "secret_copy": {"type": "boolean", "const": false}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_policy", "target_untouched", "runtime_untouched"],
+      "properties": {
+        "claim_policy": {"type": "string", "const": "record-only-unless-officially-supported"},
+        "target_untouched": {"type": "boolean", "const": true},
+        "runtime_untouched": {"type": "boolean", "const": true}
+      }
+    },
+    "commands": {"type": "object", "additionalProperties": {"type": "string"}},
+    "non_goals": {"type": "array", "minItems": 7, "items": {"type": "string"}}
+  }
+}

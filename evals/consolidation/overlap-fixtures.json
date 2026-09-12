@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "candidates": [
+    {
+      "candidate_id": "CON-001",
+      "left": {"name": "api-contract-reviewer", "description": "Review API contracts for compatibility, completeness, and security.", "tags": ["api", "contracts", "security"]},
+      "right": {"name": "api-schema-guardian", "description": "Review API schemas for compatibility, completeness, and security.", "tags": ["api", "schemas", "security"]},
+      "similarity": 0.93,
+      "replacement": "api-contract-reviewer",
+      "recommendation": "deprecate-right",
+      "rationale": "The two candidates overlap on API contract review; retain the more specific canonical name and deprecate the duplicate after approval."
+    },
+    {
+      "candidate_id": "CON-002",
+      "left": {"name": "artifact-hasher", "description": "Hash artifacts for content-addressed evidence references.", "tags": ["artifacts", "hash", "evidence"]},
+      "right": {"name": "artifact-redactor", "description": "Redact sensitive fields before emitting artifact evidence references.", "tags": ["artifacts", "redaction", "evidence"]},
+      "similarity": 0.42,
+      "replacement": null,
+      "recommendation": "retain-both",
+      "rationale": "The skills operate on different security responsibilities and should remain separate."
+    }
+  ]
+}

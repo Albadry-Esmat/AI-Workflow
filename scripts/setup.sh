@@ -2,34 +2,48 @@
 # scripts/setup.sh — One-command setup for AI Workflow.
 #
 # Usage:
-#   ./aiw setup
-#   bash scripts/setup.sh
+#   make setup               ← recommended (must be run from the project root)
+#   bash scripts/setup.sh    ← direct invocation (works from any directory)
 #
-# The setup path is intentionally self-contained: validation dependencies are
-# installed from the root package-lock.json and no global AJV/PyYAML packages
-# are required.
+# What this script does:
+#   1. Checks required prerequisites (git, node, npm, python3)
+#   2. Creates a project-local Python environment and installs pinned requirements
+#   3. Installs root Node dependencies from package-lock.json with npm ci
+#   4. Installs .opencode/ npm plugin dependencies in its local directory
+#   4. Creates .env from .env.example if .env does not yet exist
+#   5. Creates required runtime directories
+#   6. Runs health-check.sh to validate the final state
+#   7. Prints next steps
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Load shared utilities
 # shellcheck source=scripts/lib/common.sh
 source "$ROOT/scripts/lib/common.sh"
 
 PASS=0
 WARN=0
 FAIL=0
-_ok() { ok "$1"; PASS=$((PASS + 1)); }
-_warn() { warn "$1"; WARN=$((WARN + 1)); }
-_fail() { fail "$1"; FAIL=$((FAIL + 1)); }
 
+_ok()   { ok "$1";   PASS=$((PASS+1)); }
+_warn() { warn "$1"; WARN=$((WARN+1)); }
+_fail() { fail "$1"; FAIL=$((FAIL+1)); }
+
+# Load .env if present (so env vars are available for steps below)
 load_env "$ROOT/.env"
-banner "Setup"
 
+# ─────────────────────────────────────────────────────────────────────────────
+banner "Setup"
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── 1. Required prerequisites ─────────────────────────────────────────────────
 header "Checking required prerequisites"
-for tool in git node npm; do
-  if command -v "$tool" >/dev/null 2>&1; then
+
+for tool in git node npm python3; do
+  if command -v "$tool" &>/dev/null; then
     _ok "$tool found ($(command -v "$tool"))"
   else
     _fail "$tool is required but not found"
@@ -38,68 +52,108 @@ done
 
 if [[ "$FAIL" -gt 0 ]]; then
   echo
-  fail "Setup cannot continue — required tools are missing."
+  fail "Setup cannot continue — $FAIL required tool(s) are missing."
   echo "  Install Node.js: https://nodejs.org"
+  echo "  Install Python:  https://python.org"
   echo "  Install Git:     https://git-scm.com"
   exit 1
 fi
 
-header "Installing repository-pinned validation dependencies"
-if [[ ! -f "$ROOT/package-lock.json" ]]; then
-  _fail "package-lock.json not found — cannot install pinned dependencies"
+# ── 2. Project-local Python toolchain ─────────────────────────────────────────
+header "Setting up project-local Python environment"
+
+VENV="$ROOT/.venv"
+if [[ ! -x "$VENV/bin/python" ]]; then
+  step "Creating $VENV..."
+  python3 -m venv "$VENV"
+  _ok "Created disposable project-local Python environment"
 else
-  if npm ci --ignore-scripts --no-audit --no-fund --silent; then
-    _ok "Root npm dependencies installed from package-lock.json"
+  _ok "$VENV already exists"
+fi
+
+if "$VENV/bin/python" -c 'import jsonschema, yaml' &>/dev/null; then
+  _ok "Pinned Python validation dependencies are available"
+else
+  step "Installing pinned Python requirements into $VENV..."
+  if "$VENV/bin/python" -m pip install --disable-pip-version-check --requirement "$ROOT/requirements-dev.txt" --quiet; then
+    _ok "Pinned Python requirements installed"
   else
-    _fail "Root npm dependency installation failed"
+    _fail "Pinned Python requirements could not be installed"
+    echo "       Fix: $VENV/bin/python -m pip install --requirement requirements-dev.txt"
   fi
 fi
 
-if [[ "$FAIL" -gt 0 ]]; then
-  echo
-  fail "Setup cannot continue — dependency installation failed."
-  exit 1
+# ── 3. Project-local root Node toolchain ───────────────────────────────────────
+header "Setting up project-local Node dependencies"
+
+if [[ -f "$ROOT/package-lock.json" ]]; then
+  step "Installing root packages from package-lock.json with npm ci..."
+  if npm ci --ignore-scripts --no-audit --no-fund --silent; then
+    _ok "Root Node dependencies installed from the committed lockfile"
+  else
+    _fail "Root Node dependencies could not be installed from package-lock.json"
+  fi
+else
+  _fail "package-lock.json not found — deterministic Node installation is unavailable"
 fi
 
-header "Checking optional tools"
-if command -v opencode >/dev/null 2>&1; then
-  _ok "opencode found ($(command -v opencode))"
+if [[ -x "$ROOT/scripts/validate-json-schema.mjs" ]]; then
+  _ok "Project-owned JSON Schema validator found"
 else
-  _warn "opencode not found — install from https://opencode.ai before running agents"
-fi
-if command -v graphify >/dev/null 2>&1; then
-  _ok "graphify found ($(command -v graphify))"
-else
-  _warn "graphify not found — knowledge graph commands will be unavailable"
+  _fail "Project-owned JSON Schema validator not found"
 fi
 
-header "Setting up .opencode plugin dependencies"
-if [[ -d "$ROOT/.opencode/node_modules" ]]; then
+# ── 4. .opencode/ npm plugin ──────────────────────────────────────────────────
+header "Setting up .opencode/ plugin dependencies"
+
+if [[ ! -f "$ROOT/.opencode/package.json" ]]; then
+  _ok ".opencode has no plugin package manifest — no plugin dependency install required"
+elif [[ -d "$ROOT/.opencode/node_modules" ]]; then
   _ok ".opencode/node_modules already present — skipping install"
 else
-  if npm install --prefix "$ROOT/.opencode" --ignore-scripts --no-audit --no-fund --silent; then
-    _ok ".opencode packages installed"
+  step "Installing .opencode/ npm packages..."
+  if [[ -f "$ROOT/.opencode/package-lock.json" ]]; then
+    install_cmd=(npm ci --prefix "$ROOT/.opencode" --ignore-scripts --no-audit --no-fund --silent)
   else
-    _fail ".opencode dependency installation failed"
+    install_cmd=(npm install --prefix "$ROOT/.opencode" --ignore-scripts --no-audit --no-fund --silent)
+  fi
+  if "${install_cmd[@]}"; then
+    _ok ".opencode/ packages installed locally"
+  else
+    _warn ".opencode/ npm packages could not be installed"
   fi
 fi
 
-header "Environment configuration"
+# ── 4. Create .env from .env.example ─────────────────────────────────────────
+header "Environment configuration (.env)"
+
 if [[ -f "$ROOT/.env" ]]; then
-  _ok ".env exists — existing credentials were not modified"
+  _ok ".env already exists — skipping copy"
+  info "Edit .env to update values (especially GITHUB_TOKEN)"
 else
   if [[ -f "$ROOT/.env.example" ]]; then
     cp "$ROOT/.env.example" "$ROOT/.env"
-    chmod 600 "$ROOT/.env"
     _ok ".env created from .env.example"
-    warn "Set GITHUB_TOKEN in $ROOT/.env before starting agents"
+    echo
+    echo "  Optional: add provider or GitHub credentials later through the approved auth flow."
+    echo "  Prefer short-lived, fine-grained credentials and rotate them regularly."
+    echo "  The core no-secret demo and validation path do not require credentials."
+    echo
   else
     _fail ".env.example not found — cannot create .env"
   fi
 fi
 
-header "Creating required runtime directories"
-for dir in ".opencode/state/sessions" "exports" "work-items/bugs"; do
+# ── 5. Required runtime directories ──────────────────────────────────────────
+header "Creating required directories"
+
+REQUIRED_DIRS=(
+  ".opencode/state/sessions"
+  "exports"
+  "work-items/bugs"
+)
+
+for dir in "${REQUIRED_DIRS[@]}"; do
   if [[ -d "$ROOT/$dir" ]]; then
     _ok "$dir exists"
   else
@@ -108,34 +162,54 @@ for dir in ".opencode/state/sessions" "exports" "work-items/bugs"; do
   fi
 done
 
+# ── 6. Install aiw CLI ────────────────────────────────────────────────────────
 header "Installing aiw CLI"
-if [[ -x "$ROOT/aiw" ]]; then
+
+AIW_BIN="$ROOT/aiw"
+if [[ -x "$AIW_BIN" ]]; then
   if [[ -w /usr/local/bin ]]; then
-    ln -sf "$ROOT/aiw" /usr/local/bin/aiw
+    ln -sf "$AIW_BIN" /usr/local/bin/aiw
     _ok "aiw installed → /usr/local/bin/aiw"
   else
+    # Try ~/.local/bin (always writable, no sudo needed)
     mkdir -p "$HOME/.local/bin"
-    ln -sf "$ROOT/aiw" "$HOME/.local/bin/aiw"
+    ln -sf "$AIW_BIN" "$HOME/.local/bin/aiw"
     _ok "aiw installed → $HOME/.local/bin/aiw"
-    if ! echo "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
-      _warn "$HOME/.local/bin is not on PATH; add it to your shell profile"
+
+    # Warn if ~/.local/bin is not on PATH
+    if ! echo "$PATH" | tr ':' '\n' | grep -q "$HOME/.local/bin"; then
+      echo
+      warn "~/.local/bin is not on your PATH yet."
+      echo "  Add this line to your shell profile (~/.zshrc or ~/.bashrc):"
+      echo
+      echo '    export PATH="$HOME/.local/bin:$PATH"'
+      echo
+      echo "  Then reload: source ~/.zshrc"
+      echo "  Or for this session only: export PATH=\"\$HOME/.local/bin:\$PATH\""
+      echo
     fi
   fi
 else
-  _fail "aiw script not found at $ROOT/aiw"
+  _fail "aiw script not found at $AIW_BIN"
 fi
 
+# ── 7. Pre-commit hook ────────────────────────────────────────────────────────
+# ── 7. Pre-commit hook ────────────────────────────────────────────────────────
 header "Installing pre-commit hook"
+
 HOOKS_DIR="$ROOT/.git/hooks"
 PRECOMMIT="$HOOKS_DIR/pre-commit"
+
 if [[ ! -d "$ROOT/.git" ]]; then
-  _warn "Not a Git repository — skipping pre-commit hook"
+  _warn "Not a git repository — skipping pre-commit hook install"
 elif [[ -f "$PRECOMMIT" ]]; then
   _ok "pre-commit hook already installed"
 else
   mkdir -p "$HOOKS_DIR"
-  cat > "$PRECOMMIT" <<'HOOK'
+  cat > "$PRECOMMIT" << 'HOOK'
 #!/usr/bin/env bash
+# Pre-commit hook — run skill validation before every commit.
+# Installed by scripts/setup.sh. Remove this file to disable.
 set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 echo "Running skill validation..."
@@ -143,25 +217,35 @@ if bash "$ROOT/scripts/validate-skills.sh" --quiet 2>&1; then
   echo "  PASS: Skill validation passed"
 else
   echo "  FAIL: Skill validation failed — commit blocked"
-  echo "  Run: npm run validate"
+  echo "  Run: make validate  for a full diagnostic"
   exit 1
 fi
 HOOK
   chmod +x "$PRECOMMIT"
-  _ok "pre-commit hook installed"
+  _ok "pre-commit hook installed at $PRECOMMIT"
+  info "The hook runs 'make validate' before every commit. Remove .git/hooks/pre-commit to disable."
 fi
 
+# ── 8. Final health check ─────────────────────────────────────────────────────
 header "Running health check"
+echo
 bash "$ROOT/scripts/health-check.sh" || true
 
+# ── Summary ───────────────────────────────────────────────────────────────────
 echo
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo -e "  Setup complete: ${GREEN}$PASS passed${NC}, ${YELLOW}$WARN warnings${NC}, ${RED}$FAIL failed${NC}"
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo
-echo "Next steps:"
-echo "  1. Set GITHUB_TOKEN in .env"
-echo "  2. Run: aiw health"
-echo "  3. Run: aiw validate"
-echo "  4. Run: aiw start /path/to/your-project"
-[[ "$FAIL" -eq 0 ]]
+echo -e "${BOLD}Next steps:${NC}"
+echo "  1. aiw health                      — verify the project-local toolchain"
+echo "  2. aiw validate-onboarding-o0      — verify the agent-neutral O0 contract"
+echo "  3. Select and authenticate an agent runtime only when you are ready"
+echo "  4. aiw start /path/to/your-project — launch behavior is runtime-adapter work"
+echo ""
+echo "  Quick reference:"
+echo "    aiw init /path/to/project  — copy workflow into another project"
+echo "    aiw validate               — validate all skills"
+echo "    aiw doctor                 — full diagnostic"
+echo "    aiw help                   — all available commands"
+echo

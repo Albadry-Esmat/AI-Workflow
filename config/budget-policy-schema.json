@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/budget-policy.schema.json",
+  "title": "AI-Workflow Execution Budget Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["budget_id", "budget_version", "pipeline_template", "per_run", "per_step", "retry_policy", "cancellation"],
+  "properties": {
+    "budget_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,100}$" },
+    "budget_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "pipeline_template": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "per_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_steps", "max_retries", "max_tool_calls", "max_elapsed_ms", "max_input_tokens", "max_output_tokens", "max_estimated_cost_usd"],
+      "properties": {
+        "max_steps": { "type": "integer", "minimum": 1 },
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "max_tool_calls": { "type": "integer", "minimum": 0 },
+        "max_elapsed_ms": { "type": "integer", "minimum": 1 },
+        "max_input_tokens": { "type": "integer", "minimum": 0 },
+        "max_output_tokens": { "type": "integer", "minimum": 0 },
+        "max_estimated_cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "per_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_attempts", "max_tool_calls", "max_elapsed_ms", "max_input_tokens", "max_output_tokens", "max_estimated_cost_usd"],
+      "properties": {
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "max_tool_calls": { "type": "integer", "minimum": 0 },
+        "max_elapsed_ms": { "type": "integer", "minimum": 1 },
+        "max_input_tokens": { "type": "integer", "minimum": 0 },
+        "max_output_tokens": { "type": "integer", "minimum": 0 },
+        "max_estimated_cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_attempts", "retryable_categories", "non_retryable_categories", "backoff_ms", "jitter_ms"],
+      "properties": {
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "retryable_categories": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["validation", "authorization", "dependency", "timeout", "tool", "budget", "cancelled", "unknown"] },
+          "uniqueItems": true
+        },
+        "non_retryable_categories": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["validation", "authorization", "dependency", "timeout", "tool", "budget", "cancelled", "unknown"] },
+          "uniqueItems": true
+        },
+        "backoff_ms": { "type": "integer", "minimum": 0 },
+        "jitter_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "cancellation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supported", "trigger", "terminal_status"],
+      "properties": {
+        "supported": { "type": "boolean" },
+        "trigger": { "type": "string", "enum": ["budget-exceeded", "user-request", "kill-signal", "timeout"] },
+        "terminal_status": { "type": "string", "const": "cancelled" }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string", "maxLength": 500 }, "maxItems": 20 }
+  }
+}

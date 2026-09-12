@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate-skills.sh — Full skill validation suite (10 checks).
+# validate-skills.sh — Full skill validation suite (11 checks).
 #
 # Run from the project root:  make validate  OR  bash scripts/validate-skills.sh
 #
@@ -15,8 +15,10 @@
 #   8. origin_metadata shape validation for v5.1.0+ skills
 #   9. index.yaml version field matches SKILL.md frontmatter version
 #   10. Community skill SHA-256 hash verification
+#   11. Credential guidance and canonical data ownership checks
 #
-# Requires: node and the pinned root npm dependencies
+# Requires: node (checks 5, 7, 8), project-local Python (checks 0, 9, 10, 11)
+# Requires: the project-owned JSON Schema wrapper for pipeline validation.
 
 set -euo pipefail
 
@@ -26,6 +28,15 @@ cd "$ROOT"
 # Load shared utilities
 # shellcheck source=scripts/lib/common.sh
 source "$ROOT/scripts/lib/common.sh"
+
+PYTHON_BIN="${AIW_PYTHON_BIN:-$ROOT/.venv/bin/python}"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+AJV_BIN="${AIW_AJV_BIN:-$ROOT/scripts/validate-json-schema.mjs}"
+if [[ ! -x "$AJV_BIN" ]]; then
+  AJV_BIN=""
+fi
 
 # Load .env (non-fatal — env vars are only informational here)
 load_env "$ROOT/.env" 2>/dev/null || true
@@ -39,18 +50,27 @@ _skip()   { info "SKIP: $1"; }
 
 # ── 0. YAML syntax check ───────────────────────────────────────────────────────
 header "0/10 — YAML syntax check (skills/index.yaml)"
-if node scripts/validate-yaml.js; then
-  _ok "skills/index.yaml is valid YAML"
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" -c "
+import yaml, sys
+try:
+    with open('skills/index.yaml') as f:
+        yaml.safe_load(f.read())
+    print('  PASS: skills/index.yaml parses as valid YAML')
+except yaml.YAMLError as e:
+    print(f'  FAIL: skills/index.yaml YAML parse error: {e}', file=sys.stderr)
+    sys.exit(1)
+" && _ok "skills/index.yaml is valid YAML" || { _fail "skills/index.yaml has YAML parse errors — run: python3 -c \"import yaml; yaml.safe_load(open('skills/index.yaml'))\" to debug"; }
 else
-  _fail "skills/index.yaml has YAML parse errors"
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── 1. Pipeline JSON schema validation ────────────────────────────────────────
 header "1/10 — Pipeline configs vs pipeline-schema.json"
-if [[ -x node_modules/.bin/ajv ]]; then
+if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
   for f in skills/pipelines/*.json; do
-    [[ -f "$f" ]] || continue
-    if npx --no-install ajv validate \
+    [[ -f "$f" ]] || continue   # guard: skip if glob did not expand (empty dir)
+    if "$AJV_BIN" validate \
         -s skills/schema/pipeline-schema.json \
         -d "$f" \
         --spec=draft7 \
@@ -61,7 +81,7 @@ if [[ -x node_modules/.bin/ajv ]]; then
     fi
   done
 else
-  _fail "ajv-cli is not installed locally — run: npm ci"
+  _fail "project-owned JSON Schema validator not found — run: make setup"
 fi
 
 # ── 2. SKILL.md required sections ─────────────────────────────────────────────
@@ -293,19 +313,200 @@ fi
 
 # ── 9. index.yaml version vs SKILL.md frontmatter ─────────────────────────────
 header "9/10 — index.yaml version vs SKILL.md frontmatter version"
-if node scripts/validate-skill-metadata.js; then
-  PASS=$((PASS+1))
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" - <<'PYEOF' && PASS=$((PASS+1)) || { FAIL=$((FAIL+1)); echo "         Fix: sync the version field in the failing SKILL.md frontmatter to match index.yaml"; }
+import re, sys
+
+with open("skills/index.yaml") as f:
+    raw = f.read()
+
+blocks = raw.split("\n- id:")
+mismatches = []
+passes = []
+
+for block in blocks[1:]:
+    skill_match   = re.search(r'executable_skill:\s*(.+)', block)
+    version_match = re.search(r'(?m)^  version:\s*(.+)', block)
+    if not skill_match or not version_match:
+        continue
+    skill_path = skill_match.group(1).strip()
+    idx_ver    = version_match.group(1).strip()
+
+    try:
+        with open(skill_path) as sf:
+            content = sf.read()
+        m = re.search(r'^version:\s*(.+)$', content, re.MULTILINE)
+        skill_ver = m.group(1).strip().strip('"\'') if m else "MISSING"
+    except FileNotFoundError:
+        skill_ver = "FILE_NOT_FOUND"
+
+    if idx_ver != skill_ver:
+        mismatches.append(
+            f"  FAIL: {skill_path}  index.yaml={idx_ver}  SKILL.md={skill_ver}"
+        )
+    else:
+        passes.append(skill_path)
+
+for p in passes:
+    print(f"  PASS: {p}")
+for m in mismatches:
+    print(m)
+
+sys.exit(1 if mismatches else 0)
+PYEOF
 else
-  FAIL=$((FAIL+1))
-  echo "         Fix: synchronize index.yaml and SKILL.md metadata"
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── 10. Community skill SHA-256 hash verification ─────────────────────────────
 header "10/10 — Community skill SHA-256 hash verification"
-if node scripts/validate-skill-metadata.js; then
+
+"$PYTHON_BIN" - <<'PYEOF'
+import sys, hashlib, yaml
+from pathlib import Path
+
+root = Path(".")
+index_path = root / "skills" / "index.yaml"
+
+try:
+    with open(index_path) as f:
+        data = yaml.safe_load(f)
+except Exception as e:
+    print(f"  SKIP: Could not read skills/index.yaml: {e}")
+    sys.exit(0)
+
+skills = data.get("skills", []) if isinstance(data, dict) else data
+community_skills = [s for s in skills if
+    isinstance(s.get("origin_metadata"), dict) and
+    s["origin_metadata"].get("source") == "community"]
+
+if not community_skills:
+    print("  PASS: No community skills installed")
+    sys.exit(0)
+
+fail_count = 0
+for skill in community_skills:
+    skill_id   = skill.get("id", "?")
+    skill_name = skill.get("name", "?")
+    skill_path = skill.get("executable_skill") or skill.get("reference_path", "")
+    expected_sha = skill.get("origin_metadata", {}).get("sha256")
+
+    if not expected_sha:
+        print(f"  FAIL [{skill_id} {skill_name}]: origin_metadata.sha256 missing")
+        fail_count += 1
+        continue
+
+    skill_file = root / skill_path
+    if not skill_file.exists():
+        print(f"  FAIL [{skill_id} {skill_name}]: SKILL.md not found at {skill_path}")
+        fail_count += 1
+        continue
+
+    actual_sha = hashlib.sha256(skill_file.read_bytes()).hexdigest()
+    if actual_sha == expected_sha:
+        print(f"  PASS [{skill_id} {skill_name}]: SHA-256 verified")
+    else:
+        print(f"  FAIL [{skill_id} {skill_name}]: SHA-256 mismatch")
+        print(f"    expected: {expected_sha}")
+        print(f"    actual:   {actual_sha}")
+        fail_count += 1
+
+sys.exit(1 if fail_count > 0 else 0)
+PYEOF
+
+if [ $? -eq 0 ]; then
   _ok "Community skill SHA-256 verification"
 else
   _fail "Community skill SHA-256 verification — see FAIL lines above"
+fi
+
+# ── 11. Credential guidance and canonical data ownership ───────────────────────
+header "11/11 — Credential guidance and canonical data ownership"
+
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" - <<'PYEOF' && _ok "Credential guidance and canonical data ownership" || _fail "Credential guidance or canonical data ownership check"
+import json
+import re
+import sys
+from pathlib import Path
+from glob import glob
+
+root = Path('.')
+errors = []
+
+# The historical changelog may mention superseded guidance as a record of what
+# changed; current onboarding and operational guidance must not repeat it.
+guidance_files = [
+    Path('.env.example'),
+    Path('docs/github-export.md'),
+    Path('docs/how-to-use.md'),
+    Path('docs/mcp.md'),
+    Path('docs/community-skill-registry.md'),
+    Path('scripts/setup.sh'),
+    Path('scripts/health-check.sh'),
+    Path('website/data/site-content.json'),
+]
+for path in guidance_files:
+    if not path.exists():
+        errors.append(f'{path}: guidance file missing')
+        continue
+    text = path.read_text(errors='replace')
+    forbidden = [
+        r'generate new token \(classic\)',
+        r'classic PAT',
+        r'non[- ]expiring',
+        r'no expiration',
+        r'no expiry',
+        r'repo \+ read:org',
+        r'full control of private repositories',
+        r'ghp_[A-Za-z0-9_.-]+',
+        r'required scopes:\s*repo',
+    ]
+    for pattern in forbidden:
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            errors.append(f'{path}: forbidden credential guidance matches /{pattern}/')
+    if path.suffix in {'.md', '.sh', '.example', '.json'} and not re.search(r'fine[- ]grained|short[- ]lived|rotate|expiry', text, flags=re.IGNORECASE):
+        errors.append(f'{path}: missing safe credential guidance marker')
+
+map_path = root / 'config' / 'canonical-data-map.json'
+try:
+    data = json.loads(map_path.read_text())
+    entries = data.get('entries', [])
+    if not entries:
+        errors.append('config/canonical-data-map.json: entries is empty')
+    ids = [entry.get('id') for entry in entries]
+    if len(ids) != len(set(ids)):
+        errors.append('config/canonical-data-map.json: duplicate entry IDs')
+    canonical_paths = [entry.get('canonical_path') for entry in entries]
+    if len(canonical_paths) != len(set(canonical_paths)):
+        errors.append('config/canonical-data-map.json: duplicate canonical paths')
+    required = {'id', 'canonical_path', 'field_scope', 'derived_paths', 'owner', 'edit_policy', 'sync_mode'}
+    for entry in entries:
+        missing = sorted(required - set(entry))
+        if missing:
+            errors.append(f"{entry.get('id', '?')}: missing fields {', '.join(missing)}")
+            continue
+        canonical = entry['canonical_path']
+        if not glob(canonical, recursive=True) and not canonical.startswith('ASE-OS-Website/'):
+            errors.append(f"{entry['id']}: canonical path has no match: {canonical}")
+        for derived in entry['derived_paths']:
+            if '*' in derived or '?' in derived or '[' in derived:
+                if not glob(derived, recursive=True):
+                    errors.append(f"{entry['id']}: derived path has no match: {derived}")
+            elif not Path(derived).exists() and not derived.startswith('ASE-OS-Website/'):
+                errors.append(f"{entry['id']}: derived path missing: {derived}")
+except Exception as exc:
+    errors.append(f'config/canonical-data-map.json: {exc}')
+
+if errors:
+    for error in errors:
+        print(f'  FAIL: {error}', file=sys.stderr)
+    sys.exit(1)
+
+print(f'  PASS: checked {len(guidance_files)} guidance files and {len(entries)} canonical ownership entries')
+PYEOF
+else
+  _fail "project-local Python not found — run: make setup"
 fi
 
 # ── Results ───────────────────────────────────────────────────────────────────

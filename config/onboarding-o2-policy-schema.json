@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Workflow Onboarding O2 Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "selection", "authentication", "demo", "recovery", "commands", "non_goals"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "redact_secrets", "resume_allowed", "unknown_state_fails_closed"],
+      "properties": {
+        "path": {"type": "string", "const": ".aiw/onboarding-o2/state.json"},
+        "redact_secrets": {"type": "boolean", "const": true},
+        "resume_allowed": {"type": "boolean", "const": true},
+        "unknown_state_fails_closed": {"type": "boolean", "const": true}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalog_path", "auto_precedence", "explicit_missing_fails", "silent_fallback"],
+      "properties": {
+        "catalog_path": {"type": "string", "const": "config/agent-runtime-catalog.json"},
+        "auto_precedence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "explicit_missing_fails": {"type": "boolean", "const": true},
+        "silent_fallback": {"type": "boolean", "const": false}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aiw_stores_raw_secrets", "delegated_status_only", "login_automation", "redact_logs"],
+      "properties": {
+        "aiw_stores_raw_secrets": {"type": "boolean", "const": false},
+        "delegated_status_only": {"type": "boolean", "const": true},
+        "login_automation": {"type": "string", "enum": ["never", "runtime-owned"]},
+        "redact_logs": {"type": "boolean", "const": true}
+      }
+    },
+    "demo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["no_secret", "external_writes", "network", "deterministic"],
+      "properties": {
+        "no_secret": {"type": "boolean", "const": true},
+        "external_writes": {"type": "integer", "const": 0},
+        "network": {"type": "string", "enum": ["disabled", "optional"]},
+        "deterministic": {"type": "boolean", "const": true}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owned_root", "rollback_only_owned_paths", "target_projects_untouched", "backup_before_target_mutation"],
+      "properties": {
+        "owned_root": {"type": "string", "const": ".aiw/onboarding-o2"},
+        "rollback_only_owned_paths": {"type": "boolean", "const": true},
+        "target_projects_untouched": {"type": "boolean", "const": true},
+        "backup_before_target_mutation": {"type": "boolean", "const": true}
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["setup", "doctor", "agent_list", "agent_detect", "agent_use", "demo", "auth_status", "recover"],
+      "properties": {
+        "setup": {"type": "string", "const": "aiw setup"},
+        "doctor": {"type": "string", "const": "aiw doctor"},
+        "agent_list": {"type": "string", "const": "aiw agent list"},
+        "agent_detect": {"type": "string", "const": "aiw agent detect"},
+        "agent_use": {"type": "string", "const": "aiw agent use <id|auto>"},
+        "demo": {"type": "string", "const": "aiw demo"},
+        "auth_status": {"type": "string", "const": "aiw auth status"},
+        "recover": {"type": "string", "const": "aiw recover"}
+      }
+    },
+    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "quick-review-web-fixture",
+  "private": true,
+  "scripts": {"test": "node src/app.js"}
+}

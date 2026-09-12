@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/toolchain-policy.json",
+  "title": "ToolchainPolicy",
+  "description": "Fail-closed O1 policy for deterministic core and adapter toolchains.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "core_dependencies", "lockfiles", "verification", "runtime_installation", "recovery"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "core_dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_must_be_project_local", "node_must_be_project_local", "global_python_install_forbidden", "global_node_install_forbidden", "runtime_installation_separate"],
+      "properties": {
+        "python_must_be_project_local": {"type": "boolean", "const": true},
+        "node_must_be_project_local": {"type": "boolean", "const": true},
+        "global_python_install_forbidden": {"type": "boolean", "const": true},
+        "global_node_install_forbidden": {"type": "boolean", "const": true},
+        "runtime_installation_separate": {"type": "boolean", "const": true}
+      }
+    },
+    "lockfiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_lockfile_required", "python_requirements_pinned", "lockfile_drift_blocks", "integrity_checked"],
+      "properties": {
+        "node_lockfile_required": {"type": "boolean", "const": true},
+        "python_requirements_pinned": {"type": "boolean", "const": true},
+        "lockfile_drift_blocks": {"type": "boolean", "const": true},
+        "integrity_checked": {"type": "boolean", "const": true}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_only_is_non_mutating", "check_only_disables_network", "unknown_version_blocks", "report_paths_and_versions"],
+      "properties": {
+        "check_only_is_non_mutating": {"type": "boolean", "const": true},
+        "check_only_disables_network": {"type": "boolean", "const": true},
+        "unknown_version_blocks": {"type": "boolean", "const": true},
+        "report_paths_and_versions": {"type": "boolean", "const": true}
+      }
+    },
+    "runtime_installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aiw_installs_by_default", "explicit_consent_required", "adapter_owned", "unattended_install_forbidden"],
+      "properties": {
+        "aiw_installs_by_default": {"type": "boolean", "const": false},
+        "explicit_consent_required": {"type": "boolean", "const": true},
+        "adapter_owned": {"type": "boolean", "const": true},
+        "unattended_install_forbidden": {"type": "boolean", "const": true}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["failed_install_leaves_previous_state", "venv_recreatable", "node_modules_recreatable", "rollback_documented"],
+      "properties": {
+        "failed_install_leaves_previous_state": {"type": "boolean", "const": true},
+        "venv_recreatable": {"type": "boolean", "const": true},
+        "node_modules_recreatable": {"type": "boolean", "const": true},
+        "rollback_documented": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

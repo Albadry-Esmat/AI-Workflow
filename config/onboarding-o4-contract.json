@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O4",
+  "title": "Verified Agent-Neutral Runtime Installation Control Plane",
+  "state": {
+    "path": ".aiw/onboarding-o4/state.json",
+    "evidence_path": ".aiw/onboarding-o4/evidence.jsonl",
+    "owned_root": ".aiw/onboarding-o4",
+    "state_write_policy": "atomic-redacted"
+  },
+  "catalog": {
+    "path": "config/runtime-installer-catalog.json",
+    "schema_path": "config/runtime-installer-catalog-schema.json",
+    "record_selection": "exact-installer-id",
+    "source_of_truth": "official-documentation-review"
+  },
+  "commands": {
+    "install_plan": {"syntax": "aiw onboarding install-plan [--agent <id|auto>] [--platform <platform>] [--json]", "status": "implemented-in-o4"},
+    "install_verify": {"syntax": "aiw onboarding install-verify [--agent <id>] [--json]", "status": "implemented-in-o4"},
+    "install": {"syntax": "aiw onboarding install --installer <installer-id> --yes [--json]", "status": "manual-only-until-verified"},
+    "recover": {"syntax": "aiw onboarding recover --o4 [--reset-state] [--json]", "status": "implemented-in-o4"},
+    "auth_login": {"syntax": "aiw auth login", "status": "deferred-runtime-owned"},
+    "target_init": {"syntax": "aiw init <target>", "status": "deferred-guarded-batch"},
+    "start": {"syntax": "aiw start [--agent <adapter-id>] <target>", "status": "deferred-launch-adapter"}
+  },
+  "lifecycle": {
+    "plan": ["load-catalog", "filter-platform", "classify-command", "show-provenance", "show-verification", "show-rollback"],
+    "verify": ["resolve-existing-executable", "safe-version-probe", "optional-read-only-doctor", "record-redacted-evidence"],
+    "install": ["load-exact-record", "validate-schema", "validate-provenance", "validate-platform", "validate-command-policy", "require-explicit-yes", "block-until-eligible"],
+    "recover": ["load-owned-state", "reset-incomplete-record", "preserve-target", "preserve-runtime"]
+  },
+  "command_policy": {
+    "shell_pipeline": {"allowed": false, "reason": "network-fetched script execution is not safely generic"},
+    "elevated": {"allowed": false, "reason": "O4 cannot safely assume host privilege or rollback"},
+    "network_download": {"allowed": false, "reason": "no automatic binary or package download in O4"},
+    "package_manager_mutation": {"allowed": false, "reason": "package-manager state is user-controlled"},
+    "docker_mutation": {"allowed": false, "reason": "container state is outside O4 ownership"}
+  },
+  "planning": {
+    "default_mode": "plan",
+    "network": "disabled",
+    "mutations": 0,
+    "commands_executed": 0,
+    "raw_secret_values": 0,
+    "manual_guidance_allowed": true
+  },
+  "verification": {
+    "read_only": true,
+    "version_probe_required": true,
+    "doctor_probe_optional": true,
+    "timeout_seconds_max": 30,
+    "external_writes": 0,
+    "secrets_seen": false
+  },
+  "installation": {
+    "default_status": "manual-only",
+    "eligible_records": [],
+    "automatic_execution": "blocked",
+    "explicit_consent": true,
+    "target_project_mutations": 0
+  },
+  "authentication": {
+    "raw_secret_storage": false,
+    "raw_secret_input": false,
+    "login_automation": "runtime-owned",
+    "status": "delegated-and-redacted"
+  },
+  "target": {
+    "initialization": "deferred",
+    "mutations": 0,
+    "launch": "deferred",
+    "secret_copy": false
+  },
+  "rollback": {
+    "claim_policy": "record-only-unless-officially-supported",
+    "target_project_untouched": true,
+    "runtime_ownership_recorded": true
+  },
+  "diagnostics": {
+    "human_output": true,
+    "json_output": true,
+    "error_codes": true,
+    "redaction": true,
+    "warnings_nonfatal": true
+  },
+  "non_goals": [
+    "Automatic execution of shell-piped or PowerShell expression installers",
+    "Automatic package-manager, Docker, binary, or elevated installation",
+    "Provider or runtime login automation",
+    "Target project initialization or mutation",
+    "Provider-specific launch dispatch",
+    "First-class safety claims for candidate adapters",
+    "Rollback claims without an official source"
+  ]
+}

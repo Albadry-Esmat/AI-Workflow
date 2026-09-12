@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "batch": "O2",
+  "title": "Resumable Agent-Neutral Onboarding",
+  "state": {
+    "path": ".aiw/onboarding-o2/state.json",
+    "evidence_path": ".aiw/onboarding-o2/evidence.jsonl",
+    "owned_root": ".aiw/onboarding-o2",
+    "resume_key": "workflow_id",
+    "state_write_policy": "atomic-redacted"
+  },
+  "phases": [
+    {"id": "preflight", "mutates_machine": false, "requires_auth": false},
+    {"id": "core-toolchain", "mutates_machine": true, "requires_auth": false},
+    {"id": "project-config", "mutates_machine": true, "requires_auth": false},
+    {"id": "cli-link", "mutates_machine": true, "requires_auth": false},
+    {"id": "runtime-detect", "mutates_machine": false, "requires_auth": false},
+    {"id": "runtime-select", "mutates_machine": true, "requires_auth": false},
+    {"id": "no-secret-demo", "mutates_machine": false, "requires_auth": false},
+    {"id": "auth-status", "mutates_machine": false, "requires_auth": false},
+    {"id": "complete", "mutates_machine": false, "requires_auth": false}
+  ],
+  "commands": {
+    "setup": {"syntax": "aiw setup [--check-only|--resume|--json]", "status": "implemented-in-o2"},
+    "doctor": {"syntax": "aiw doctor [--json]", "status": "implemented-in-o2"},
+    "agent_list": {"syntax": "aiw agent list [--json]", "status": "implemented-in-o2"},
+    "agent_detect": {"syntax": "aiw agent detect [--json]", "status": "implemented-in-o2"},
+    "agent_use": {"syntax": "aiw agent use <adapter-id|auto> [--json]", "status": "implemented-in-o2"},
+    "demo": {"syntax": "aiw demo [--json]", "status": "implemented-in-o2"},
+    "auth_status": {"syntax": "aiw auth status [--json]", "status": "implemented-in-o2"},
+    "recover": {"syntax": "aiw recover [--json]", "status": "implemented-in-o2"},
+    "auth_login": {"syntax": "aiw auth login", "status": "deferred-runtime-owned"},
+    "auth_logout": {"syntax": "aiw auth logout", "status": "deferred-runtime-owned"},
+    "start": {"syntax": "aiw start [--agent <adapter-id>] <target>", "status": "deferred-launch-adapter"}
+  },
+  "sequences": {
+    "default": ["setup", "doctor", "agent-detect", "agent-use-auto", "demo", "auth-status"],
+    "no_secret": ["setup-check-only", "doctor", "agent-detect", "demo"],
+    "resume": ["load-state", "resume-first-incomplete-step", "doctor"]
+  },
+  "selection": {
+    "auto": {"precedence_source": "config/onboarding-o2-policy.json", "record_reason": true, "fail_if_none": true},
+    "explicit": {"missing_adapter": "fail", "incompatible_adapter": "fail", "silent_fallback": false},
+    "state_update": "atomic"
+  },
+  "authentication": {
+    "raw_secret_storage": false,
+    "login_automation": "runtime-owned",
+    "status": "delegated-and-redacted",
+    "no_secret_demo_before_auth": true
+  },
+  "demo": {
+    "network": "disabled",
+    "external_writes": 0,
+    "secret_values": 0,
+    "target_project_mutations": 0,
+    "deterministic_output": true
+  },
+  "diagnostics": {
+    "human_output": true,
+    "json_output": true,
+    "error_codes": true,
+    "redaction": true,
+    "exit_nonzero_on_required_failure": true,
+    "warnings_nonfatal": true
+  },
+  "recovery": {
+    "state_atomicity": true,
+    "owned_paths_only": true,
+    "target_project_untouched": true,
+    "runtime_install_untouched": true,
+    "recover_command": "aiw recover"
+  },
+  "non_goals": [
+    "Installing runtimes or provider CLIs",
+    "Automating login or handling raw credentials",
+    "Launching a provider-specific runtime",
+    "Initializing or modifying a target project",
+    "Making first-class safety or evidence claims for candidate adapters"
+  ]
+}

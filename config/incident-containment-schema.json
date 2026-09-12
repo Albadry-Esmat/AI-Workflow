@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/incident-containment.schema.json",
+  "title": "AI-Workflow Incident Containment Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "incident_id", "incident_type", "trigger", "severity", "detected_at", "containment_actions", "external_writes", "quarantine", "evidence_bundle", "verdict"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "incident_id": { "type": "string", "pattern": "^INC-[0-9a-f]{12}$" },
+    "incident_type": { "type": "string", "enum": ["runaway_loop", "prompt_injection", "supply_chain", "credential_exposure", "slo_breach", "telemetry_privacy"] },
+    "trigger": { "type": "string", "enum": ["budget_exhausted", "untrusted_instruction", "dependency_finding", "secret_pattern", "slo_burn", "privacy_test_failure"] },
+    "severity": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+    "detected_at": { "type": "string", "format": "date-time" },
+    "containment_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "enum": ["kill_switch", "quarantine", "capability_disable", "credential_revoke", "rollback", "no_external_write"] },
+      "uniqueItems": true
+    },
+    "external_writes": { "type": "integer", "const": 0 },
+    "quarantine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "status", "reason"],
+      "properties": {
+        "run_id": { "type": "string", "pattern": "^RUN-[0-9a-f]{12}$" },
+        "status": { "type": "string", "enum": ["quarantined", "released", "not_applicable"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "credential_revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "boolean" },
+        "completed": { "type": "boolean" },
+        "scope": { "type": "string" }
+      }
+    },
+    "evidence_bundle": { "type": "string", "pattern": "^(artifact|file)://[^\\s]+$" },
+    "verdict": { "type": "string", "enum": ["contained", "block", "needs-human-review"] },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rollback_applied": { "type": "boolean" },
+        "kill_switch_released": { "type": "boolean" },
+        "follow_up_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

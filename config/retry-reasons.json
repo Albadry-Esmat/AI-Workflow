@@ -1,0 +1,13 @@
+{
+  "taxonomy_version": "1.0.0",
+  "reasons": [
+    { "code": "OUTPUT_SCHEMA_INVALID", "category": "validation", "retryable": false, "terminal_code": "OUTPUT_SCHEMA_INVALID", "description": "The produced record cannot satisfy its declared output contract." },
+    { "code": "AUTHORIZATION_REQUIRED", "category": "authorization", "retryable": false, "terminal_code": "POLICY_DENIED", "description": "The requested action requires approval or is outside the active capability policy." },
+    { "code": "DEPENDENCY_UNAVAILABLE", "category": "dependency", "retryable": true, "terminal_code": "RETRY_EXHAUSTED", "description": "A declared dependency is unavailable and may be retried within budget." },
+    { "code": "TIMEOUT", "category": "timeout", "retryable": true, "terminal_code": "RETRY_EXHAUSTED", "description": "The bounded operation exceeded its time allowance." },
+    { "code": "TOOL_EXECUTION_FAILED", "category": "tool", "retryable": true, "terminal_code": "RETRY_EXHAUSTED", "description": "A permitted tool returned a failure and may be retried within budget." },
+    { "code": "BUDGET_EXCEEDED", "category": "budget", "retryable": false, "terminal_code": "BUDGET_EXCEEDED", "description": "A run, step, retry, tool-call, time, token, or spend limit was exceeded." },
+    { "code": "CANCELLED", "category": "cancelled", "retryable": false, "terminal_code": "CANCELLED", "description": "Execution was stopped by a supported cancellation or kill trigger." },
+    { "code": "UNKNOWN_FAILURE", "category": "unknown", "retryable": false, "terminal_code": "UNKNOWN_FAILURE", "description": "An unclassified failure is fail-closed and not retried automatically." }
+  ]
+}

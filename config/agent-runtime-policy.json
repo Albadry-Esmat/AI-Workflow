@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "core_neutrality": {
+    "agent_runtime_is_adapter": true,
+    "core_must_not_require_named_runtime": true,
+    "runtime_config_is_adapter_owned": true
+  },
+  "selection": {
+    "auto_selection_allowed": true,
+    "auto_selection_deterministic": true,
+    "explicit_selection_no_fallback": true,
+    "selection_recorded_in_run_manifest": true
+  },
+  "installation": {
+    "aiw_installs_runtime_by_default": false,
+    "requires_explicit_consent": true,
+    "supports_check_only": true,
+    "supports_no_network": true
+  },
+  "authentication": {
+    "no_secret_demo_required": true,
+    "aiw_must_not_store_raw_secrets": true,
+    "runtime_auth_delegated": true,
+    "scope_validation_required": true
+  },
+  "support_claims": {
+    "first_class_requires_fixture": true,
+    "compatible_must_declare_limits": true,
+    "generic_must_not_claim_safety": true,
+    "website_claims_source_owned": true
+  },
+  "evidence": {
+    "adapter_id_required": true,
+    "external_writes_default_false": true,
+    "unknown_capabilities_fail_closed": true
+  },
+  "initial_adapters": ["opencode", "claude-code", "codex", "generic-command"]
+}

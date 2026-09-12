@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "source_repository": "Albadry-Esmat/AI-Workflow",
+  "source_branch": "Dev",
+  "entries": [
+    {
+      "id": "skill-content",
+      "canonical_path": ".opencode/skills/*/SKILL.md",
+      "field_scope": "skill instructions and frontmatter",
+      "derived_paths": ["website/data/.opencode/skills/*/SKILL.md"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "skill-index",
+      "canonical_path": "skills/index.yaml",
+      "field_scope": "skill discovery metadata",
+      "derived_paths": ["website/data/skills/index.yaml"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "runtime-registry",
+      "canonical_path": "skills/registry.json",
+      "field_scope": "runtime skill registry",
+      "derived_paths": ["website/data/skills/registry.json"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "skill-graph",
+      "canonical_path": "skills/graph/skill-graph.yaml",
+      "field_scope": "skill dependency graph",
+      "derived_paths": ["website/data/skills/graph/skill-graph.yaml"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "pipeline-definitions",
+      "canonical_path": "skills/pipelines/*.json",
+      "field_scope": "pipeline definitions",
+      "derived_paths": ["website/data/skills/pipelines/*.json"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "runtime-agent-config",
+      "canonical_path": "opencode.json",
+      "field_scope": "agent and MCP configuration",
+      "derived_paths": ["website/data/opencode.json"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "changelog",
+      "canonical_path": "docs/changelog.md",
+      "field_scope": "AI-Workflow change history",
+      "derived_paths": ["website/data/docs/changelog.md"],
+      "owner": "AI-Workflow",
+      "edit_policy": "canonical-only",
+      "sync_mode": "exact-mirror"
+    },
+    {
+      "id": "website-generated-content",
+      "canonical_path": "website/data/site-content.json",
+      "field_scope": "generated website facts and explicitly marked editorial content",
+      "derived_paths": ["ASE-OS-Website/data/site-content.json"],
+      "owner": "AI-Workflow for generated fields; ASE-OS-Website for marked editorial fields",
+      "edit_policy": "generated-fields-canonical-only",
+      "sync_mode": "validated-sync"
+    },
+    {
+      "id": "website-presentation",
+      "canonical_path": "ASE-OS-Website/src/**",
+      "field_scope": "website components, styling, routing, and presentation",
+      "derived_paths": [],
+      "owner": "ASE-OS-Website",
+      "edit_policy": "website-owned",
+      "sync_mode": "independent-review"
+    }
+  ]
+}

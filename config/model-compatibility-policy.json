@@ -1,0 +1,35 @@
+{
+  "policy_version": "1.0.0",
+  "required_capabilities": ["execution-contracts-1.1", "budget-evidence", "privacy-redaction-v1", "telemetry-event-1.0"],
+  "models": [
+    {
+      "model_id": "github-copilot/claude-sonnet-4.6",
+      "provider": "github-copilot",
+      "expected": "compatible",
+      "contract_version": "1.1.0",
+      "capabilities": ["execution-contracts-1.1", "budget-evidence", "privacy-redaction-v1", "telemetry-event-1.0"],
+      "failure_reason": null
+    },
+    {
+      "model_id": "fixture/legacy-no-telemetry",
+      "provider": "fixture",
+      "expected": "incompatible",
+      "contract_version": "1.1.0",
+      "capabilities": ["execution-contracts-1.1"],
+      "failure_reason": "missing budget, privacy, and telemetry evidence capabilities"
+    },
+    {
+      "model_id": "fixture/provider-unavailable",
+      "provider": "fixture",
+      "expected": "incompatible",
+      "contract_version": "1.0.0",
+      "capabilities": ["execution-contracts-1.1"],
+      "failure_reason": "provider cannot emit the required contract version"
+    }
+  ],
+  "rollback_policy": {
+    "on_incompatible": "rollback-to-last-known-good",
+    "last_known_good": "github-copilot/claude-sonnet-4.6",
+    "promotion_requires_pass": true
+  }
+}
