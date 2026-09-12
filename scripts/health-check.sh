@@ -7,9 +7,9 @@
 #   1. Required tools (git, node, npm, opencode)
 #   2. Optional tools (graphify) and local validation dependencies
 #   3. .env file exists
-#   4. GITHUB_TOKEN is set (required)
+#   4. GITHUB_TOKEN is set (optional — only for built-in github MCP)
 #   5. Optional env vars (with warnings, not failures)
-#   6. .opencode/node_modules installed
+#   6. .opencode/node_modules (optional — only for local plugin)
 #   7. Skill count sanity (index.yaml vs .opencode/skills/)
 #   8. opencode.json skill paths exist on disk
 #
@@ -89,16 +89,18 @@ else
   _fail ".env not found — run: make setup  (or: cp .env.example .env)"
 fi
 
-# ── 4. Required env vars ──────────────────────────────────────────────────────
-header "Required environment variables"
+# ── 4. Optional env vars (GitHub) ─────────────────────────────────────────────
+header "GitHub token (optional)"
 
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
   # Mask the token — show first 4 chars then fixed asterisks
   MASKED="${GITHUB_TOKEN:0:4}********************"
   _ok "GITHUB_TOKEN is set  ($MASKED)"
 else
-  _fail "GITHUB_TOKEN is not set"
-  echo "       Add GITHUB_TOKEN=<your-token> to .env"
+  _warn "GITHUB_TOKEN is not set — built-in github MCP will be unavailable"
+  echo "       Only needed for the built-in github MCP server."
+  echo "       Skip this if you connect to GitHub via an external MCP / desktop app."
+  echo "       To enable: add GITHUB_TOKEN=<your-token> to .env"
   echo "       Create a token at: https://github.com/settings/tokens"
   echo "       Required scopes: repo, read:org"
 fi
@@ -134,7 +136,8 @@ header ".opencode/ plugin dependencies"
 if [[ -d "$ROOT/.opencode/node_modules" ]]; then
   _ok ".opencode/node_modules exists"
 else
-  _fail ".opencode/node_modules missing — run: make setup  (or: npm install --prefix .opencode)"
+  _warn ".opencode/node_modules missing — local plugin unavailable; skip if you connect via external MCPs / desktop app"
+  echo "       To install: run make setup  (or: npm install --prefix .opencode)"
 fi
 
 # ── 7. Skill count sanity ─────────────────────────────────────────────────────
