@@ -10,7 +10,7 @@
 #   4. .env file exists
 #   5. Credentials are optional until a provider operation is requested
 #   6. Optional env vars (with warnings, not failures)
-#   7. .opencode plugin dependency state
+#   7. .opencode plugin dependency state (optional — skip with external MCPs)
 #   8. Skill count sanity (index.yaml vs .opencode/skills/)
 #   9. opencode.json skill paths exist on disk
 #  10. Required runtime directories
@@ -158,7 +158,8 @@ if [[ ! -f "$ROOT/.opencode/package.json" ]]; then
 elif [[ -d "$ROOT/.opencode/node_modules" ]]; then
   _ok ".opencode/node_modules exists"
 else
-  _fail ".opencode/node_modules missing — run: make setup"
+  _warn ".opencode/node_modules missing — local plugin unavailable; skip if you connect via external MCPs / desktop app"
+  echo "       To install: run make setup  (or: npm install --prefix .opencode)"
 fi
 
 # ── 8. Skill count sanity ─────────────────────────────────────────────────────
