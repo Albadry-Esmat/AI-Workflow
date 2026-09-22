@@ -2,7 +2,7 @@ name: Supply Chain Controls
 
 on:
   push:
-    branches: [Dev]
+    branches: [main]
     paths:
       - "package.json"
       - "package-lock.json"
@@ -33,13 +33,13 @@ jobs:
       - name: Checkout AI-Workflow
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: Dev
+          ref: main
 
-      - name: Checkout ASE-OS-Website Dev
+      - name: Checkout ASE-OS-Website main
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: Albadry-Esmat/ASE-OS-Website
-          ref: Dev
+          ref: main
           path: website-repo
 
       - name: Generate CycloneDX SBOM
