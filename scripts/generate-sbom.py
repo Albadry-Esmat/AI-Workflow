@@ -75,12 +75,13 @@ def load_lock(repository: str, lockfile: Path) -> tuple[dict, list[dict], list[d
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--website-root", type=Path, required=True)
+    parser.add_argument("--website-root", type=Path, help="Optionally include a local website checkout")
     parser.add_argument("--output", type=Path, default=Path("artifacts/sbom.cdx.json"))
     args = parser.parse_args()
     source_root = args.source_root.resolve()
-    website_root = args.website_root.resolve()
-    repositories = [("AI-Workflow", source_root / "package-lock.json"), ("ASE-OS-Website", website_root / "package-lock.json")]
+    repositories = [("AI-Workflow", source_root / "package-lock.json")]
+    if args.website_root:
+        repositories.append(("ASE-OS-Website", args.website_root.resolve() / "package-lock.json"))
     components: list[dict] = []
     dependencies: list[dict] = []
     roots = []

@@ -51,15 +51,18 @@ def check_lock(repository: str, manifest_path: Path, lockfile_path: Path) -> lis
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--website-root", type=Path, required=True)
+    parser.add_argument("--website-root", type=Path, help="Optionally include a local website checkout")
     parser.add_argument("--workflow", type=Path, default=Path(".github/workflows"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/dependency-scan.json"))
     args = parser.parse_args()
     source = args.source_root.resolve()
-    website = args.website_root.resolve()
     failures = []
     failures.extend(check_lock("AI-Workflow", source / "package.json", source / "package-lock.json"))
-    failures.extend(check_lock("ASE-OS-Website", website / "package.json", website / "package-lock.json"))
+    lockfiles_checked = [str(source / "package-lock.json")]
+    if args.website_root:
+        website = args.website_root.resolve()
+        failures.extend(check_lock("ASE-OS-Website", website / "package.json", website / "package-lock.json"))
+        lockfiles_checked.append(str(website / "package-lock.json"))
     workflow = (source / args.workflow).resolve() if not args.workflow.is_absolute() else args.workflow.resolve()
     if not workflow.exists():
         failures.append(f"missing workflow path: {workflow}")
@@ -79,7 +82,7 @@ def main() -> int:
         "schema_version": "1.0.0",
         "advisory_source": "offline-lock-integrity",
         "advisory_database_available": False,
-        "lockfiles_checked": [str(source / "package-lock.json"), str(website / "package-lock.json")],
+        "lockfiles_checked": lockfiles_checked,
         "findings": [{"severity": "high", "code": failure} for failure in failures],
         "verdict": "block" if failures else "pass",
         "limitations": ["No online vulnerability advisory database was consulted; npm audit/OSV must run in an environment with advisory access."]
