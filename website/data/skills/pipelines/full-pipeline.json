@@ -1,14 +1,14 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "3.8.0",
-  "description": "Full idea-to-production pipeline (v3.8.0): cost estimate (HITL) → requirements → clarify (HITL) [→ optional spec-debate] [→ optional research artifact] → architecture [→ optional arch-debate] → UX/DB design → design system ∥ dependency graph → impact analysis → task DAG → code generation → guard layer → quality + testing → cross-artifact consistency → RTM → completeness audit → drift detection → defect management (conditional) → deployment → export + docs + post-run cost report",
+  "version": "4.0.0",
+  "description": "Full idea-to-production pipeline (v4.0.0 \u2014 TASK-0073..0080 expansion): cost estimate (HITL) \u2192 requirements \u2192 clarify [\u2192 optional spec-debate] [\u2192 optional pre-arch research] \u2192 architecture [\u2192 optional arch-debate] \u2192 UX/DB design \u2192 design system \u2225 dependency graph \u2192 planning [\u2192 optional dual-model plan-debate consensus] \u2192 phase-4b-research (conditional on uncertainty markers) \u2192 task DAG \u2192 impact analysis \u2192 phase-4c parallel 4-reviewer dispatch \u2192 phase-4d confidence scoring \u2192 phase-4e conditional debate \u2192 phase-4f finding aggregation \u2192 phase-4g change requests \u2192 contract freeze \u2192 phase-4h validation (revision loop, HITL@3) \u2192 code generation \u2192 guard layer \u2192 quality + testing \u2192 cross-artifact consistency \u2192 RTM \u2192 completeness audit \u2192 drift detection \u2192 defect management (conditional) \u2192 deployment \u2192 export + docs + post-run cost report. TASK-0078: reduced to 4 mandatory HITL gates (GATE-001..004). Set hitl_preset:'full' to restore all 18 legacy gates.",
   "mode": "hybrid",
   "phases": [
     {
       "id": "phase-0-cost-estimate",
       "label": "Token Cost Estimate",
-      "note": "FEATURE-018: Pre-run token cost estimate with HITL approval. User approves (YES), rejects (NO — aborts cleanly), or reduces scope (REDUCE). Set pipeline_config.ci_mode: true to skip. Runs as the very first step before any other skill executes.",
+      "note": "FEATURE-018: Pre-run token cost estimate with HITL approval. User approves (YES), rejects (NO \u2014 aborts cleanly), or reduces scope (REDUCE). Set pipeline_config.ci_mode: true to skip. Runs as the very first step before any other skill executes.",
       "skills": [
         {
           "name": "cost-estimator",
@@ -46,10 +46,10 @@
     },
     {
       "id": "phase-1ca-debate-prep",
-      "label": "Debate Preparation — Advocate + Skeptic (parallel)",
+      "label": "Debate Preparation \u2014 Advocate + Skeptic (parallel)",
       "condition": "pipeline_config.debate_requirements === true",
       "parallel": true,
-      "note": "FEATURE-013: Runs two requirement-analyzer instances in parallel — one as advocate (finds opportunities and value) and one as skeptic (challenges assumptions and finds gaps) — to produce the two inputs required by debate-synthesizer. Only active when pipeline_config.debate_requirements: true.",
+      "note": "FEATURE-013: Runs two requirement-analyzer instances in parallel \u2014 one as advocate (finds opportunities and value) and one as skeptic (challenges assumptions and finds gaps) \u2014 to produce the two inputs required by debate-synthesizer. Only active when pipeline_config.debate_requirements: true.",
       "skills": [
         {
           "name": "requirement-analyzer",
@@ -147,7 +147,7 @@
       "id": "phase-2c-design-and-graph",
       "label": "Design System + Dependency Graph",
       "parallel": true,
-      "note": "TASK-0054: design-system-generator and dependency-analyzer have no data dependency on each other — run concurrently to save one sequential phase.",
+      "note": "TASK-0054: design-system-generator and dependency-analyzer have no data dependency on each other \u2014 run concurrently to save one sequential phase.",
       "skills": [
         {
           "name": "design-system-generator",
@@ -163,13 +163,111 @@
     },
     {
       "id": "phase-4-planning",
-      "label": "Planning",
-      "note": "Phase numbering gap: phase-3 is intentionally reserved. The design layer (phase-2b + phase-2c) occupies the logical phase-3 slot. Numbering skips to phase-4 to preserve roadmap compatibility.",
+      "label": "Planning \u2014 Model A (Strategic Planner)",
+      "note": "Phase numbering gap: phase-3 is intentionally reserved. The design layer (phase-2b + phase-2c) occupies the logical phase-3 slot. Numbering skips to phase-4 to preserve roadmap compatibility. When debate_plan is enabled, this phase runs as Model A (Strategic Planner) in parallel with phase-4-planning-b. When debate_plan is false (default), this is the sole planning pass.",
       "skills": [
         {
           "name": "feature-planning",
           "version": "^2.2.0",
-          "max_retries": 2
+          "max_retries": 2,
+          "config": {
+            "instance": "model_a",
+            "system_prompt_prefix_condition": "pipeline_config.debate_plan === true ? 'You are a Strategic Planner. Generate a complete implementation plan optimizing for minimal critical path, strong dependency ordering, and early risk surfacing. Do not reference or access any other model plan.' : null"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4-planning-b",
+      "label": "Planning \u2014 Model B Independent Pass (Pragmatist Planner)",
+      "condition": "pipeline_config.debate_plan === true",
+      "note": "FEATURE-PLAN-DEBATE: Second independent feature-planning pass running in parallel with phase-4-planning. Model B receives identical context (architecture, requirements, design artifacts) but is isolated from Model A output via orchestrator_context_isolation. Produces plan_b consumed by phase-4b-plan-debate.",
+      "skills": [
+        {
+          "name": "feature-planning",
+          "version": "^2.2.0",
+          "max_retries": 2,
+          "config": {
+            "instance": "model_b",
+            "persona": "pragmatist",
+            "orchestrator_context_isolation": {
+              "exclude_phases": [
+                "phase-4-planning"
+              ],
+              "audit_log": true,
+              "audit_entry_format": "{ phase_id, excluded_phases, context_hash_algorithm: 'sha256', context_hash, timestamp }"
+            },
+            "system_prompt_prefix": "You are a Pragmatist Planner. Generate an implementation plan prioritizing: (1) minimal inter-task dependencies to enable parallel delivery, (2) early testability at each milestone, (3) risk-front-loading \u2014 highest-risk tasks first, (4) conservative effort estimates with 1.3x buffer, (5) explicit rollback points for high-risk tasks. Do NOT reference any other plan \u2014 derive only from the provided architecture and requirements."
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4b-plan-debate",
+      "label": "Plan Debate \u2014 Dual-Model Cross-Review and Consensus",
+      "condition": "pipeline_config.debate_plan === true",
+      "note": "FEATURE-PLAN-DEBATE: Symmetric cross-review of plan_a (phase-4-planning) and plan_b (phase-4-planning-b). 10 criteria, max 3 rounds, threshold 0.80. Pass-sticky rule. Per-criterion research escalation on no-movement stalemate (max_concurrent_research: 3). HITL gate if consensus not reached within max_rounds. Produces consensus_plan for downstream phases.",
+      "skills": [
+        {
+          "name": "plan-debate",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "plan_a_source": "phase-4-planning.plan",
+            "plan_b_source": "phase-4-planning-b.plan",
+            "max_rounds": {
+              "$pipeline_param": "plan_debate_max_rounds",
+              "default": 3,
+              "type": "integer",
+              "min": 1,
+              "max": 5
+            },
+            "consensus_threshold": {
+              "$pipeline_param": "plan_debate_consensus_threshold",
+              "default": 0.8,
+              "type": "float",
+              "min": 0.5,
+              "max": 1.0
+            },
+            "research_enabled": {
+              "$pipeline_param": "plan_debate_research_enabled",
+              "default": true,
+              "type": "boolean"
+            },
+            "max_concurrent_research": {
+              "$pipeline_param": "plan_debate_max_concurrent_research",
+              "default": 3,
+              "type": "integer",
+              "min": 1,
+              "max": 10
+            },
+            "research_token_budget_per_criterion": {
+              "$pipeline_param": "plan_debate_research_token_budget",
+              "default": 2000,
+              "type": "integer"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4b-research",
+      "label": "Post-Planning Research (conditional)",
+      "condition": "state.feature_plan.uncertainty_markers.length > 0 || state.feature_plan.new_external_dependencies.length > 0",
+      "note": "TASK-0075 / B-4: Triggered when planner emits uncertainty_markers (values matching /^(TBD|UNVERIFIED|ASSUMPTION|UNCLEAR|NEEDS_RESEARCH)$/i) OR new_external_dependencies is non-empty. Produces research_appendix artifact. Reviewers in phase-4c-reviewer-dispatch receive research_appendix as injected context.",
+      "skills": [
+        {
+          "name": "research-artifact",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "mode": "post_planning",
+            "input_source": "feature_plan",
+            "uncertainty_markers_path": "feature_plan.uncertainty_markers",
+            "new_external_dependencies_path": "feature_plan.new_external_dependencies",
+            "output_artifact": "research_appendix",
+            "output_schema": "skills/schema/research-appendix.schema.json"
+          }
         }
       ]
     },
@@ -182,6 +280,307 @@
           "name": "task-dag",
           "version": "^1.0.0",
           "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-4c-reviewer-dispatch",
+      "label": "Specialized Review \u2014 4 Parallel Reviewers",
+      "condition": "pipeline_config.pipeline_mode === 'specialized_review'",
+      "parallel": true,
+      "note": "TASK-0071: Dispatches 4 specialized reviewer skills in parallel. Each receives plan_draft + research_appendix (when available from phase-4b-research). Each emits ReviewFinding[] validated against skills/schema/review-finding.schema.json. Orchestrator strips proposed_plan field if present and logs guardrail_violation. pipeline_mode defaults to legacy_dual_planner when not set.",
+      "skills": [
+        {
+          "name": "architecture-reviewer",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "guardrail": "strip_proposed_plan",
+            "inject_research_appendix": true
+          }
+        },
+        {
+          "name": "security-reviewer",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "guardrail": "strip_proposed_plan",
+            "inject_research_appendix": true
+          }
+        },
+        {
+          "name": "performance-reviewer",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "guardrail": "strip_proposed_plan",
+            "inject_research_appendix": true
+          }
+        },
+        {
+          "name": "maintainability-reviewer",
+          "version": "^1.0.0",
+          "max_retries": 2,
+          "config": {
+            "guardrail": "strip_proposed_plan",
+            "inject_research_appendix": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4d-confidence-scoring",
+      "label": "Section-Level Confidence Scoring",
+      "note": "TASK-0079: Deterministic (no LLM). Consumes all ReviewFindings from phase-4c-reviewer-dispatch. Computes per-section confidence = max(0.0, 1.0 - sum_of_penalties). Penalty table: critical=0.30, high=0.15, medium=0.05, low=0.02, info=0.00. plan_confidence = min(section.confidence) over non-outlier sections (sections with confidence >= confidence_floor; default floor=0.3). Produces confidence_report artifact. Feeds phase-4e trigger and phase-4h HC-07.",
+      "skills": [
+        {
+          "name": "confidence-scorer",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "penalty_table": {
+              "critical": 0.3,
+              "high": 0.15,
+              "medium": 0.05,
+              "low": 0.02,
+              "info": 0.0
+            },
+            "confidence_floor": {
+              "$pipeline_param": "confidence_floor",
+              "default": 0.3,
+              "type": "float",
+              "min": 0.0,
+              "max": 1.0
+            },
+            "input_source": "phase-4c-reviewer-dispatch.findings",
+            "output_artifact": "confidence_report",
+            "output_schema": "skills/schema/confidence-report.schema.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4e-conditional-debate",
+      "label": "Scoped Debate (conditional)",
+      "condition": "confidence_report.debate_trigger_sections.length > 0 || phase_outputs['phase-4f-finding-aggregation'].review_report.requires_debate_count > 0",
+      "note": "TASK-0074: Three trigger conditions evaluated deterministically before debate invocation. T1 (contradictory reviewers): two findings share same section_id AND their issue_fingerprints match AND reviewer A severity is critical/high while reviewer B severity is low/info (or vice versa). T2 (low confidence): confidence_report has sections with confidence < 0.5. T3 (critical volume): review_report critical findings count > pipeline_config.debate_critical_threshold (default 3). When triggered, debate receives ONLY the flagged section context, not the full plan. When not triggered, emits debate_skipped event conforming to debate-skipped-event.schema.json.",
+      "config": {
+        "trigger_conditions": {
+          "T1_contradictory_reviewers": {
+            "description": "Two findings share section_id AND issue_fingerprint match AND one has severity in [critical,high] while the other has severity in [low,info].",
+            "input": "phase-4c-reviewer-dispatch.findings",
+            "match_field": "issue_fingerprint",
+            "severity_group_A": [
+              "critical",
+              "high"
+            ],
+            "severity_group_B": [
+              "low",
+              "info"
+            ]
+          },
+          "T2_low_confidence_sections": {
+            "description": "Any section in confidence_report has confidence < 0.5.",
+            "input": "confidence_report.sections",
+            "threshold": 0.5
+          },
+          "T3_critical_findings_threshold": {
+            "description": "Total critical-severity findings across all reviewers exceeds threshold.",
+            "input": "phase-4c-reviewer-dispatch.findings",
+            "severity_filter": "critical",
+            "threshold": {
+              "$pipeline_param": "debate_critical_threshold",
+              "default": 3,
+              "type": "integer",
+              "min": 1
+            }
+          }
+        },
+        "scoped_context_policy": "flagged_sections_only",
+        "debate_skipped_schema": "skills/schema/debate-skipped-event.schema.json"
+      },
+      "skills": [
+        {
+          "name": "multi-agent-debate",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "scope": "flagged_sections",
+            "flagged_sections_source": "confidence_report.debate_trigger_sections",
+            "context_injection": [
+              "confidence_report",
+              "phase-4c-reviewer-dispatch.findings"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4f-finding-aggregation",
+      "label": "Finding Aggregation + Deduplication",
+      "note": "TASK-0071: Aggregates all ReviewFindings from phase-4c-reviewer-dispatch. Computes issue_fingerprint (sha256(title+'|'+section_id+'|'+reviewer_type)[0:16]) for any finding missing it. Deduplicates by issue_fingerprint: when multiple reviewers emit semantically-equivalent findings (same fingerprint), retain the highest-severity instance and append others as duplicates. Sets requires_debate=true on contradiction pairs. Produces review_report artifact.",
+      "skills": [
+        {
+          "name": "finding-aggregator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "input_source": "phase-4c-reviewer-dispatch",
+            "fingerprint_algorithm": "sha256-title-section-reviewer-16hex",
+            "dedup_policy": "keep_highest_severity",
+            "output_artifact": "review_report"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4g-change-requests",
+      "label": "Change Request Generation (conditional)",
+      "condition": "review_report.findings.filter(f => f.severity === 'critical' || f.severity === 'high').length > 0",
+      "note": "TASK-0077: For each critical or high finding, generates a change-request conforming to change-request.schema.json. Change requests reference finding_id and are linked to plan sections. Consumed by phase-4h validation and phase-contract-freeze.",
+      "skills": [
+        {
+          "name": "change-request-handler",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "input_source": "review_report.findings",
+            "severity_filter": [
+              "critical",
+              "high"
+            ],
+            "output_schema": "skills/schema/change-request.schema.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4h-validation",
+      "label": "Objective Validation Checklist (deterministic)",
+      "note": "TASK-0073: Pure-logic validation engine \u2014 no LLM call. Evaluates 7 hard checks and 6 soft checks against the plan and review artifacts. Produces validation_result conforming to validation-result.schema.json. Verdict: APPROVED (all hard pass, no soft warnings), CONDITIONALLY_APPROVED (all hard pass, \u22651 soft warning), REJECTED (\u22651 hard failure). On REJECTED: returns plan to planner, increments revision_count. When revision_count reaches 3, escalates to HITL gate GATE-ESC-001.",
+      "skills": [
+        {
+          "name": "validation-checklist-engine",
+          "version": "^1.0.0",
+          "max_retries": 0,
+          "config": {
+            "hard_checks": [
+              {
+                "id": "HC-01",
+                "name": "All tasks have unique IDs",
+                "condition": "plan.tasks.map(t=>t.id).every((id,i,arr)=>arr.indexOf(id)===i)",
+                "fail_message": "Duplicate task IDs detected. IDs must be globally unique within the plan."
+              },
+              {
+                "id": "HC-02",
+                "name": "All tasks reference \u22651 requirement",
+                "condition": "plan.tasks.every(t => t.req_ids && t.req_ids.length >= 1)",
+                "fail_message": "One or more tasks have no req_ids mapping. Every task must trace to at least one requirement."
+              },
+              {
+                "id": "HC-03",
+                "name": "No circular task dependencies",
+                "condition": "dag_is_acyclic(plan.tasks)",
+                "fail_message": "Circular dependency detected in task dependency graph. The task DAG must be acyclic."
+              },
+              {
+                "id": "HC-04",
+                "name": "All critical review findings resolved",
+                "condition": "review_report.findings.filter(f=>f.severity==='critical' && !f.resolved_by_change_request).length === 0",
+                "fail_message": "One or more critical-severity findings are unresolved (no resolved_by_change_request). All critical findings must have a linked change request before validation passes."
+              },
+              {
+                "id": "HC-05",
+                "name": "Plan hash integrity",
+                "condition": "sha256_rfc8785(plan) === implementation_contract.plan_hash",
+                "fail_message": "Plan hash mismatch. The plan was mutated after contract freeze without an authorized change request. Recompute contract hash or submit a change request."
+              },
+              {
+                "id": "HC-06",
+                "name": "All modules have defined public APIs",
+                "condition": "implementation_contract.module_contracts.every(m => m.public_api && m.public_api.length >= 1)",
+                "fail_message": "One or more module contracts have an empty public_api. Every module must export at least one symbol."
+              },
+              {
+                "id": "HC-07",
+                "name": "No zero-confidence sections",
+                "condition": "confidence_report.validation_block_sections.length === 0",
+                "fail_message": "One or more plan sections have confidence=0.0 (maximum penalties applied from critical+high findings). These sections must be revised before proceeding. Affected sections: {confidence_report.validation_block_sections}."
+              }
+            ],
+            "soft_checks": [
+              {
+                "id": "SC-IQ-01",
+                "subgroup": "input_quality",
+                "name": "Research appendix covers all uncertainty markers",
+                "condition": "!state.feature_plan.uncertainty_markers || state.feature_plan.uncertainty_markers.length === 0 || research_appendix.uncertainty_resolutions.every(r => r.resolution_status !== 'unresolvable')",
+                "warning_message": "One or more uncertainty markers could not be resolved. Reviewers may have based findings on unresolved assumptions."
+              },
+              {
+                "id": "SC-IQ-02",
+                "subgroup": "input_quality",
+                "name": "All new external dependencies assessed",
+                "condition": "research_appendix.dependency_assessments.every(d => d.recommendation !== 'rejected')",
+                "warning_message": "One or more new external dependencies are flagged as rejected. Review dependency_assessments in research_appendix before proceeding."
+              },
+              {
+                "id": "SC-IQ-03",
+                "subgroup": "input_quality",
+                "name": "Plan confidence above advisory threshold",
+                "condition": "confidence_report.plan_confidence >= 0.5",
+                "warning_message": "Overall plan confidence is below 0.5. High volume of medium/high findings present. Consider additional revision before proceeding."
+              },
+              {
+                "id": "SC-OQ-01",
+                "subgroup": "output_quality",
+                "name": "All high-severity findings have change requests",
+                "condition": "review_report.findings.filter(f=>f.severity==='high' && !f.resolved_by_change_request).length === 0",
+                "warning_message": "One or more high-severity findings lack a change request. These will become technical debt items if not addressed."
+              },
+              {
+                "id": "SC-OQ-02",
+                "subgroup": "output_quality",
+                "name": "Debate outcome (when debate ran) produced consensus",
+                "condition": "!phase_outputs['phase-4e-conditional-debate'] || phase_outputs['phase-4e-conditional-debate'].debate_outcome === 'consensus_reached'",
+                "warning_message": "Debate ran but did not reach consensus on all flagged sections. Human review recommended before code generation."
+              },
+              {
+                "id": "SC-OQ-03",
+                "subgroup": "output_quality",
+                "name": "No sections have confidence in range [confidence_floor, 0.5)",
+                "condition": "confidence_report.sections.filter(s => s.confidence >= confidence_report.confidence_floor && s.confidence < 0.5).length === 0",
+                "warning_message": "Some sections have confidence between floor and 0.5 (borderline quality). These sections may generate suboptimal code. Review before proceeding."
+              }
+            ],
+            "revision_loop": {
+              "on_rejected": "return_to_planner",
+              "increment_field": "revision_count",
+              "max_revisions_before_hitl": 3,
+              "hitl_gate_id": "GATE-ESC-001"
+            },
+            "output_artifact": "validation_result",
+            "output_schema": "skills/schema/validation-result.schema.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4i-contract-freeze",
+      "label": "Implementation Contract Freeze",
+      "condition": "pipeline_config.pipeline_mode === 'specialized_review' && (phase_outputs['phase-4h-validation'].verdict === 'APPROVED' || phase_outputs['phase-4h-validation'].verdict === 'CONDITIONALLY_APPROVED')",
+      "note": "TASK-0076: Generates an immutable ImplementationContract after validation passes. contract_id = UUIDv4. plan_hash = sha256_rfc8785(canonical_plan). Per-section content_hash = sha256_rfc8785(section). expiry = approved_at + 72h. implementation_rules[] derived from open critical/high findings + security constraints. Stored at artifacts/contracts/contract-{contract_id}.json (append-only). Implementation agents must validate contract before generating any code. After GATE-003 human_approval, contract is cosigned by human reviewer.",
+      "skills": [
+        {
+          "name": "contract-freezer",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "config": {
+            "hash_algorithm": "sha256-rfc8785",
+            "expiry_hours": 72,
+            "contract_schema": "skills/schema/implementation-contract.schema.json",
+            "storage_path": "artifacts/contracts/contract-{contract_id}.json",
+            "immutable": true
+          }
         }
       ]
     },
@@ -237,7 +636,7 @@
     {
       "id": "phase-7a-rtm",
       "label": "Requirements Traceability Matrix",
-      "note": "FEATURE-014: Builds RTM linking REQ → ADR → TEST → TASK. Writes artifacts/rtm-<timestamp>.md and .json for implementation-completeness-auditor consumption.",
+      "note": "FEATURE-014: Builds RTM linking REQ \u2192 ADR \u2192 TEST \u2192 TASK. Writes artifacts/rtm-<timestamp>.md and .json for implementation-completeness-auditor consumption.",
       "skills": [
         {
           "name": "traceability-matrix",
@@ -298,7 +697,7 @@
     {
       "id": "phase-8-repair",
       "label": "Repair (conditional)",
-      "condition": "test.failed OR build.broken",
+      "condition": "test.failed || build.broken",
       "skills": [
         {
           "name": "code-repair",
@@ -321,7 +720,7 @@
     {
       "id": "phase-8b-drift",
       "label": "Drift Detection",
-      "note": "FEATURE-015: Compares spec-latest.md (FEATURE-007) against working tree. Produces drift score (0–100); warns if < 70 (configurable). Writes artifacts/drift-report-<timestamp>.md. Does not block pipeline — advisory only.",
+      "note": "FEATURE-015: Compares spec-latest.md (FEATURE-007) against working tree. Produces drift score (0\u2013100); warns if < 70 (configurable). Writes artifacts/drift-report-<timestamp>.md. Does not block pipeline \u2014 advisory only.",
       "skills": [
         {
           "name": "drift-detector",
@@ -345,7 +744,7 @@
     {
       "id": "phase-8d-defect-management",
       "label": "Defect Management (conditional)",
-      "condition": "defects_detected === true OR missings_count > 0",
+      "condition": "defects_detected === true || missings_count > 0",
       "skills": [
         {
           "name": "defect-manager",
@@ -398,7 +797,7 @@
       "id": "phase-10c-cost-report",
       "label": "Post-Run Cost Report",
       "async": true,
-      "note": "FEATURE-018: Invokes cost-estimator in post_run mode to emit an actual vs. estimated token usage report. Runs asynchronously after all pipeline phases complete — does not block pipeline result.",
+      "note": "FEATURE-018: Invokes cost-estimator in post_run mode to emit an actual vs. estimated token usage report. Runs asynchronously after all pipeline phases complete \u2014 does not block pipeline result.",
       "skills": [
         {
           "name": "cost-estimator",
@@ -414,6 +813,10 @@
   ],
   "parallel_groups": [
     [
+      "phase-4-planning",
+      "phase-4-planning-b"
+    ],
+    [
       "requirement-analyzer:advocate",
       "requirement-analyzer:skeptic"
     ],
@@ -424,6 +827,12 @@
     [
       "design-system-generator",
       "dependency-analyzer"
+    ],
+    [
+      "architecture-reviewer",
+      "security-reviewer",
+      "performance-reviewer",
+      "maintainability-reviewer"
     ],
     [
       "clean-code-review",
@@ -441,113 +850,190 @@
   ],
   "gates": [
     {
+      "gate_id": "GATE-001",
       "after_phase": "phase-0-cost-estimate",
-      "type": "condition",
-      "condition": "phase_outputs['phase-0-cost-estimate'].approval_status !== 'rejected'",
-      "label": "Abort pipeline if user rejected the cost estimate"
-    },
-    {
-      "after_phase": "phase-1-requirements",
       "type": "human_approval",
-      "label": "Validate requirements scope with stakeholder",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-1b-clarify",
-      "type": "condition",
-      "label": "Auto-advance if no clarifications needed; otherwise HITL gate already handled inside clarify skill",
-      "condition": "true"
-    },
-    {
-      "after_phase": "phase-1c-spec-debate",
-      "type": "human_approval",
-      "condition": "pipeline_config.debate_requirements === true",
-      "label": "Review spec debate transcript and approve unified requirements before architecture begins",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-1d-research",
-      "type": "condition",
-      "condition": "true",
-      "label": "Auto-advance — research-artifact skill manages its own HITL review gate internally"
-    },
-    {
-      "after_phase": "phase-2-architecture",
-      "type": "human_approval",
-      "label": "Sign off on architecture before design layer",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-2a-debate",
-      "type": "human_approval",
-      "condition": "pipeline_config.debate_architecture === true",
-      "label": "Review debate transcript and approve hardened architecture before design layer",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-2b-design",
-      "type": "human_approval",
-      "label": "Approve UX architecture and database schema before design system generation",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-2c-design-and-graph",
-      "type": "human_approval",
-      "label": "Approve design system token files and dependency graph before planning",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-7-quality",
-      "type": "human_approval",
-      "label": "Approve security posture and coverage before RTM and audit",
-      "timeout": 3600
-    },
-    {
-      "after_phase": "phase-7a-rtm",
-      "type": "condition",
-      "label": "Block if RTM overall_rtm_score < 60 — insufficient REQ coverage before guards",
-      "condition": "phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score >= 60"
-    },
-    {
-      "after_phase": "phase-7b-consistency",
-      "type": "human_approval",
-      "condition": "phase_outputs['phase-7b-consistency'].verdict === 'block'",
-      "label": "Consistency violations found — review and reply OVERRIDE <reason> to proceed, or fix violations and re-run",
+      "label": "GATE-001: Cost estimate approval \u2014 approve (YES), reject (NO \u2014 aborts), or reduce scope (REDUCE). Mandatory, non-bypassable.",
       "timeout": 3600,
       "bypass_on_timeout": false,
-      "re_invoke_on_pattern": {
-        "pattern": "^OVERRIDE\\s+(.+)$",
-        "skill": "cross-artifact-consistency",
-        "inject": { "override_approved": true, "override_reason": "$1" }
-      }
+      "choices": [
+        "YES",
+        "NO",
+        "REDUCE"
+      ],
+      "on_choice": {
+        "NO": {
+          "action": "abort_pipeline",
+          "reason": "User rejected cost estimate."
+        },
+        "REDUCE": {
+          "action": "invoke_scope_reduction",
+          "skill": "cost-estimator",
+          "config": {
+            "mode": "scope_reduction"
+          }
+        }
+      },
+      "skip_condition": "pipeline_config.ci_mode === true",
+      "skip_log_reason": "ci_mode_cost_gate_bypass",
+      "note": "TASK-0078: Legacy gate IDs replaced: GATE-COST-ESTIMATE, GATE-0-COST. Set hitl_preset:'full' to restore original behavior."
     },
     {
-      "after_phase": "phase-7b-guards",
-      "type": "condition",
-      "label": "Block if any guard verdict is 'block'",
-      "condition": "guards.every(g => g.verdict === 'pass')"
-    },
-    {
-      "after_phase": "phase-8c-release-guard",
-      "type": "condition",
-      "label": "Block if completeness guard verdict is 'block'",
-      "condition": "release_guard.verdict === 'pass'"
-    },
-    {
-      "after_phase": "phase-8d-defect-management",
+      "gate_id": "GATE-002",
+      "after_phase": "phase-4h-validation",
       "type": "human_approval",
-      "condition": "defects_detected === true OR missings_count > 0",
-      "label": "Defect triage: confirm priority, severity, and assignment before repair chain is generated (conditional \u2014 only when defects or missings detected)",
-      "timeout": 3600
+      "label": "GATE-002: Validation + review gate. Triggered ONLY when hard check failures exist OR critical findings are unresolved. Human sees: validation_result.hard_check_failures, review_report.findings[severity=critical], confidence_report.plan_confidence. Choices: APPROVE (proceed to code generation), REVISE (return to planner \u2014 does not consume a revision slot), REJECT (abort).",
+      "condition": "validation_result.hard_check_failures.length > 0 || review_report.findings.filter(f => f.severity === 'critical').length > 0",
+      "timeout": 7200,
+      "bypass_on_timeout": false,
+      "choices": [
+        "APPROVE",
+        "REVISE",
+        "REJECT"
+      ],
+      "on_choice": {
+        "REVISE": {
+          "action": "return_to_phase",
+          "target_phase": "phase-4-planning",
+          "increment_revision_count": false
+        },
+        "REJECT": {
+          "action": "abort_pipeline",
+          "reason": "Human rejected plan after validation failures."
+        }
+      },
+      "artifacts_presented": [
+        "validation_result",
+        "review_report",
+        "confidence_report",
+        "research_appendix"
+      ],
+      "note": "TASK-0078: Replaces gates after phase-2-architecture, phase-2a-debate, phase-2b-design, phase-2c-design-and-graph, phase-5-impact, phase-7-quality (6 legacy gates consolidated)."
     },
     {
+      "gate_id": "GATE-ESC-001",
+      "after_phase": "phase-4h-validation",
+      "type": "human_approval",
+      "label": "GATE-ESC-001: Revision limit escalation. Triggered when revision_count reaches 3 (three REJECTED cycles without passing validation). Human sees: full revision_history, all hard_check_failures across all revision rounds, and debate transcripts if available. Choices: FORCE_PROCEED (override all failures \u2014 requires written justification), ABORT, EXTEND_REVISIONS (grants 2 additional revision rounds).",
+      "condition": "validation_result.revision_count >= 3 && validation_result.verdict === 'REJECTED'",
+      "timeout": 0,
+      "bypass_on_timeout": false,
+      "choices": [
+        "FORCE_PROCEED",
+        "ABORT",
+        "EXTEND_REVISIONS"
+      ],
+      "on_choice": {
+        "FORCE_PROCEED": {
+          "action": "proceed_to_phase",
+          "target_phase": "phase-6-execution",
+          "require_justification": true,
+          "justification_min_length": 50,
+          "log_override": true
+        },
+        "ABORT": {
+          "action": "abort_pipeline",
+          "reason": "Human aborted after repeated validation failure."
+        },
+        "EXTEND_REVISIONS": {
+          "action": "set_state",
+          "state_delta": {
+            "validation_result.revision_count": "validation_result.revision_count - 2"
+          },
+          "then": "return_to_phase",
+          "target_phase": "phase-4-planning"
+        }
+      },
+      "artifacts_presented": [
+        "validation_result.revision_history",
+        "review_report",
+        "confidence_report",
+        "phase_outputs['phase-4e-conditional-debate']"
+      ],
+      "note": "TASK-0073: Resolves B-4 dangling state machine ISS-004. This gate is the only HITL escalation point for the validation revision loop."
+    },
+    {
+      "gate_id": "GATE-003",
+      "after_phase": "phase-8c-release-guard",
+      "type": "human_approval",
+      "label": "GATE-003: Release readiness gate. Triggered when completeness guard verdict is 'block' OR RTM overall_rtm_score < 60 OR defects_detected. Human sees: completeness audit score, RTM coverage, open defects. Choices: APPROVE_RELEASE, DEFER (creates backlog items for gaps), BLOCK.",
+      "condition": "release_guard.verdict === 'block' || phase_outputs['phase-7a-rtm'].coverage_scores.overall_rtm_score < 60 || defects_detected === true",
+      "timeout": 7200,
+      "bypass_on_timeout": false,
+      "choices": [
+        "APPROVE_RELEASE",
+        "DEFER",
+        "BLOCK"
+      ],
+      "on_choice": {
+        "APPROVE_RELEASE": {
+          "action": "proceed_to_phase",
+          "target_phase": "phase-9-deploy",
+          "log_override": true
+        },
+        "DEFER": {
+          "action": "proceed_to_phase",
+          "target_phase": "phase-9-deploy",
+          "create_backlog_items": true
+        },
+        "BLOCK": {
+          "action": "abort_pipeline",
+          "reason": "Human blocked release due to completeness/quality gaps."
+        }
+      },
+      "artifacts_presented": [
+        "phase_outputs['phase-8b-audit']",
+        "phase_outputs['phase-7a-rtm']",
+        "phase_outputs['phase-8d-defect-management']"
+      ],
+      "note": "TASK-0078: Replaces gates after phase-7a-rtm, phase-7b-consistency, phase-7b-guards, phase-8b-audit, phase-8b-drift, phase-8c-release-guard, phase-8d-defect-management (7 legacy gates consolidated)."
+    },
+    {
+      "gate_id": "GATE-004",
       "after_phase": "phase-9-deploy",
       "type": "human_approval",
-      "label": "Mandatory deployment approval \u2014 non-bypassable",
+      "label": "GATE-004: Mandatory deployment approval \u2014 non-bypassable. No timeout. Human must explicitly approve before deployment executes.",
+      "timeout": 0,
       "bypass_on_timeout": false,
-      "timeout": 0
+      "choices": [
+        "APPROVE_DEPLOY",
+        "REJECT_DEPLOY"
+      ],
+      "on_choice": {
+        "REJECT_DEPLOY": {
+          "action": "abort_pipeline",
+          "reason": "Deployment rejected by human."
+        }
+      },
+      "note": "TASK-0078: Replaces legacy gate after phase-9-deploy. Mandatory, no bypass, no timeout."
     }
   ],
+  "hitl_presets": {
+    "full": {
+      "description": "Restores all 18 legacy HITL gates. Use in environments requiring maximum human oversight. Set pipeline_config.hitl_preset:'full' to activate.",
+      "restores_gate_ids": [
+        "GATE-COST-ESTIMATE",
+        "GATE-REQ-SCOPE",
+        "GATE-CLARIFY-AUTO",
+        "GATE-SPEC-DEBATE",
+        "GATE-RESEARCH-AUTO",
+        "GATE-ARCH-SIGNOFF",
+        "GATE-ARCH-DEBATE",
+        "GATE-DESIGN-UX-DB",
+        "GATE-DESIGN-SYSTEM-GRAPH",
+        "GATE-PLAN-DEBATE",
+        "GATE-PLAN-IMPACT",
+        "GATE-QUALITY-SECURITY",
+        "GATE-RTM-SCORE",
+        "GATE-CONSISTENCY-OVERRIDE",
+        "GATE-GUARDS-VERDICT",
+        "GATE-RELEASE-COMPLETENESS",
+        "GATE-DEFECT-TRIAGE",
+        "GATE-DEPLOY-APPROVAL"
+      ],
+      "note": "When hitl_preset:'full' is active, GATE-001..004 are superseded by the 18 legacy gates. The 4 mandatory gates are included within the 18."
+    }
+  },
   "recovery": {
     "on_critical_failure": "rollback-manager",
     "max_repair_iterations": 3,
@@ -557,8 +1043,7 @@
     "documentation-generator",
     "doc-maintainer",
     "adr-generator",
-    "work-item-exporter",
-    "cost-estimator"
+    "work-item-exporter"
   ],
   "token_policy": {
     "auto_compress": true,
@@ -593,6 +1078,7 @@
       "work-item-exporter",
       "behavioral-telemetry-collector"
     ],
-    "comment": "Set enabled:true to route eligible non-blocking skills through an async batch endpoint. NOTE: The github-copilot/claude-sonnet-4.6 model does not expose a batch API — this policy is reserved for future use when the runtime supports async batch processing. Never enable for skills in a gate dependency chain — orchestrator Step 3k enforces this and overrides to sync_override with a warning."
-  }
+    "comment": "Set enabled:true to route eligible non-blocking skills through an async batch endpoint. NOTE: The github-copilot/claude-sonnet-4.6 model does not expose a batch API \u2014 this policy is reserved for future use when the runtime supports async batch processing. Never enable for skills in a gate dependency chain \u2014 orchestrator Step 3k enforces this and overrides to sync_override with a warning."
+  },
+  "_async_skills_note": "cost-estimator is NOT listed here \u2014 phase-0 is synchronous/blocking; phase-10c has async:true in its skill config directly."
 }
