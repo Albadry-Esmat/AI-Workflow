@@ -28,36 +28,20 @@ permissions:
 jobs:
   supply-chain:
     name: Lockfile, SBOM, and immutable-action checks
-    # Cross-repository credentials are intentionally unavailable to Dependabot
-    # pull requests. Run the private companion-repository checks only on trusted
-    # main pushes or an explicitly invoked workflow.
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout AI-Workflow
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: main
-
-      - name: Checkout ASE-OS-Website main
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: Albadry-Esmat/ASE-OS-Website
-          ref: main
-          token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
-          path: website-repo
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Generate CycloneDX SBOM
-        run: python3 scripts/generate-sbom.py --website-root website-repo
+        run: python3 scripts/generate-sbom.py
 
       - name: Run offline-safe supply-chain scan
-        run: python3 scripts/scan-supply-chain.py --website-root website-repo
+        run: python3 scripts/scan-supply-chain.py
 
       - name: Run AI-Workflow npm audit
-        run: npm audit --package-lock-only --audit-level=high
-
-      - name: Run ASE-OS-Website npm audit
-        working-directory: website-repo
         run: npm audit --package-lock-only --audit-level=high
 
       - name: Validate supply-chain policy and generated artifacts
