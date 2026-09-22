@@ -76,6 +76,10 @@
             "type": "string",
             "description": "Optional human-readable annotation for this phase. Shown in progress UIs and pipeline documentation."
           },
+          "config": {
+            "type": "object",
+            "description": "Phase-level runtime configuration, such as deterministic trigger definitions for conditional phases."
+          },
           "skills": {
             "type": "array",
             "minItems": 1,
@@ -210,6 +214,23 @@
           "description": "Human-readable note for pipeline maintainers."
         }
       }
+    },
+    "hitl_presets": {
+      "type": "object",
+      "description": "Named human-oversight presets selected explicitly by the runtime.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string" },
+          "restores_gate_ids": { "type": "array", "items": { "type": "string" } },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "_async_skills_note": {
+      "type": "string",
+      "description": "Maintainer-only explanation of async routing decisions; not runtime input."
     }
   },
   "oneOf": [
@@ -286,6 +307,11 @@
         "properties": { "bypass_on_timeout": { "const": false } }
       },
       "properties": {
+        "gate_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9-]*$",
+          "description": "Stable identifier for audit, reporting, and preset selection."
+        },
         "after_skill": {
           "type": "string",
           "description": "Gate fires after this skill name completes (flat pipeline format)."
@@ -321,6 +347,33 @@
         "note": {
           "type": "string",
           "description": "Optional human-readable annotation for this gate. Shown in pipeline documentation and approval UIs."
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Explicit user choices accepted by a human-approval gate."
+        },
+        "on_choice": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "description": "Runtime action configuration for the corresponding user choice."
+          },
+          "description": "Choice-to-action map interpreted by the orchestrator."
+        },
+        "skip_condition": {
+          "type": "string",
+          "description": "Expression that explicitly skips a gate, for example in CI mode."
+        },
+        "skip_log_reason": {
+          "type": "string",
+          "description": "Audit reason recorded when skip_condition is true."
+        },
+        "artifacts_presented": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Artifact references that must be shown to the human approver."
         },
         "re_invoke_on_pattern": {
           "type": "object",

@@ -57,7 +57,7 @@ cd /path/to/your-project
 opencode
 ```
 
-This copies `opencode.json`, `.opencode/` (all 113 skills + 19 agents), and your `.env` configuration into the target project. Review the target project’s `.env` separately and use short-lived, least-privilege credentials; do not copy personal tokens into a new project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
+This copies `opencode.json`, `.opencode/` (all 119 skills + 19 agents), and your `.env` configuration into the target project. Review the target project’s `.env` separately and use short-lived, least-privilege credentials; do not copy personal tokens into a new project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
 
 ---
 

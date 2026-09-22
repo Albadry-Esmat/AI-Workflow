@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/implementation-contract.schema.json",
+  "title": "ImplementationContract",
+  "description": "Frozen implementation contract produced at phase-4i-contract-freeze (TASK-0076). Immutable once issued. Downstream skills validate this before generating code. All hash fields use RFC 8785 canonical form before SHA-256.",
+  "x-hash-algorithm": "sha256-rfc8785",
+  "x-hash-note": "All fields annotated x-hash-algorithm='sha256-rfc8785': (1) serialize source to RFC 8785 JSON Canonical Form (sorted keys, no whitespace, per IETF RFC 8785); (2) UTF-8 encode; (3) SHA-256; (4) lowercase hex. Do NOT use JSON.stringify() without key-sorting.",
+  "type": "object",
+  "required": [
+    "contract_id",
+    "version",
+    "status",
+    "plan_hash",
+    "content_hash",
+    "sections",
+    "approved_at",
+    "expiry",
+    "locked_by_phase",
+    "plan_snapshot",
+    "module_contracts",
+    "implementation_rules",
+    "change_requests",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v4. Generated at contract freeze time. Immutable."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Contract version. Starts at 1. Incremented by change-request-handler on each approved change request."
+    },
+    "supersedes_contract_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "default": null,
+      "description": "contract_id of the prior version this contract supersedes. Null for version 1."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "superseded", "expired", "revoked"],
+      "description": "active: valid for implementation. superseded: replaced by newer version via approved CR. expired: past 72h expiry. revoked: invalidated by critical failure or manual override."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.2.0",
+      "description": "Schema version. 1.2.0 adds version, status, sections, expiry, approved_at, supersedes_contract_id, implementation_rules, change_requests fields."
+    },
+    "plan_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "x-hash-algorithm": "sha256-rfc8785",
+      "x-hash-source": "plan_snapshot",
+      "description": "SHA-256 of plan_snapshot serialized in RFC 8785 canonical form. Detects plan mutations after freeze."
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "x-hash-algorithm": "sha256-rfc8785",
+      "x-hash-source": "{ module_contracts, interface_contracts }",
+      "description": "SHA-256 of module_contracts + interface_contracts object in RFC 8785 canonical form. Detects contract drift."
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Per-section contract entries. One entry per plan section at freeze time.",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "section_title", "content_hash", "confidence", "status", "locked_at"],
+        "additionalProperties": false,
+        "properties": {
+          "section_id": {
+            "type": "string",
+            "description": "Section identifier from the plan."
+          },
+          "section_title": {
+            "type": "string",
+            "description": "Human-readable section title."
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "x-hash-algorithm": "sha256-rfc8785",
+            "description": "SHA-256 of this section's canonical content at freeze time. Allows per-section drift detection."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Section confidence score from phase-4d-confidence-scoring at freeze time."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["approved", "conditionally_approved", "needs_attention"],
+            "description": "Section approval status at freeze time."
+          },
+          "open_findings": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": [],
+            "description": "finding_ids of open findings on this section at freeze time. Non-empty only for conditionally_approved sections."
+          },
+          "locked_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when this section was frozen."
+          },
+          "amended_at": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "default": null,
+            "description": "Timestamp when this section was last amended via an approved change request."
+          },
+          "amended_by_cr": {
+            "type": ["string", "null"],
+            "pattern": "^CR-[0-9a-f]{8}-[0-9]{3}$",
+            "default": null,
+            "description": "CR ID that last amended this section."
+          }
+        }
+      }
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when validation passed and contract was frozen. Set exclusively by phase-4i-contract-freeze at HITL gate-close — never by caller input."
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime: approved_at + 72 hours. After expiry, implementation agents must request contract renewal. Status transitions to 'expired' automatically."
+    },
+    "locked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the contract was frozen. Same as approved_at for initial version."
+    },
+    "locked_by_phase": {
+      "type": "string",
+      "description": "Phase ID that triggered the freeze. Expected value: 'phase-4i-contract-freeze'."
+    },
+    "plan_snapshot": {
+      "type": "object",
+      "description": "Verbatim copy of the consensus_plan (or feature_plan when debate_plan=false) at freeze time. Immutable."
+    },
+    "module_contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/module_contract" },
+      "description": "Per-module interface contracts frozen at this point."
+    },
+    "interface_contracts": {
+      "type": "array",
+      "default": [],
+      "items": { "$ref": "#/$defs/interface_contract" },
+      "description": "Cross-module interface contracts (APIs, event schemas, shared types). Optional."
+    },
+    "implementation_rules": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Non-negotiable rules implementation agents must follow. Derived from open critical/high findings, security constraints, and architecture decisions.",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "rule_text", "source", "enforcement"],
+        "additionalProperties": false,
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "pattern": "^RULE-[0-9]{3}$",
+            "description": "Unique rule identifier within this contract."
+          },
+          "rule_text": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500,
+            "description": "The rule as an imperative. E.g. 'All API endpoints MUST validate JWT before processing.'"
+          },
+          "source": {
+            "type": "string",
+            "description": "Origin: finding_id, decision_id, or descriptive source string.",
+            "minLength": 1
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": ["hard_block", "warn", "log_only"],
+            "description": "hard_block: implementation agent halts if violated. warn: continue with warning. log_only: record and continue."
+          }
+        }
+      }
+    },
+    "change_requests": {
+      "type": "array",
+      "maxItems": 3,
+      "default": [],
+      "description": "Change requests applied to this contract. Maximum 3 per contract (enforced here and in change-request-handler). Each item is a full ChangeRequest object. Use change-request.schema.json for individual CR validation.",
+      "items": { "type": "object" }
+    },
+    "decision_log_refs": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string",
+        "pattern": "^DEC-[0-9]{4}$"
+      },
+      "description": "DEC-NNNN IDs of all active DecisionEntry records at freeze time."
+    },
+    "mutation_audit": {
+      "type": "array",
+      "default": [],
+      "items": { "$ref": "#/$defs/mutation_audit_entry" },
+      "description": "Append-only log of every hash recomputation. Supports forensic verification."
+    }
+  },
+  "$defs": {
+    "module_contract": {
+      "type": "object",
+      "required": ["module_id", "module_name", "public_api", "dependencies", "language"],
+      "additionalProperties": false,
+      "properties": {
+        "module_id": { "type": "string", "pattern": "^MOD-[0-9]{4}$" },
+        "module_name": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "public_api": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/api_entry" },
+          "description": "All exported functions, classes, and types."
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^MOD-[0-9]{4}$" },
+          "description": "Module IDs this module depends on. Must form a DAG."
+        },
+        "language": {
+          "type": "string",
+          "enum": ["typescript", "javascript", "python", "go", "rust", "java", "kotlin", "swift", "dart", "csharp", "cpp", "sql", "other"],
+          "description": "Primary implementation language for this module."
+        },
+        "file_path": { "type": "string", "description": "Relative path from project root." }
+      }
+    },
+    "api_entry": {
+      "type": "object",
+      "required": ["name", "kind", "signature"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["function", "class", "type", "const", "enum"] },
+        "signature": { "type": "string" },
+        "req_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(REQ|TASK)-[A-Z0-9-]+$" }
+        }
+      }
+    },
+    "interface_contract": {
+      "type": "object",
+      "required": ["contract_name", "contract_type", "schema_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "contract_name": { "type": "string" },
+        "contract_type": { "type": "string", "enum": ["rest_api", "event_schema", "shared_type", "grpc_proto", "graphql_schema"] },
+        "schema_ref": { "type": "string" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "mutation_audit_entry": {
+      "type": "object",
+      "required": ["timestamp", "trigger", "old_plan_hash", "new_plan_hash"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "trigger": {
+          "type": "string",
+          "enum": ["initial_freeze", "change_request_applied", "manual_override"],
+          "description": "What caused the recomputation."
+        },
+        "change_request_id": { "type": "string", "pattern": "^CR-[0-9a-f]{8}-[0-9]{3}$" },
+        "old_plan_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "new_plan_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "old_content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "new_content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

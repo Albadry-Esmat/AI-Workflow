@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/review-finding.schema.json",
+  "title": "ReviewFinding",
+  "description": "A single finding emitted by a reviewer skill during phase-4c-reviewer-dispatch. Validated by orchestrator before aggregation in phase-4f. GUARDRAIL: proposed_plan field forbidden.",
+  "type": "object",
+  "required": [
+    "finding_id",
+    "issue_fingerprint",
+    "reviewer_type",
+    "section_id",
+    "title",
+    "severity",
+    "category",
+    "description",
+    "recommendation",
+    "evidence",
+    "created_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "pattern": "^RVW-[A-Z]{3,6}-[0-9]{4}$",
+      "description": "Unique finding identifier. Format: RVW-{REVIEWER_CODE}-{seq}. Reviewer codes: ARCH (architecture), SEC (security), PERF (performance), MAINT (maintainability). Examples: RVW-ARCH-0001, RVW-SEC-0042, RVW-PERF-0007, RVW-MAINT-0003."
+    },
+    "issue_fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16}$",
+      "description": "sha256(title + '|' + section_id + '|' + reviewer_type) truncated to first 16 hex chars. Computed by orchestrator during aggregation (phase-4f) if absent. Used for deduplication: keep highest-severity instance when same fingerprint appears from multiple reviewers. Also used by phase-4e contradiction detection: fingerprint with severity_group divergence across reviewers triggers scoped debate."
+    },
+    "reviewer_type": {
+      "type": "string",
+      "enum": ["architecture", "security", "performance", "maintainability"],
+      "description": "Which reviewer skill produced this finding. Must match the emitting skill: architecture-reviewer → 'architecture', security-reviewer → 'security', performance-reviewer → 'performance', maintainability-reviewer → 'maintainability'."
+    },
+    "section_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "The plan section this finding targets. Must match a section_id in the plan under review. No casing constraint — matches whatever format the planner uses for section IDs."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 200,
+      "description": "Short human-readable title of the finding. Used in issue_fingerprint computation."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"],
+      "description": "Severity level. critical = must fix before any code generation; high = must fix this sprint; medium = technical debt; low = advisory; info = informational only."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "interface_gap",
+        "dependency_violation",
+        "coupling",
+        "scalability",
+        "resilience",
+        "req_coverage",
+        "pattern_violation",
+        "rollback_gap",
+        "authentication",
+        "authorization",
+        "injection",
+        "secrets_exposure",
+        "crypto_weakness",
+        "input_validation",
+        "owasp_top10",
+        "compliance_gap",
+        "data_exposure",
+        "missing_slo",
+        "n_plus_one",
+        "missing_index",
+        "missing_cache",
+        "scalability_gap",
+        "sync_hot_path",
+        "missing_perf_test",
+        "resource_bounds_missing",
+        "missing_test",
+        "missing_rollback",
+        "missing_observability",
+        "missing_docs",
+        "solid_violation",
+        "tech_debt",
+        "missing_runbook",
+        "api_versioning_gap",
+        "other"
+      ],
+      "description": "Finding category. Each reviewer uses its own taxonomy subset: architecture uses interface_gap/dependency_violation/coupling/scalability/resilience/req_coverage/pattern_violation/rollback_gap; security uses authentication/authorization/injection/secrets_exposure/crypto_weakness/input_validation/owasp_top10/compliance_gap/data_exposure; performance uses missing_slo/n_plus_one/missing_index/missing_cache/scalability_gap/sync_hot_path/missing_perf_test/resource_bounds_missing; maintainability uses missing_test/missing_rollback/missing_observability/missing_docs/solid_violation/tech_debt/missing_runbook/api_versioning_gap. 'other' is the fallback for edge cases."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2000,
+      "description": "Full description of the problem, including root cause where known."
+    },
+    "recommendation": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1000,
+      "description": "Specific actionable recommendation to resolve the finding. MUST NOT be a plan or plan revision — describes what should change, not a replacement plan."
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Typed supporting evidence for the finding.",
+      "required": ["source_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "source_ref": {
+          "type": "string",
+          "description": "Reference to the exact plan section, task ID, module name, or line in a spec file."
+        },
+        "code_snippet": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Optional verbatim excerpt from the plan or spec illustrating the problem."
+        },
+        "cwe_id": {
+          "type": "string",
+          "pattern": "^CWE-[0-9]+$",
+          "description": "Optional CWE reference for security findings."
+        },
+        "owasp_ref": {
+          "type": "string",
+          "description": "Optional OWASP category reference (e.g., A01:2021)."
+        }
+      }
+    },
+    "requires_debate": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set true by aggregator (phase-4f) when this finding participates in a contradiction pair across reviewers. When true, the section is added to phase-4e debate trigger list."
+    },
+    "contradiction_pair_fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16}$",
+      "description": "Present only when requires_debate=true. The issue_fingerprint of the contradicting finding from the opposing reviewer (same fingerprint, diverging severity group: one critical/high, other low/info)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the finding was created by the reviewer skill."
+    },
+    "resolved_by_change_request": {
+      "type": "string",
+      "pattern": "^CR-[0-9a-f]{8}-[0-9]{3}$",
+      "description": "Optional. Change request ID that resolves this finding. Set during phase-4g or change-request-handler. Pattern matches CR ID format: CR-{8-hex}-{3-digit-seq}."
+    }
+  }
+}

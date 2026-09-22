@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/debate-skipped-event.schema.json",
+  "title": "DebateSkippedEvent",
+  "description": "Event emitted by phase-4e-conditional-debate when all trigger conditions evaluate false and the scoped debate is skipped. Written to pipeline event log and consumed by orchestrator to advance to phase-4f.",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "plan_id",
+    "trigger_evaluation",
+    "skipped_at",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "event_id": {
+      "type": "string",
+      "pattern": "^EVT-DEBATE-SKIP-[0-9]{8}-[a-f0-9]{6}$",
+      "description": "Unique event ID. Format: EVT-DEBATE-SKIP-{YYYYMMDD}-{6 random hex chars}."
+    },
+    "event_type": {
+      "type": "string",
+      "const": "debate.skipped"
+    },
+    "plan_id": { "type": "string" },
+    "trigger_evaluation": {
+      "type": "object",
+      "required": ["T1_contradictory_reviewers", "T2_low_confidence_sections", "T3_critical_findings_threshold"],
+      "additionalProperties": false,
+      "properties": {
+        "T1_contradictory_reviewers": {
+          "type": "object",
+          "required": ["triggered", "contradiction_pairs_found"],
+          "properties": {
+            "triggered": { "type": "boolean" },
+            "contradiction_pairs_found": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "T2_low_confidence_sections": {
+          "type": "object",
+          "required": ["triggered", "sections_below_threshold"],
+          "properties": {
+            "triggered": { "type": "boolean" },
+            "sections_below_threshold": { "type": "integer", "minimum": 0 },
+            "threshold_used": { "type": "number" }
+          }
+        },
+        "T3_critical_findings_threshold": {
+          "type": "object",
+          "required": ["triggered", "critical_findings_count"],
+          "properties": {
+            "triggered": { "type": "boolean" },
+            "critical_findings_count": { "type": "integer", "minimum": 0 },
+            "threshold_used": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "skipped_at": { "type": "string", "format": "date-time" },
+    "next_phase": {
+      "type": "string",
+      "const": "phase-4f-finding-aggregation",
+      "description": "Always phase-4f (finding aggregation) when debate is skipped."
+    }
+  }
+}

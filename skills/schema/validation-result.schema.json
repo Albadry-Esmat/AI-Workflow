@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/validation-result.schema.json",
+  "title": "ValidationResult",
+  "description": "Artifact produced by phase-4h-validation (TASK-0073). Output of the deterministic Objective Validation Checklist Engine. Contains pass/fail verdicts for all hard and soft checks, an overall verdict, and revision metadata.",
+  "type": "object",
+  "required": [
+    "validation_id",
+    "plan_id",
+    "plan_hash",
+    "verdict",
+    "hard_checks",
+    "soft_checks",
+    "hard_check_failures",
+    "soft_check_warnings",
+    "revision_count",
+    "validated_at",
+    "schema_version",
+    "revision_history"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "validation_id": {
+      "type": "string",
+      "pattern": "^VAL-[0-9]{4}-[a-f0-9]{8}$",
+      "description": "Unique validation run ID. Format: VAL-{YYYY}-{first 8 chars of plan_hash}."
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "ID of the plan (or consensus_plan) being validated."
+    },
+    "plan_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "x-hash-algorithm": "sha256-rfc8785",
+      "description": "SHA-256 (RFC 8785) of the plan snapshot at time of validation. Used to detect plan mutations between validation and code generation."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "APPROVED",
+        "CONDITIONALLY_APPROVED",
+        "REJECTED"
+      ],
+      "description": "Overall verdict. APPROVED: all hard checks pass + no soft check warnings. CONDITIONALLY_APPROVED: all hard checks pass + \u22651 soft check warning. REJECTED: \u22651 hard check failure."
+    },
+    "hard_checks": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/hard_check_result"
+      },
+      "description": "Exactly 7 hard check results. All must pass for verdict != REJECTED."
+    },
+    "soft_checks": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "$ref": "#/$defs/soft_check_result"
+      },
+      "description": "Exactly 6 soft check results (3 input_quality + 3 output_quality). Failures produce CONDITIONALLY_APPROVED but do not cause REJECTED."
+    },
+    "hard_check_failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of hard check IDs (HC-01 through HC-07) that failed. Empty when verdict=APPROVED or CONDITIONALLY_APPROVED."
+    },
+    "soft_check_warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of soft check IDs (SC-IQ-01..03, SC-OQ-01..03) that produced warnings."
+    },
+    "revision_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of times this plan has been returned to the planner for revision. Incremented by orchestrator on each REJECTED\u2192revise cycle. When this reaches 3, the HITL escalation gate GATE-ESC-001 activates."
+    },
+    "confidence_report_ref": {
+      "type": "string",
+      "description": "Artifact ID of the confidence_report from phase-4d-confidence-scoring. Present when phase-4d ran."
+    },
+    "validated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revision_history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/revision_history_entry"
+      },
+      "description": "Append-only log of prior validation rounds."
+    }
+  },
+  "$defs": {
+    "hard_check_result": {
+      "type": "object",
+      "required": [
+        "check_id",
+        "check_name",
+        "passed",
+        "evaluated_value",
+        "expected_condition"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "enum": [
+            "HC-01",
+            "HC-02",
+            "HC-03",
+            "HC-04",
+            "HC-05",
+            "HC-06",
+            "HC-07"
+          ]
+        },
+        "check_name": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "evaluated_value": {
+          "description": "The actual value observed (numeric, boolean, or string) during the check."
+        },
+        "expected_condition": {
+          "type": "string",
+          "description": "Human-readable pass condition, e.g., '>= 1' or '!= null' or 'all items present'."
+        },
+        "failure_message": {
+          "type": "string",
+          "description": "Present only when passed=false. Precise human-readable explanation of why the check failed."
+        }
+      }
+    },
+    "soft_check_result": {
+      "type": "object",
+      "required": [
+        "check_id",
+        "check_name",
+        "subgroup",
+        "passed",
+        "evaluated_value",
+        "expected_condition"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "enum": [
+            "SC-IQ-01",
+            "SC-IQ-02",
+            "SC-IQ-03",
+            "SC-OQ-01",
+            "SC-OQ-02",
+            "SC-OQ-03"
+          ]
+        },
+        "check_name": {
+          "type": "string"
+        },
+        "subgroup": {
+          "type": "string",
+          "enum": [
+            "input_quality",
+            "output_quality"
+          ]
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "evaluated_value": {},
+        "expected_condition": {
+          "type": "string"
+        },
+        "warning_message": {
+          "type": "string",
+          "description": "Present only when passed=false. Explains the quality gap without blocking the pipeline."
+        }
+      }
+    },
+    "revision_history_entry": {
+      "type": "object",
+      "required": [
+        "revision_number",
+        "returned_at",
+        "hard_check_failures",
+        "soft_check_warnings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "revision_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "returned_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hard_check_failures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "soft_check_warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
