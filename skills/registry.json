@@ -198,6 +198,108 @@
         "dedup_override_reason": null,
         "created_at": "2026-06-24T00:00:00Z"
       }
+    },
+    {
+      "name": "delegate",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "orchestration",
+      "description": "Formally delegates a scoped sub-task to a named agent with success criteria and handback protocol",
+      "path": ".opencode/skills/delegate/SKILL.md",
+      "inputs": ["task", "target_agent", "context", "success_criteria", "max_turns", "fallback_action", "return_format"],
+      "outputs": ["result", "success", "turns_used", "escalation", "audit_entry"],
+      "feedback_routes": [
+        {
+          "condition": "success == false && fallback_action == 'retry'",
+          "target_skill": "delegate",
+          "payload_keys": ["task", "target_agent", "context", "success_criteria", "retry_context"]
+        },
+        {
+          "condition": "success == false && fallback_action == 'escalate'",
+          "target_skill": "orchestrator",
+          "payload_keys": ["escalation", "audit_entry"]
+        }
+      ],
+      "hitl_gates": [
+        {
+          "id": "delegation-escalation",
+          "condition": "success == false && fallback_action == 'escalate'",
+          "description": "Delegate failed to meet success criteria; human decides next step"
+        }
+      ],
+      "origin_metadata": {
+        "source": "human",
+        "created_by_session": null,
+        "approval_tier": "standard",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-07-13T00:00:00Z"
+      }
+    },
+    {
+      "name": "plan-debate",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "planning",
+      "description": "Reconciles two independently produced implementation plans through bounded cross-review and consensus.",
+      "path": ".opencode/skills/plan-debate/SKILL.md",
+      "inputs": ["plan_a", "plan_b", "requirements", "session_id"],
+      "outputs": ["consensus_plan", "termination", "final_consensus_score", "unresolved_concerns"],
+      "consumes_from": ["feature-planning@^2.2.0"],
+      "produces_for": ["task-dag@^1.0.0"],
+      "orchestration": "Optional after two isolated planning passes when pipeline_config.debate_plan is true."
+    },
+    {
+      "name": "confidence-scorer",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "planning",
+      "description": "Computes deterministic section and plan confidence from specialized review findings.",
+      "path": ".opencode/skills/confidence-scorer/SKILL.md",
+      "inputs": ["findings", "plan_sections", "session_id"],
+      "outputs": ["confidence_report"],
+      "consumes_from": ["feature-planning@^2.2.0"],
+      "produces_for": ["finding-aggregator@^1.0.0", "validation-checklist-engine@^1.0.0"],
+      "orchestration": "Deterministic phase after specialized review dispatch."
+    },
+    {
+      "name": "finding-aggregator",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "review",
+      "description": "Validates, deduplicates, and summarizes specialized review findings deterministically.",
+      "path": ".opencode/skills/finding-aggregator/SKILL.md",
+      "inputs": ["architecture_findings", "security_findings", "performance_findings", "maintainability_findings", "confidence_report", "session_id"],
+      "outputs": ["review_report", "guardrail_violations", "deduplication_log"],
+      "consumes_from": ["confidence-scorer@^1.0.0"],
+      "produces_for": ["validation-checklist-engine@^1.0.0", "contract-freezer@^1.0.0"],
+      "orchestration": "Deterministic aggregation after parallel specialized reviews."
+    },
+    {
+      "name": "validation-checklist-engine",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "planning",
+      "description": "Applies deterministic hard and soft plan-quality checks and controls the revision loop.",
+      "path": ".opencode/skills/validation-checklist-engine/SKILL.md",
+      "inputs": ["revised_plan", "review_report", "confidence_report", "requirements", "session_id"],
+      "outputs": ["validation_result"],
+      "consumes_from": ["finding-aggregator@^1.0.0", "confidence-scorer@^1.0.0"],
+      "produces_for": ["contract-freezer@^1.0.0"],
+      "orchestration": "Runs before contract freeze and can return control to planning through its bounded revision loop."
+    },
+    {
+      "name": "contract-freezer",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "planning",
+      "description": "Creates an immutable, approval-gated implementation contract with canonical hashes.",
+      "path": ".opencode/skills/contract-freezer/SKILL.md",
+      "inputs": ["revised_plan", "validation_result", "review_report", "confidence_report", "session_id", "hitl_approver_id"],
+      "outputs": ["contract_id", "contract", "storage_path"],
+      "consumes_from": ["validation-checklist-engine@^1.0.0"],
+      "produces_for": ["code-generator@^1.1.0"],
+      "orchestration": "Runs only after an approving validation result and named GATE-003 approval."
     }
   ]
 }

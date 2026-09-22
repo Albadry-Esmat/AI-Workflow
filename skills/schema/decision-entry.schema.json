@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/decision-entry.schema.json",
+  "title": "DecisionEntry",
+  "description": "Records a significant architectural or technical decision made during planning. Append-only — entries are never modified, only superseded. Planner records decisions for technology, architecture, data store, protocol, security, and deployment choices.",
+  "type": "object",
+  "required": [
+    "id",
+    "decision_type",
+    "context",
+    "options",
+    "decision",
+    "rationale",
+    "trade_offs",
+    "decided_by",
+    "decided_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DEC-[0-9]{4}$",
+      "description": "Unique decision ID. Format: DEC-NNNN, zero-padded to 4 digits. Assigned sequentially per pipeline run. Immutable once set."
+    },
+    "decision_type": {
+      "type": "string",
+      "enum": [
+        "technology",
+        "architecture",
+        "data_store",
+        "protocol",
+        "security",
+        "deployment",
+        "testing",
+        "other"
+      ],
+      "description": "Category of decision. Must be one of the defined types for indexability and query support."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 120,
+      "description": "Short title for this decision. E.g. 'Select primary database engine'."
+    },
+    "context": {
+      "type": "string",
+      "minLength": 30,
+      "maxLength": 4000,
+      "description": "What problem or situation prompted this decision. Include constraints and forces in play."
+    },
+    "options": {
+      "type": "array",
+      "description": "All alternatives considered. Minimum 2 options required — single-option decisions are rejected.",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["label", "summary", "pros", "cons"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Short option label. E.g. 'PostgreSQL', 'MongoDB'."
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 1000,
+            "description": "Why this option was considered."
+          },
+          "pros": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 5 },
+            "minItems": 1,
+            "description": "Benefits of this option."
+          },
+          "cons": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 5 },
+            "minItems": 1,
+            "description": "Drawbacks of this option."
+          },
+          "selected": {
+            "type": "boolean",
+            "default": false,
+            "description": "True for the chosen option. Exactly one option must have selected: true per DecisionEntry."
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "The label of the chosen option. Must match exactly one options[].label where selected: true."
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 30,
+      "maxLength": 4000,
+      "description": "Why this option was chosen over the alternatives. Must be substantive."
+    },
+    "trade_offs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 5 },
+      "minItems": 1,
+      "description": "Accepted downsides or risks of the chosen option."
+    },
+    "evidence": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["type", "ref"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["requirement", "adr", "research_artifact", "metric", "external_doc", "benchmark", "regulatory", "expert_opinion"]
+          },
+          "ref": {
+            "type": "string",
+            "description": "Artifact ID, URL, or descriptive reference string."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional context for this evidence item."
+          }
+        }
+      },
+      "description": "Supporting evidence: benchmarks, research artifacts, regulatory requirements, precedents."
+    },
+    "decided_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Who or what made this decision. For planner: 'feature-planning'. For human: 'hitl:{identifier}'. For consensus: 'consensus:{agent_a}+{agent_b}'."
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the decision was made."
+    },
+    "supersedes": {
+      "type": ["string", "null"],
+      "pattern": "^DEC-[0-9]{4}$",
+      "default": null,
+      "description": "ID of the prior DecisionEntry this entry supersedes. The superseded entry remains in the log — never deleted. Null if this is an original decision."
+    },
+    "superseded_by": {
+      "type": ["string", "null"],
+      "pattern": "^DEC-[0-9]{4}$",
+      "default": null,
+      "description": "ID of the DecisionEntry that supersedes this one. Null if this decision is still active. Set by the decision log manager when a newer decision is recorded."
+    },
+    "affected_sections": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Plan section IDs impacted by this decision."
+    },
+    "affected_contract_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "default": [],
+      "description": "UUIDs of implementation contracts that reference this decision."
+    }
+  }
+}

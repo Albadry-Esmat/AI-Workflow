@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-workflow/schemas/research-appendix.schema.json",
+  "title": "ResearchAppendix",
+  "description": "Artifact produced by phase-4b-research (TASK-0075). Contains resolved information for all uncertainty markers and new external dependencies flagged in the feature-planning output. Injected as context into all phase-4a reviewer skills.",
+  "type": "object",
+  "required": [
+    "appendix_id",
+    "plan_id",
+    "triggered_by",
+    "uncertainty_resolutions",
+    "dependency_assessments",
+    "produced_at",
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "appendix_id": {
+      "type": "string",
+      "pattern": "^RSCH-[0-9]{4}-[a-f0-9]{8}$"
+    },
+    "plan_id": { "type": "string" },
+    "triggered_by": {
+      "type": "object",
+      "required": ["uncertainty_markers", "new_external_dependencies"],
+      "additionalProperties": false,
+      "properties": {
+        "uncertainty_markers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["marker_text", "task_id", "field_path"],
+            "properties": {
+              "marker_text": { "type": "string", "description": "The exact marker found: TBD, UNVERIFIED, ASSUMPTION, UNCLEAR, or NEEDS_RESEARCH." },
+              "task_id": { "type": "string" },
+              "field_path": { "type": "string", "description": "JSONPath to the field containing the marker, e.g., 'tasks[3].description'." }
+            }
+          }
+        },
+        "new_external_dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/external_dependency" }
+        }
+      }
+    },
+    "uncertainty_resolutions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/uncertainty_resolution" },
+      "description": "One resolution entry per unique uncertainty marker in the plan."
+    },
+    "dependency_assessments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dependency_assessment" },
+      "description": "One assessment per new_external_dependency."
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Human-readable executive summary of research findings. Injected verbatim into reviewer context."
+    },
+    "produced_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "external_dependency": {
+      "type": "object",
+      "required": ["name", "version", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "source": { "type": "string", "description": "Package registry, git URL, or vendor name." }
+      }
+    },
+    "uncertainty_resolution": {
+      "type": "object",
+      "required": ["marker_text", "task_id", "resolution_status", "resolved_value"],
+      "additionalProperties": false,
+      "properties": {
+        "marker_text": { "type": "string" },
+        "task_id": { "type": "string" },
+        "resolution_status": {
+          "type": "string",
+          "enum": ["resolved", "partially_resolved", "unresolvable"],
+          "description": "resolved: clear answer found. partially_resolved: best available answer but uncertainty remains. unresolvable: no information available — reviewer must treat as high-risk assumption."
+        },
+        "resolved_value": {
+          "type": "string",
+          "description": "The resolved content. For unresolvable markers, states the specific gap and recommended risk mitigation."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in the resolved value. Injected as context to reviewers."
+        },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "References (doc URLs, RFC numbers, library version pages) supporting the resolution."
+        }
+      }
+    },
+    "dependency_assessment": {
+      "type": "object",
+      "required": ["dependency_name", "version", "license", "security_status", "maturity"],
+      "additionalProperties": false,
+      "properties": {
+        "dependency_name": { "type": "string" },
+        "version": { "type": "string" },
+        "license": { "type": "string", "description": "SPDX license identifier, e.g., MIT, Apache-2.0." },
+        "security_status": {
+          "type": "string",
+          "enum": ["clean", "known_cves", "unmaintained", "unknown"],
+          "description": "clean: no known CVEs. known_cves: CVEs exist (listed in cve_refs). unmaintained: no activity in >18 months. unknown: could not assess."
+        },
+        "cve_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "CVE IDs when security_status=known_cves."
+        },
+        "maturity": {
+          "type": "string",
+          "enum": ["stable", "beta", "alpha", "deprecated", "unknown"]
+        },
+        "recommendation": {
+          "type": "string",
+          "enum": ["approved", "approved_with_conditions", "rejected"],
+          "description": "approved: safe to use. approved_with_conditions: usable but conditions noted. rejected: do not use — provide alternative."
+        },
+        "conditions_or_alternative": {
+          "type": "string",
+          "description": "Required when recommendation != approved. States conditions or alternative package."
+        }
+      }
+    }
+  }
+}

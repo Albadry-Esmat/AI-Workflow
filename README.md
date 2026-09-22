@@ -2,7 +2,7 @@
 
 **An open framework that takes ideas to production using a pipeline of specialized AI agents.**
 
-AI Workflow provides a structured skill system — 113 skills, 19 agents, and 22 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
+AI Workflow provides a structured skill system — 119 skills, 19 agents, and 22 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
 
 ---
 
@@ -38,7 +38,7 @@ aiw start /path/to/your-project
 # Option B — install the full workflow into another project permanently
 aiw init /path/to/your-project
 cd /path/to/your-project
-opencode   # all 113 skills + 19 agents, fully self-contained
+opencode   # all 119 skills + 19 agents, fully self-contained
 ```
 
 **Option A** keeps AI Workflow in its own folder. Your project's files are what the agents read and edit.
@@ -63,7 +63,7 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 
 | What | Count |
 |------|-------|
-| Skills | 113 |
+| Skills | 119 |
 | Agents | 18 specialized + 1 primary orchestrator |
 | Pipeline templates | 22 |
 
@@ -183,7 +183,7 @@ A **skill** is a markdown file (`SKILL.md`) with 12 sections that define exactly
 ├── feature-planning/SKILL.md
 ├── clean-code-review/SKILL.md
 ├── security-review/SKILL.md
-└── ... (113 total)
+└── ... (119 total)
 ```
 
 The skill registry (`skills/index.yaml`) is the single source of truth for all skill metadata.
@@ -260,13 +260,13 @@ AI-Workflow/
 ├── .env.example               ← environment variable template (copy to .env)
 ├── Makefile                   ← make targets (backward compat with aiw CLI)
 ├── .opencode/
-│   ├── skills/                ← 113 SKILL.md files (AI-executable skill specs)
+│   ├── skills/                ← 119 SKILL.md files (AI-executable skill specs)
 │   └── agent/                 ← per-agent instruction files (19 files)
 ├── skills/
 │   ├── index.yaml             ← skill registry (single source of truth)
 │   ├── registry.json          ← machine-readable runtime registry
 │   ├── pipelines/             ← 22 pipeline template JSON files
-│   ├── graph/skill-graph.yaml ← 113 nodes, 328 edges
+│   ├── graph/skill-graph.yaml ← 119 nodes, 366 edges
 │   └── schema/                ← JSON schemas for pipelines and registry
 ├── scripts/
 │   ├── setup.sh               ← one-command project setup
