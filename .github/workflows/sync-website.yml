@@ -100,11 +100,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout ASE-OS-Website Dev branch
+      - name: Checkout ASE-OS-Website main branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           repository: Albadry-Esmat/ASE-OS-Website
-          ref: Dev
+          ref: main
           token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
           path: ase-os-website
 
