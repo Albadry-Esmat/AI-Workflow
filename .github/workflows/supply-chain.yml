@@ -28,6 +28,10 @@ permissions:
 jobs:
   supply-chain:
     name: Lockfile, SBOM, and immutable-action checks
+    # Cross-repository credentials are intentionally unavailable to Dependabot
+    # pull requests. Run the private companion-repository checks only on trusted
+    # main pushes or an explicitly invoked workflow.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout AI-Workflow
