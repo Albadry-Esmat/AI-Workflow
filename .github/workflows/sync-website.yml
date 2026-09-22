@@ -1,12 +1,12 @@
 name: Sync Website Data
 
 # ─── Triggers ────────────────────────────────────────────────────────────────
-# Runs automatically on every push to Dev that touches any data source file.
+# Runs automatically on every push to main that touches any data source file.
 # Can also be triggered manually from GitHub Actions UI (workflow_dispatch).
 on:
   push:
     branches:
-      - Dev
+      - main
     paths:
       - "skills/index.yaml"
       - "skills/registry.json"
