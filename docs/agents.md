@@ -62,6 +62,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `cloud-platform` | `cloud-architecture-reviewer`, `serverless-architect`, `container-orchestration-architect` | `subagent` | read-only |
 | `security-specialist` | `threat-model-designer`, `secrets-management-architect`, `devsecops-pipeline-designer` | `subagent` | read-only |
 | `sre` | `slo-sla-designer`, `load-test-designer`, `profiling-advisor`, `runbook-generator`, `chaos-engineering-designer` | `subagent` | read-only |
+| `github-reviewer` | `github-pr-review` | `subagent` | edit: ask |
 
 ### Subagent Capability Mapping
 
@@ -85,6 +86,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `cloud-platform` | architecture, deployment strategy | WAF reviews, serverless topologies, Kubernetes cluster designs | deployer, architect |
 | `security-specialist` | architecture, security review | STRIDE threat models, secrets management architecture, DevSecOps pipeline designs | reviewer |
 | `sre` | architecture, deployment strategy | SLO/SLA designs, load test scenarios, runbooks, chaos experiments | deployer, tester |
+| `github-reviewer` | PR metadata, diff, CI status | review_report, labels_applied, merge-gate summary | reviewer |
 
 ## Agent Configuration
 
@@ -138,6 +140,15 @@ All agents are configured in `opencode.json` and have corresponding instruction 
         ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
         ".opencode/skills/security-guard/SKILL.md",
         ".opencode/skills/implementation-completeness-guard/SKILL.md"
+      ]
+    },
+    "github-reviewer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": { "edit": "ask", "bash": "deny" },
+      "description": "GitHub review automation — PR reviews, bug-issue triage, merge-gate summaries. Advisory only; merge authority stays human.",
+      "skills": [
+        ".opencode/skills/github-pr-review/SKILL.md"
       ]
     },
     "tester": {
@@ -284,7 +295,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 }
 ```
 
-Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 19 agents (1 primary + 18 subagents) have corresponding instruction files.
+Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 20 agents (1 primary + 19 subagents) have corresponding instruction files.
 
 ## Model Configuration
 

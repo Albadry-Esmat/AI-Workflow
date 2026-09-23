@@ -9,6 +9,12 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### GitHub review agent + skill (active, HITL-approved; trial-reviewed PR #28 dry-run score 9.5/approve)
+
+- Added `github-pr-review` (SKL-126) draft skill composing `clean-code-review` + `security-review` over PR diffs with scoring, verdict mapping, and triage labels; advisory only, never merges or pushes.
+- Added `github-reviewer` subagent (`edit: ask`, `bash: deny`) owning PR reviews, `bug`-issue triage, and merge-gate summaries.
+- Index/graph (120 nodes, 369 edges)/registry/agent docs updated. Status `draft` until quality-scoring + explicit HITL sign-off.
+
 ### Execution kernel Phases 1-4 complete (REQ-EXE-001..005, REQ-POL-001..003, REQ-TRC-001..003, REQ-MOD-001/002, REQ-UXI-001/002, REQ-GRP-001/002, REQ-DEL-001)
 
 - Added M1 OpenCode-local adapter (`scripts/runtime-adapter.js`), M2 file checkpointer with idempotent `task()` (`scripts/checkpointer.js`), M3 deny-by-default gateway (`scripts/policy-gateway.js` + `config/policy-gateway.yaml`), M4 trace envelope (`scripts/trace-envelope.js` + schema), M5 static router (`scripts/task-router.js` + `config/task-router.yaml`), `aiw run --template quick-fix|feature-delivery|release-review` (`scripts/aiw-run.js`).

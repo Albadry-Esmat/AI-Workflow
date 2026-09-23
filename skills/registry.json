@@ -1,6 +1,6 @@
 {
   "version": "5.3.0",
-  "description": "Orchestrator skill registry — contains skills with full I/O contracts, feedback routes, and orchestration metadata required for pipeline routing. This is a curated subset of skills/index.yaml; not every skill needs a registry entry (only those the orchestrator needs to resolve explicitly). The complete skill catalog is in skills/index.yaml.",
+  "description": "Orchestrator skill registry \u2014 contains skills with full I/O contracts, feedback routes, and orchestration metadata required for pipeline routing. This is a curated subset of skills/index.yaml; not every skill needs a registry entry (only those the orchestrator needs to resolve explicitly). The complete skill catalog is in skills/index.yaml.",
   "parallel_groups": [
     {
       "id": "quality-parallel",
@@ -18,7 +18,7 @@
         "behavioral-telemetry-collector",
         "session-insights"
       ],
-      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended — non-blocking",
+      "description": "Telemetry collection and insight aggregation run asynchronously at pipeline.ended \u2014 non-blocking",
       "note": "Priority: session-insights depends on behavioral-telemetry-collector output (session_summary). These run sequentially within the async group, not truly in parallel."
     }
   ],
@@ -48,7 +48,7 @@
       "produces_for": [
         "architecture-design@^1.1.0"
       ],
-      "orchestration": "MUST run first — entry point for all feature work",
+      "orchestration": "MUST run first \u2014 entry point for all feature work",
       "feedback_routes": [],
       "origin_metadata": {
         "source": "human",
@@ -65,7 +65,7 @@
       "status": "active",
       "domain": "system",
       "path": ".opencode/skills/adaptive-proposal-generator/SKILL.md",
-      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval — nothing is applied automatically.",
+      "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval \u2014 nothing is applied automatically.",
       "inputs": [
         "session_summary",
         "historical_summaries",
@@ -133,7 +133,7 @@
         "frontend-ux-architect@^2.0.0",
         "database-architect@^1.1.0"
       ],
-      "orchestration": "Invoked after phase-2-architecture and before phase-2b-design. Optional — enabled by pipeline_config.debate_architecture: true. Escalates to HITL gate on stalemate or max_rounds exceeded.",
+      "orchestration": "Invoked after phase-2-architecture and before phase-2b-design. Optional \u2014 enabled by pipeline_config.debate_architecture: true. Escalates to HITL gate on stalemate or max_rounds exceeded.",
       "feedback_routes": [
         {
           "target_skill": "feature-planning",
@@ -206,18 +206,41 @@
       "domain": "orchestration",
       "description": "Formally delegates a scoped sub-task to a named agent with success criteria and handback protocol",
       "path": ".opencode/skills/delegate/SKILL.md",
-      "inputs": ["task", "target_agent", "context", "success_criteria", "max_turns", "fallback_action", "return_format"],
-      "outputs": ["result", "success", "turns_used", "escalation", "audit_entry"],
+      "inputs": [
+        "task",
+        "target_agent",
+        "context",
+        "success_criteria",
+        "max_turns",
+        "fallback_action",
+        "return_format"
+      ],
+      "outputs": [
+        "result",
+        "success",
+        "turns_used",
+        "escalation",
+        "audit_entry"
+      ],
       "feedback_routes": [
         {
           "condition": "success == false && fallback_action == 'retry'",
           "target_skill": "delegate",
-          "payload_keys": ["task", "target_agent", "context", "success_criteria", "retry_context"]
+          "payload_keys": [
+            "task",
+            "target_agent",
+            "context",
+            "success_criteria",
+            "retry_context"
+          ]
         },
         {
           "condition": "success == false && fallback_action == 'escalate'",
           "target_skill": "orchestrator",
-          "payload_keys": ["escalation", "audit_entry"]
+          "payload_keys": [
+            "escalation",
+            "audit_entry"
+          ]
         }
       ],
       "hitl_gates": [
@@ -243,10 +266,24 @@
       "domain": "planning",
       "description": "Reconciles two independently produced implementation plans through bounded cross-review and consensus.",
       "path": ".opencode/skills/plan-debate/SKILL.md",
-      "inputs": ["plan_a", "plan_b", "requirements", "session_id"],
-      "outputs": ["consensus_plan", "termination", "final_consensus_score", "unresolved_concerns"],
-      "consumes_from": ["feature-planning@^2.2.0"],
-      "produces_for": ["task-dag@^1.0.0"],
+      "inputs": [
+        "plan_a",
+        "plan_b",
+        "requirements",
+        "session_id"
+      ],
+      "outputs": [
+        "consensus_plan",
+        "termination",
+        "final_consensus_score",
+        "unresolved_concerns"
+      ],
+      "consumes_from": [
+        "feature-planning@^2.2.0"
+      ],
+      "produces_for": [
+        "task-dag@^1.0.0"
+      ],
       "orchestration": "Optional after two isolated planning passes when pipeline_config.debate_plan is true."
     },
     {
@@ -256,10 +293,21 @@
       "domain": "planning",
       "description": "Computes deterministic section and plan confidence from specialized review findings.",
       "path": ".opencode/skills/confidence-scorer/SKILL.md",
-      "inputs": ["findings", "plan_sections", "session_id"],
-      "outputs": ["confidence_report"],
-      "consumes_from": ["feature-planning@^2.2.0"],
-      "produces_for": ["finding-aggregator@^1.0.0", "validation-checklist-engine@^1.0.0"],
+      "inputs": [
+        "findings",
+        "plan_sections",
+        "session_id"
+      ],
+      "outputs": [
+        "confidence_report"
+      ],
+      "consumes_from": [
+        "feature-planning@^2.2.0"
+      ],
+      "produces_for": [
+        "finding-aggregator@^1.0.0",
+        "validation-checklist-engine@^1.0.0"
+      ],
       "orchestration": "Deterministic phase after specialized review dispatch."
     },
     {
@@ -269,10 +317,26 @@
       "domain": "review",
       "description": "Validates, deduplicates, and summarizes specialized review findings deterministically.",
       "path": ".opencode/skills/finding-aggregator/SKILL.md",
-      "inputs": ["architecture_findings", "security_findings", "performance_findings", "maintainability_findings", "confidence_report", "session_id"],
-      "outputs": ["review_report", "guardrail_violations", "deduplication_log"],
-      "consumes_from": ["confidence-scorer@^1.0.0"],
-      "produces_for": ["validation-checklist-engine@^1.0.0", "contract-freezer@^1.0.0"],
+      "inputs": [
+        "architecture_findings",
+        "security_findings",
+        "performance_findings",
+        "maintainability_findings",
+        "confidence_report",
+        "session_id"
+      ],
+      "outputs": [
+        "review_report",
+        "guardrail_violations",
+        "deduplication_log"
+      ],
+      "consumes_from": [
+        "confidence-scorer@^1.0.0"
+      ],
+      "produces_for": [
+        "validation-checklist-engine@^1.0.0",
+        "contract-freezer@^1.0.0"
+      ],
       "orchestration": "Deterministic aggregation after parallel specialized reviews."
     },
     {
@@ -282,10 +346,23 @@
       "domain": "planning",
       "description": "Applies deterministic hard and soft plan-quality checks and controls the revision loop.",
       "path": ".opencode/skills/validation-checklist-engine/SKILL.md",
-      "inputs": ["revised_plan", "review_report", "confidence_report", "requirements", "session_id"],
-      "outputs": ["validation_result"],
-      "consumes_from": ["finding-aggregator@^1.0.0", "confidence-scorer@^1.0.0"],
-      "produces_for": ["contract-freezer@^1.0.0"],
+      "inputs": [
+        "revised_plan",
+        "review_report",
+        "confidence_report",
+        "requirements",
+        "session_id"
+      ],
+      "outputs": [
+        "validation_result"
+      ],
+      "consumes_from": [
+        "finding-aggregator@^1.0.0",
+        "confidence-scorer@^1.0.0"
+      ],
+      "produces_for": [
+        "contract-freezer@^1.0.0"
+      ],
       "orchestration": "Runs before contract freeze and can return control to planning through its bounded revision loop."
     },
     {
@@ -295,11 +372,53 @@
       "domain": "planning",
       "description": "Creates an immutable, approval-gated implementation contract with canonical hashes.",
       "path": ".opencode/skills/contract-freezer/SKILL.md",
-      "inputs": ["revised_plan", "validation_result", "review_report", "confidence_report", "session_id", "hitl_approver_id"],
-      "outputs": ["contract_id", "contract", "storage_path"],
-      "consumes_from": ["validation-checklist-engine@^1.0.0"],
-      "produces_for": ["code-generator@^1.1.0"],
+      "inputs": [
+        "revised_plan",
+        "validation_result",
+        "review_report",
+        "confidence_report",
+        "session_id",
+        "hitl_approver_id"
+      ],
+      "outputs": [
+        "contract_id",
+        "contract",
+        "storage_path"
+      ],
+      "consumes_from": [
+        "validation-checklist-engine@^1.0.0"
+      ],
+      "produces_for": [
+        "code-generator@^1.1.0"
+      ],
       "orchestration": "Runs only after an approving validation result and named GATE-003 approval."
+    },
+    {
+      "name": "github-pr-review",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "review",
+      "description": "Reviews a GitHub PR end-to-end by composing clean-code-review and security-review, scoring, and publishing findings plus triage labels. Advisory only.",
+      "path": ".opencode/skills/github-pr-review/SKILL.md",
+      "inputs": [
+        "pr_number",
+        "repo",
+        "strictness",
+        "session_id"
+      ],
+      "outputs": [
+        "review_report",
+        "labels_applied",
+        "review_url"
+      ],
+      "consumes_from": [
+        "clean-code-review@^1.1.0",
+        "security-review@^1.0.0"
+      ],
+      "produces_for": [
+        "defect-manager@^1.0.0"
+      ],
+      "orchestration": "Invoked by github-reviewer on PR opened/synchronized or on demand. Publishing steps require HITL approval."
     }
   ]
 }

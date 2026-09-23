@@ -1,85 +1,119 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/claude-sonnet-4.6",
-
   "mcp": {
-
     "github": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github@2025.4.8"],
-      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" },
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github@2025.4.8"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
       "enabled": true
     },
-
     "brave-search": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search@0.6.2"],
-      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-brave-search@0.6.2"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
       "enabled": true
     },
-
     "memory": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory@2026.7.4"],
-      "enabled": true
-    },
-
-    "context7": {
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@3.2.2"],
-      "env": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" },
-      "enabled": true
-    },
-
-    "playwright": {
-      "type": "local",
       "command": [
-        "npx", "-y", "@playwright/mcp@0.0.77",
-        "--headless",
-        "--isolated",
-        "--browser", "chromium"
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory@2026.7.4"
       ],
       "enabled": true
     },
-
+    "context7": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp@3.2.2"
+      ],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.77",
+        "--headless",
+        "--isolated",
+        "--browser",
+        "chromium"
+      ],
+      "enabled": true
+    },
     "slack": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-slack@2025.4.25"],
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-slack@2025.4.25"
+      ],
       "env": {
         "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
         "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
       },
       "enabled": false
     },
-
     "vercel": {
       "type": "local",
-      "command": ["npx", "-y", "vercel-mcp@0.0.7"],
-      "env": { "VERCEL_TOKEN": "${VERCEL_TOKEN}" },
+      "command": [
+        "npx",
+        "-y",
+        "vercel-mcp@0.0.7"
+      ],
+      "env": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}"
+      },
       "enabled": false
     }
-
   },
-
   "agent": {
     "primary": {
       "mode": "primary",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "ask" },
-      "description": "Main orchestrator — drives the full AI pipeline, approves HITL gates, and coordinates all subagents"
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      },
+      "description": "Main orchestrator \u2014 drives the full AI pipeline, approves HITL gates, and coordinates all subagents"
     },
     "analyzer": {
       "mode": "subagent",
       "model": "github-copilot/claude-haiku-4.5",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
       "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
     },
     "architect": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "System architecture design \u2014 modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
       "skills": [
         ".opencode/skills/architecture-design/SKILL.md",
         ".opencode/skills/frontend-ux-architect/SKILL.md",
@@ -89,14 +123,20 @@
     "planner": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
       "skill": ".opencode/skills/feature-planning/SKILL.md"
     },
     "reviewer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
       "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, security, and implementation completeness. Invoked during the implementation phase.",
       "skills": [
         ".opencode/skills/clean-code-review/SKILL.md",
@@ -112,7 +152,10 @@
     "tester": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
       "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
       "skills": [
         ".opencode/skills/testing-strategy/SKILL.md",
@@ -122,7 +165,10 @@
     "builder": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
       "description": "Incremental code generation, targeted code repair, design system file generation, and SEO artifact generation. Invoked after feature planning and impact analysis are complete.",
       "skills": [
         ".opencode/skills/code-generator/SKILL.md",
@@ -134,7 +180,10 @@
     "impact-analyzer": {
       "mode": "subagent",
       "model": "github-copilot/claude-haiku-4.5",
-      "permission": { "edit": "deny", "bash": "deny" },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
         ".opencode/skills/dependency-analyzer/SKILL.md",
@@ -144,43 +193,61 @@
     "test-generator": {
       "mode": "subagent",
       "model": "github-copilot/claude-haiku-4.5",
-      "permission": { "edit": "ask", "bash": "deny" },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
       "skill": ".opencode/skills/test-generator/SKILL.md"
     },
     "recovery": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Last-resort recovery agent — reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "description": "Last-resort recovery agent \u2014 reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
       "skill": ".opencode/skills/rollback-manager/SKILL.md"
     },
     "deployer": {
       "mode": "subagent",
       "model": "github-copilot/claude-haiku-4.5",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Deployment strategy \u2014 environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
       "skill": ".opencode/skills/deployment-strategy/SKILL.md"
     },
     "documenter": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "ask", "bash": "deny" },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
       "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
       "skill": ".opencode/skills/documentation-generator/SKILL.md"
     },
     "doc-maintainer": {
       "mode": "subagent",
       "model": "github-copilot/claude-haiku-4.5",
-      "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "description": "Autonomous documentation maintenance engine \u2014 detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"
     },
     "data-engineer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Data platform specialist — designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Data platform specialist \u2014 designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
       "skills": [
         ".opencode/skills/data-pipeline-architect/SKILL.md",
         ".opencode/skills/data-quality-validator/SKILL.md",
@@ -192,8 +259,11 @@
     "api-designer": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "API contract specialist — produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "API contract specialist \u2014 produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
       "skills": [
         ".opencode/skills/api-design-architect/SKILL.md",
         ".opencode/skills/graphql-architect/SKILL.md",
@@ -203,8 +273,11 @@
     "distributed-systems": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Distributed systems architect — microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Distributed systems architect \u2014 microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
       "skills": [
         ".opencode/skills/ddd-architect/SKILL.md",
         ".opencode/skills/microservices-architect/SKILL.md",
@@ -217,8 +290,11 @@
     "cloud-platform": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Cloud infrastructure specialist — Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Cloud infrastructure specialist \u2014 Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
       "skills": [
         ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
         ".opencode/skills/serverless-architect/SKILL.md",
@@ -228,8 +304,11 @@
     "security-specialist": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Security depth specialist \u2014 STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
       "skills": [
         ".opencode/skills/threat-model-designer/SKILL.md",
         ".opencode/skills/secrets-management-architect/SKILL.md",
@@ -239,8 +318,11 @@
     "sre": {
       "mode": "subagent",
       "model": "github-copilot/claude-sonnet-4.6",
-      "permission": { "edit": "deny", "bash": "deny" },
-      "description": "Site Reliability Engineering specialist — SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Site Reliability Engineering specialist \u2014 SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
       "skills": [
         ".opencode/skills/slo-sla-designer/SKILL.md",
         ".opencode/skills/load-test-designer/SKILL.md",
@@ -248,7 +330,18 @@
         ".opencode/skills/runbook-generator/SKILL.md",
         ".opencode/skills/chaos-engineering-designer/SKILL.md"
       ]
+    },
+    "github-reviewer": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "description": "GitHub review automation \u2014 PR reviews, bug-issue triage, merge-gate summaries. Advisory only; merge authority stays human.",
+      "skills": [
+        ".opencode/skills/github-pr-review/SKILL.md"
+      ]
     }
   }
 }
-
