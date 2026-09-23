@@ -120,6 +120,7 @@ jobs:
 
       - name: Install validation dependencies
         run: |
+          npm ci --ignore-scripts
           pip install pyyaml==6.0.2 jsonschema==4.23.0 --quiet
           npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
