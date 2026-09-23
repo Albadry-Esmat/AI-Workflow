@@ -8,7 +8,7 @@
   },
   "selection": {
     "catalog_path": "config/agent-runtime-catalog.json",
-    "auto_precedence": ["opencode", "claude-code", "codex", "generic-command"],
+    "auto_precedence": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"],
     "explicit_missing_fails": true,
     "silent_fallback": false
   },

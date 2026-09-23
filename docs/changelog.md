@@ -17,6 +17,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Phase 2: 8-case versioned benchmark (`aiw benchmark`, 8/8 det, live fails closed), Codex adapter (`--adapter codex`), scoped single-use approvals, retrieval `vector-trial` flag.
 - Phase 3: cross-thread store, orchestrator-workers fan-out (`aiw workers`), serve supervision (`aiw serve-supervise`).
 - Phase 4: frontier release gate (`aiw release-review --yes`, fail-closed), cost dashboard (`aiw cost-dashboard`).
+- Full CLI matrix: kernel adapters for Claude Code, Copilot CLI, Antigravity (`agy`), Cursor (`agent -p`), legacy Gemini CLI, and Aider via shared `scripts/adapter-factory.js`; catalog + policy/toolchain schemas + O0/O2 validators extended to the nine-adapter set; `aiw run --adapter <id>` and `aiw agent list` cover all of them. Kernel suite 22/22.
 - See `docs/agent-runtime-adapters.md` (OpenCode hardened; Codex launch-level + file evidence) and `docs/evaluations/quick-review-evaluations.md` (det baseline preserved; kernel benchmark nightly-ready).
 
 ### Fix: declare js-yaml dependency for aiw plan (REQ-FIX-001)

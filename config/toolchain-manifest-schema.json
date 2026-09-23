@@ -71,7 +71,7 @@
         "additionalProperties": false,
         "required": ["adapter_id", "version_policy", "aiw_installs_runtime", "requires_explicit_consent", "version_probe", "supported_channels"],
         "properties": {
-          "adapter_id": {"type": "string", "enum": ["opencode", "claude-code", "codex", "generic-command"]},
+          "adapter_id": {"type": "string", "enum": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"]},
           "version_policy": {"type": "string", "enum": ["user-selected-exact", "project-pinned", "container-pinned", "user-managed"]},
           "aiw_installs_runtime": {"type": "boolean", "const": false},
           "requires_explicit_consent": {"type": "boolean", "const": true},

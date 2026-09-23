@@ -9,8 +9,25 @@ const codex = require('./codex-adapter');
 const checkpointer = require('./checkpointer');
 const { retrieve } = require('./retrieve');
 
+const ADAPTERS = {
+  'opencode': () => require('./runtime-adapter'),
+  'codex': () => require('./codex-adapter'),
+  'claude-code': () => require('./claude-adapter'),
+  'copilot-cli': () => require('./copilot-adapter'),
+  'antigravity': () => require('./antigravity-adapter'),
+  'cursor': () => require('./cursor-adapter'),
+  'gemini-cli': () => require('./gemini-adapter'),
+  'aider': () => require('./aider-adapter'),
+};
+function loadAdapter(id) {
+  const name = id || 'opencode';
+  const loader = ADAPTERS[name];
+  if (!loader) throw new Error(`unknown adapter: ${name} (expected one of ${Object.keys(ADAPTERS).join(', ')})`);
+  return { adapter: loader(), name };
+}
+
 function usage() {
-  console.error('Usage: aiw run --template <quick-fix|feature-delivery|release-review> [--adapter opencode|codex] [--thread <id>] [--tool <tool>] [--path <path>] [--approval <token>] [--retrieval deterministic|vector-trial] "request"');
+  console.error('Usage: aiw run --template <quick-fix|feature-delivery|release-review> [--adapter opencode|codex|claude-code|copilot-cli|antigravity|cursor|gemini-cli|aider] [--thread <id>] [--tool <tool>] [--path <path>] [--approval <token>] [--retrieval deterministic|vector-trial] "request"');
   process.exit(2);
 }
 function parseArgs(argv) {
@@ -33,12 +50,12 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.request) usage();
   const r = router.route(args.template);
-  const adapter = args.adapter === 'codex' ? codex : opencode;
+  const { adapter } = loadAdapter(args.adapter);
   adapter.start(args.thread, { model_tier: r.model_tier, pipeline: r.pipeline });
   const ctx = retrieve(args.request.split(' ').slice(0, 5).join(' '), args.retrieval);
   checkpointer.appendCheckpoint(args.thread, { kind: 'retrieval', method: ctx.method, strategy: args.retrieval });
   const res = adapter.send(args.thread, { prompt: args.request, model_tier: r.model_tier, tool: args.tool, targetPath: args.path, approval: args.approval });
-  console.log(JSON.stringify({ template: r, adapter: args.adapter, thread: args.thread, retrieval: ctx, result: res, evidence: opencode.evidence(args.thread) }, null, 2));
+  console.log(JSON.stringify({ template: r, adapter: args.adapter, thread: args.thread, retrieval: ctx, result: res, evidence: adapter.evidence(args.thread) }, null, 2));
 }
 if (require.main === module) main();
 module.exports = { retrieve };

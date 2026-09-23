@@ -65,6 +65,20 @@ node "$ROOT/scripts/release-review.js" --thread "test-rel-$RANDOM" 2>/dev/null &
 node "$ROOT/scripts/release-review.js" --yes --thread "test-rel-$RANDOM" > /dev/null && ok "release-review --yes approved" || bad "release-review yes"
 # 17. cost dashboard emits JSON (Phase 4)
 node "$ROOT/scripts/cost-dashboard.js" > /dev/null && ok "cost-dashboard" || bad "cost-dashboard"
+# 18. full CLI matrix: detect never crashes, allow/deny enforced per adapter
+node -e "
+const map = {'claude-code':'claude-adapter','copilot-cli':'copilot-adapter','antigravity':'antigravity-adapter','cursor':'cursor-adapter','gemini-cli':'gemini-adapter','aider':'aider-adapter'};
+for (const [id, mod] of Object.entries(map)) {
+  const a = require('$ROOT/scripts/' + mod);
+  const d = a.detect();
+  if (!d || d.id !== id || typeof d.installed !== 'boolean') { console.error('bad detect: ' + id); process.exit(1); }
+  const t = 'test-matrix-' + id + '-' + Date.now();
+  a.start(t, { model_tier: 'cheap', pipeline: 'quick-review' });
+  const okRes = a.send(t, { prompt: 'x', model_tier: 'cheap', tool: 'read', targetPath: 'docs/a.md' });
+  const denyRes = a.send(t, { prompt: 'x', model_tier: 'cheap', tool: 'shell', targetPath: 'docs/a.md' });
+  if (okRes.denied || !denyRes.denied) { console.error('bad enforce: ' + id); process.exit(1); }
+}
+" && ok "CLI matrix allow/deny (6 adapters)" || bad "CLI matrix"
 
 echo ""
 echo "kernel: $PASS passed, $FAIL failed"

@@ -223,6 +223,362 @@
       }
     },
     {
+      "id": "copilot-cli",
+      "display_name": "GitHub Copilot CLI",
+      "vendor": "GitHub",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli",
+        "reviewed_at": "2026-09-23",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "copilot",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "package-manager", "name": "npm/Homebrew/WinGet", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["runtime-login", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "copilot",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "unknown",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": true,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "unknown",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "antigravity",
+      "display_name": "Google Antigravity CLI",
+      "vendor": "Google",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://antigravity.google/docs/cli/install",
+        "reviewed_at": "2026-09-23",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "agy",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "native-installer", "name": "Antigravity installer script", "user_action_required": true},
+          {"kind": "package-manager", "name": "WinGet", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["browser-device", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "agy",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "unknown",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "unknown",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "cursor",
+      "display_name": "Cursor CLI",
+      "vendor": "Anysphere",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://cursor.com/docs/cli/overview",
+        "reviewed_at": "2026-09-23",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "agent",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "native-installer", "name": "Cursor install script", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["runtime-login", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "agent",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": true,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "gemini-cli",
+      "display_name": "Gemini CLI (legacy)",
+      "vendor": "Google",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://geminicli.com/docs/get-started/installation",
+        "reviewed_at": "2026-09-23",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "gemini",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "package-manager", "name": "npm/Homebrew/MacPorts", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["browser-device", "api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "gemini",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": true,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "unknown"
+      }
+    },
+    {
+      "id": "aider",
+      "display_name": "Aider",
+      "vendor": "Aider",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://aider.chat/docs/install.html",
+        "reviewed_at": "2026-09-23",
+        "verification_state": "fixture-pending"
+      },
+      "detection": {
+        "executable": "aider",
+        "version_args": ["--version"],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {"kind": "package-manager", "name": "pip/npm", "user_action_required": true},
+          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": ["api-key-env"],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "aider",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "unknown",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "unknown",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      }
+    },
+    {
       "id": "generic-command",
       "display_name": "Generic Agent Command",
       "vendor": "User-managed",

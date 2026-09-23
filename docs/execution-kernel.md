@@ -31,6 +31,21 @@ aiw run --template quick-fix --tool shell --path docs/a.md "run ls"
 ## Evidence
 Per thread under `.opencode/state/<thread>/`: `checkpoint.jsonl` + `trace.jsonl`. Adapter evidence level: `launch-only + file-checkpoints/traces (P1)`.
 
+## CLI matrix (all popular CLIs)
+| Adapter | Executable | Status | `aiw run --adapter` | Notes |
+|---|---|---|---|---|
+| OpenCode | `opencode` | hardened default | `opencode` | 75+ providers/BYOM, `serve :4096` |
+| Codex CLI | `codex` | candidate | `codex` | OpenAI-only, `CODEX_HOME` isolation |
+| Claude Code | `claude` | candidate | `claude-code` | `/login`, trust prompts honored |
+| Copilot CLI | `copilot` | candidate | `copilot-cli` | `-p` non-interactive hook, org policies inherited |
+| Antigravity | `agy` | candidate | `antigravity` | Google's current agent (replaces Gemini CLI); `AGENTS.md` respected |
+| Cursor | `agent` | candidate | `cursor` | `-p`, `--mode`, `--sandbox`; version string recorded honestly (binary name collides) |
+| Gemini CLI | `gemini` | legacy candidate | `gemini-cli` | kept for existing installs; prefer Antigravity |
+| Aider | `aider` | candidate | `aider` | repo-scoped via gateway |
+| Generic | user-defined | pass-through | n/a | no safety/evidence claims by design |
+
+All adapters enforce gateway + checkpoint + trace. First-class status requires per-runtime fixtures (O0/O2 validators updated to the nine-adapter set).
+
 ## Phase 2 — Benchmark + second adapter (done)
 - `evals/execution-kernel/cases/v1.json` (8 cases: normal/broken/security/PR) + `scripts/evaluate-execution-kernel.js` (`aiw benchmark --mode det` 8/8; `--mode live` fails closed).
 - `scripts/codex-adapter.js` (`aiw run --adapter codex`, CODEX_HOME isolation, launch-level evidence).
