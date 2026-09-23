@@ -34,5 +34,5 @@
     "external_writes_default_false": true,
     "unknown_capabilities_fail_closed": true
   },
-  "initial_adapters": ["opencode", "claude-code", "codex", "generic-command"]
+  "initial_adapters": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"]
 }

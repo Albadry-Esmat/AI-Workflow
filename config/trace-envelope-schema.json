@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Trace envelope v1 (minimal, P1)",
+  "type": "object",
+  "required": ["trace_id", "thread_id", "model", "tool_calls", "guardrail", "ts"],
+  "properties": {
+    "trace_id": { "type": "string" },
+    "thread_id": { "type": "string" },
+    "model": { "type": "string" },
+    "tool_calls": { "type": "array" },
+    "guardrail": { "enum": ["allow", "deny"] },
+    "handoff": { "type": ["string", "null"] },
+    "ts": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

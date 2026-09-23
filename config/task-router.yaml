@@ -1,0 +1,21 @@
+# Task-class router (M5) — static mapping, no LLM classifier in P1.
+# Anthropic routing pattern: cheap for common, frontier for hard/review.
+version: "1.0.0"
+routes:
+  quick-fix:
+    pipeline: "quick-review"
+    model_tier: "cheap"
+    description: "Single-session fix: classify/extract + deterministic reviewers"
+  feature-delivery:
+    pipeline: "full-pipeline"
+    model_tier: "balanced"
+    description: "Default delivery: plan + code + guards"
+  release-review:
+    pipeline: "pre-deploy"
+    model_tier: "frontier"
+    description: "Release gate: disputed evals + security + completeness"
+default_route: "feature-delivery"
+model_tiers:
+  cheap: "claude-haiku-class or local small"
+  balanced: "claude-sonnet-class"
+  frontier: "claude-opus-class or flagship"

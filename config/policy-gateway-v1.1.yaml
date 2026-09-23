@@ -1,0 +1,18 @@
+# Policy Gateway full rules v1.1 (Phase 2) — deny by default, fail closed.
+# Extends v1 baseline with network/secrets/Git/deploy scoping + approval TTL.
+version: "1.1.0"
+default_decision: deny
+allowed_tools: [read, grep, glob, plan]
+allowed_paths: ["skills/", "docs/", "config/", "evals/", "artifacts/"]
+denied_paths: [".env", ".opencode/state/store/"]
+privileged_tools_requiring_approval: [write, shell, git, deploy, network, secrets]
+network:
+  default: deny
+  allowlist: []
+secrets:
+  env_only: true
+  never_write_to_disk: true
+approval:
+  max_ttl_seconds: 600
+  single_use: true
+  scope: "tool + path + thread"

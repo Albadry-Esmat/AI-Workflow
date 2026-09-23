@@ -1,0 +1,24 @@
+{
+  "fixture_version": "1.0.0",
+  "adapter_id": "claude-code",
+  "purpose": "First-class promotion evidence for the Claude Code kernel adapter: detection, fail-closed denial, and replay safety.",
+  "detection": {
+    "executable": "claude",
+    "version_args": ["--version"],
+    "expect_installed_field": true,
+    "never_claim_identity_from_presence": true
+  },
+  "deny_case": {
+    "tool": "shell",
+    "path": "docs/a.md",
+    "approval": null,
+    "expected_decision": "deny",
+    "reason_contains": "scoped approval"
+  },
+  "replay_safety": {
+    "target_fixture_untouched": true,
+    "saved_responses_only": true
+  },
+  "promotion_status": "candidate",
+  "promotion_requires": ["detection-pass", "deny-pass", "replay-pass", "nightly-live-trace"]
+}

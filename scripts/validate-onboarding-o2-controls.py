@@ -63,7 +63,7 @@ def main() -> int:
     check("recovery is owned-path-only", policy["recovery"]["rollback_only_owned_paths"] and policy["recovery"]["target_projects_untouched"])
     check("contract has all O2 commands", {"setup", "doctor", "agent_list", "agent_detect", "agent_use", "demo", "auth_status", "recover"}.issubset(contract["commands"]))
     check("contract keeps login and launch deferred", contract["commands"]["auth_login"]["status"] == "deferred-runtime-owned" and contract["commands"]["start"]["status"] == "deferred-launch-adapter")
-    check("catalog has four O0 adapters", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "generic-command"})
+    check("catalog has the nine CLI-matrix adapters", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"})
     check("fixtures cover required O2 scenarios", {f["id"] for f in fixtures["fixtures"]} >= {"setup-resume-after-failure", "explicit-missing-fails", "auto-deterministic", "no-runtime-demo", "auth-delegated", "recover-owned-state"})
 
     with tempfile.TemporaryDirectory(prefix="aiw-o2-controls-") as raw:

@@ -74,7 +74,7 @@
     },
     "initial_adapters": {
       "type": "array",
-      "const": ["opencode", "claude-code", "codex", "generic-command"],
+      "const": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"],
       "items": {"type": "string"}
     }
   }

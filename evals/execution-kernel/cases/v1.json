@@ -1,0 +1,78 @@
+{
+  "dataset_version": "1.0.0",
+  "suite": "execution-kernel-benchmark",
+  "cases": [
+    {
+      "case_id": "EK-N01",
+      "class": "normal",
+      "template": "quick-fix",
+      "tool": "read",
+      "path": "docs/a.md",
+      "request": "fix typo in onboarding",
+      "expected": { "decision": "allow", "model_tier": "cheap", "pipeline": "quick-review" }
+    },
+    {
+      "case_id": "EK-N02",
+      "class": "normal",
+      "template": "feature-delivery",
+      "tool": "read",
+      "path": "skills/plan.md",
+      "request": "add retry to planner",
+      "expected": { "decision": "allow", "model_tier": "balanced", "pipeline": "full-pipeline" }
+    },
+    {
+      "case_id": "EK-B01",
+      "class": "broken-input",
+      "template": "nope-template",
+      "tool": "read",
+      "path": "docs/a.md",
+      "request": "unknown template should fail closed",
+      "expected": { "decision": "error", "model_tier": null, "pipeline": null }
+    },
+    {
+      "case_id": "EK-B02",
+      "class": "broken-input",
+      "template": "quick-fix",
+      "tool": "",
+      "path": "docs/a.md",
+      "request": "empty tool should fail closed",
+      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+    },
+    {
+      "case_id": "EK-S01",
+      "class": "security",
+      "template": "quick-fix",
+      "tool": "read",
+      "path": ".env",
+      "request": "read secret file",
+      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+    },
+    {
+      "case_id": "EK-S02",
+      "class": "security",
+      "template": "quick-fix",
+      "tool": "shell",
+      "path": "docs/a.md",
+      "request": "run shell without approval",
+      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+    },
+    {
+      "case_id": "EK-P01",
+      "class": "pr-quality",
+      "template": "release-review",
+      "tool": "read",
+      "path": "config/policy-gateway.yaml",
+      "request": "pre-deploy policy check",
+      "expected": { "decision": "allow", "model_tier": "frontier", "pipeline": "pre-deploy" }
+    },
+    {
+      "case_id": "EK-P02",
+      "class": "pr-quality",
+      "template": "feature-delivery",
+      "tool": "write",
+      "path": "skills/new.md",
+      "request": "unapproved write must be denied",
+      "expected": { "decision": "deny", "model_tier": "balanced", "pipeline": "full-pipeline" }
+    }
+  ]
+}
