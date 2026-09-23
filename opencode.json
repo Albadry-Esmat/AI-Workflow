@@ -342,6 +342,18 @@
       "skills": [
         ".opencode/skills/github-pr-review/SKILL.md"
       ]
+    },
+    "merge-gatekeeper": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "description": "Merge-gate automation \u2014 evaluates merge conditions from live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.",
+      "skills": [
+        ".opencode/skills/github-merge-gate/SKILL.md"
+      ]
     }
   }
 }
