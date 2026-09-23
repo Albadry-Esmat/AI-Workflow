@@ -3515,9 +3515,22 @@ skills:
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
   executable_skill: .opencode/skills/github-pr-review/SKILL.md
   tags: [github, pr-review, code-quality, security, triage, automation]
-  version: 1.0.0
+  version: 1.1.0
   depends_on: [SKL-004, SKL-006]
   related_skills: [SKL-055, SKL-120]
   mastery_level: intermediate
   use_when: 'Reviewing a GitHub pull request, automating PR review on open/synchronize, or producing a merge-gate summary with labels.'
   do_not_use_when: 'Merging code, pushing fixes, reviewing non-GitHub diffs, or when the GitHub MCP server is unavailable.'
+- id: SKL-127
+  name: GitHub Merge Gate
+  short_description: Decide merge vs hold for a pull request from review verdict, required checks, bot approval freshness, and unresolved criticals; merges only on unanimous green.
+  reference_path: .opencode/skills/github-merge-gate/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .opencode/skills/github-merge-gate/SKILL.md
+  tags: [github, merge-gate, automation, ci, audit]
+  version: 1.0.0
+  depends_on: [SKL-126]
+  related_skills: [SKL-055, SKL-004, SKL-006]
+  mastery_level: intermediate
+  use_when: 'Deciding whether a pull request may merge, gating on CI completion, or auditing a merge decision.'
+  do_not_use_when: 'Approving reviews, merging on red checks, bypassing branch policy, or closing human PRs.'

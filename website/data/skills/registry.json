@@ -395,7 +395,7 @@
     },
     {
       "name": "github-pr-review",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "active",
       "domain": "review",
       "description": "Reviews a GitHub PR end-to-end by composing clean-code-review and security-review, scoring, and publishing findings plus triage labels. Advisory only.",
@@ -419,6 +419,30 @@
         "defect-manager@^1.0.0"
       ],
       "orchestration": "Invoked by github-reviewer on PR opened/synchronized or on demand. Publishing steps require HITL approval."
+    },
+    {
+      "name": "github-merge-gate",
+      "version": "1.0.0",
+      "status": "active",
+      "domain": "review",
+      "description": "Merges a PR only on unanimous green (approve verdict, checks, fresh bot approval, no criticals); otherwise holds with reason. Never uses admin bypass.",
+      "path": ".opencode/skills/github-merge-gate/SKILL.md",
+      "inputs": [
+        "pr_number",
+        "repo",
+        "verdict",
+        "session_id"
+      ],
+      "outputs": [
+        "decision",
+        "reason",
+        "merge_commit"
+      ],
+      "consumes_from": [
+        "github-pr-review@^1.1.0"
+      ],
+      "produces_for": [],
+      "orchestration": "Invoked by merge-gatekeeper on CI completion or on demand under standing delegation for unanimous-green merges."
     }
   ]
 }

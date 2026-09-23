@@ -1,0 +1,56 @@
+name: Agent Review Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  deterministic-gate:
+    name: Deterministic review gate (no LLM, no model cost)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "20"
+
+      - name: Install kernel dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run kernel suite + benchmark
+        id: kernel
+        run: |
+          bash tests/test-execution-kernel.sh
+          node scripts/evaluate-execution-kernel.js --mode det --out /tmp/agent-bench.json
+          echo "bench=$(node -p "JSON.parse(require('fs').readFileSync('/tmp/agent-bench.json','utf8')).passed + '/' + JSON.parse(require('fs').readFileSync('/tmp/agent-bench.json','utf8')).total")" >> "$GITHUB_OUTPUT"
+
+      - name: Post agent-gate checklist
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const bench = '${{ steps.kernel.outputs.bench }}';
+            const body = `## Agent gate (deterministic)
+            - Kernel suite + benchmark (det): **${bench} passed**
+            - LLM review: pending — \`github-reviewer\` runs on demand and posts score + verdict
+            - Merge: \`merge-gatekeeper\` merges only on unanimous green (approve verdict, checks, fresh bot approval, no criticals). Never \--admin.`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            });
+            const prior = comments.find((c) => c.body.includes('## Agent gate (deterministic)'));
+            if (prior) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo, comment_id: prior.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+              });
+            }

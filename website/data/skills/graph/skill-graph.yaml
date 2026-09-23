@@ -1,8 +1,8 @@
 meta:
   version: 3.1.0
   last_updated: '2026-07-09'
-  total_nodes: 120
-  total_edges: 369
+  total_nodes: 121
+  total_edges: 371
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
@@ -798,6 +798,13 @@ nodes:
   layer: platform
 - id: SKL-126
   name: github-pr-review
+  domain: review
+  mastery_level: intermediate
+  version: 1.1.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-127
+  name: github-merge-gate
   domain: review
   mastery_level: intermediate
   version: 1.0.0
@@ -2337,3 +2344,11 @@ edges:
   to: SKL-055
   type: dependency
   label: github-pr-review feeds critical findings to defect-manager intake
+- from: SKL-127
+  to: SKL-126
+  type: dependency
+  label: github-merge-gate consumes github-pr-review verdict
+- from: SKL-127
+  to: SKL-055
+  type: dependency
+  label: github-merge-gate holds on open blocking defect-manager issues

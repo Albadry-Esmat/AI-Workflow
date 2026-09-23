@@ -1,6 +1,6 @@
 ---
 name: github-pr-review
-version: 1.0.0
+version: 1.1.0
 domain: review
 description: >
   Use when reviewing a GitHub pull request end-to-end: fetch the diff, run code-quality
@@ -83,9 +83,26 @@ Step 5 — Verdict mapping
 
 Step 6 — Publish (write MCP calls — HITL policy applies)
   Post PR review with verdict + line-anchored findings (no exploit paths, no secrets).
+  IF verdict is "request-changes": use request-changes review type so the
+    author is formally blocked pending fixes.
   IF critical/high defects: apply label "bug".
   IF scope unclear (empty description, >20 files, mixed concerns): apply label "needs-triage".
   Post merge-gate summary comment: score, verdict, check status, top 3 findings.
+
+Step 7 — File bugs (v1.1.0)
+  FOR EACH critical or unresolved-high finding:
+    Open ONE GitHub issue with label "bug" containing: finding summary,
+    file:line, PR link, trace/session refs, and a reproduction sketch.
+    Deduplicate: skip if an open "bug" issue already references the same
+    file:line + rule. Link each issue back to the PR.
+  Record issue URLs in review_report.bug_issues[].
+
+Step 8 — Bot approval (v1.1.0, requires REVIEWER_BOT_TOKEN identity)
+  IF verdict == "approve" AND all required checks green AND no unresolved criticals:
+    Post an approving review AS THE BOT IDENTITY (never as the PR author —
+    self-approvals are rejected by GitHub and must never be attempted).
+  ELSE: do not approve. If verdict == "request-changes", the blocking review
+    from Step 6 already holds the PR.
 ```
 
 ---
@@ -97,6 +114,8 @@ Step 6 — Publish (write MCP calls — HITL policy applies)
 | `review_report` | object | `{ pr, score, verdict, issues[], checks }` |
 | `labels_applied` | array[string] | Labels added to the PR |
 | `review_url` | string | URL of the posted PR review |
+| `bug_issues` | array[string] | URLs of filed bug issues (v1.1.0) |
+| `bot_approval_posted` | boolean | Whether the bot identity approved (v1.1.0) |
 
 ---
 
@@ -107,6 +126,8 @@ Step 6 — Publish (write MCP calls — HITL policy applies)
 - **Changed-files scope.** Never review or comment on files outside the PR diff.
 - **Score formula fixed.** 10 − (critical×1.5 + high×0.8 + medium×0.3 + low×0.1), floor 1 — identical to reviewer.
 - **No code pushes.** Fix suggestions go in review comments; never commit to the PR branch.
+- **Never self-approve.** Approvals are posted only under the bot identity on PRs authored by someone else. Attempting author self-approval is a violation.
+- **One issue per finding.** Bug filing deduplicates on open issues (file:line + rule) before creating.
 
 ---
 
