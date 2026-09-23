@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Agent-owned review-to-merge (standing delegation for unanimous-green merges)
+- `github-pr-review` v1.1.0: request-changes reviews, per-finding `bug` issues with dedup + PR links, bot-identity approvals (self-approval forbidden).
+- New `github-merge-gate` (SKL-127) + `merge-gatekeeper` agent: merge only on C1–C5 unanimous green (squash), hold + reason otherwise; `--admin` forbidden unconditionally; audit-logged.
+- New `agent-review.yml` CI: deterministic kernel gate comment on every PR sync; LLM review + gate run on demand.
+- New `docs/bot-ownership.md`: machine-user + `REVIEWER_BOT_TOKEN` setup (missing → gate holds with `no-bot-identity`), ownership table, revocation.
+- Index/graph 121 nodes · 371 edges · registry · agents docs (21 agents) updated.
+
 ### GitHub review agent + skill (active, HITL-approved; trial-reviewed PR #28 dry-run score 9.5/approve)
 
 - Added `github-pr-review` (SKL-126) draft skill composing `clean-code-review` + `security-review` over PR diffs with scoring, verdict mapping, and triage labels; advisory only, never merges or pushes.
