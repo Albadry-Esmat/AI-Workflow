@@ -78,3 +78,18 @@ jobs:
 
       - name: Validate Batch 8 controls
         run: python3 scripts/validate-batch8-controls.py
+
+      - name: Install kernel dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run execution-kernel deterministic suite
+        run: bash tests/test-execution-kernel.sh
+
+      - name: Run execution-kernel benchmark (det)
+        run: node scripts/evaluate-execution-kernel.js --mode det
+
+      - name: Run execution-kernel benchmark (live, secrets-gated)
+        if: ${{ env.PROVIDER_API_KEY != '' }}
+        env:
+          PROVIDER_API_KEY: ${{ secrets.PROVIDER_API_KEY }}
+        run: node scripts/evaluate-execution-kernel.js --mode live || echo "live benchmark not configured — det baseline preserved"

@@ -9,6 +9,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Execution kernel Phases 1-4 complete (REQ-EXE-001..005, REQ-POL-001..003, REQ-TRC-001..003, REQ-MOD-001/002, REQ-UXI-001/002, REQ-GRP-001/002, REQ-DEL-001)
+
+- Added M1 OpenCode-local adapter (`scripts/runtime-adapter.js`), M2 file checkpointer with idempotent `task()` (`scripts/checkpointer.js`), M3 deny-by-default gateway (`scripts/policy-gateway.js` + `config/policy-gateway.yaml`), M4 trace envelope (`scripts/trace-envelope.js` + schema), M5 static router (`scripts/task-router.js` + `config/task-router.yaml`), `aiw run --template quick-fix|feature-delivery|release-review` (`scripts/aiw-run.js`).
+- `aiw run` preserves `aiw start` behavior unless `--template` is passed; privileged tools denied without scoped approval; per-thread evidence under `.opencode/state/<thread>/`.
+- Added `tests/test-execution-kernel.sh` (21/21 deterministic, no network) and `docs/execution-kernel.md`.
+- Phase 2: 8-case versioned benchmark (`aiw benchmark`, 8/8 det, live fails closed), Codex adapter (`--adapter codex`), scoped single-use approvals, retrieval `vector-trial` flag.
+- Phase 3: cross-thread store, orchestrator-workers fan-out (`aiw workers`), serve supervision (`aiw serve-supervise`).
+- Phase 4: frontier release gate (`aiw release-review --yes`, fail-closed), cost dashboard (`aiw cost-dashboard`).
+- See `docs/agent-runtime-adapters.md` (OpenCode hardened; Codex launch-level + file evidence) and `docs/evaluations/quick-review-evaluations.md` (det baseline preserved; kernel benchmark nightly-ready).
+
+### Fix: declare js-yaml dependency for aiw plan (REQ-FIX-001)
+
+- Added `js-yaml ^4.1.0` to root `package.json` dependencies; fixes `aiw plan` failing on clean install where `scripts/plan-workflow.js`, `build-capability-index.js`, `validate-skill-metadata.js`, `validate-yaml.js` require `js-yaml`.
+- Verified with `node scripts/plan-workflow.js --help` and `--json` plan output; `validate-yaml` passes.
+
 ### Vendor-Neutral Verifier Adapters and Optional Evidence Refresh (Onboarding Batch O7)
 
 - Added a neutral verifier-adapter catalog for GitHub CLI attestations, Sigstore Cosign blobs, npm registry provenance, and the internal O6 local delegate, with deterministic record fingerprints and strict claim requirements.

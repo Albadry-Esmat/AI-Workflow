@@ -88,6 +88,13 @@ show_help() {
   echo -e "    ${CYAN}plan${NC}               Show a side-effect-free execution plan"
   echo -e "    ${CYAN}plan --pipeline <name>${NC}  Plan a specific pipeline"
   echo -e "    ${CYAN}plan --json${NC}       Emit the execution manifest as JSON"
+  echo -e "    ${CYAN}run --template <name>${NC}  Durable kernel run (quick-fix|feature-delivery|release-review)"
+  echo -e "    ${CYAN}kernel-test${NC}       Deterministic execution-kernel suite (no network)"
+  echo -e "    ${CYAN}benchmark${NC}         Run versioned execution-kernel benchmark (det; live fails closed)"
+  echo -e "    ${CYAN}workers${NC}           Fan-out orchestrator-workers (parallel subtasks)"
+  echo -e "    ${CYAN}release-review${NC}    Frontier-gated release (requires --yes + green benchmark)"
+  echo -e "    ${CYAN}cost-dashboard${NC}    Quality/cost/latency per task class"
+  echo -e "    ${CYAN}serve-supervise${NC}   Probe opencode serve :4096 health"
   echo ""
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
@@ -266,6 +273,27 @@ cmd_validate() {
 }
 cmd_plan() {
   node "$ROOT/scripts/plan-workflow.js" "$@"
+}
+cmd_run_kernel() {
+  node "$ROOT/scripts/aiw-run.js" "$@"
+}
+cmd_kernel_test() {
+  bash "$ROOT/tests/test-execution-kernel.sh" "$@"
+}
+cmd_benchmark() {
+  node "$ROOT/scripts/evaluate-execution-kernel.js" "$@"
+}
+cmd_workers() {
+  node "$ROOT/scripts/orchestrate-workers.js" "$@"
+}
+cmd_release_review() {
+  node "$ROOT/scripts/release-review.js" "$@"
+}
+cmd_cost_dashboard() {
+  node "$ROOT/scripts/cost-dashboard.js" "$@"
+}
+cmd_serve_supervise() {
+  bash "$ROOT/scripts/serve-supervise.sh" "$@"
 }
 cmd_lint() {
   echo -e "${BOLD}Running quick lint (YAML + schema)...${NC}"
@@ -690,7 +718,15 @@ case "$COMMAND" in
   setup)            cmd_setup "$@" ;;
   onboarding)       cmd_onboarding "$@" ;;
   health)           cmd_health "$@" ;;
-  start|run)        cmd_start "$@" ;;
+  start)            cmd_start "$@" ;;
+  run)
+    if [[ "${1:-}" == "--template" ]]; then cmd_run_kernel "$@"; else cmd_start "$@"; fi ;;
+  kernel-test)      cmd_kernel_test "$@" ;;
+  benchmark)        cmd_benchmark "$@" ;;
+  workers)          cmd_workers "$@" ;;
+  release-review)   cmd_release_review "$@" ;;
+  cost-dashboard)   cmd_cost_dashboard "$@" ;;
+  serve-supervise)  cmd_serve_supervise "$@" ;;
   init)             cmd_init "$@" ;;
   validate)         cmd_validate "$@" ;;
   plan)             cmd_plan "$@" ;;
