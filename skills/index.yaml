@@ -3508,3 +3508,16 @@ skills:
   mastery_level: advanced
   use_when: 'After validation passes and named GATE-003 approval is present.'
   do_not_use_when: 'When validation is rejected, approval evidence is absent, or append-only storage is unavailable.'
+- id: SKL-126
+  name: GitHub PR Review
+  short_description: Review a GitHub pull request end-to-end by composing code-quality and security analysis, scoring the PR, and publishing findings plus triage labels.
+  reference_path: .opencode/skills/github-pr-review/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .opencode/skills/github-pr-review/SKILL.md
+  tags: [github, pr-review, code-quality, security, triage, automation]
+  version: 1.0.0
+  depends_on: [SKL-004, SKL-006]
+  related_skills: [SKL-055, SKL-120]
+  mastery_level: intermediate
+  use_when: 'Reviewing a GitHub pull request, automating PR review on open/synchronize, or producing a merge-gate summary with labels.'
+  do_not_use_when: 'Merging code, pushing fixes, reviewing non-GitHub diffs, or when the GitHub MCP server is unavailable.'
