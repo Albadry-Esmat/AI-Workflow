@@ -239,7 +239,7 @@ jobs:
             -m "Changed: ${CHANGED_FILES}" \
             -m "Source: https://github.com/Albadry-Esmat/AI-Workflow/commit/${{ github.sha }}"
 
-          git push origin Dev
+          git push origin main
 
       - name: No changes — skip push
         if: steps.changes.outputs.changed == '0'
