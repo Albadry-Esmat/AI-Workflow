@@ -1,4 +1,4 @@
-"""Check AI-Workflow Dev to ASE-OS-Website Dev release compatibility."""
+"""Check AI-Workflow main to ASE-OS-Website main release compatibility."""
 
 from __future__ import annotations
 
@@ -41,15 +41,15 @@ def main() -> int:
     violations: list[str] = []
     checks = []
 
-    if source_branch != "Dev":
-        violations.append(f"source branch is {source_branch}, expected Dev")
-    checks.append("source branch is Dev")
-    if manifest.get("source_branch") != "Dev":
-        violations.append("manifest source_branch is not Dev")
-    checks.append("manifest source branch is Dev")
-    if manifest.get("website_branch") != "Dev":
-        violations.append("manifest website_branch is not Dev")
-    checks.append("manifest website branch is Dev")
+    if source_branch != "main":
+        violations.append(f"source branch is {source_branch}, expected main")
+    checks.append("source branch is main")
+    if manifest.get("source_branch") != "main":
+        violations.append("manifest source_branch is not main")
+    checks.append("manifest source branch is main")
+    if manifest.get("website_branch") != "main":
+        violations.append("manifest website_branch is not main")
+    checks.append("manifest website branch is main")
     manifest_source_commit = manifest.get("source_commit", "")
     source_commit_compatible = manifest_source_commit == source_commit
     if not source_commit_compatible:

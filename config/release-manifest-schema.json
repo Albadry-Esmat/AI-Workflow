@@ -22,10 +22,10 @@
   "properties": {
     "manifest_version": { "type": "string", "const": "1.0.0" },
     "source_repository": { "type": "string", "minLength": 1 },
-    "source_branch": { "type": "string", "const": "Dev" },
+    "source_branch": { "type": "string", "const": "main" },
     "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "website_repository": { "type": "string", "minLength": 1 },
-    "website_branch": { "type": "string", "const": "Dev" },
+    "website_branch": { "type": "string", "const": "main" },
     "website_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "website_commit_role": { "type": "string", "const": "sync-base" },
     "data_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },

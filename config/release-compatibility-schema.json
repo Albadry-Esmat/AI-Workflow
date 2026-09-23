@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/release-compatibility.schema.json",
-  "title": "AI-Workflow Dev Release Compatibility",
+  "title": "AI-Workflow main Release Compatibility",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "source_branch", "website_branch", "source_commit", "manifest_source_commit", "data_hash", "manifest_data_hash", "source_validation", "verdict"],
   "properties": {
     "schema_version": { "type": "string", "const": "1.0.0" },
-    "source_branch": { "type": "string", "const": "Dev" },
-    "website_branch": { "type": "string", "const": "Dev" },
+    "source_branch": { "type": "string", "const": "main" },
+    "website_branch": { "type": "string", "const": "main" },
     "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "manifest_source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "data_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
