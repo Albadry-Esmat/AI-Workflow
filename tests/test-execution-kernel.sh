@@ -65,6 +65,17 @@ node "$ROOT/scripts/release-review.js" --thread "test-rel-$RANDOM" 2>/dev/null &
 node "$ROOT/scripts/release-review.js" --yes --thread "test-rel-$RANDOM" > /dev/null && ok "release-review --yes approved" || bad "release-review yes"
 # 17. cost dashboard emits JSON (Phase 4)
 node "$ROOT/scripts/cost-dashboard.js" > /dev/null && ok "cost-dashboard" || bad "cost-dashboard"
+# 18b. claude-code promotion fixture validates against live detect
+node -e "
+const fs = require('fs');
+const fx = JSON.parse(fs.readFileSync('$ROOT/evals/execution-kernel/fixtures/claude-code.json', 'utf8'));
+const a = require('$ROOT/scripts/claude-adapter');
+const d = a.detect();
+if (fx.adapter_id !== d.id) process.exit(1);
+if (typeof d.installed !== 'boolean') process.exit(1);
+const deny = a.send('test-fx-' + Date.now(), { prompt: 'x', model_tier: 'cheap', tool: fx.deny_case.tool, targetPath: fx.deny_case.path });
+if (!deny.denied || !deny.reason.includes(fx.deny_case.reason_contains)) process.exit(1);
+" && ok "claude-code fixture (detect + deny)" || bad "claude fixture"
 # 18. full CLI matrix: detect never crashes, allow/deny enforced per adapter
 node -e "
 const map = {'claude-code':'claude-adapter','copilot-cli':'copilot-adapter','antigravity':'antigravity-adapter','cursor':'cursor-adapter','gemini-cli':'gemini-adapter','aider':'aider-adapter'};
