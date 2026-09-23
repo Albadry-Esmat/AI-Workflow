@@ -150,13 +150,13 @@ flowchart LR
 | Remote main at analysis | `d8dd32f` — merge Dev into main (2026-09-13) |
 | Tags/releases | No Git tags were found locally. Release artifacts/tags: **Unknown / Needs Verification**. |
 
-As of 2026-09-22, GitHub has one remote branch (`main`) and no open pull requests. On 2026-09-22, the diverged `release/production-hardening` and `fix/production-hardening-reconciled` branches were archived as the dated tags `archive/release-production-hardening-2026-09-22` and `archive/fix-production-hardening-reconciled-2026-09-22`, then deleted from GitHub. Dependabot PRs for setup-node (#14), setup-python (#17), and checkout (#20, replacing superseded #13) were merged; obsolete branches were deleted. Stale local remote-tracking refs were pruned during the same cleanup. `main` is protected against force-pushes and deletion, requires one approving review, requires conversation resolution, and requires the `Scan repository history for secrets` check.
+As of 2026-09-22, GitHub has one remote branch (`main`) and no open pull requests. On 2026-09-22, the diverged `release/production-hardening` and `fix/production-hardening-reconciled` branches were archived as the dated tags `archive/release-production-hardening-2026-09-22` and `archive/fix-production-hardening-reconciled-2026-09-22`, then deleted from GitHub. Dependabot PRs for setup-node (#14), setup-python (#17), and checkout (#20, replacing superseded #13) were merged; obsolete branches were deleted. Stale local remote-tracking refs were pruned during the same cleanup. `main` is protected against force-pushes and deletion, requires one approving review, resolved conversations, and passing `Skill Validation`, `Website Data Sync Check`, `Docs Broken-Link Check`, and `Scan repository history for secrets` checks.
 
 ### Branch and merge conventions (observed)
 
 - Documentation says framework changes target `main`; personal project material belongs on `develop` or a fork.
 - Actual active development had been `Dev` (capital D); the remote branch was retired during cleanup and `main` is now the sole canonical branch. Website synchronization is triggered from `main`.
-- Historical PR prefixes include `feature/`, `security/`, `fix/`, `docs/`, `release/`, and Dependabot conventions. `main` is protected against force-push and deletion, requires one approval plus conversation resolution, and requires the secret-scan status check.
+- Historical PR prefixes include `feature/`, `security/`, `fix/`, `docs/`, `release/`, and Dependabot conventions. `main` is protected against force-push and deletion, requires one approval plus conversation resolution, and requires the four PR quality checks listed above.
 - The recent history is dominated by onboarding, production hardening, governance, validation, and synchronization. PRs #6–#12 were merged in late August; PR #15 merged documentation/metadata; dependency PRs are open/closed as listed above.
 
 ### Hygiene and sensitive material
@@ -267,7 +267,7 @@ The initial validation run exposed missing local Node dependencies, an expanded 
 
 ## 12. Unknown / needs verification
 
-- `main` protection now requires one approval, conversation resolution, and the secret-scan status check. Current branch inventory is verified as `main` only. The Supply Chain workflow still needs a valid credential for the private companion repository; environment/release settings and long-term Action run health require separate inspection.
+- `main` protection now requires one approval, conversation resolution, and four PR quality checks: Skill Validation, Website Data Sync Check, Docs Broken-Link Check, and Secret Scan. Current branch inventory is verified as `main` only. Environment/release settings and long-term Action run health require separate inspection.
 - The actual OpenCode runtime’s compliance with every declarative pipeline/orchestrator feature needs end-to-end runtime evidence.
 - The companion ASE-OS-Website repository’s own build/deploy settings and whether sync credentials remain valid require separate authorized inspection.
 - Real target-project deployment execution is not demonstrated by this repository.
