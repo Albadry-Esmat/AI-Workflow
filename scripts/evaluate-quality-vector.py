@@ -72,7 +72,7 @@ def main() -> int:
         release_score = 100 if release_ok else 0
         release_refs = ["release-compatibility:manifest"] if release_ok else ["release-compatibility:failure"]
     else:
-        release_ok, release_evidence = True, "Release compatibility deferred to the Dev synchronization gate."
+        release_ok, release_evidence = True, "Release compatibility deferred to the main synchronization gate."
         release_status = "warn"
         release_score = 100
         release_refs = ["release-compatibility:deferred-to-dev"]

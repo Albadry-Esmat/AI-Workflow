@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate and validate an AI-Workflow to website Dev ReleaseManifest."""
+"""Generate and validate an AI-Workflow to website main ReleaseManifest."""
 
 from __future__ import annotations
 
@@ -35,10 +35,10 @@ def validate(manifest: dict) -> list[str]:
     errors.extend(f"missing field: {field}" for field in sorted(required - set(manifest)))
     if manifest.get("manifest_version") != "1.0.0":
         errors.append("manifest_version must be 1.0.0")
-    if manifest.get("source_branch") != "Dev":
-        errors.append("source_branch must be Dev")
-    if manifest.get("website_branch") != "Dev":
-        errors.append("website_branch must be Dev")
+    if manifest.get("source_branch") != "main":
+        errors.append("source_branch must be main")
+    if manifest.get("website_branch") != "main":
+        errors.append("website_branch must be main")
     if not COMMIT_RE.match(str(manifest.get("source_commit", ""))):
         errors.append("source_commit must be a 40-character lowercase SHA")
     if not COMMIT_RE.match(str(manifest.get("website_commit", ""))):
@@ -91,7 +91,7 @@ def main() -> int:
         "website_validation": args.website_validation,
         "website_build": args.website_build,
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
-        "trigger": "AI-Workflow Dev synchronization",
+        "trigger": "AI-Workflow main synchronization",
     }
     errors = validate(manifest)
     if args.validate or errors:
