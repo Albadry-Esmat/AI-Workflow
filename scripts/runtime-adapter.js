@@ -35,7 +35,7 @@ function send(threadId, { prompt, model_tier, tool, targetPath, approval }) {
   });
   checkpointer.appendCheckpoint(threadId, { kind: 'turn', prompt: String(prompt).slice(0, 500), verdict, trace_id: rec.trace_id });
   if (verdict.decision === 'deny') return { denied: true, reason: verdict.reason, trace_id: rec.trace_id };
-  return { denied: false, planned: true, note: 'P1 deterministic plan (no live model). Live dispatch in Phase 2.', trace_id: rec.trace_id };
+  return { denied: false, planned: true, note: 'Deterministic plan (no live model). Live execution runs via the runtime with its own auth; AIW holds zero model credentials.', trace_id: rec.trace_id };
 }
 function interrupt(threadId, reason) {
   checkpointer.appendCheckpoint(threadId, { kind: 'interrupt', reason: reason || 'HITL' });

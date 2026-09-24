@@ -7,5 +7,5 @@ module.exports = makeAdapter({
   id: 'aider',
   executable: 'aider',
   isolation: 'per-thread state dir; repo-scoped edits only via gateway allowlist (no bypass)',
-  notes: 'Deterministic plan via Aider adapter (no live model). Live dispatch behind approval in nightly.',
+  notes: 'Deterministic plan via Aider adapter (no live model). Live runs as `aider --message` (read-only) with the runtime auth; AIW holds zero model credentials.',
 });

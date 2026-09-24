@@ -88,8 +88,8 @@ jobs:
       - name: Run execution-kernel benchmark (det)
         run: node scripts/evaluate-execution-kernel.js --mode det
 
-      - name: Run execution-kernel benchmark (live, secrets-gated)
-        if: ${{ env.PROVIDER_API_KEY != '' }}
-        env:
-          PROVIDER_API_KEY: ${{ secrets.PROVIDER_API_KEY }}
-        run: node scripts/evaluate-execution-kernel.js --mode live || echo "live benchmark not configured — det baseline preserved"
+      - name: Run execution-kernel benchmark (live, runtime-authenticated only)
+        # No AIW-owned model keys exist by design. Live executes through the
+        # runtime's own non-interactive entry with the runtime's own auth.
+        # Fails closed with no-authenticated-runtime when none is available.
+        run: node scripts/evaluate-execution-kernel.js --mode live --adapter codex || echo "no authenticated runtime — det baseline preserved"

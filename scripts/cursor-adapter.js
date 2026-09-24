@@ -10,5 +10,5 @@ module.exports = makeAdapter({
   id: 'cursor',
   executable: 'agent',
   isolation: 'per-thread state dir; sandbox mode honored where reported (unknown until fixture)',
-  notes: 'Deterministic plan via Cursor adapter (no live model). Live `agent -p` dispatch behind approval in nightly.',
+  notes: 'Deterministic plan via Cursor adapter (no live model). Live runs as `agent -p` with the runtime auth; AIW holds zero model credentials.',
 });

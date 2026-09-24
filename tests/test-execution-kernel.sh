@@ -65,6 +65,46 @@ node "$ROOT/scripts/release-review.js" --thread "test-rel-$RANDOM" 2>/dev/null &
 node "$ROOT/scripts/release-review.js" --yes --thread "test-rel-$RANDOM" > /dev/null && ok "release-review --yes approved" || bad "release-review yes"
 # 17. cost dashboard emits JSON (Phase 4)
 node "$ROOT/scripts/cost-dashboard.js" > /dev/null && ok "cost-dashboard" || bad "cost-dashboard"
+# 17b. no AIW-owned model credentials: provider keys must not appear outside
+# redaction lists (scripts/onboarding-o2.py) and null-fixture envs (evals/onboarding-o0)
+if grep -rE "OPENAI_API_KEY|ANTHROPIC_API_KEY|GEMINI_API_KEY|PROVIDER_API_KEY" \
+  "$ROOT/scripts/checkpointer.js" "$ROOT/scripts/policy-gateway.js" "$ROOT/scripts/policy-approval.js" \
+  "$ROOT/scripts/trace-envelope.js" "$ROOT/scripts/task-router.js" "$ROOT/scripts/runtime-adapter.js" \
+  "$ROOT/scripts/codex-adapter.js" "$ROOT/scripts/claude-adapter.js" "$ROOT/scripts/copilot-adapter.js" \
+  "$ROOT/scripts/antigravity-adapter.js" "$ROOT/scripts/cursor-adapter.js" "$ROOT/scripts/gemini-adapter.js" \
+  "$ROOT/scripts/aider-adapter.js" "$ROOT/scripts/adapter-factory.js" "$ROOT/scripts/runtime-auth.js" \
+  "$ROOT/scripts/aiw-run.js" "$ROOT/scripts/evaluate-execution-kernel.js" "$ROOT/scripts/cost-dashboard.js" \
+  "$ROOT/scripts/store.js" "$ROOT/scripts/orchestrate-workers.js" "$ROOT/scripts/release-review.js" \
+  "$ROOT/scripts/retrieve.js" "$ROOT/config/policy-gateway.yaml" "$ROOT/config/task-router.yaml" \
+  "$ROOT/.github/workflows/nightly-evaluation.yml" "$ROOT/.github/workflows/agent-review.yml" \
+  "$ROOT/docs/execution-kernel.md" "$ROOT/aiw" 2>/dev/null; then
+  bad "provider key reference in kernel surface"
+else
+  ok "no provider keys in kernel surface"
+fi
+# 18a. runtime-auth attests without secrets (environment-aware: proves live
+# where authenticated, proves fail-closed shape everywhere)
+node -e "
+const {checkAuth} = require('$ROOT/scripts/runtime-auth');
+const a = checkAuth('codex');
+if (typeof a.installed !== 'boolean' || typeof a.authenticated !== 'boolean') process.exit(1);
+if (!a.installed && a.authenticated) process.exit(1); // never authed when absent
+const c = checkAuth('cursor');
+if (c.authenticated && !/cursor/i.test(c.version || '')) process.exit(1); // non-Cursor binary must not pass
+const d = require('$ROOT/scripts/live-dispatch');
+if (!a.authenticated) {
+  const r = d.dispatch('test-noauth', { adapter: 'codex', prompt: 'x', targetPath: '' });
+  if (!r.failed || !/no-authenticated-runtime/.test(r.reason)) process.exit(1);
+}
+" && ok "runtime-auth attestation" || bad "runtime-auth"
+# 18b. live-dispatch refuses unauthenticated runtimes (fail-closed)
+node -e "
+const d = require('$ROOT/scripts/live-dispatch');
+const r = d.dispatch('test-live-refuse', { adapter: 'claude-code', prompt: 'x', targetPath: '' });
+if (!r.failed || !/no-authenticated-runtime/.test(r.reason)) process.exit(1);
+const r2 = d.dispatch('test-live-refuse', { adapter: 'codex', prompt: 'x', tool: 'shell', targetPath: '' });
+if (!r2.denied) process.exit(1);
+" && ok "live-dispatch fail-closed" || bad "live-dispatch"
 # 18b. claude-code promotion fixture validates against live detect
 node -e "
 const fs = require('fs');
