@@ -111,6 +111,15 @@ if (!r.failed) process.exit(1);
 " && ok "native review unknown-adapter" || bad "native review"
 rm -rf "$ROOT/.opencode/state/test-nr" "$ROOT/.opencode/state/native-"*
 
+# 10. stage metrics degrade gracefully + hold without data
+node -e "
+const M = require('$ROOT/scripts/stage-metrics');
+if (typeof M.mergedPRs !== 'function') process.exit(1);
+const R = require('$ROOT/scripts/rollout-tracker');
+const d = R.evaluate({ days: 0, prs: 0, autonomy_rate: 0 });
+if (d.action !== 'hold' || d.from !== 'shadow') process.exit(1);
+" && ok "stage metrics hold" || bad "stage metrics"
+
 echo ""
 echo "workflow-p2: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
