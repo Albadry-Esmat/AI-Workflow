@@ -1,0 +1,25 @@
+# Rollout policy (S) — promotion is deliberate, demotion is automatic.
+version: "1.0.0"
+stages: [shadow, autonomous_merge, continuous_engineering]
+current_stage: shadow
+promote_shadow_to_merge:
+  minimum_days: 14
+  minimum_prs: 20
+  autonomy_rate: 0.90
+  policy_violations: 0
+  incorrect_gatekeeper_decisions: 0
+demote_merge_to_shadow:
+  critical_escape_bug: true
+  policy_violation: true
+  incorrect_auto_merge: true
+  rollback_rate_above: 0.10
+promote_merge_to_continuous:
+  minimum_days: 14
+  minimum_prs: 30
+  autonomy_rate: 0.95
+  policy_violations: 0
+  critical_escape_bugs: 0
+demote_continuous_to_merge:
+  critical_incident: true
+  policy_violation: true
+  budget_runaway: true
