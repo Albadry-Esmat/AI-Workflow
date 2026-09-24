@@ -9,6 +9,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P2 executable workflow (state machine, locks, cases, investigation)
+
+- `scripts/workflow-state.js`: enforced transitions, forbidden-throw, 3-cycle cap with escalation.
+- `scripts/case-store.js` + `case-report.js`: `artifacts/cases/<id>/` with immutable events and audit chain `thread → PR → reviews → merge`.
+- `scripts/work-locks.js`: scoped locks with heartbeat/expiry; conflicts wait or escalate.
+- `scripts/pr-router.js`: opened→review, synchronize→re-review, checks→gate, drafts observe-only.
+- New read-only `investigation` agent (1 round, then resolve/escalate); `docs/autonomous-workflow.md`.
+- `tests/test-workflow-p2.sh` 5/5.
+
 ### P1 autonomous-governance foundation (policies as data, control-plane protection)
 
 - 10 policy files under `config/` (validation-profile, development, review, risk, budget, merge, rollback, backlog, control-plane, policy-versions) with discovery via `scripts/policy-loader.js` (config/ first, `.ai/` adapter layout supported).

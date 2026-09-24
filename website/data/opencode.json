@@ -350,10 +350,20 @@
         "edit": "ask",
         "bash": "deny"
       },
-      "description": "Merge-gate automation \u2014 evaluates merge conditions from live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.",
+      "description": "Merge-gate automation — evaluates merge conditions from live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.",
       "skills": [
         ".opencode/skills/github-merge-gate/SKILL.md"
       ]
+    },
+    "investigation": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-haiku-4.5",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Bounded evidence gathering for NEEDS_INVESTIGATION findings — one round, then resolve or escalate. Read-only.",
+      "skills": []
     }
   }
 }
