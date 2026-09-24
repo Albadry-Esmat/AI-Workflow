@@ -103,6 +103,14 @@ if (r.picked.join() !== 'A') process.exit(1);
 if (r.skipped.length !== 3) process.exit(1);
 " && ok "backlog selection limits" || bad "backlog"
 
+# 9. native review router: unknown adapter fails closed (no runtime touched)
+node -e "
+const {nativeReview} = require('$ROOT/scripts/native-review');
+const r = nativeReview('test-nr', { adapter: 'nope', target: 'main' });
+if (!r.failed) process.exit(1);
+" && ok "native review unknown-adapter" || bad "native review"
+rm -rf "$ROOT/.opencode/state/test-nr" "$ROOT/.opencode/state/native-"*
+
 echo ""
 echo "workflow-p2: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

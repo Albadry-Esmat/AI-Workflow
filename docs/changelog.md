@@ -9,6 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Native runtime review (codex review, claude ultrareview)
+
+- `scripts/native-review.js`: read-only native review via runtime auth (`codex review --base/--uncommitted`, `claude ultrareview --json`), gateway-wrapped, latency-traced. Proven: caught planted hardcoded credential (P1, file:line) in 43s.
+- `docs/live-matrix.md` updated with native-review column.
+
 ### P4 issue ownership (manager agent, backlog selection)
 
 - New read-only `issue-manager` agent: dedupe/create/link/label/update/close/reopen; close requires verified fix + green tests + reviewed SHA.
