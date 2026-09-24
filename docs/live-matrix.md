@@ -16,3 +16,9 @@ own auth. AIW holds zero model credentials and never calls provider APIs.
 Rules: read-only tools only for live; every dispatch gateway-wrapped; latency + runtime-reported
 usage recorded in the trace envelope; costs aggregated from usage, never billing APIs.
 `no-authenticated-runtime` is fail-closed, never bypassed.
+
+## Native review commands
+| Runtime | Command | Status |
+|---|---|---|
+| Codex | `codex review --base <branch>` / `--uncommitted` | ✅ proven (caught planted credential, P1 file:line) |
+| Claude Code | `claude ultrareview [target] --json` | runner implemented, awaiting `/login` |
