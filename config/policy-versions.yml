@@ -1,0 +1,15 @@
+# Policy version registry foundation (U) — every execution records governing versions.
+version: "1.0.0"
+effective_date: "2026-09-24"
+policies:
+  development: "1.0.0"
+  review: "1.1.0"
+  merge: "1.0.0"
+  security: "1.0.0"
+  validation: "1.0.0"
+  risk: "1.0.0"
+  budget: "1.0.0"
+  rollback: "1.0.0"
+  backlog: "1.0.0"
+  control_plane: "1.0.0"
+migration_rule: active cases continue under starting snapshot unless security-critical policy requires immediate migration

@@ -1,0 +1,9 @@
+# Budget policy (L) — all numbers configurable; exhaustion escalates, never degrades quality.
+version: "1.0.0"
+automation:
+  budgets:
+    max_fix_cycles: 3
+    max_live_llm_calls_per_pr: 10
+    max_investigation_rounds: 1
+    max_retry_per_step: 2
+cost_tracking_stages: [analysis, planning, implementation, self_review, pr_review, fixing, investigation, post_merge]

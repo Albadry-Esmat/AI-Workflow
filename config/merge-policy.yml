@@ -1,0 +1,25 @@
+# Merge policy (F/V) — pre/post split, fail-closed, human-hold semantics.
+version: "1.0.0"
+pre_merge_gates: [build, unit_tests, integration_tests_where_available, lint, typecheck, static_analysis, secret_scan, security_checks, architecture_checks, migration_validation, independent_approval, head_sha_validation, no_conflicts, no_blocking_bugs]
+post_merge_gates: [main_build, deployment, smoke_tests, health_checks, runtime_integration_tests, production_monitoring, regression_detection]
+# C1-C12 revised: deployment checks live post-merge; human hold is a label.
+conditions:
+  C1_required_ci_green: pre_merge_gates
+  C2_valid_reviewer_approval: true
+  C3_approval_matches_head_sha: true
+  C4_no_blocking_findings: true
+  C5_no_blocking_linked_bugs: true
+  C6_branch_protection_satisfied: true
+  C7_pr_not_draft: true
+  C8_no_merge_conflicts: true
+  C9_review_cycles_within_limit: true
+  C10_no_policy_violation: true
+  C11_no_human_hold: human_hold_label_absent
+  C12_post_merge_tracked: post_merge_plan_present
+human_hold_label: human-hold
+verdict:
+  all_true: MERGE_ALLOWED
+  anything_else: MERGE_BLOCKED
+unknown_means: NOT_SATISFIED
+admin_bypass: forbidden
+merge_method_default: squash

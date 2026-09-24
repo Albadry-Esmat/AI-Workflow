@@ -1,0 +1,30 @@
+# Validation profile (P1.1) — per-repository command matrix. Technology-agnostic:
+# the engine reads commands from here instead of assuming a stack.
+version: "1.0.0"
+environment:
+  node: ">=20 <25"
+  python: ">=3.11 <3.13"
+validation:
+  install:
+    command: npm ci --no-audit --no-fund
+    required: true
+    timeout_seconds: 300
+  build:
+    command: bash scripts/validate-skills.sh
+    required: true
+    timeout_seconds: 600
+  test:
+    command: bash tests/test-execution-kernel.sh
+    required: true
+    timeout_seconds: 600
+  lint:
+    command: node scripts/validate-yaml.js
+    required: true
+    timeout_seconds: 120
+  typecheck:
+    command: null
+    required: false
+  security:
+    command: npm audit --omit=dev
+    required: true
+    timeout_seconds: 300

@@ -1,0 +1,15 @@
+# Rollback policy (R) — restrained auto-revert; uncertainty becomes incident + escalate.
+version: "1.0.0"
+rollback:
+  allowed: true
+  strategy: revert-pr
+  window: configured_per_repo
+  auto_revert_requires_all:
+    - merge_within_rollback_window
+    - associated_smoke_or_health_check_failed
+    - failure_confidence_high
+    - no_subsequent_dependent_merge
+    - no_human_activity_indicating_intervention
+  otherwise: create_incident_and_escalate
+  revert_path: automatic revert PR → deterministic validation → emergency gate → merge if policy permits
+  never: blind_revert_on_single_monitoring_signal

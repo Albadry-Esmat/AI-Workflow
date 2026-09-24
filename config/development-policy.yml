@@ -1,0 +1,18 @@
+# Development policy (P1.2) — branches, commits, protected targets.
+version: "1.0.0"
+branches:
+  prefixes: [feat, fix, refactor, chore, docs, test, ci]
+  format: "<prefix>/<issue>-<slug>"
+  must_originate_from_current_target: true
+  must_synchronize_before_review: true
+  stale_branch: rebase-and-revalidate
+  # Never force-refresh after approval unless repo policy demands it (SHA invalidation).
+  no_auto_refresh_after_approval: true
+protected_branches: [main, master, develop]
+protected_patterns: ["release/*"]
+direct_push_denied_for: [human, automation]
+commits:
+  types: [feat, fix, refactor, test, docs, chore, ci, perf]
+  format: "<type>: <subject>"
+  traceability: every commit message references work item or case id
+merge_strategy_default: squash

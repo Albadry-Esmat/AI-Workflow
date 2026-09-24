@@ -800,7 +800,7 @@ nodes:
   name: github-pr-review
   domain: review
   mastery_level: intermediate
-  version: 1.1.0
+  version: 1.2.0
   status: active
   layer: pipeline-quality
 - id: SKL-127

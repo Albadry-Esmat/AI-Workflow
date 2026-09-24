@@ -1,0 +1,24 @@
+# Control-plane protection (C) — the system may never weaken its own controls.
+version: "1.0.0"
+protected_paths:
+  - .github/workflows/
+  - config/merge-policy.yml
+  - config/review-policy.yml
+  - config/validation-profile.yml
+  - config/budget-policy.yml
+  - config/control-plane.yml
+  - config/risk-policy.yml
+  - config/rollback-policy.yml
+  - config/backlog-policy.yml
+  - config/policy-versions.yml
+  - config/agent-runtime-policy.json
+  - config/agent-runtime-catalog.json
+  - opencode.json
+  - .opencode/agent/
+  - docs/bot-ownership.md
+  - docs/security.md
+classification: GOVERNANCE_CHANGE
+governance_change_behavior:
+  disable_normal_auto_merge: true
+  require: elevated_governance_review
+  initial_rollout: human_approval_required
