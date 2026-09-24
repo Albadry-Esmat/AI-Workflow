@@ -113,6 +113,11 @@ Add a new entry at the end of `skills/index.yaml`. Follow the exact format of ex
 
 Add the skill entry to `skills/registry.json` following the existing schema. Required fields: `name`, `version`, `path`, `status`, `domain`, `inputs`, `outputs`.
 
+> **JSON formatting (issue #32):** never rewrite `opencode.json` or `skills/registry.json`
+> with a generic serializer — it reformats the whole file. Make surgical text edits,
+> then verify with `python3 scripts/canonical-json.py --check` (canonical form:
+> indent=2, ASCII escapes, no trailing newline). CI enforces this.
+
 ### 5 — Update skills/graph/skill-graph.yaml
 
 Add a node entry and increment `total_nodes` by 1.

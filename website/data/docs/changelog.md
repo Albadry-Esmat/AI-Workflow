@@ -9,6 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### JSON canonical format guard (closes #32)
+
+- One-time normalization of `opencode.json` (3 lines, mixed escapes unified).
+- `scripts/canonical-json.py --check/--write` + CI workflow + pre-PR gate step + CONTRIBUTING rule: surgical edits only, byte-stable round-trips enforced.
+
 ### Native runtime review (codex review, claude ultrareview)
 
 - `scripts/native-review.js`: read-only native review via runtime auth (`codex review --base/--uncommitted`, `claude ultrareview --json`), gateway-wrapped, latency-traced. Proven: caught planted hardcoded credential (P1, file:line) in 43s.

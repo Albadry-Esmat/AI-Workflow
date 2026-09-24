@@ -350,7 +350,7 @@
         "edit": "ask",
         "bash": "deny"
       },
-      "description": "Merge-gate automation — evaluates merge conditions from live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.",
+      "description": "Merge-gate automation \u2014 evaluates merge conditions from live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.",
       "skills": [
         ".opencode/skills/github-merge-gate/SKILL.md"
       ]
@@ -362,7 +362,7 @@
         "edit": "deny",
         "bash": "deny"
       },
-      "description": "Bounded evidence gathering for NEEDS_INVESTIGATION findings — one round, then resolve or escalate. Read-only.",
+      "description": "Bounded evidence gathering for NEEDS_INVESTIGATION findings \u2014 one round, then resolve or escalate. Read-only.",
       "skills": []
     },
     "issue-manager": {
@@ -372,7 +372,7 @@
         "edit": "deny",
         "bash": "deny"
       },
-      "description": "Issue lifecycle ownership — dedupe, create, link, label, update, close, reopen. Reviewer determines resolution.",
+      "description": "Issue lifecycle ownership \u2014 dedupe, create, link, label, update, close, reopen. Reviewer determines resolution.",
       "skills": []
     }
   }
