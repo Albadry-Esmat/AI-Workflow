@@ -64,6 +64,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `sre` | `slo-sla-designer`, `load-test-designer`, `profiling-advisor`, `runbook-generator`, `chaos-engineering-designer` | `subagent` | read-only |
 | `github-reviewer` | `github-pr-review` | `subagent` | edit: ask |
 | `merge-gatekeeper` | `github-merge-gate` | `subagent` | edit: ask |
+| `investigation` | — (read-only diagnostics) | `subagent` | read-only |
 
 ### Subagent Capability Mapping
 
@@ -297,7 +298,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 }
 ```
 
-Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 21 agents (1 primary + 20 subagents) have corresponding instruction files.
+Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 22 agents (1 primary + 21 subagents) have corresponding instruction files.
 
 ## Model Configuration
 
