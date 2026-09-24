@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 'use strict';
-// Phase 4: cost/quality/latency dashboard per task class (model tier).
-// Sources: trace.jsonl files (allow/deny, tool calls) + benchmark reports (pass rate, latency).
-// Token costs are placeholders in det mode (no live LLM); nightly live mode fills real usage.
+// Cost/quality/latency dashboard per task class (model tier).
+// Sources: trace.jsonl files (allow/deny, tool calls, latency) + benchmark reports.
+// Costs come exclusively from runtime-reported usage; AIW holds zero model
+// credentials and never calls provider billing. Det mode reports zero live tokens.
 const fs = require('node:fs');
 const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
@@ -30,19 +31,32 @@ function main() {
   const traces = collectTraces();
   const benches = collectBenchmarks();
   const byTier = {};
+  const usage = { input_tokens: 0, output_tokens: 0, live_calls: 0, latency_ms_total: 0 };
   for (const t of traces) {
     const k = t.model || 'unknown';
-    byTier[k] = byTier[k] || { traces: 0, allow: 0, deny: 0 };
+    byTier[k] = byTier[k] || { traces: 0, allow: 0, deny: 0, live_calls: 0, latency_ms_total: 0 };
     byTier[k].traces++;
     if (t.guardrail === 'allow') byTier[k].allow++; else byTier[k].deny++;
+    for (const c of t.tool_calls || []) {
+      if (c.live) {
+        byTier[k].live_calls++;
+        usage.live_calls++;
+        if (typeof c.latency_ms === 'number') { byTier[k].latency_ms_total += c.latency_ms; usage.latency_ms_total += c.latency_ms; }
+        if (c.usage) {
+          usage.input_tokens += c.usage.input_tokens || 0;
+          usage.output_tokens += c.usage.output_tokens || 0;
+        }
+      }
+    }
   }
   const latestBench = benches.length ? benches[benches.length - 1] : null;
   const report = {
     ts: new Date().toISOString(),
     traces_total: traces.length,
     by_model_tier: byTier,
-    benchmark: latestBench ? { version: latestBench.dataset_version, passed: latestBench.passed, total: latestBench.total } : null,
-    cost_note: 'det mode: zero live tokens. Nightly live mode records real tokens/cost/latency per tier.',
+    benchmark: latestBench ? { version: latestBench.dataset_version, passed: latestBench.passed, total: latestBench.total, live: latestBench.live ? `${latestBench.live.passed}/${latestBench.live.prompts.length}` : null } : null,
+    runtime_usage: usage,
+    cost_note: 'det mode: zero live tokens. Live latency/usage is recorded from runtime-reported output only; AIW holds zero model credentials.',
   };
   console.log(JSON.stringify(report, null, 2));
 }

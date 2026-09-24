@@ -32,7 +32,7 @@ function makeAdapter({ id, executable, isolation, notes }) {
     });
     checkpointer.appendCheckpoint(threadId, { kind: 'turn', adapter: id, prompt: String(prompt).slice(0, 500), verdict, trace_id: rec.trace_id });
     if (verdict.decision === 'deny') return { denied: true, reason: verdict.reason, trace_id: rec.trace_id };
-    return { denied: false, planned: true, isolation, note: notes || 'Deterministic plan (no live model). Live dispatch behind approval in nightly.', trace_id: rec.trace_id };
+    return { denied: false, planned: true, isolation, note: notes || 'Deterministic plan (no live model). Live execution runs via the runtime with its own auth; AIW holds zero model credentials.', trace_id: rec.trace_id };
   }
   function evidence(threadId) {
     return {

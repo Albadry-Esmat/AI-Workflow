@@ -8,5 +8,5 @@ module.exports = makeAdapter({
   id: 'antigravity',
   executable: 'agy',
   isolation: 'per-thread state dir; workspace permissions/sandbox config honored (no bypass)',
-  notes: 'Deterministic plan via Antigravity adapter (no live model). Live dispatch behind approval in nightly.',
+  notes: 'Deterministic plan via Antigravity adapter (no live model). Live runs via the runtime with its own auth once flags verify; AIW holds zero model credentials.',
 });

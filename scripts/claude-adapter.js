@@ -7,5 +7,5 @@ module.exports = makeAdapter({
   id: 'claude-code',
   executable: 'claude',
   isolation: 'per-thread state dir; runtime-owned trust prompts honored (no bypass)',
-  notes: 'Deterministic plan via Claude Code adapter (no live model). Live dispatch behind approval in nightly.',
+  notes: 'Deterministic plan via Claude Code adapter (no live model). Live runs as `claude -p --bare` with the runtime auth; AIW holds zero model credentials.',
 });

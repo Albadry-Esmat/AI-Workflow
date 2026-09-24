@@ -35,6 +35,6 @@ function send(threadId, { prompt, model_tier, tool, targetPath, approval }) {
   });
   checkpointer.appendCheckpoint(threadId, { kind: 'turn', adapter: 'codex', prompt: String(prompt).slice(0, 500), verdict, trace_id: rec.trace_id });
   if (verdict.decision === 'deny') return { denied: true, reason: verdict.reason, trace_id: rec.trace_id };
-  return { denied: false, planned: true, isolation: codexHome(threadId), note: 'P2 deterministic plan via Codex adapter (live dispatch behind approval in nightly).', trace_id: rec.trace_id };
+  return { denied: false, planned: true, isolation: codexHome(threadId), note: 'Deterministic plan via Codex adapter (no live model). Live runs as `codex exec` with the runtime auth; AIW holds zero model credentials.', trace_id: rec.trace_id };
 }
 module.exports = { detect, start, send, codexHome };

@@ -8,5 +8,5 @@ module.exports = makeAdapter({
   id: 'copilot-cli',
   executable: 'copilot',
   isolation: 'per-thread state dir; trusted-directory prompts honored (no bypass)',
-  notes: 'Deterministic plan via Copilot CLI adapter (no live model). Live `copilot -p` dispatch behind approval in nightly.',
+  notes: 'Deterministic plan via Copilot CLI adapter (no live model). Live runs as `copilot -p` with the runtime auth; AIW holds zero model credentials.',
 });

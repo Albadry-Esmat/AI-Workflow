@@ -90,7 +90,7 @@ show_help() {
   echo -e "    ${CYAN}plan --json${NC}       Emit the execution manifest as JSON"
   echo -e "    ${CYAN}run --template <name>${NC}  Durable kernel run (quick-fix|feature-delivery|release-review)"
   echo -e "    ${CYAN}kernel-test${NC}       Deterministic execution-kernel suite (no network)"
-  echo -e "    ${CYAN}benchmark${NC}         Run versioned execution-kernel benchmark (det; live fails closed)"
+  echo -e "    ${CYAN}benchmark${NC}         Run versioned execution-kernel benchmark (det; live needs --adapter + authenticated runtime)"
   echo -e "    ${CYAN}workers${NC}           Fan-out orchestrator-workers (parallel subtasks)"
   echo -e "    ${CYAN}release-review${NC}    Frontier-gated release (requires --yes + green benchmark)"
   echo -e "    ${CYAN}cost-dashboard${NC}    Quality/cost/latency per task class"

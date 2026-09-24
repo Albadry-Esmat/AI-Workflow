@@ -47,7 +47,7 @@ Per thread under `.opencode/state/<thread>/`: `checkpoint.jsonl` + `trace.jsonl`
 All adapters enforce gateway + checkpoint + trace. First-class status requires per-runtime fixtures (O0/O2 validators updated to the nine-adapter set).
 
 ## Phase 2 — Benchmark + second adapter (done)
-- `evals/execution-kernel/cases/v1.json` (8 cases: normal/broken/security/PR) + `scripts/evaluate-execution-kernel.js` (`aiw benchmark --mode det` 8/8; `--mode live` fails closed).
+- `evals/execution-kernel/cases/v1.json` (8 cases: normal/broken/security/PR) + `scripts/evaluate-execution-kernel.js` (`aiw benchmark --mode det` 8/8; `--mode live --adapter <id>` runs only against an authenticated runtime with its own auth, else `no-authenticated-runtime`). AIW holds zero model credentials — live executes through the runtime, never around it.
 - `scripts/codex-adapter.js` (`aiw run --adapter codex`, CODEX_HOME isolation, launch-level evidence).
 - Full policy v1.1 + `scripts/policy-approval.js` scoped single-use expiring approvals (`approve` → `check` consumes).
 - `scripts/retrieve.js` `--retrieval deterministic|vector-trial` (trial recorded, deterministic returned).
@@ -57,7 +57,8 @@ All adapters enforce gateway + checkpoint + trace. First-class status requires p
 
 ## Phase 4 — Release (done)
 - `scripts/release-review.js` (`aiw release-review --yes` requires frontier mapping + green benchmark, fail-closed otherwise; attestation in store).
-- `scripts/cost-dashboard.js` (`aiw cost-dashboard`: traces per tier + benchmark pass + det zero-token note).
+- `scripts/cost-dashboard.js` (`aiw cost-dashboard`: traces per tier + benchmark pass + det zero-token note; live usage comes from runtime-reported output only).
+- **Auth model:** the runtime owns authentication, models, and billing. `scripts/runtime-auth.js` probes installed+authenticated state read-only. AIW never stores model credentials and never calls provider APIs.
 - Kernel suite 21/21 (`aiw kernel-test`); repo suites preserved (194 + evals definitions).
 
 ## Rollback

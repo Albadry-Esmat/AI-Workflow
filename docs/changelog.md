@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Runtime-owned live execution (zero AIW model credentials)
+
+- Removed the `PROVIDER_API_KEY` assumption: live now means execution through the runtime's own non-interactive entry with the runtime's own auth (`scripts/runtime-auth.js` attests installed+authenticated, read-only, never prints secrets).
+- New `scripts/live-dispatch.js`: read-only dispatch (Codex `exec --json` proven live 12–14s with real usage tokens; Claude `-p --bare` runner implemented, correctly refused — CLI not logged in); gateway-wrapped; latency + runtime usage in traces; cost dashboard aggregates usage, never billing.
+- New `docs/live-matrix.md`: per-runtime dispatch/auth status table (Antigravity stays unknown until flags verify; Cursor collision recorded).
+- Regression test bans provider-key references outside redaction lists. Corrected per review: AIW is a control plane on top of coding agents, not beside them.
+
 ### Agent-owned review-to-merge (standing delegation for unanimous-green merges)
 - `github-pr-review` v1.1.0: request-changes reviews, per-finding `bug` issues with dedup + PR links, bot-identity approvals (self-approval forbidden).
 - New `github-merge-gate` (SKL-127) + `merge-gatekeeper` agent: merge only on C1–C5 unanimous green (squash), hold + reason otherwise; `--admin` forbidden unconditionally; audit-logged.
