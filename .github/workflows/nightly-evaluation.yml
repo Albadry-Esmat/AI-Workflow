@@ -93,3 +93,8 @@ jobs:
         # runtime's own non-interactive entry with the runtime's own auth.
         # Fails closed with no-authenticated-runtime when none is available.
         run: node scripts/evaluate-execution-kernel.js --mode live --adapter codex || echo "no authenticated runtime — det baseline preserved"
+
+      - name: Stage metrics + rollout evaluation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/stage-metrics.js || echo "metrics degraded — cases-only"

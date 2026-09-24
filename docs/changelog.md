@@ -9,6 +9,12 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Stage metrics in nightly (shadow autonomy)
+
+- `scripts/stage-metrics.js`: merges case outcomes with merged-PR counts (gh, graceful degrade) into rollout evaluation; nightly step added.
+- Tracker initialized at shadow day 0; promotion correctly holds (autonomy 0 — no autonomous cases yet, honestly reported).
+- Workflow tests 10/10.
+
 ### JSON canonical format guard (closes #32)
 
 - One-time normalization of `opencode.json` (3 lines, mixed escapes unified).
