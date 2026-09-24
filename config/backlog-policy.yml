@@ -1,0 +1,13 @@
+# Backlog policy (N) — hard limits against self-dealing; business weights stay human-owned.
+version: "1.0.0"
+backlog:
+  max_auto_created_issues_per_case: 5
+  max_auto_selected_risk: medium
+  max_new_auto_tasks_per_day: 10
+  require_deduplication: true
+  maximum_generation_depth: 3
+selection_considers: [severity, business_priority, production_impact, age, dependency_relationships, risk, estimated_cost]
+business_priority_weights_owner: human-governance
+ai_may_propose_priority_changes: true
+ai_may_not_redefine_priorities: true
+generated_item_must_include: [origin_case_id, origin_agent, origin_type, parent_issue, generation_depth]

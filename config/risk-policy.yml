@@ -1,0 +1,24 @@
+# Risk policy (G) — deterministic path rules first; weights only after calibration data.
+version: "1.0.0"
+mode: deterministic-rules
+path_rules:
+  - pattern: "security/**"
+    level: CRITICAL
+  - pattern: "auth/**"
+    level: HIGH
+  - pattern: "authorization/**"
+    level: HIGH
+  - pattern: "migrations/**"
+    level: HIGH
+  - pattern: ".github/workflows/**"
+    level: GOVERNANCE
+  - pattern: "infra/**"
+    level: HIGH
+  - pattern: "package-lock.json"
+    level: MEDIUM
+  - pattern: "package.json"
+    level: MEDIUM
+considered_factors: [changed_lines, changed_files, test_impact, api_impact, database_impact, architecture_impact, dependency_changes, critical_business_path]
+risk_drives: [review_depth, required_tests, specialized_reviewers, validation_requirements, deployment_strategy, post_merge_monitoring]
+calibration_sources: [escaped_bugs, reverts, human_overrides, review_findings, incident_frequency, post_merge_failures]
+default_level: LOW

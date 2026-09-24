@@ -1,0 +1,17 @@
+# Review policy (P1.3/P1.4) — outcomes, tiers, findings, disclosure.
+version: "1.1.0"
+outcomes: [APPROVE, REQUEST_CHANGES, NEEDS_INVESTIGATION]
+severity: [CRITICAL, HIGH, MEDIUM, LOW]
+blocking_levels: [BLOCKING, IMPORTANT, SUGGESTION]
+approve_requires: no unresolved BLOCKING findings
+request_changes_requires: at least one BLOCKING finding with file + reason + severity + fix
+needs_investigation_max_rounds: 1
+finding_fields: [finding_id, category, severity, blocking_level, file, symbol, description, evidence, expected_behavior, recommended_fix, reviewed_sha]
+fingerprint_v2:
+  fields: [repository, category, symbol, normalized_description, context_hash]
+  note: line numbers excluded; normalization lowercases, strips identifiers/literals, sorts tokens
+placeholder_rejection: [N/A, TBD, TODO, none, "no changes"]
+security_disclosure:
+  public_text_only: "Blocking security finding detected. See private security record SEC-xxx."
+  private_class: SECURITY_PRIVATE
+  forbidden_in_public: [exploit details, credentials, attack instructions, sensitive evidence]

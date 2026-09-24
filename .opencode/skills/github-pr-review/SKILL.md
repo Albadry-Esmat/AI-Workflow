@@ -1,6 +1,6 @@
 ---
 name: github-pr-review
-version: 1.1.0
+version: 1.2.0
 domain: review
 description: >
   Use when reviewing a GitHub pull request end-to-end: fetch the diff, run code-quality
@@ -89,13 +89,24 @@ Step 6 — Publish (write MCP calls — HITL policy applies)
   IF scope unclear (empty description, >20 files, mixed concerns): apply label "needs-triage".
   Post merge-gate summary comment: score, verdict, check status, top 3 findings.
 
-Step 7 — File bugs (v1.1.0)
+Step 7 — File bugs (v1.1.0, fingerprint v2 in v1.2.0)
   FOR EACH critical or unresolved-high finding:
+    Compute fingerprint v2 = sha256(repository + category + symbol +
+      normalized_description + context_hash) where normalization lowercases,
+      strips identifiers/literals, and sorts tokens. Line numbers excluded.
     Open ONE GitHub issue with label "bug" containing: finding summary,
-    file:line, PR link, trace/session refs, and a reproduction sketch.
-    Deduplicate: skip if an open "bug" issue already references the same
-    file:line + rule. Link each issue back to the PR.
+    fingerprint, file/symbol, PR link, trace/session refs, reproduction sketch.
+    Deduplicate: skip if an open "bug" issue carries the same fingerprint.
+    Link each issue back to the PR.
   Record issue URLs in review_report.bug_issues[].
+
+Step 7b — PR contract validation (v1.2.0)
+  Validate the PR body against the tiered contract: always-required sections
+  (Issue, Summary, Implementation, Testing, Validation Results, Risk, Workflow ID)
+  plus conditional sections triggered by change classification (security, database,
+  API, migration, breaking, deployment, performance). Reject placeholder content
+  (N/A, TBD, TODO, none) in required sections — fail the verdict to
+  "request-changes" with reason PR_CONTRACT_INVALID.
 
 Step 8 — Bot approval (v1.1.0, requires REVIEWER_BOT_TOKEN identity)
   IF verdict == "approve" AND all required checks green AND no unresolved criticals:

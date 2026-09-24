@@ -31,6 +31,23 @@ Every gate decision appends `{ pr, head_sha, decision, reason, checks, timestamp
 run log and posts a hold/merge comment on the PR. The monthly summary lists merges, holds
 with reasons, bugs filed, and overrides. Human override is always available and always wins.
 
+## Credential lifecycle (P1.8)
+| Field | Value |
+|---|---|
+| Credential owner | repository maintainer (human) |
+| GitHub App ID | TBD — register app, record ID here |
+| Installation scope | this repository only |
+| Permissions | Contents: read · Pull requests: read+write · Issues: read+write · no admin, no workflows, no secrets |
+| Secret location | repo secret `REVIEWER_BOT_TOKEN` (CI) / ignored `.env` (local); never committed, never logged |
+| Creation | maintainer creates installation token per run (short-lived, auto-expiring) |
+| Rotation/expiry | 90-day review; rotate on maintainer change or suspected exposure |
+| Revocation | delete secret or uninstall app → gate holds with `no-bot-identity` (instant human-only mode) |
+| Emergency disablement | add `human-hold` label to any PR, or revoke — both take effect immediately |
+| Audit | every token use appears in gate decisions; quarterly access review |
+| Compromise response | revoke → rotate → audit prior 30 days of gate decisions → report |
+
+Prefer GitHub App installation tokens over long-lived PATs.
+
 ## Revocation
-Delete `REVIEWER_BOT_TOKEN` (or the machine user) to instantly return to human-only merges.
+Delete `REVIEWER_BOT_TOKEN` (or uninstall the app) to instantly return to human-only merges.
 The gate then holds everything with reason `no-bot-identity`.

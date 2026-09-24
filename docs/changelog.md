@@ -9,6 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P1 autonomous-governance foundation (policies as data, control-plane protection)
+
+- 10 policy files under `config/` (validation-profile, development, review, risk, budget, merge, rollback, backlog, control-plane, policy-versions) with discovery via `scripts/policy-loader.js` (config/ first, `.ai/` adapter layout supported).
+- Tiered PR template (7 always-required + conditional sections, placeholder rejection); branch/commit policy (no `bugfix/` dup, sync-before-review, squash default).
+- Finding fingerprint v2 (repo+category+symbol+normalized+context hash; skill bumped to 1.2.0); severity/blocking tiers + `needs-investigation` + security-disclosure rules in review policy.
+- `GOVERNANCE_CHANGE` classification with CI enforcement (`.github/workflows/governance-gate.yml` labels + requires human review); `governance` + `human-hold` labels; credential lifecycle in `bot-ownership.md`.
+- `tests/test-governance-policies.sh` 8/8. Control-plane protection active from P1 per decision.
+
 ### Runtime-owned live execution (zero AIW model credentials)
 
 - Removed the `PROVIDER_API_KEY` assumption: live now means execution through the runtime's own non-interactive entry with the runtime's own auth (`scripts/runtime-auth.js` attests installed+authenticated, read-only, never prints secrets).
