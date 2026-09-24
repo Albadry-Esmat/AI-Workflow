@@ -82,13 +82,20 @@ if grep -rE "OPENAI_API_KEY|ANTHROPIC_API_KEY|GEMINI_API_KEY|PROVIDER_API_KEY" \
 else
   ok "no provider keys in kernel surface"
 fi
-# 18a. runtime-auth attests without secrets (codex authenticated here)
+# 18a. runtime-auth attests without secrets (environment-aware: proves live
+# where authenticated, proves fail-closed shape everywhere)
 node -e "
 const {checkAuth} = require('$ROOT/scripts/runtime-auth');
 const a = checkAuth('codex');
-if (!a.installed || !a.authenticated) process.exit(1);
+if (typeof a.installed !== 'boolean' || typeof a.authenticated !== 'boolean') process.exit(1);
+if (!a.installed && a.authenticated) process.exit(1); // never authed when absent
 const c = checkAuth('cursor');
-if (c.authenticated) process.exit(1); // grok binary must not pass as Cursor
+if (c.authenticated && !/cursor/i.test(c.version || '')) process.exit(1); // non-Cursor binary must not pass
+const d = require('$ROOT/scripts/live-dispatch');
+if (!a.authenticated) {
+  const r = d.dispatch('test-noauth', { adapter: 'codex', prompt: 'x', targetPath: '' });
+  if (!r.failed || !/no-authenticated-runtime/.test(r.reason)) process.exit(1);
+}
 " && ok "runtime-auth attestation" || bad "runtime-auth"
 # 18b. live-dispatch refuses unauthenticated runtimes (fail-closed)
 node -e "
