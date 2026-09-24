@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P4 issue ownership (manager agent, backlog selection)
+
+- New read-only `issue-manager` agent: dedupe/create/link/label/update/close/reopen; close requires verified fix + green tests + reviewed SHA.
+- `scripts/backlog-select.js`: enforces medium-risk cap, fingerprint dedup, depth ≤ 3, daily budget, ≤5 per case.
+- `opencode.json` edited surgically (+10/−0) per issue #32's rule.
+- Workflow tests 8/8.
+
 ### P3 shadow autonomy (metrics, rollout policy, shadow gate)
 
 - `config/rollout-policy.yml` + `scripts/rollout-tracker.js`: promotion eligibility is human-decided, demotion automatic on trust-signal decay.

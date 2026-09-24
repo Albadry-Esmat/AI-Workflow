@@ -88,6 +88,21 @@ if (g.decision !== 'MERGE_BLOCKED') process.exit(1);
 " && ok "shadow gate fail-closed" || bad "shadow"
 rm -rf "$ROOT/artifacts/cases/SHADOW-T"*
 
+# 8. backlog selection respects risk cap, dedup, depth, daily budget
+node -e "
+const {select} = require('$ROOT/scripts/backlog-select');
+const seen = new Set(['fp-known']);
+const items = [
+  { id: 'A', risk: 'low', fingerprint: 'fp-a', generation_depth: 0 },
+  { id: 'B', risk: 'high', fingerprint: 'fp-b', generation_depth: 0 },
+  { id: 'C', risk: 'low', fingerprint: 'fp-known', generation_depth: 0 },
+  { id: 'D', risk: 'medium', fingerprint: 'fp-d', generation_depth: 9 },
+];
+const r = select(items, { seenFingerprints: seen });
+if (r.picked.join() !== 'A') process.exit(1);
+if (r.skipped.length !== 3) process.exit(1);
+" && ok "backlog selection limits" || bad "backlog"
+
 echo ""
 echo "workflow-p2: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

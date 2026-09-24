@@ -7,9 +7,9 @@ cd "$ROOT"
 
 echo "== 1/4 website mirrors =="
 bash scripts/sync-website-data.sh > /dev/null
-if [ -n "$(git status --porcelain website/data/)" ]; then
+if [ -n "$(git diff --name-only -- website/data/)" ]; then
   echo "  FAIL: website/data/ drifted — mirrors updated above, review + commit them"
-  git status --porcelain website/data/
+  git diff --name-only -- website/data/
   exit 1
 fi
 echo "  PASS: mirrors in sync"

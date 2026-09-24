@@ -65,6 +65,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `github-reviewer` | `github-pr-review` | `subagent` | edit: ask |
 | `merge-gatekeeper` | `github-merge-gate` | `subagent` | edit: ask |
 | `investigation` | — (read-only diagnostics) | `subagent` | read-only |
+| `issue-manager` | `—` (GitHub issues API) | `subagent` | read-only |
 
 ### Subagent Capability Mapping
 
@@ -90,6 +91,8 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `sre` | architecture, deployment strategy | SLO/SLA designs, load test scenarios, runbooks, chaos experiments | deployer, tester |
 | `github-reviewer` | PR metadata, diff, CI status | review_report, labels_applied, merge-gate summary | reviewer |
 | `merge-gatekeeper` | live PR state, review verdict | merge/hold decision, audit log | reviewer |
+| `investigation` | finding, repo, environment | RESOLVED evidence or UNRESOLVED + missing list | reviewer |
+| `issue-manager` | findings, issues API | deduped/linked/labeled issues, closures | reviewer |
 
 ## Agent Configuration
 
@@ -298,7 +301,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 }
 ```
 
-Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 22 agents (1 primary + 21 subagents) have corresponding instruction files.
+Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 23 agents (1 primary + 22 subagents) have corresponding instruction files.
 
 ## Model Configuration
 
