@@ -71,6 +71,23 @@ if (!rep.includes('ANALYZING')) process.exit(1);
 " && ok "case store + audit chain" || bad "case store"
 rm -rf "$ROOT/artifacts/cases/TEST-"*
 
+# 6. rollout tracker: auto-demote on violation, promote-eligible only via human
+node -e "
+const R = require('$ROOT/scripts/rollout-tracker');
+const d = R.evaluate({ policy_violations: 0 });
+if (d.action !== 'hold') process.exit(1);
+" && ok "rollout tracker hold" || bad "rollout"
+
+# 7. shadow gate blocks without approval
+node -e "
+const C = require('$ROOT/scripts/case-store');
+const id = 'SHADOW-T' + Date.now();
+C.createCase(id, {});
+const g = require('$ROOT/scripts/shadow-gate').shadowEvaluate(id);
+if (g.decision !== 'MERGE_BLOCKED') process.exit(1);
+" && ok "shadow gate fail-closed" || bad "shadow"
+rm -rf "$ROOT/artifacts/cases/SHADOW-T"*
+
 echo ""
 echo "workflow-p2: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

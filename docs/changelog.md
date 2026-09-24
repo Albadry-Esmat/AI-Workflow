@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P3 shadow autonomy (metrics, rollout policy, shadow gate)
+
+- `config/rollout-policy.yml` + `scripts/rollout-tracker.js`: promotion eligibility is human-decided, demotion automatic on trust-signal decay.
+- `scripts/shadow-gate.js`: post-hoc MERGE_ALLOWED/BLOCKED recomputation without merging (measures gatekeeper agreement).
+- `scripts/metrics-report.js`: autonomy/escalation/cycle rates from case events (proxies first).
+- Workflow tests 7/7.
+
 ### P2 executable workflow (state machine, locks, cases, investigation)
 
 - `scripts/workflow-state.js`: enforced transitions, forbidden-throw, 3-cycle cap with escalation.
