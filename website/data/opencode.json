@@ -364,6 +364,16 @@
       },
       "description": "Bounded evidence gathering for NEEDS_INVESTIGATION findings — one round, then resolve or escalate. Read-only.",
       "skills": []
+    },
+    "issue-manager": {
+      "mode": "subagent",
+      "model": "github-copilot/claude-haiku-4.5",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "description": "Issue lifecycle ownership — dedupe, create, link, label, update, close, reopen. Reviewer determines resolution.",
+      "skills": []
     }
   }
 }
