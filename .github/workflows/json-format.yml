@@ -1,0 +1,19 @@
+name: JSON Format Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  canonical:
+    name: Canonical JSON check (issue #32)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check canonical form
+        run: python3 scripts/canonical-json.py --check

@@ -14,6 +14,9 @@ if [ -n "$(git diff --name-only -- website/data/)" ]; then
 fi
 echo "  PASS: mirrors in sync"
 
+echo "== 1b/4 canonical JSON =="
+python3 scripts/canonical-json.py --check > /dev/null || { echo "  FAIL: run python3 scripts/canonical-json.py --write and commit"; exit 1; }
+
 echo "== 2/4 governance policies =="
 bash tests/test-governance-policies.sh > /tmp/prepr-gov.log 2>&1 || { tail -5 /tmp/prepr-gov.log; exit 1; }
 
