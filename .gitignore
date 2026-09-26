@@ -88,7 +88,9 @@ artifacts/npm-audit-*.json
 .opencode/state/locks/
 .opencode/state/producers/
 .opencode/state/reviews/
+.opencode/state/governance/
 artifacts/shadow-observations/
+graphify-out/.rebuild.lock
 
 # ─── O1 project-local toolchain environment ────────────────────────────────────
 # Disposable Python environment; recreate from requirements-dev.txt.
