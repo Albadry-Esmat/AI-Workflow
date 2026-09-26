@@ -11,8 +11,12 @@ export AIW_GATE_REGISTRY="/tmp/gd-adv-$$-$(date +%s).jsonl"
 rm -f "$AIW_GATE_REGISTRY"
 trap 'rm -f "$AIW_GATE_REGISTRY" "${AIW_GATE_REGISTRY%.jsonl}.consumptions.jsonl"' EXIT
 # Unique synthetic subjects per run (never collide with other runs/residue).
+# NOTE: e2e uses its own SC/SD pair — SA carries a blocking finding from the
+# forgery attacks above, so e2e must not reuse SA (self-pollution).
 SA=$(node -e "console.log(require('crypto').createHash('sha256').update('syn-a-'+Date.now()+''+process.pid).digest('hex'))")
 SB=$(node -e "console.log(require('crypto').createHash('sha256').update('syn-b-'+Date.now()+''+process.pid).digest('hex'))")
+SC=$(node -e "console.log(require('crypto').createHash('sha256').update('syn-c-'+Date.now()+''+process.pid).digest('hex'))")
+SD=$(node -e "console.log(require('crypto').createHash('sha256').update('syn-d-'+Date.now()+''+process.pid).digest('hex'))")
 PRE="const sod=require('$ROOT/scripts/separation-of-duties');const id=require('$ROOT/scripts/execution-identity');const g=require('$ROOT/scripts/require-gate-decision');const gd=require('$ROOT/scripts/gate-decisions');"
 mkd() { # mkd <exec> <subject> [class] → decision id (authed human)
   node -e "console.log(gd_record());" 2>/dev/null || node -e "
@@ -153,7 +157,7 @@ fi
 
 # ── End-to-end advancement chain (§20) ────────────────────────────────
 node -e "$PRE
-const S='$SA';
+const S='$SC';
 const pe=require('$ROOT/scripts/producer-evidence');
 const re=require('$ROOT/scripts/review-evidence');
 const fe=require('$ROOT/scripts/evidence-freshness');
@@ -178,7 +182,7 @@ const auth=g.requireGateDecision({decisionId:dec,gateId:'release',gateClass:'rel
   sod:{producers,reviewer:review,gateRole:'gatekeeper'}});
 if(!auth.consumption||!auth.sod.allowed)process.exit(1);
 // mutate subject: EVERY edge of the old chain is dead for S2
-const S2='$SB';
+const S2='$SD';
 if(fe.check('review',review,{subjectHash:S2}).fresh)process.exit(1);
 if(fe.check('benchmark',bench,{subjectHash:S2}).fresh)process.exit(1);
 try{g.requireGateDecision({decisionId:dec,gateId:'release',gateClass:'release',action:'release-attest',subjectHash:S2,subjectKind:'repo_head',executionId:'e2e-rel2',
@@ -187,7 +191,7 @@ const staleProd=pe.loadForSubject(S2);
 if(staleProd.producers.length!==0)process.exit(1);
 console.log('E2E-OK');
 " | grep -q E2E-OK && ok "end-to-end chain authorizes; subject mutation kills every edge" || bad "e2e chain"
-rm -rf "$ROOT/.opencode/state/producers/$SA.jsonl" "$ROOT/.opencode/state/reviews/$SA.jsonl"
+rm -rf "$ROOT/.opencode/state/producers/$SC.jsonl" "$ROOT/.opencode/state/reviews/$SC.jsonl"
 
 echo ""
 echo "governance-adversarial: $PASS passed, $FAIL failed"
