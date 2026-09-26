@@ -79,6 +79,17 @@ artifacts/npm-audit-*.json
 !artifacts/.gitkeep
 
 
+# ─── Ephemeral test/execution state (never commit) ─────────────────────────────
+.opencode/state/test-*/
+.opencode/state/test-*
+.opencode/state/test-rel*/
+.opencode/state/findings/
+.opencode/state/store/
+.opencode/state/locks/
+.opencode/state/producers/
+.opencode/state/reviews/
+artifacts/shadow-observations/
+
 # ─── O1 project-local toolchain environment ────────────────────────────────────
 # Disposable Python environment; recreate from requirements-dev.txt.
 .venv/

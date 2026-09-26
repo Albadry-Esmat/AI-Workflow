@@ -18,14 +18,18 @@ function makeAdapter({ id, executable, isolation, notes }) {
       return { id, installed: false, version: null };
     }
   }
-  function start(threadId, { model_tier, pipeline }) {
-    checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: id, model_tier, pipeline, isolation });
+  function start(threadId, { model_id, model_tier, tier_hint, pipeline, model_resolution = null, agent_identity = null }) {
+    const effectiveModel = model_id || model_tier || 'unknown';
+    checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: id, model_id: effectiveModel, model_tier, pipeline, isolation, model_resolution, agent_identity });
     return { threadId, adapter: id };
   }
-  function send(threadId, { prompt, model_tier, tool, targetPath, approval }) {
+  function send(threadId, { prompt, model_id, model_tier, tier_hint, model_resolution = null, agent_identity = null, gate_id = null, subject_hash = null, execution_id = null, tool, targetPath, approval }) {
     const verdict = gateway.check({ tool: tool || 'read', path: targetPath || '', threadId, approval });
+    const effectiveModel = model_id || model_tier || 'unknown';
     const rec = trace.writeTrace(threadId, {
-      model: model_tier || 'balanced',
+      model: effectiveModel,
+      model_id: model_id || undefined,
+      model_resolution,
       tool_calls: [{ tool: tool || 'read', path: targetPath || '', decision: verdict.decision, adapter: id }],
       guardrail: verdict.decision,
       handoff: verdict.decision === 'deny' ? 'policy-denied' : null,

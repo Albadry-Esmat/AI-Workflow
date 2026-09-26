@@ -118,6 +118,14 @@ The orchestrator reads `verdict` after each guard gate:
 | CR impact approval | `change-impact-analyzer` (change-request pipeline, phase 2) | CR planning | 7200s | No |
 | CR scope delivery | `implementation-completeness-auditor` (change-request pipeline, phase 6) | CR closure | 3600s | No |
 
+Enforced by `scripts/validate-pipeline-gates.py` (CI + `make validate`): every
+`human_approval` gate in `skills/pipelines/*.json` must explicitly declare
+`bypass_on_timeout` (currently 94/94 declare `false`). Timeout means BLOCKED +
+escalate — never implicit approval. `bypass_on_timeout:true` requires
+`timeout_expiry_action:'continue_by_policy'` plus a registered exception in
+`config/gate-timeout-exceptions.json`, and is forbidden for security,
+deployment, release, completeness, governance-change, and force-proceed gates.
+
 ### Deployment Gate (Special Rule)
 
 The deployment gate is a system-level invariant:
@@ -128,6 +136,22 @@ The deployment gate is a system-level invariant:
 - No deployment action occurs until an explicit `approve` response is received
 - Any pipeline configuration missing this gate is **rejected before execution** with error `MISSING_DEPLOYMENT_GATE`
 
+### Decision Registry (Phase 1B)
+
+`scripts/gate-decisions.js` is the authoritative approval / rejection / override
+registry — distinct from `policy-approval.js` (privileged tool permission) and
+`case-store.js` (case event history). Human and authorized sources write decision
+records; guards, the orchestrator, and promotion resolve them by `decision_id`.
+
+Consumers receive only `{ "override_decision_id": "gd_..." }` and resolve it
+against the registry (existence, hash-chain integrity, expiry, gate/scope/
+subject binding). Plain `{ override_approved: true, approver: "..." }` bearer
+objects are never trusted. Records separate integrity (`decision_id`,
+`subject_hash`, `prev_hash`, `record_hash`), attribution (`principal`: type, id,
+`authenticated`, source), and authorization (`gate_id`, `gate_class`, scope,
+`policy_version`). Authority enforcement for high-stakes gates lands in Phase 2;
+the registry already reports `authority.sufficient_for_high_stakes` per decision.
+
 ### Gate Response Actions
 
 | Response | Orchestrator Action |
@@ -135,7 +159,8 @@ The deployment gate is a system-level invariant:
 | `approve` | Continue pipeline, log decision |
 | `reject` | Halt pipeline, return partial results |
 | `modify` | Apply modifications to current artifact, re-validate, continue |
-| `timeout` | Log `gate_skipped`, auto-continue (standard gates only — NOT deployment gate) |
+| `timeout` | BLOCKED + escalate (record `gate_timeout`; surface gate id, phase, elapsed). Continue only with `bypass_on_timeout:true` + registered `policy_exception` — forbidden for security/deployment/release/completeness/governance-change/force-proceed gates. Enforced by `scripts/validate-pipeline-gates.py`. |
+| `missing / invalid response` | BLOCKED. A non-response is never an approval. |
 
 ## Documentation Governance (Layer 4)
 
@@ -196,7 +221,7 @@ The deployment gate is a system-level invariant:
 - HITL gate changes require updating the orchestrator AND this file.
 - Permission changes require updating agent configuration AND this file.
 - Adding a guard skill requires updating the Guard Inventory table AND `skills-registry.md`.
-- Model changes to `reviewer`, `security-specialist`, or `recovery` agents require a PR comment with justification. Downgrading these agents to a lightweight model (e.g. `claude-haiku-4.5`) without documented rationale is not permitted. See [`docs/models.md`](models.md) for available model IDs and recommended assignments.
+- Model changes to `reviewer`, `gatekeeper`, `security-specialist`, or `recovery` agents require a PR comment with justification. Downgrading these agents to a lightweight model (e.g. `github-copilot/claude-haiku-4.5`) without documented rationale is not permitted. See [`docs/models.md`](models.md) and the authoritative `config/model-requirements.yml` for explicit model overrides. Availability is verified via `runtime.listAvailableModels()`; unavailable explicit models fail closed with no silent inheritance.
 
 ## Agent Resource Limits
 

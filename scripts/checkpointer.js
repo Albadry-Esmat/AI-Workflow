@@ -9,9 +9,10 @@ const crypto = require('node:crypto');
 
 const ROOT = path.resolve(__dirname, '..');
 const STATE_ROOT = path.join(ROOT, '.opencode', 'state');
+const { sanitizeId } = require('./sanitize-id');
 
 function threadDir(threadId) {
-  return path.join(STATE_ROOT, threadId);
+  return path.join(STATE_ROOT, sanitizeId(threadId));
 }
 function checkpointPath(threadId) {
   return path.join(threadDir(threadId), 'checkpoint.jsonl');

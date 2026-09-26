@@ -1,7 +1,6 @@
 ---
 description: Deployment strategy — environment model, promotion rules, rollback criteria, feature flags, and IaC scaffold. Invoked after testing strategy is defined.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

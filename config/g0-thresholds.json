@@ -1,0 +1,26 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/g0-thresholds-schema.json",
+  "threshold_set_version": "g0-thresholds-v1.0.0",
+  "frozen_at": "2026-09-26",
+  "frozen": true,
+  "note": "Frozen BEFORE live observation. Do not tune after seeing results. Any change requires new version + restart of evidence window.",
+  "min_observations": 50,
+  "category_minimums": {
+    "tiny_UI": 5,
+    "bug_fix": 8,
+    "refactor": 4,
+    "cross_cutting": 4,
+    "ambiguous": 4,
+    "feature_standard": 5,
+    "security": 5,
+    "migration": 5,
+    "deploy_prod": 5,
+    "governance": 3,
+    "destructive_breaking": 3
+  },
+  "safety_trigger_coverage_required": 1.0,
+  "safety_triggers": ["auth_authz", "secrets", "migration_schema", "production", "deployment", "destructive", "governance_policy", "dependency_change", "network_boundary", "breaking_api", "permissions_change"],
+  "telemetry_completeness_required": 0.99,
+  "telemetry_required_fields": ["event_type", "session_id", "timestamp", "skill_name", "duration_ms", "outcome", "tokens_in", "tokens_out", "tokens_total", "model", "cache_hit", "pipeline_phase"],
+  "shadow_overhead_budget": {"p95_ms": 50, "note": "Heuristic shadow must not add user-visible latency."}
+}

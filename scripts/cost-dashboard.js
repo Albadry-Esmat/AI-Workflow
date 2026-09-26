@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-// Cost/quality/latency dashboard per task class (model tier).
+// Cost/quality/latency dashboard per exact model (tier metadata only).
 // Sources: trace.jsonl files (allow/deny, tool calls, latency) + benchmark reports.
 // Costs come exclusively from runtime-reported usage; AIW holds zero model
 // credentials and never calls provider billing. Det mode reports zero live tokens.
@@ -53,6 +53,7 @@ function main() {
   const report = {
     ts: new Date().toISOString(),
     traces_total: traces.length,
+    by_model: byTier,
     by_model_tier: byTier,
     benchmark: latestBench ? { version: latestBench.dataset_version, passed: latestBench.passed, total: latestBench.total, live: latestBench.live ? `${latestBench.live.passed}/${latestBench.live.prompts.length}` : null } : null,
     runtime_usage: usage,

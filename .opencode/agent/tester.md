@@ -1,7 +1,6 @@
 ---
 description: Test strategy, test case generation, coverage targets, edge cases, and quality gates. Invoked after feature planning is approved.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

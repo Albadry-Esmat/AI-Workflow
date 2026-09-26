@@ -303,36 +303,42 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate IoT/embedded requirements \u2014 confirm system type, real-time class, safety standard, hardware target, and communication protocols before domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on initial architecture before systems domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve systems domain constraints: architecture pattern (bare-metal/RTOS/IoT), memory budget, protocol selection, OTA design, safety standard controls \u2014 these are foundational hardware decisions",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2d-architecture-refine",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve hardware-constrained architecture before data design and planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve data architecture (device registry, telemetry schema, local data structures) before planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap and impact surface before embedded system implementation",
       "timeout": 3600
     },
@@ -352,6 +358,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture, WCET analysis, HIL test coverage, and safety control verification before audit",
       "timeout": 3600
     },

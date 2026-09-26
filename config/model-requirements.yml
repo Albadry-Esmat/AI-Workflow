@@ -1,0 +1,226 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# AI Workflow — Model Requirements Manifest (AUTHORITATIVE, v2)
+#
+# Boundary: Declare → Verify → Consume → Execute. Never Install → Connect →
+# Authenticate → Configure.
+#
+# - This file is the SOLE authority for model POLICY.
+# - Precedence (highest wins, deterministic):
+#     agent/task-specific explicit model → global agent model →
+#     current runtime/session model.
+# - `model: null` (or absent) means INHERIT — continue to the lower-priority
+#   source. Inheritance is normal, NOT fallback.
+# - An exact `model` means REQUIRE EXACTLY THIS MODEL. Unavailable explicit
+#   overrides fail closed with no silent inheritance.
+# - `global_agent_model` (null or exact id) applies to all agents/tasks
+#   without their own override. It is policy — never confuse it with the
+#   runtime's own selected model.
+# - `tier_hint` is descriptive metadata ONLY and MUST NOT determine execution.
+# - `provider` / `capabilities` describe WHAT is needed, never HOW the provider
+#   is provisioned (no api_key, login_command, install_command, provider_setup).
+# - Availability comes from the runtime capability interface
+#   (runtime.listAvailableModels); the current session model comes from
+#   scripts/runtime-session-model.js. The workflow verifies and consumes; the
+#   runtime owns what is installed, connected, authenticated, and available.
+# ─────────────────────────────────────────────────────────────────────────────
+version: "2.0.0"
+ownership: ai-workflow
+authority: authoritative-model-selection
+unavailable_behavior_default: fail_closed
+
+# Optional shared override for all agents/tasks without their own model.
+# null = no global override (inherit the runtime/session model).
+global_agent_model: null
+
+agents:
+  primary:
+    model: null
+    provider: null
+    capabilities: [orchestration, multi-step-reasoning]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  analyzer:
+    model: null
+    provider: null
+    capabilities: [requirement-extraction, normalization]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  architect:
+    model: null
+    provider: null
+    capabilities: [system-design, reasoning]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  planner:
+    model: null
+    provider: null
+    capabilities: [task-decomposition, dependency-mapping]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  reviewer:
+    model: null
+    provider: null
+    capabilities: [code-review, security-review, reasoning]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  tester:
+    model: null
+    provider: null
+    capabilities: [test-strategy, coverage-analysis]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  builder:
+    model: null
+    provider: null
+    capabilities: [code-generation, code-repair]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  impact-analyzer:
+    model: null
+    provider: null
+    capabilities: [dependency-analysis, blast-radius]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  test-generator:
+    model: null
+    provider: null
+    capabilities: [test-generation]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  recovery:
+    model: null
+    provider: null
+    capabilities: [rollback-planning, precision-reasoning]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  deployer:
+    model: null
+    provider: null
+    capabilities: [deployment-strategy]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  documenter:
+    model: null
+    provider: null
+    capabilities: [documentation-generation]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  doc-maintainer:
+    model: null
+    provider: null
+    capabilities: [documentation-maintenance]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  data-engineer:
+    model: null
+    provider: null
+    capabilities: [etl-design, ml-pipeline-design]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  api-designer:
+    model: null
+    provider: null
+    capabilities: [api-contract-design]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  distributed-systems:
+    model: null
+    provider: null
+    capabilities: [ddd, microservices, resilience-design]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  cloud-platform:
+    model: null
+    provider: null
+    capabilities: [cloud-architecture, kubernetes]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  security-specialist:
+    model: null
+    provider: null
+    capabilities: [threat-modeling, secrets-architecture]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  sre:
+    model: null
+    provider: null
+    capabilities: [slo-design, reliability]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  github-reviewer:
+    model: null
+    provider: null
+    capabilities: [pr-review, code-review]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  merge-gatekeeper:
+    model: null
+    provider: null
+    capabilities: [merge-gate-evaluation]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  investigation:
+    model: null
+    provider: null
+    capabilities: [evidence-gathering]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  issue-manager:
+    model: null
+    provider: null
+    capabilities: [issue-lifecycle]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  gatekeeper:
+    model: null
+    provider: null
+    capabilities: [policy-enforcement, gate-evaluation, evidence-verification]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+
+tasks:
+  quick-fix:
+    model: null
+    provider: null
+    capabilities: [single-session-fix, classification]
+    tier_hint: cheap
+    fallbacks: []
+    on_unavailable: fail_closed
+  feature-delivery:
+    model: null
+    provider: null
+    capabilities: [plan-code-guard-delivery]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed
+  release-review:
+    model: null
+    provider: null
+    capabilities: [release-gate, security-review, completeness]
+    tier_hint: frontier
+    fallbacks: []
+    on_unavailable: fail_closed

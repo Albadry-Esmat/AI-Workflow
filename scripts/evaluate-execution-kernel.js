@@ -4,7 +4,7 @@
 // Modes: --mode det (default, no network/model) | --mode live --adapter <id>
 // (executes through that runtime's own non-interactive entry with the runtime's
 // own auth; AIW holds zero model credentials; fails closed otherwise).
-// Graders per case: routing (template->tier/pipeline), tool-choice (gateway decision), policy (deny reasons), trace (envelope validates).
+// Graders per case: routing (template->model_id/pipeline; tier is metadata-only), tool-choice (gateway decision), policy (deny reasons), trace (envelope validates).
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -30,8 +30,11 @@ function grade(caseDef) {
   let routingOk = false, toolOk = false, traceOk = false;
   try {
     const r = router.route(caseDef.template);
-    routingOk = r.model_tier === caseDef.expected.model_tier && r.pipeline === caseDef.expected.pipeline;
-    if (!routingOk) findings.push(`routing mismatch: got ${r.model_tier}/${r.pipeline}`);
+    // AUTHORITY: model_id. model_tier is metadata-only and must not gate.
+    const expectedId = caseDef.expected.model_id !== undefined ? caseDef.expected.model_id : null;
+    const idOk = expectedId === null ? r.model_id == null : r.model_id === expectedId;
+    routingOk = idOk && r.pipeline === caseDef.expected.pipeline;
+    if (!routingOk) findings.push(`routing mismatch: got ${r.model_id}/${r.pipeline} (requirement ${r.model_requirement})`);
   } catch (e) {
     if (caseDef.expected.decision === 'error') { routingOk = true; toolOk = true; traceOk = true; }
     else findings.push('routing error: ' + e.message);
@@ -49,7 +52,7 @@ function grade(caseDef) {
   try {
     const schema = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'trace-envelope-schema.json'), 'utf8'));
     const ajv = new Ajv({ strict: true }); addFormats(ajv);
-    const rec = { trace_id: 'tr-grade', thread_id: 'grade', model: caseDef.expected.model_tier || 'cheap', tool_calls: [], guardrail: caseDef.expected.decision === 'deny' ? 'deny' : 'allow', handoff: null, ts: new Date().toISOString() };
+    const rec = { trace_id: 'tr-grade', thread_id: 'grade', model: caseDef.expected.model_id || 'unknown', model_id: caseDef.expected.model_id || undefined, tool_calls: [], guardrail: caseDef.expected.decision === 'deny' ? 'deny' : 'allow', handoff: null, ts: new Date().toISOString() };
     traceOk = ajv.compile(schema)(rec);
     if (!traceOk) findings.push('trace schema invalid');
   } catch (e) { findings.push('trace grader error: ' + e.message); }
@@ -91,7 +94,11 @@ function main() {
   const ds = JSON.parse(fs.readFileSync(path.join(ROOT, args.dataset), 'utf8'));
   const results = ds.cases.map((c) => ({ case_id: c.case_id, class: c.class, ...grade(c) }));
   const passed = results.filter((r) => r.pass).length;
-  const report = { dataset_version: ds.dataset_version, mode: args.mode, total: results.length, passed, failed: results.length - passed, results, runtime, live, ts: new Date().toISOString() };
+  let repo_head_sha = null;
+  try {
+    repo_head_sha = require('node:child_process').execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim() || null;
+  } catch { /* best-effort evidence binding */ }
+  const report = { dataset_version: ds.dataset_version, mode: args.mode, total: results.length, passed, failed: results.length - passed, results, runtime, live, repo_head_sha, ts: new Date().toISOString() };
   if (live && live.passed !== live.prompts.length) {
     console.log(`live prompts: ${live.passed}/${live.prompts.length} ok`);
     live.prompts.filter((p) => !p.ok).forEach((p) => console.log(`  LIVE-FAIL: ${p.reason}`));

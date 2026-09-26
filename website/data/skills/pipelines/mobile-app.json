@@ -322,36 +322,42 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate mobile requirements \u2014 confirm target platforms, offline needs, monetization model, and compliance scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on initial architecture before mobile domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve mobile domain constraints: technology stack, offline strategy, App Store compliance requirements, security controls, device matrix",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2d-architecture-refine",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve mobile-constrained architecture before UX/DB design",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve mobile UX architecture and database schema (local + remote) before planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap and impact surface before mobile implementation",
       "timeout": 3600
     },
@@ -370,6 +376,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture, device matrix test coverage, and accessibility compliance before audit",
       "timeout": 3600
     },

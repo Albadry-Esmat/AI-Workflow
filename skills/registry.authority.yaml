@@ -1,0 +1,244 @@
+# AI Workflow — Capability/Authority Source (AUTHORITATIVE, P0 bootstrap v1)
+# Single source for capability + authority metadata.
+# Projections (registry.json authority extension, index.yaml tags) are GENERATED
+# via scripts/sync-authority.js --write and CI-validated via --check.
+# P0/P1: read-only bootstrap scraped from opencode.json + registry.json.
+# No execution behavior changes.
+version: "1.1.0"
+ownership: ai-workflow
+authority: authoritative-capability-source
+defaults:
+  routing_eligible: false
+  note: Any agent without explicit authority/SoD/risk/fallback metadata defaults to routing_eligible=false / deny. Resolver must reject unlisted agents.
+agents:
+  primary:
+    capabilities: [orchestration, multi-step-reasoning]
+    authority: [routing, governance, gate-relay]
+    separation_of_duty: [never-specialist, never-approver]
+    permissions: {edit: ask, bash: ask}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+  analyzer:
+    capabilities: [requirement-extraction, normalization]
+    authority: [requirements-evidence]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+  architect:
+    capabilities: [system-design, reasoning]
+    authority: [architecture-design-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+  planner:
+    capabilities: [task-decomposition, dependency-mapping]
+    authority: [planning-authority]
+    separation_of_duty: [never-gatekeeper]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+  reviewer:
+    capabilities: [code-review, security-review, reasoning]
+    authority: [review-evidence]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+  gatekeeper:
+    capabilities: [policy-enforcement, gate-evaluation, evidence-verification]
+    authority: [gate-verdict-authority]
+    separation_of_duty: [never-builder, never-reviewer, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+  builder:
+    capabilities: [code-generation, code-repair]
+    authority: [implementation-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+  tester:
+    capabilities: [test-strategy, coverage-analysis]
+    authority: [test-plan-authority]
+    separation_of_duty: [never-gatekeeper]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+  deployer:
+    capabilities: [deployment-strategy]
+    authority: [deployment-plan-authority]
+    separation_of_duty: [never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+  impact-analyzer:
+    capabilities: [dependency-analysis, blast-radius]
+    authority: [impact-evidence]
+    separation_of_duty: [never-gatekeeper]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: true
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  test-generator:
+    capabilities: [test-generation]
+    authority: [test-implementation-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  recovery:
+    capabilities: [rollback-planning, precision-reasoning]
+    authority: [recovery-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  documenter:
+    capabilities: [documentation-generation]
+    authority: [documentation-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  doc-maintainer:
+    capabilities: [documentation-maintenance]
+    authority: [documentation-maintenance-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  data-engineer:
+    capabilities: [etl-design, ml-pipeline-design]
+    authority: [data-architecture-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  api-designer:
+    capabilities: [api-contract-design]
+    authority: [api-contract-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  distributed-systems:
+    capabilities: [ddd, microservices, resilience-design]
+    authority: [distributed-design-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  cloud-platform:
+    capabilities: [cloud-architecture, kubernetes]
+    authority: [cloud-architecture-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  security-specialist:
+    capabilities: [threat-modeling, secrets-architecture]
+    authority: [security-design-authority]
+    separation_of_duty: [never-gatekeeper, never-builder, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  sre:
+    capabilities: [slo-design, reliability]
+    authority: [reliability-evidence]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  github-reviewer:
+    capabilities: [pr-review, code-review]
+    authority: [review-evidence]
+    separation_of_duty: [never-gatekeeper, never-approver, never-merger]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high]
+    fallback_eligibility: false
+    cost_class: medium
+    availability: true
+    routing_eligible: true
+  merge-gatekeeper:
+    capabilities: [merge-gate-evaluation]
+    authority: [merge-gate-authority]
+    separation_of_duty: [never-builder, never-reviewer, never-approver]
+    permissions: {edit: ask, bash: deny}
+    risk_eligibility: [low, medium, high, critical]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  investigation:
+    capabilities: [evidence-gathering]
+    authority: [diagnostics-authority]
+    separation_of_duty: [never-gatekeeper, never-approver, never-builder]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium]
+    fallback_eligibility: true
+    cost_class: low
+    availability: true
+    routing_eligible: true
+  issue-manager:
+    capabilities: [issue-lifecycle]
+    authority: [issue-management-authority]
+    separation_of_duty: [never-gatekeeper, never-approver]
+    permissions: {edit: deny, bash: deny}
+    risk_eligibility: [low, medium]
+    fallback_eligibility: false
+    cost_class: low
+    availability: true
+    routing_eligible: true

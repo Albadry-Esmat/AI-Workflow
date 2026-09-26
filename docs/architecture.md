@@ -13,7 +13,7 @@
                   ▼
 ┌──────────────────────────────────────────────────────┐
 │                   Orchestrator                        │
-│  Skills/orchestrator/orchestrator.md                  │
+│  .opencode/skills/orchestrator/SKILL.md                │
 │  - Pipeline execution                                 │
 │  - Artifact routing                                   │
 │  - Schema validation (via schema-validator)           │
@@ -31,10 +31,11 @@
                   │
                   ▼
          ┌────────────────┐
-         │ Session Context │
-         │ (memory/       │
-         │  context-      │
-         │  protocol.md)  │
+          │ Session Context │
+          │ (.opencode/    │
+          │  skills/       │
+          │  context-      │
+          │  memory/)      │
          └────────────────┘
 ```
 
@@ -52,7 +53,7 @@ Central catalog of all skills. Each entry includes:
 - `consumes_from`/`produces_for` — Dependency graph
 - `orchestration` — Execution order notes
 
-### 2. Orchestrator (`skills/orchestrator/orchestrator.md`)
+### 2. Orchestrator (`.opencode/skills/orchestrator/SKILL.md`)
 
 The meta-skill that drives execution. It:
 
@@ -74,7 +75,7 @@ Each skill is a markdown file conforming to the [Skill Template](../skills/templ
 - **Schema-enforced** — input and output have JSON Schema validations
 - **Observable** — every output includes a `metrics` object
 
-### 4. Context Memory (`skills/memory/context-protocol.md`)
+### 4. Context Memory (`.opencode/skills/context-memory/SKILL.md`)
 
 Session state is serialized into a `session_context` object:
 
@@ -83,7 +84,7 @@ Session state is serialized into a `session_context` object:
 - Compression rules minimize token consumption across turns
 - Session token budgets: 32K (quick), 64K (standard), 128K (deep)
 
-### 5. Schema Validator (`skills/validation/schema-validator.md`)
+### 5. Schema Validator (`.opencode/skills/schema-validator/` + `skills/schema/` JSON Schemas)
 
 Utility invoked by the orchestrator after each skill step. Validates:
 

@@ -556,7 +556,9 @@
               "on_rejected": "return_to_planner",
               "increment_field": "revision_count",
               "max_revisions_before_hitl": 3,
-              "hitl_gate_id": "GATE-ESC-001"
+              "hitl_gate_id": "GATE-ESC-001",
+              "extension_field": "extension_count",
+              "max_extensions": 2
             },
             "output_artifact": "validation_result",
             "output_schema": "skills/schema/validation-result.schema.json"
@@ -853,7 +855,7 @@
       "gate_id": "GATE-001",
       "after_phase": "phase-0-cost-estimate",
       "type": "human_approval",
-      "label": "GATE-001: Cost estimate approval \u2014 approve (YES), reject (NO \u2014 aborts), or reduce scope (REDUCE). Mandatory, non-bypassable.",
+      "label": "GATE-001: Cost estimate approval \u2014 approve (YES), reject (NO \u2014 aborts), or reduce scope (REDUCE). Non-bypassable except the single registered ci_mode exception (config/governance-flags-policy.json), which requires a recorded reason + identity.",
       "timeout": 3600,
       "bypass_on_timeout": false,
       "choices": [
@@ -914,9 +916,10 @@
       "gate_id": "GATE-ESC-001",
       "after_phase": "phase-4h-validation",
       "type": "human_approval",
-      "label": "GATE-ESC-001: Revision limit escalation. Triggered when revision_count reaches 3 (three REJECTED cycles without passing validation). Human sees: full revision_history, all hard_check_failures across all revision rounds, and debate transcripts if available. Choices: FORCE_PROCEED (override all failures \u2014 requires written justification), ABORT, EXTEND_REVISIONS (grants 2 additional revision rounds).",
+      "label": "GATE-ESC-001: Revision limit escalation. Triggered when revision_count reaches 3 (three REJECTED cycles without passing validation). Human sees: full revision_history, all hard_check_failures across all revision rounds, and debate transcripts if available. Choices: FORCE_PROCEED (override all failures \u2014 requires written justification), ABORT, EXTEND_REVISIONS (grants 2 additional rounds; max 2 extensions, then only ABORT/FORCE_PROCEED).",
       "condition": "validation_result.revision_count >= 3 && validation_result.verdict === 'REJECTED'",
       "timeout": 0,
+      "max_extensions": 2,
       "bypass_on_timeout": false,
       "choices": [
         "FORCE_PROCEED",
@@ -938,8 +941,11 @@
         "EXTEND_REVISIONS": {
           "action": "set_state",
           "state_delta": {
-            "validation_result.revision_count": "validation_result.revision_count - 2"
+            "validation_result.revision_count": "validation_result.revision_count - 2",
+            "validation_result.extension_count": "validation_result.extension_count + 1"
           },
+          "max_extensions": 2,
+          "exhausted_choices": ["FORCE_PROCEED", "ABORT"],
           "then": "return_to_phase",
           "target_phase": "phase-4-planning"
         }

@@ -18,7 +18,7 @@ Enforce the release readiness threshold by consuming the readiness score from th
 | `readiness_level` | `string` | Yes | Level string from auditor: release_ready / conditional / not_ready / blocked |
 | `gaps` | `array[object]` | Yes | Gap list from auditor |
 | `release_threshold` | `integer` | No | Minimum score required (default: 85, configurable per pipeline) |
-| `approval_context` | `object` | No | Prior human approval to release despite score < threshold (conditional override) |
+| `override_decision_id` | `string` | No | Registry decision id (`gd_...`) from `scripts/gate-decisions.js` authorizing release despite score < threshold. The ONLY override mechanism — bearer `approval_context` objects are never trusted. |
 
 **Input Schema:**
 
@@ -32,7 +32,11 @@ Enforce the release readiness threshold by consuming the readiness score from th
     "readiness_level":   { "type": "string", "enum": ["release_ready", "conditional", "not_ready", "blocked"] },
     "gaps":              { "type": "array" },
     "release_threshold": { "type": "integer", "minimum": 0, "maximum": 100, "default": 85 },
-    "approval_context":  { "type": "object" }
+    "override_decision_id": {
+      "type": "string",
+      "pattern": "^gd_[a-f0-9]{16}$",
+      "description": "Registry decision id resolved by the orchestrator via scripts/resolve-override.js (scope.approved_score is the baseline; current score must be >= baseline)."
+    }
   }
 }
 ```
@@ -49,11 +53,16 @@ Step 1 — Evaluate score against threshold
   If readiness_score < release_threshold: proceed to Step 2.
   Output: threshold evaluation result
 
-Step 2 — Check for approved override
-  If approval_context is present and approval_context.scope = "completeness_override":
-    If approval_context.approved_score <= readiness_score: accept override.
-    Else: block (score has regressed below approved baseline).
-  If no approval_context: emit block verdict.
+Step 2 — Resolve override decision if present
+  IF override_decision_id provided, the orchestrator MUST have resolved it via
+    node scripts/resolve-override.js --decision-id <id> --gate-id <this gate invocation>
+      --gate-class completeness --scope-json '{"approved_score":<baseline>}'
+  Accept the resolution result as given: valid AND scope.approved_score <=
+  readiness_score → accept override (record decision_id, set override_applied:true).
+  Resolution invalid, or readiness_score < scope.approved_score (regressed below
+  the approved baseline) → block with override_score_regressed where applicable.
+  A bare approval_context object with NO resolvable decision id → block with
+  reason invalid_override_context. Never mint or reinterpret approval fields.
   Output: override evaluation result
 
 Step 3 — Evaluate critical gaps
@@ -64,7 +73,10 @@ Step 3 — Evaluate critical gaps
 Step 4 — Assemble verdict
   pass: score >= threshold AND no critical missing gaps
   block: score < threshold without override, OR critical missing gap exists
-  Output: guard verdict with score summary and critical gaps
+  blocking_findings = critical_gaps mapped to {id: req_id, reason} PLUS, when
+  blocking on score, one entry {id: "readiness_below_threshold", reason}.
+  A pass verdict requires blocking_findings == [].
+  Output: guard verdict with score summary, critical gaps, and blocking_findings
 ```
 
 ## Outputs
@@ -76,6 +88,7 @@ Step 4 — Assemble verdict
 | `release_threshold` | `integer` | Threshold used for this evaluation |
 | `score_delta` | `integer` | Difference between score and threshold (negative = below threshold) |
 | `critical_gaps` | `array[object]` | Any missing critical requirements that caused a block |
+| `blocking_findings` | `array[object]` | Blocking-findings accounting for the governance envelope: critical_gaps plus a `readiness_below_threshold` entry when blocking on score. Empty if and only if verdict is `pass`. |
 | `override_applied` | `boolean` | Whether an approved override was used |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
 | `feedback` | `array[object]` | Backpropagate to implementation-completeness-auditor or code-generator |
@@ -92,6 +105,17 @@ Step 4 — Assemble verdict
     "readiness_score":    { "type": "integer" },
     "release_threshold":  { "type": "integer" },
     "score_delta":        { "type": "integer" },
+    "blocking_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "reason"],
+        "properties": {
+          "id":     { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
     "critical_gaps": {
       "type": "array",
       "items": {
@@ -145,7 +169,7 @@ Step 4 — Assemble verdict
 - This guard is the FINAL gate before deployment approval. A `block` verdict unconditionally halts the release pipeline.
 - The `release_threshold` default is 85. It can be configured per pipeline in `pipeline_config` but MUST NOT be set below 70.
 - `readiness_level: "blocked"` from the auditor always produces `verdict: "block"` — no override is possible.
-- Override mechanism (`approval_context`) requires a prior human_approval gate decision. It cannot be self-generated by the pipeline.
+- Override mechanism (`override_decision_id`) requires a resolved registry decision. It cannot be self-generated by the pipeline.
 
 ## Security Considerations
 
@@ -161,7 +185,7 @@ Step 4 — Assemble verdict
 
 - [ ] `readiness_score` compared against `release_threshold` (default 85, floor 70)
 - [ ] All `critical` requirements checked for `classification: "missing"`
-- [ ] `override_applied` flag set correctly based on `approval_context` presence
+- [ ] `override_applied` flag set correctly based on a resolved `override_decision_id`
 - [ ] `score_delta` computed as `readiness_score - release_threshold`
 - [ ] Verdict is exactly `"pass"` or `"block"` — no other values
 
@@ -172,11 +196,11 @@ Step 4 — Assemble verdict
 | `readiness_score` absent from input | Emit `verdict: "block"`, `reason: "missing_score"` |
 | `release_threshold` set below 70 in pipeline_config | Reject config: emit `verdict: "block"`, `reason: "invalid_threshold"` |
 | `readiness_level: "blocked"` from auditor | Emit `verdict: "block"` — override is NOT possible in this case |
-| `approval_context` present but no prior HITL gate logged | Emit `verdict: "block"`, `reason: "invalid_override_context"` |
+| `override_decision_id` unresolvable (unknown/expired/scope-mismatch/stale/insufficient authority) | Emit `verdict: "block"`, `reason: "invalid_override_context"` |
 
 ## Human-in-the-Loop Gates
 
-- If `verdict: "block"` and `reason: "below_threshold"`, a human may provide an `approval_context` to override the threshold for this release only. This requires an explicit human-approval gate decision — it cannot be pipeline-generated.
+- If `verdict: "block"` and `reason: "below_threshold"`, a human decision may be recorded in `scripts/gate-decisions.js` (scope.approved_score as baseline) to override the threshold for this release only. The orchestrator passes `override_decision_id`; it cannot be pipeline-generated.
 - If `verdict: "block"` and `reason: "critical_requirement_missing"` or `readiness_level: "blocked"`, no human-approval override is possible. The missing requirements must be implemented.
 
 ## Skill Composition

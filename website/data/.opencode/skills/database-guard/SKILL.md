@@ -17,7 +17,7 @@ Enforce database schema safety by inspecting proposed schema changes and migrati
 | `migration_plan` | `object` | Yes | Migration plan output from database-architect (SKL-032) |
 | `db_entities` | `array[object]` | Yes | Entity definitions from database-architect (SKL-032) |
 | `existing_schema` | `array[object]` | No | Current deployed schema for diff-based analysis |
-| `approval_context` | `object` | No | Prior human approval for destructive operations (gate decision log entry) |
+| `override_decision_id` | `string` | No | Registry decision id (`gd_...`) from `scripts/gate-decisions.js` approving named destructive operations. The ONLY approval mechanism — bearer `approval_context` objects are never trusted. |
 
 **Input Schema:**
 
@@ -30,7 +30,11 @@ Enforce database schema safety by inspecting proposed schema changes and migrati
     "migration_plan":    { "type": "object" },
     "db_entities":       { "type": "array" },
     "existing_schema":   { "type": "array" },
-    "approval_context":  { "type": "object" }
+    "override_decision_id": {
+      "type": "string",
+      "pattern": "^gd_[a-f0-9]{16}$",
+      "description": "Registry decision id resolved by the orchestrator via scripts/resolve-override.js (scope.destructive_operations must cover each destructive entry)."
+    }
   }
 }
 ```
@@ -38,14 +42,19 @@ Enforce database schema safety by inspecting proposed schema changes and migrati
 ## Required Context
 
 - `migration_plan` and `db_entities` from `database-architect` (SKL-032).
-- Prior `approval_context` if any destructive operations were previously approved via HITL gate.
+- A resolved `override_decision_id` if any destructive operations were previously approved (registry decision with matching scope).
 
 ## Execution Logic
 
 ```
-Step 1 — Check destructive operations without approval
+Step 1 — Check destructive operations without a resolved approval
   Scan migration_plan.destructive for entries.
-  If any destructive entry lacks approval_context, emit block verdict.
+  The orchestrator MUST have resolved override_decision_id via
+    node scripts/resolve-override.js --decision-id <id> --gate-id <this gate invocation>
+      --gate-class general --scope-json '{"destructive_operations":[...]}'
+  A destructive entry NOT covered by the resolved decision scope → block verdict.
+  A bare approval_context object with NO resolvable decision id → block verdict
+  with reason override_unresolved. Never mint or reinterpret approval fields.
   Output: destructive operation list + approval status
 
 Step 2 — Check missing FK indexes
@@ -79,6 +88,7 @@ Step 6 — Assemble verdict
 |-------|------|-------------|
 | `verdict` | `string` | `pass` or `block` |
 | `violations` | `array[object]` | All violations (rule, table, severity, remediation) |
+| `blocking_findings` | `array[object]` | Blocking-findings accounting for the governance envelope: `violations` with block-level severity, each as {id: rule, reason}. Empty if and only if verdict is `pass`. |
 | `warnings` | `array[object]` | Non-blocking issues that should be addressed |
 | `destructive_ops_count` | `integer` | Number of destructive operations in migration plan |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
@@ -168,7 +178,7 @@ Step 6 — Assemble verdict
 
 - [ ] All FK relationships checked for corresponding indexes
 - [ ] All PII-heuristic columns verified for annotation
-- [ ] Destructive operations list cross-referenced with `approval_context`
+- [ ] Destructive operations list cross-referenced with the resolved decision `scope.destructive_operations`
 - [ ] Cascade rules verified for all FK relationships
 - [ ] Anti-pattern scan completed (circular FKs, over-wide tables, magic enums)
 - [ ] Verdict field is exactly `"pass"` or `"block"` — no other values

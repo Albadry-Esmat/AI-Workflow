@@ -1,0 +1,39 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/flag-dependencies-schema.json",
+  "schema_version": "1.0.0",
+  "ownership": "ai-workflow-adaptive",
+  "enforcement": "fail_closed_at_startup_and_gate_eval",
+  "dependencies": {
+    "FLAG_ADAPTIVE_ROUTER": {
+      "requires": ["FLAG_FLOOR_ENFORCE"],
+      "note": "Adaptive router must never execute without floor enforcement."
+    },
+    "PROD_ADAPTIVE_PATH": {
+      "requires": ["FLAG_PREDEPLOY"],
+      "note": "Any production-capable adaptive path requires pre-deploy auth gate."
+    },
+    "FLAG_DAG": {
+      "requires": ["VERIFIED_ARTIFACT_INTEGRITY"],
+      "note": "DAG scheduler requires T-P5-01 verified refs available."
+    },
+    "FLAG_CACHE_V2": {
+      "requires": ["STATE_ACCESS", "ARTIFACT_HASHES"],
+      "note": "Cache v2 requires StateAccess abstraction + artifact hashes."
+    },
+    "FLAG_STATE_V2": {
+      "requires": ["MIGRATION_VALIDATION_PASS"],
+      "note": "Event/projection cutover requires migration validation."
+    },
+    "FLAG_FLOOR_ENFORCE": {
+      "requires": ["DETECTOR_VERSION_PINNED"],
+      "note": "Floor enforcement requires pinned detector version."
+    }
+  },
+  "illegal_combinations_fail": [
+    "FLAG_ADAPTIVE_ROUTER=true with FLAG_FLOOR_ENFORCE=false",
+    "PROD_ADAPTIVE_PATH with FLAG_PREDEPLOY=false",
+    "FLAG_DAG=true without VERIFIED_ARTIFACT_INTEGRITY",
+    "FLAG_CACHE_V2=true without STATE_ACCESS",
+    "FLAG_STATE_V2=true without MIGRATION_VALIDATION_PASS"
+  ]
+}

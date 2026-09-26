@@ -279,6 +279,7 @@ Step 6 — Write artifact
 | `final_consensus_score` | `float` | Score at termination (0.0–1.0). |
 | `unresolved_disagreements` | `array` | Criteria still unresolved at termination. |
 | `research_invocations` | `array` | `[{criterion, evidence_quality, resolution}]` |
+| `participant_lineage` | `array` | Independence record: `[{side: "plan_a" \| "plan_b", model_requirement, selected_model_id, input_ref}]`. Both sides MUST resolve to recorded model requirements with distinct input refs — a debate whose sides share undisclosed lineage is invalid. |
 | `metrics` | `object` | Execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array` | Feedback entries |
 
@@ -290,7 +291,7 @@ Step 6 — Write artifact
   "type": "object",
   "required": ["consensus_plan","debate_transcript","consensus_reached","termination",
                "rounds_taken","final_consensus_score","unresolved_disagreements",
-               "research_invocations","metrics","feedback"],
+               "research_invocations","participant_lineage","metrics","feedback"],
   "properties": {
     "consensus_plan":            { "type": "object" },
     "debate_transcript": {
@@ -340,6 +341,20 @@ Step 6 — Write artifact
           "criterion":       { "type": "string" },
           "evidence_quality":{ "type": "string", "enum": ["strong","moderate","weak","unavailable"] },
           "resolution":      { "type": "string", "enum": ["resolved","escalated_to_hitl","unavailable"] }
+        }
+      }
+    },
+    "participant_lineage": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["side","model_requirement","selected_model_id","input_ref"],
+        "properties": {
+          "side":                { "type": "string", "enum": ["plan_a","plan_b"] },
+          "model_requirement":   { "type": "string" },
+          "selected_model_id":   { "type": "string" },
+          "input_ref":           { "type": "string" }
         }
       }
     },

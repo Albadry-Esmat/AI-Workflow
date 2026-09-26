@@ -121,18 +121,21 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Confirm data sources, volumes, and SLA requirements before architecture",
       "timeout": 3600
     },
     {
       "after_phase": "phase-3-data-pipeline",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve pipeline topology and technology stack before quality/schema design",
       "timeout": 3600
     },
     {
       "after_phase": "phase-5-contracts",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve data contracts before SLO definition \u2014 contracts are binding once SLOs are set",
       "timeout": 3600
     },

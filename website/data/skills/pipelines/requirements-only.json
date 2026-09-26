@@ -16,6 +16,7 @@
     {
       "after_skill": "requirement-analyzer",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate requirements scope with stakeholder",
       "timeout": 3600
     }

@@ -1,0 +1,17 @@
+{
+  "corpus": "general-v1",
+  "version": "1.0.0",
+  "hash": "general-v1-30-cases",
+  "cases": [
+    {"id": "G-01", "task": "Change close icon spacing in header component", "files": ["src/components/Header.tsx"], "expected_profile": "FAST", "expected_goal": "ui_change"},
+    {"id": "G-02", "task": "Fix padding on login button", "files": ["src/components/LoginButton.css"], "expected_profile": "FAST", "expected_goal": "ui_change"},
+    {"id": "G-03", "task": "Fix null exception in user lookup when id missing", "files": ["src/services/user.ts"], "expected_profile": "STANDARD", "expected_goal": "bug_fix"},
+    {"id": "G-04", "task": "Add validation to signup email field", "files": ["src/forms/signup.ts"], "expected_profile": "STANDARD", "expected_goal": "bug_fix"},
+    {"id": "G-05", "task": "Refactor date helper to remove duplication", "files": ["src/utils/date.ts"], "expected_profile": "FAST", "expected_goal": "review"},
+    {"id": "G-06", "task": "Update README installation section", "files": ["README.md"], "expected_profile": "FAST", "expected_goal": "feature"},
+    {"id": "G-07", "task": "Add unit tests for cart total calculation", "files": ["src/cart/total.ts"], "expected_profile": "STANDARD", "expected_goal": "bug_fix"},
+    {"id": "G-08", "task": "Improve ambiguous dashboard loading experience", "files": ["src/pages/Dashboard.tsx"], "expected_profile": "STANDARD", "expected_goal": "feature"},
+    {"id": "G-09", "task": "Rename navigation icon and update label", "files": ["src/nav/icons.tsx"], "expected_profile": "FAST", "expected_goal": "ui_change"},
+    {"id": "G-10", "task": "Fix flaky test in checkout flow", "files": ["tests/checkout.spec.ts"], "expected_profile": "STANDARD", "expected_goal": "bug_fix"}
+  ]
+}

@@ -22,8 +22,7 @@ This skill was introduced in FEATURE-010 (Cross-Artifact Consistency Guard) as S
 | `modules` | `array[object]` | Yes | Architecture modules from `architecture-design`. Each: `name`, `responsibility`. |
 | `tasks` | `array[object]` | Yes | Task breakdown from `feature-planning`. Each: `id` (TASK-NNNN), `description`, `req_ids[]`, `module_refs[]`. |
 | `test_cases` | `array[object]` | Yes | Test cases from `test-generator`. Each: `id` (TEST-NNN), `coverage_target` (REQ ID). |
-| `override_approved` | `boolean` | No | If `true` (set by HITL gate), violations are acknowledged and the verdict is downgraded to `warn`. |
-| `override_reason` | `string` | No | Required when `override_approved: true`. Logged in audit trail. |
+| `override_decision_id` | `string` | No | Registry decision id (`gd_...`) from `scripts/gate-decisions.js` acknowledging specific violations. The ONLY override mechanism — boolean `override_approved` / free-text `override_reason` inputs are never trusted. |
 
 **Input Schema:**
 
@@ -37,8 +36,11 @@ This skill was introduced in FEATURE-010 (Cross-Artifact Consistency Guard) as S
     "modules":      { "type": "array", "minItems": 1 },
     "tasks":        { "type": "array", "minItems": 1 },
     "test_cases":   { "type": "array" },
-    "override_approved": { "type": "boolean" },
-    "override_reason":   { "type": "string", "minLength": 1 }
+    "override_decision_id": {
+      "type": "string",
+      "pattern": "^gd_[a-f0-9]{16}$",
+      "description": "Registry decision id resolved by the orchestrator via scripts/resolve-override.js (scope.violation_count must equal error_count)."
+    }
   }
 }
 ```
@@ -132,16 +134,19 @@ Step 6 — Compute verdict
 
   If error_count == 0:
     verdict = "pass"
-  Else If override_approved == true AND override_reason is non-empty:
+  Else If override_decision_id provided AND the orchestrator-resolved decision is
+  valid (via scripts/resolve-override.js --gate-class general
+  --scope-json '{"violation_count":<error_count>}') AND
+  scope.violation_count == error_count:
     verdict = "warn"
-    Record override event: { violations_overridden: error_count, reason: override_reason, timestamp }
-  Else:
-    verdict = "block"
+    Record override event: { violations_overridden: error_count, decision_id, reason: <decision reason>, timestamp }
+  Else (no decision id, unresolvable, count mismatch, or bare override_approved/override_reason booleans):
+    verdict = "block" with reason override_unresolved where an override was claimed
 
 Step 7 — Assemble output and emit telemetry
   Emit based on verdict:
     "pass"  → INFO: consistency_check_passed
-    "warn"  → WARN: consistency_violations_overridden { error_count, override_reason }
+    "warn"  → WARN: consistency_violations_overridden { error_count, decision_id, reason }
     "block" → ERROR: consistency_check_blocked { error_count, violation_summary }
   Return complete output.
 ```
@@ -153,8 +158,9 @@ Step 7 — Assemble output and emit telemetry
 | `verdict` | `string` | `"pass"` / `"warn"` / `"block"`. `block` halts the pipeline. |
 | `consistency_violations` | `array[object]` | All violations found. Fields: `rule`, `severity` (`error`/`warning`), `entity`, `message`, `fix_hint`. |
 | `error_count` | `integer` | Count of severity=error violations. |
+| `blocking_findings` | `array[object]` | Blocking-findings accounting for the governance envelope: `consistency_violations` with `severity: error`, each as {id, rule, reason}. Empty if and only if verdict is `pass`. |
 | `warning_count` | `integer` | Count of severity=warning violations. |
-| `override_event` | `object` | Present only when `override_approved: true`. Fields: `violations_overridden`, `reason`, `timestamp`. |
+| `override_event` | `object` | Present only on a resolved override. Fields: `violations_overridden`, `decision_id`, `reason` (from the registry decision), `timestamp`. |
 | `metrics` | `object` | `tokens_in`, `tokens_out`, `duration_ms`, `items_produced` (total checks run), `version`. |
 
 **Output Schema (abbreviated):**
@@ -191,8 +197,8 @@ Step 7 — Assemble output and emit telemetry
 ## Rules & Constraints
 
 1. **Four checks are mandatory.** All four checks (REQ_NO_TEST, MODULE_NO_TASK, TASK_ORPHANED, TEST_UNKNOWN_REQ) MUST always be executed. A check CANNOT be selectively disabled via config.
-2. **Block on any error.** A single `severity: error` violation produces `verdict: block` unless `override_approved: true`.
-3. **Override requires reason.** `override_approved: true` without `override_reason` is invalid. The skill MUST set `verdict: block` if `override_reason` is absent or empty.
+2. **Block on any error.** A single `severity: error` violation produces `verdict: block` unless a resolved `override_decision_id` covers the current `error_count`.
+3. **Override requires a resolved registry decision.** Boolean/free-text override inputs are never trusted. The skill MUST set `verdict: block` (reason `override_unresolved` where claimed) unless `override_decision_id` resolves valid with matching `scope.violation_count`.
 4. **Warning-only violations do not block.** `TASK_ORPHANED` violations are `severity: warning` — they are reported but never produce a `block` verdict on their own.
 5. **Structural linkage only.** This skill checks structural ID-based linkage — whether IDs reference each other. It does NOT check semantic correctness (whether the test actually tests the requirement, whether the task actually implements the requirement). Semantic consistency is out of scope.
 6. **Single run scope.** Only the artifacts from the current pipeline run are checked.
@@ -202,7 +208,7 @@ Step 7 — Assemble output and emit telemetry
 
 - **No credential scanning.** This skill processes structured data — IDs, names, and descriptions. If any description field contains a credential pattern, emit `WARN: credential_in_input`, redact, and continue.
 - **PII awareness.** Requirement statements and task descriptions in `consistency_violations[].message` fields are truncated to 100 characters. Do not write full requirement statements into violation messages.
-- **Override audit trail.** Override events MUST be logged with timestamp and reason. The audit record is included in the output and written to `artifacts/consistency-overrides.log` (append-only).
+- **Override audit trail.** Override events MUST reference the registry `decision_id` with timestamp and the decision reason. The audit record is included in the output and written to `artifacts/consistency-overrides.log` (append-only).
 
 ## Token Optimization
 
@@ -218,8 +224,8 @@ Step 7 — Assemble output and emit telemetry
 - [ ] Every task appears in one of: linked or orphaned category
 - [ ] `error_count` equals count of violations with `severity: "error"`
 - [ ] `warning_count` equals count of violations with `severity: "warning"`
-- [ ] `verdict: "block"` if `error_count > 0` and `override_approved !== true`
-- [ ] `verdict: "warn"` if `error_count > 0` and `override_approved === true` with non-empty reason
+- [ ] `verdict: "block"` if `error_count > 0` and no valid `override_decision_id` with matching count
+- [ ] `verdict: "warn"` only with a resolved `override_decision_id` whose `scope.violation_count` equals `error_count`
 - [ ] `verdict: "pass"` if `error_count === 0`
 - [ ] Override event recorded when override path taken
 - [ ] Fix hints present on every violation
@@ -232,7 +238,7 @@ Step 7 — Assemble output and emit telemetry
 | `modules[]` empty | Hard error: `{"error": "EMPTY_MODULES"}`. Halt. |
 | `tasks[]` empty | Hard error: `{"error": "EMPTY_TASKS"}`. Halt. |
 | `test_cases[]` empty | Run checks A–D with no test links. All requirements get REQ_NO_TEST violations. |
-| `override_approved: true` but `override_reason` absent | Treat as `override_approved: false`. Emit `WARN: override_reason_required`. |
+| Bare `override_approved`/`override_reason` inputs without `override_decision_id` | Treat as absent. Emit `WARN: override_unresolved`. `verdict: "block"`. |
 | Duplicate req_id in requirements[] | Deduplicate (first wins). Emit `WARN: duplicate_req_id`. |
 
 ## Human-in-the-Loop Gates
@@ -243,7 +249,7 @@ Step 7 — Assemble output and emit telemetry
 
 **Gate behavior:** When the guard produces `verdict: block`, the orchestrator presents the `consistency_violations[]` list to the user with the message: "Consistency violations found. Review the violations above. Reply OVERRIDE with a reason to proceed, or fix the violations and re-run."
 
-If the user replies `OVERRIDE <reason>`, the orchestrator re-invokes this skill with `override_approved: true` and `override_reason: <reason>`. The skill then produces `verdict: warn`.
+If the user replies `OVERRIDE <reason>`, the orchestrator records a decision in `scripts/gate-decisions.js` (scope: this gate invocation + current `error_count`) and re-invokes this skill with the resulting `override_decision_id`. Only a resolved decision produces `verdict: warn`. Raw `OVERRIDE` text alone never advances the pipeline.
 
 This gate MUST NOT auto-advance on timeout. A blocked pipeline stays blocked until a human decision is made.
 

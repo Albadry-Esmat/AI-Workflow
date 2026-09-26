@@ -258,6 +258,7 @@
     {
       "after_phase": "phase-0-compliance",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Confirm compliance frameworks before pipeline begins",
       "timeout": 300,
       "note": "Human reviews selected frameworks, data_classification, and jurisdiction before any design or implementation work starts. Timeout defaults to soc2 + confidential if no response."

@@ -83,6 +83,60 @@ jobs:
       - name: Evaluate model/provider compatibility and rollback
         run: python3 scripts/evaluate-model-compatibility.py
 
+      - name: Install root Node dependencies (model resolver needs js-yaml)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Validate single model authority and runtime boundary
+        run: python3 scripts/validate-model-requirements.py
+
+      - name: Validate pipeline gate timeout/bypass governance
+        run: python3 scripts/validate-pipeline-gates.py
+
+      - name: Run Phase 1A governance tests (timeout fail-closed, atomic approvals)
+        run: bash tests/test-governance-1a.sh
+
+      - name: Run Phase 1B governance tests (decision registry, identity, chain)
+        run: bash tests/test-governance-1b.sh
+
+      - name: Validate governance-weakening inputs policy
+        run: python3 scripts/validate-governance-flags.py
+
+      - name: Run Phase 2 governance tests (override migration, identity, flags)
+        run: bash tests/test-governance-2.sh
+
+      - name: Run Phase 3 governance tests (SHA binding, evidence, cache)
+        run: bash tests/test-governance-3.sh
+
+      - name: Run Phase 4 governance tests (change protection, separation, terminal)
+        run: bash tests/test-governance-4.sh
+
+      - name: Check opencode.json runtime projection in sync (no drift to merge)
+        run: node scripts/sync-opencode-models.js --check
+
+      - name: Run model-boundary regression suite
+        run: bash tests/test-model-boundary.sh
+
+      - name: Run model runtime-compatibility gate tests (deterministic fixtures, no provider auth)
+        run: bash tests/test-model-runtime-compatibility.sh
+
+      - name: Run execution identity tests (Phase A attribution, no provider auth)
+        run: bash tests/test-execution-identity.sh
+
+      - name: Run gate authorization tests (Phase B fixtures, no provider auth)
+        run: bash tests/test-gate-authorization.sh
+
+      - name: Run separation-of-duties tests (Phase C policy, no provider auth)
+        run: bash tests/test-separation-of-duties.sh
+
+      - name: Run governance evidence tests (Phase D fixtures, no provider auth)
+        run: bash tests/test-governance-evidence.sh
+
+      - name: Run findings lifecycle tests (Phase E fixtures, no provider auth)
+        run: bash tests/test-findings-lifecycle.sh
+
+      - name: Run governance adversarial tests (Phase E fixtures, no provider auth)
+        run: bash tests/test-governance-adversarial.sh
+
       - name: Test Batch 8 telemetry privacy
         run: python3 scripts/test-telemetry-privacy.py
 

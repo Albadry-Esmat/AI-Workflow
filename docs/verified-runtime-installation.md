@@ -1,5 +1,12 @@
 # Verified Agent-Neutral Runtime Installation — O4
 
+> **Transitional technical debt:** `config/runtime-installer-catalog.json` predates
+> the Declare → Verify → Consume → Execute boundary and is marked
+> `transitional-technical-debt` (operator-owned, never executed by workflow code).
+> It remains only because O4 planning/verification still reads its records as
+> reference data. Delete the catalog once O4 migrates to
+> `config/runtime-prerequisites.json` declarations.
+
 Onboarding O4 adds a **provenance-aware installer control plane** without coupling AI-Workflow to a single runtime. It turns official installation documentation into reviewable source-owned records, exposes platform-specific plans, verifies already-installed runtimes through bounded read-only probes, and blocks automatic installation when a record is not eligible under the fail-closed policy.
 
 ## Why O4 is intentionally conservative

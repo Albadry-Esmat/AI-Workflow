@@ -21,14 +21,19 @@ function detect() {
 function codexHome(threadId) {
   return path.join('CODEX_HOME=' + path.resolve('.opencode', 'state', threadId, 'codex-home'));
 }
-function start(threadId, { model_tier, pipeline }) {
-  checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: 'codex', model_tier, pipeline, isolation: 'CODEX_HOME per thread' });
+function start(threadId, { model_id, model_tier, tier_hint, pipeline, model_resolution = null, agent_identity = null }) {
+  const effectiveModel = model_id || model_tier || 'unknown';
+  checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: 'codex', model_id: effectiveModel, model_tier, pipeline, isolation: 'CODEX_HOME per thread', model_resolution, agent_identity });
   return { threadId, adapter: 'codex' };
 }
-function send(threadId, { prompt, model_tier, tool, targetPath, approval }) {
+function send(threadId, { prompt, model_id, model_tier, tier_hint, model_resolution = null, agent_identity = null, gate_id = null, subject_hash = null, execution_id = null, tool, targetPath, approval }) {
   const verdict = gateway.check({ tool: tool || 'read', path: targetPath || '', threadId, approval });
+  const effectiveModel = model_id || model_tier || 'unknown';
   const rec = trace.writeTrace(threadId, {
-    model: model_tier || 'balanced',
+    model: effectiveModel,
+    model_id: model_id || undefined,
+    model_resolution,
+    agent_identity, gate_id, subject_hash, execution_id,
     tool_calls: [{ tool: tool || 'read', path: targetPath || '', decision: verdict.decision, adapter: 'codex' }],
     guardrail: verdict.decision,
     handoff: verdict.decision === 'deny' ? 'policy-denied' : null,

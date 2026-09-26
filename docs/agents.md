@@ -36,9 +36,9 @@ An agent is an AI entity that executes one or more skills. Agents are defined in
 | Mode | `primary` |
 | Scope | Full pipeline orchestration |
 | Skills delegated | All (via orchestrator) |
-| HITL responsibility | Gate approvals |
+| HITL responsibility | Relay human gate decisions (never originates approvals) |
 
-The primary agent receives user requests, delegates skill execution to subagents, reviews results at HITL gates, and assembles the final response.
+The primary agent receives user requests, delegates skill execution to subagents, relays human HITL gate decisions into `scripts/gate-decisions.js`, and assembles the final response. It transcribes approvals — it never originates them: advancement requires a human response artifact or a resolved registry `decision_id`.
 
 ### Subagents
 
@@ -47,7 +47,8 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `analyzer` | `requirement-analyzer` | `subagent` | read-only |
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
 | `planner` | `feature-planning` | `subagent` | edit: ask |
-| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `security-guard`, `implementation-completeness-guard` | `subagent` | edit: ask |
+| `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor` (evidence producers only — never gates) | `subagent` | edit: ask |
+| `gatekeeper` | `security-guard`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard`, `cross-artifact-consistency`, `compliance-gate`, `work-item-lifecycle-guard`, `contract-freezer`, `validation-checklist-engine`, `confidence-scorer`, `finding-aggregator`, `traceability-matrix`, `drift-detector` (enforcement only — never modifies implementation) | `subagent` | read-only |
 | `tester` | `testing-strategy`, `mutation-test-generator` | `subagent` | read-only |
 | `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
 | `impact-analyzer` | `dependency-analyzer`, `change-impact-analyzer` | `subagent` | read-only |
@@ -74,7 +75,8 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `analyzer` | raw input, context | requirements, open_questions, assumptions | None |
 | `architect` | requirements, constraints | modules, data_flow, integration_points | analyzer |
 | `planner` | requirements, modules | tasks, dependency_map, phases | architect |
-| `reviewer` | code, architecture context | issues, vulnerabilities, remediation | architect |
+| `reviewer` | code, architecture context | issues, vulnerabilities, readiness score (evidence only) | architect |
+| `gatekeeper` | raw findings, scores, gaps, artifacts | pass/block verdicts, blocking_findings | reviewer |
 | `tester` | requirements, modules, tasks | test_plan, test_cases, mutation_score, assertion_gaps | planner |
 | `builder` | architecture, feature plan | generated code files, repair diffs | planner, impact-analyzer |
 | `impact-analyzer` | architecture, proposed change | dependency_graph, impact_surface, required_skills | architect |
@@ -103,20 +105,17 @@ All agents are configured in `opencode.json` and have corresponding instruction 
   "agent": {
     "primary": {
       "mode": "primary",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "ask" },
-      "description": "Main orchestrator — drives the full AI pipeline, approves HITL gates, and coordinates all subagents"
+      "description": "Main orchestrator — drives the full AI pipeline, relays human HITL gate decisions, and coordinates all subagents (never originates approvals)"
     },
     "analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
       "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
     },
     "architect": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
       "skills": [
@@ -127,30 +126,43 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "planner": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
       "skill": ".opencode/skills/feature-planning/SKILL.md"
     },
     "reviewer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
-      "description": "Code quality analysis (SOLID, clean architecture, complexity, anti-patterns) and security review. Also runs all governance guards: database, performance, UI/UX compliance, security, and implementation completeness. Invoked during the implementation phase.",
+      "description": "Evidence producer: code quality analysis, security review, and implementation completeness audit. Produces findings and scores — never gates, never approves, never merges.",
       "skills": [
         ".opencode/skills/clean-code-review/SKILL.md",
         ".opencode/skills/security-review/SKILL.md",
-        ".opencode/skills/implementation-completeness-auditor/SKILL.md",
+        ".opencode/skills/implementation-completeness-auditor/SKILL.md"
+      ]
+    },
+    "gatekeeper": {
+      "mode": "subagent",
+      "permission": { "edit": "deny", "bash": "deny" },
+      "description": "Policy enforcement: evaluates raw evidence against policy and produces pass/block verdicts. Cannot modify implementation, cannot promote, cannot approve PRs.",
+      "skills": [
+        ".opencode/skills/security-guard/SKILL.md",
         ".opencode/skills/database-guard/SKILL.md",
         ".opencode/skills/performance-guard/SKILL.md",
         ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
-        ".opencode/skills/security-guard/SKILL.md",
-        ".opencode/skills/implementation-completeness-guard/SKILL.md"
+        ".opencode/skills/implementation-completeness-guard/SKILL.md",
+        ".opencode/skills/cross-artifact-consistency/SKILL.md",
+        ".opencode/skills/compliance-gate/SKILL.md",
+        ".opencode/skills/work-item-lifecycle-guard/SKILL.md",
+        ".opencode/skills/contract-freezer/SKILL.md",
+        ".opencode/skills/validation-checklist-engine/SKILL.md",
+        ".opencode/skills/confidence-scorer/SKILL.md",
+        ".opencode/skills/finding-aggregator/SKILL.md",
+        ".opencode/skills/traceability-matrix/SKILL.md",
+        ".opencode/skills/drift-detector/SKILL.md"
       ]
     },
     "github-reviewer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "GitHub review automation — PR reviews, bug-issue triage, merge-gate summaries. Advisory only; merge authority stays human.",
       "skills": [
@@ -159,7 +171,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "tester": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
       "skills": [
@@ -169,7 +180,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "builder": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Incremental code generation, targeted code repair, design system file generation, and SEO artifact generation. Invoked after feature planning and impact analysis are complete.",
       "skills": [
@@ -181,7 +191,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "impact-analyzer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
@@ -191,42 +200,36 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "test-generator": {
       "mode": "subagent",
-      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
       "skill": ".opencode/skills/test-generator/SKILL.md"
     },
     "recovery": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Last-resort recovery agent — reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
       "skill": ".opencode/skills/rollback-manager/SKILL.md"
     },
     "deployer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
       "skill": ".opencode/skills/deployment-strategy/SKILL.md"
     },
     "documenter": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
       "skill": ".opencode/skills/documentation-generator/SKILL.md"
     },
     "doc-maintainer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-haiku-4.5",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
       "skill": ".opencode/skills/doc-maintainer/SKILL.md"
     },
     "data-engineer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Data platform specialist — designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
       "skills": [
@@ -239,7 +242,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "api-designer": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "API contract specialist — produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
       "skills": [
@@ -250,7 +252,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "distributed-systems": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Distributed systems architect — microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
       "skills": [
@@ -264,7 +265,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "cloud-platform": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Cloud infrastructure specialist — Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
       "skills": [
@@ -275,7 +275,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "security-specialist": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
       "skills": [
@@ -286,7 +285,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
     },
     "sre": {
       "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Site Reliability Engineering specialist — SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
       "skills": [
@@ -301,27 +299,41 @@ All agents are configured in `opencode.json` and have corresponding instruction 
 }
 ```
 
-Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 23 agents (1 primary + 22 subagents) have corresponding instruction files.
+Agent instruction files live at `.opencode/agent/<name>.md`. These define the agent's behavior rules and execution constraints beyond the JSON config. All 24 agents (1 primary + 23 subagents) have corresponding instruction files.
 
 ## Model Configuration
 
-Every agent has its own `"model"` field in `opencode.json`. Changing the model for any agent is a **single-line edit** — no restart required.
+Agents inherit the model currently selected by the runtime/session by default
+(native OpenCode behavior — no per-agent `"model"` field). Model precedence:
+agent-specific override → global agent override → current runtime/session model.
+See [`docs/models.md`](models.md) for the full rule, verification, and fail-closed semantics.
 
-```json
-"architect": {
-  "model": "github-copilot/claude-opus-4.5",   ← change this one line
-  ...
-}
+To pin an agent to an exact model, declare it in `config/model-requirements.yml`
+(single source of truth), then regenerate the projection:
+
+```bash
+node scripts/sync-opencode-models.js --write
 ```
 
-The top-level `"model"` key is the global fallback for any agent that doesn't specify its own.
+```yaml
+# config/model-requirements.yml
+agents:
+  architect:
+    model: some-provider/some-model   # exact requirement (fail-closed if unavailable)
+    fallbacks: []
+    on_unavailable: fail_closed
+```
 
-**Full reference** → [`docs/models.md`](models.md) — lists all available model IDs, current assignments, cost-optimisation tips, and governance rules for safety-critical agents.
+An explicit override that is unavailable blocks execution — it never falls back
+silently. Omitting `model` (or `null`) means inherit.
+
+**Full reference** → [`docs/models.md`](models.md) — precedence, inheritance vs
+explicit semantics, provider neutrality, and governance rules for safety-critical agents.
 
 ## Agent Rules
 
 1. Subagents MUST NOT modify system state outside their assigned skill's output.
 2. Subagents have read-only access unless explicitly granted `edit: ask`.
-3. The primary agent is the only agent that can approve HITL gates.
+3. The primary agent is the only agent that may relay human HITL gate decisions into the registry. It MUST NOT originate approvals. Subagents MUST NOT advance gates.
 4. All inter-agent communication passes through the orchestrator — agents do not call each other directly.
 5. Agent changes require updating this file AND `changelog.md`.

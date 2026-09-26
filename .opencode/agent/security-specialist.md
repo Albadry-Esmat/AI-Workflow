@@ -1,7 +1,6 @@
 ---
 description: Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

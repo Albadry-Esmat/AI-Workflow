@@ -76,7 +76,11 @@ Step 3 — Merge or hold
     (e.g. "needs-triage" when blocked on scope, never remove human labels).
 
 Step 4 — Audit
-  Append { pr, head_sha, decision, reason, checks, timestamp } to the gate audit log.
+  Append { pr, head_sha, decision, reason, checks, decided_by, timestamp } to
+  `artifacts/merge-gate-audit.jsonl` (append-only JSONL, one entry per decision;
+  the file is the authoritative merge-gate audit log). `decided_by` carries the
+  executing agent identity ({ agent: "merge-gatekeeper", model_requirement,
+  selected_model_id }) — merge decisions without an audit entry are invalid.
 ```
 
 ---
@@ -88,6 +92,7 @@ Step 4 — Audit
 | `decision` | string | `merge` or `hold` |
 | `reason` | string | Failing condition + remediation, or `all-green` |
 | `merge_commit` | string \| null | Merge SHA when decision is merge |
+| `audit_entry` | object | The entry appended to `artifacts/merge-gate-audit.jsonl` for this decision |
 
 ---
 

@@ -78,6 +78,13 @@ The delegate returns a structured response matching `return_format`:
 - `"json"` → structured data matching caller's expected schema
 - `"artifact"` → file path(s) of generated artifacts
 
+Every handback result carries `delegated: true` plus the delegator identity and
+`task_hash`. Delegated outputs are advisory input to the calling phase — they
+are NEVER gate evidence on their own. A gate consumes a delegated review only
+after the owning agent (reviewer for findings, gatekeeper for verdicts)
+re-executes the work in-pipeline and emits its own output. The orchestrator
+MUST reject any gate input whose sole provenance is a delegated result.
+
 ### 4. Post-Delegation
 
 The caller receives the result and:
@@ -107,6 +114,7 @@ The caller receives the result and:
 5. **No secret passing** — Never include API keys, tokens, or credentials in delegation context
 6. **No circular delegation** — Agent A → Agent B → Agent A is forbidden. The system rejects it.
 7. **No delegation without success criteria** — The `success_criteria` field is mandatory for a reason
+8. **No gate laundering** — Never delegate to manufacture a review verdict for a gate. Delegated outputs carry `delegated: true` and are ineligible as gate evidence.
 
 ## Examples
 

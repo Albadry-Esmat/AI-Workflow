@@ -1,7 +1,6 @@
 ---
 description: Evidence gathering for NEEDS_INVESTIGATION findings — one bounded round, then resolve or escalate.
 mode: subagent
-model: github-copilot/claude-haiku-4.5
 permission:
   edit: deny
   bash: deny

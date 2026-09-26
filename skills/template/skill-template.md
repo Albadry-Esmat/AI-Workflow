@@ -176,7 +176,7 @@ Define gate points where human review is required before proceeding.
 
 Gate behavior:
 - `pause`: halt pipeline, emit approval request, wait for response
-- `auto_continue`: proceed if no response within timeout (logged as `gate_skipped`)
+- `auto_continue`: FORBIDDEN as a default — timeout means BLOCKED + escalate. May be used only with `timeout_expiry_action:'continue_by_policy'` plus a registered `policy_exception`, and never for security/deployment/release/completeness/governance-change/force-proceed gates (see scripts/validate-pipeline-gates.py).
 - `reject`: halt and return partial results
 
 ## 13. Skill Composition

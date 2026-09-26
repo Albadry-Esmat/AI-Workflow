@@ -1,7 +1,6 @@
 ---
 description: Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

@@ -5,9 +5,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
-function nsDir(ns) { return path.join(ROOT, '.opencode', 'state', 'store', ns); }
+const { sanitizeId } = require('./sanitize-id');
+function nsDir(ns) { return path.join(ROOT, '.opencode', 'state', 'store', sanitizeId(ns)); }
 function keyPath(ns, key) {
-  const safe = String(key).replace(/[^a-zA-Z0-9-_]/g, '_').slice(0, 128);
+  const safe = sanitizeId(key);
   return path.join(nsDir(ns), safe + '.json');
 }
 function put(ns, key, value) {

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/governance-flags-policy-schema.json",
+  "schema_version": "1.0.0",
+  "ownership": "ai-workflow-governance",
+  "boundary": "Governance-weakening inputs are owned here. Anything not enumerated is forbidden.",
+  "ci_mode_skips": [
+    {
+      "pipeline": "full-pipeline",
+      "gate_id": "GATE-001",
+      "requires_reason": true,
+      "requires_identity": true,
+      "note": "Registered exception: non-interactive CI cannot answer the cost gate. Every skip emits a gate_decision{decision: skipped_by_policy} with reason + decided_by. No other gate in any template may carry a ci_mode skip."
+    }
+  ],
+  "weakening_inputs": {
+    "skip_validation": {
+      "allowed_in_pipeline_json": false,
+      "forbidden_on_skill_pattern": "*-guard",
+      "requires_log": true,
+      "note": "No checked-in pipeline may set skip_validation:true. Runtime use must be logged as a gate decision with reason + decided_by."
+    },
+    "memoization_enabled_false": {
+      "allowed": true,
+      "requires_log": true,
+      "note": "Disabling the cache is safe direction; enabling-stale-cache concerns belong to cache freshness rules. Logged for audit."
+    },
+    "force_warm_start": {
+      "allowed": true,
+      "requires_log": true,
+      "requires_reason": true,
+      "note": "Overrides snapshot content-hash mismatch. Logged with reason + decided_by; theoverride decision should reference the divergence warning."
+    },
+    "restore_from_snapshot": {
+      "allowed": true,
+      "requires_log": true,
+      "note": "Logged with snapshot_id + decided_by. Snapshot payloads are trusted only with matching content_hash unless force_warm_start is separately logged."
+    },
+    "resume_from_phase": {
+      "allowed": true,
+      "requires_log": true,
+      "note": "Logged with phase + checkpoint id. Skipped phases keep their prior gate decisions; subject changes invalidate them per SHA-binding rules."
+    }
+  }
+}

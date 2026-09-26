@@ -1,0 +1,13 @@
+{
+  "finding_id": "OVERROUTE-G02-v1",
+  "status": "non-blocking-tuning-backlog",
+  "case": "G-02",
+  "task": "Fix padding on login button",
+  "files": ["src/components/LoginButton.css"],
+  "classifier": "heuristic-shadow-0.1.1 predicts security/GOVERNED (keyword login triggers auth_authz)",
+  "detector": "floor GOVERNED via auth_authz",
+  "assessment": "Over-routing in safe direction. Acceptable during shadow. Do NOT weaken auth detection to fix.",
+  "action": "Retain for P15 tuning (e.g. file-scoped auth signals: .css vs auth logic). No safety change.",
+  "blocks_promotion": false,
+  "blocks_g0": false
+}

@@ -17,18 +17,24 @@ function detect() {
     return { id: 'opencode', installed: false, version: null };
   }
 }
-function start(threadId, { model_tier, pipeline }) {
-  checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: 'opencode', model_tier, pipeline });
+function start(threadId, { model_id, model_tier, tier_hint, pipeline, model_resolution = null, agent_identity = null }) {
+  const effectiveModel = model_id || model_tier || 'unknown';
+  checkpointer.appendCheckpoint(threadId, { kind: 'run', phase: 'started', adapter: 'opencode', model_id: effectiveModel, model_tier, pipeline, model_resolution, agent_identity });
   return { threadId, adapter: 'opencode' };
 }
 // send() enforces policy gateway BEFORE any tool use, records checkpoint + trace.
 // In P1 the adapter executes deterministically (no live model call): it performs
 // read-only retrieval planning and returns a planned diff. Live model dispatch
 // lands in Phase 2 behind the same gateway + trace envelope.
-function send(threadId, { prompt, model_tier, tool, targetPath, approval }) {
+// AUTHORITY: model_id (exact) determines execution; model_tier is legacy metadata.
+function send(threadId, { prompt, model_id, model_tier, tier_hint, model_resolution = null, agent_identity = null, gate_id = null, subject_hash = null, execution_id = null, tool, targetPath, approval }) {
   const verdict = gateway.check({ tool: tool || 'read', path: targetPath || '', threadId, approval });
+  const effectiveModel = model_id || model_tier || 'unknown';
   const rec = trace.writeTrace(threadId, {
-    model: model_tier || 'cheap',
+    model: effectiveModel,
+    model_id: model_id || undefined,
+    model_resolution,
+    agent_identity, gate_id, subject_hash, execution_id,
     tool_calls: [{ tool: tool || 'read', path: targetPath || '', decision: verdict.decision }],
     guardrail: verdict.decision,
     handoff: verdict.decision === 'deny' ? 'policy-denied' : null,

@@ -1,7 +1,6 @@
 ---
 description: Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

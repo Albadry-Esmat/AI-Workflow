@@ -49,3 +49,51 @@ jobs:
                 body: `## Governance change detected\nThis PR touches control-plane paths (${gov.length} file(s)) and is classified **GOVERNANCE_CHANGE**.\nNormal auto-merge is disabled; elevated governance review (human approval) is required.\n\n\`\`\`\n${gov.join('\n')}\n\`\`\``,
               });
             }
+
+  require-approval:
+    name: Require governance approval (blocking check)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Fail without governance-approved label on control-plane changes
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner, repo: context.repo.repo,
+              pull_number: context.issue.number, per_page: 100,
+            });
+            const { execSync } = require('child_process');
+            const changed = files.map((f) => f.filename);
+            const out = execSync('node -e "const {loadPolicies,isGovernancePath}=require(\'./scripts/policy-loader\');const {policies}=loadPolicies();const files=JSON.parse(process.argv[1]);console.log(JSON.stringify(files.filter(f=>isGovernancePath(f,policies))))" ' + JSON.stringify(JSON.stringify(changed)), { encoding: 'utf8' });
+            const gov = JSON.parse(out);
+            if (gov.length === 0) {
+              console.log('No control-plane paths touched — governance approval not required.');
+              return;
+            }
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const approved = labels.some((l) => l.name === 'governance-approved');
+            if (!approved) {
+              core.setFailed(
+                `GOVERNANCE_CHANGE without approval: ${gov.length} control-plane file(s) changed ` +
+                `but the 'governance-approved' label is absent. A human with write access must review ` +
+                `and apply the label; see docs/branch-protection.md.`
+              );
+            } else {
+              console.log(`Governance change approved via label (${gov.length} file(s)).`);
+            }

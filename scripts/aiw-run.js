@@ -3,7 +3,6 @@
 // aiw run --template quick-fix|feature-delivery|release-review --adapter opencode|codex
 //   --thread <id> [--tool <tool>] [--path <path>] [--approval <token>] [--retrieval deterministic|vector-trial] "request"
 // Phase 2: dual adapters (OpenCode default, Codex opt-in), scoped approvals, retrieval A/B flag.
-const router = require('./task-router');
 const opencode = require('./runtime-adapter');
 const codex = require('./codex-adapter');
 const checkpointer = require('./checkpointer');
@@ -49,12 +48,47 @@ function parseArgs(argv) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.request) usage();
-  const r = router.route(args.template);
+  // Enforcement: Declare → Discover → Verify → Resolve BEFORE any adapter
+  // contact. Fail-closed with one concise actionable failure; no partial work
+  // (no checkpoint/trace exists yet at this point).
+  const gate = require('./require-model-availability');
+  let r;
+  let model_id;
+  let model_resolution;
+  try {
+    ({ route: r, model_id, model_resolution } = gate.verifyTemplate(args.template));
+  } catch (err) {
+    if (err.code === 'NO_AVAILABLE_MODEL') {
+      console.error(String(err.message));
+      process.exit(1);
+    }
+    throw err;
+  }
   const { adapter } = loadAdapter(args.adapter);
-  adapter.start(args.thread, { model_tier: r.model_tier, pipeline: r.pipeline });
+  // Phase A: launcher assigns the canonical execution identity (fail-closed
+  // when the route names no agent — unattributable execution is refused).
+  const identity = require('./execution-identity');
+  if (!r.agent) {
+    console.error(`execution identity failed: template '${args.template}' routes to no agent; refusing unattributable execution.`);
+    process.exit(1);
+  }
+  const agent_identity = identity.createLauncherIdentity({ agent: r.agent, executionId: args.thread, source: 'launcher:aiw-run' });
+  adapter.start(args.thread, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity });
   const ctx = retrieve(args.request.split(' ').slice(0, 5).join(' '), args.retrieval);
   checkpointer.appendCheckpoint(args.thread, { kind: 'retrieval', method: ctx.method, strategy: args.retrieval });
-  const res = adapter.send(args.thread, { prompt: args.request, model_tier: r.model_tier, tool: args.tool, targetPath: args.path, approval: args.approval });
+  const res = adapter.send(args.thread, { prompt: args.request, model_id, tier_hint: r.tier_hint, agent_identity, tool: args.tool, targetPath: args.path, approval: args.approval, model_resolution });
+  // Phase D: producer evidence for completed producer-role dispatches —
+  // launcher-owned identity + derived HEAD subject (denied turns produced
+  // nothing and are skipped; recording never alters dispatch outcome).
+  if (!res.denied) {
+    try {
+      const producers = require('./producer-evidence');
+      const head = producers.repoHeadSha();
+      if (head) producers.record({ agentIdentity: agent_identity, subjectHash: head, outcome: res.failed ? 'failed' : 'completed', sourceRef: args.thread });
+    } catch (err) {
+      console.error(`producer evidence warning: ${err.message}`);
+    }
+  }
   console.log(JSON.stringify({ template: r, adapter: args.adapter, thread: args.thread, retrieval: ctx, result: res, evidence: adapter.evidence(args.thread) }, null, 2));
 }
 if (require.main === module) main();

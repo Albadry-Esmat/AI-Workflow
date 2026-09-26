@@ -1,0 +1,19 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/classifier-registry-schema.json",
+  "evaluated_classifier": {
+    "implementation": "heuristic-shadow",
+    "classifier_version": "heuristic-shadow-0.1.1",
+    "wrapper_version": "0.1.1",
+    "detector_version": "safety-detector-0.1.0",
+    "schema_version": "1.0.0",
+    "policy_version": "governance-2.6.0",
+    "provider": "none-heuristic",
+    "model": "heuristic-shadow-0.1.0",
+    "note": "Deterministic keyword/pattern stub. No LLM. Shadow-only. Recorded as the exact implementation evaluated in seed + live observation window."
+  },
+  "staleness_rule": "Any replacement or material change (including LLM-backed classifier, prompt change, threshold change, detector change, policy change) marks all prior promotion evidence STALE and requires re-evaluation in a new bound evidence window. Do not mix versions in one window.",
+  "history": [
+    {"version": "heuristic-shadow-0.1.0", "status": "superseded-FAIL", "reason": "Under-routed S-05/S-06/S-07/S-08 (see regression_mandatory)."},
+    {"version": "heuristic-shadow-0.1.1", "status": "current-evaluated", "reason": "Adds destructive/breaking/governance/RBAC to high-risk mapping."}
+  ]
+}

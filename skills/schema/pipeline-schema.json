@@ -337,8 +337,23 @@
         },
         "bypass_on_timeout": {
           "type": "boolean",
-          "default": false,
-          "description": "If true, gate auto-continues when timeout is reached. Defaults to false (safe). Set to true only for non-critical informational gates. MUST be false for deployment gates — enforced by schema when timeout is 0."
+          "description": "REQUIRED on every human_approval gate (declare explicitly; never rely on defaults). If true, gate auto-continues when timeout is reached. May be true only with timeout_expiry_action:'continue_by_policy' plus a registered policy_exception, and never for security/deployment/release/completeness/governance-change/force-proceed gates (enforced by scripts/validate-pipeline-gates.py). Timeout expiry otherwise means BLOCKED + escalate."
+        },
+        "timeout_expiry_action": {
+          "type": "string",
+          "enum": ["continue_by_policy"],
+          "description": "Required when bypass_on_timeout is true. Only 'continue_by_policy' is permitted, and only with a registered policy_exception."
+        },
+        "policy_exception": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Registered exception id from config/gate-timeout-exceptions.json authorizing bypass_on_timeout:true. Absent registry means no exceptions exist."
+        },
+        "max_extensions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2,
+          "description": "REQUIRED on any gate offering an EXTEND choice (e.g. EXTEND_REVISIONS). Bounds the number of granted extension rounds; exhausted extensions leave only abort/force-proceed. Maximum 2."
         },
         "label": {
           "type": "string",

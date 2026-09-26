@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/governance-flags-policy-schema.json",
+  "title": "AI-Workflow Governance-Weakening Inputs Policy",
+  "description": "Single ownership point for ci_mode skips and weakening runtime inputs. Anything not enumerated is forbidden.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ownership", "boundary", "ci_mode_skips", "weakening_inputs"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "ownership": { "type": "string", "const": "ai-workflow-governance" },
+    "boundary": { "type": "string" },
+    "ci_mode_skips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pipeline", "gate_id", "requires_reason", "requires_identity"],
+        "properties": {
+          "pipeline": { "type": "string", "minLength": 1 },
+          "gate_id": { "type": "string", "minLength": 1 },
+          "requires_reason": { "type": "boolean", "const": true },
+          "requires_identity": { "type": "boolean", "const": true },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "weakening_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skip_validation", "memoization_enabled_false", "force_warm_start", "restore_from_snapshot", "resume_from_phase"],
+      "properties": {
+        "skip_validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed_in_pipeline_json", "forbidden_on_skill_pattern", "requires_log"],
+          "properties": {
+            "allowed_in_pipeline_json": { "type": "boolean", "const": false },
+            "forbidden_on_skill_pattern": { "type": "string" },
+            "requires_log": { "type": "boolean", "const": true },
+            "note": { "type": "string" }
+          }
+        },
+        "memoization_enabled_false": { "type": "object", "additionalProperties": false, "required": ["allowed", "requires_log"], "properties": { "allowed": { "type": "boolean", "const": true }, "requires_log": { "type": "boolean", "const": true }, "note": { "type": "string" } } },
+        "force_warm_start": { "type": "object", "additionalProperties": false, "required": ["allowed", "requires_log", "requires_reason"], "properties": { "allowed": { "type": "boolean", "const": true }, "requires_log": { "type": "boolean", "const": true }, "requires_reason": { "type": "boolean", "const": true }, "note": { "type": "string" } } },
+        "restore_from_snapshot": { "type": "object", "additionalProperties": false, "required": ["allowed", "requires_log"], "properties": { "allowed": { "type": "boolean", "const": true }, "requires_log": { "type": "boolean", "const": true }, "note": { "type": "string" } } },
+        "resume_from_phase": { "type": "object", "additionalProperties": false, "required": ["allowed", "requires_log"], "properties": { "allowed": { "type": "boolean", "const": true }, "requires_log": { "type": "boolean", "const": true }, "note": { "type": "string" } } }
+      }
+    }
+  }
+}

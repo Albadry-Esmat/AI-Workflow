@@ -40,7 +40,7 @@ Disabled servers are pre-configured — set `"enabled": true` in `opencode.json`
 - `builder` → `work-item-exporter` writes GitHub Issues directly
 - `analyzer` → `defect-manager` creates bug reports as Issues
 - `deployer` → reads GitHub Actions workflow run status during pre-deploy gate
-- `reviewer` → `implementation-completeness-guard` checks linked PR status
+- `gatekeeper` → `implementation-completeness-guard` checks linked PR status
 
 ---
 
@@ -151,7 +151,7 @@ use library /vercel/next.js for Next.js 15 docs
 **Agents that benefit most:**
 - `tester` → `test-generator` executes the Playwright e2e tests it generates to verify they pass before writing to state
 - `builder` → `seo-optimizer` navigates to a Vercel preview URL and verifies meta tags, Open Graph, and structured data are rendered in the actual DOM
-- `reviewer` → `ui-ux-compliance-guard` navigates to rendered components and verifies accessibility (ARIA roles, contrast, focus order) in the real browser — not just static analysis
+- `gatekeeper` → `ui-ux-compliance-guard` navigates to rendered components and verifies accessibility (ARIA roles, contrast, focus order) in the real browser — not just static analysis
 - `sre` → `load-test-designer` navigates to the live URL to baseline real page performance before defining SLOs
 
 **Governance note:** The `--isolated` flag ensures no session state (cookies, localStorage) persists between agent invocations. Each test run starts with a clean slate.
