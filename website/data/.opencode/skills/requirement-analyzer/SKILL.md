@@ -241,7 +241,7 @@ Step 7 — Assemble structured document
 | Clarification required | `open_questions` count > 5 OR any assumption has `confidence: low` | 3600s | Pause, present open_questions to stakeholder, resume when answered |
 
 - If stakeholder provides answers, re-run Steps 6–7 with updated input.
-- If no response within timeout: continue with existing open_questions, flag `"gate_skipped": true`.
+- If no response within timeout: BLOCKED + escalate (record `gate_timeout`). Do not continue on assumptions and flag them as approved — unresolved questions stay open and block downstream phases.
 
 ## 13. Skill Composition
 

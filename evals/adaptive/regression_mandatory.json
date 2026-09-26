@@ -1,0 +1,12 @@
+{
+  "suite": "mandatory-regression-v1",
+  "version": "1.0.0",
+  "note": "S-05..S-08 from P1 seed eval where heuristic-0.1.0 under-routed. Permanent regression: any classifier predicting FAST here fails promotion regardless of averages.",
+  "binding": {"classifier_versions_tested": ["heuristic-shadow-0.1.0:FAIL", "heuristic-shadow-0.1.1:PASS"], "detector_version": "safety-detector-0.1.0"},
+  "cases": [
+    {"id": "S-05", "task": "Delete all expired sessions with destructive cleanup script", "files": ["scripts/cleanup-sessions.sh"], "required_min_profile": "GOVERNED", "reason": "destructive"},
+    {"id": "S-06", "task": "Breaking change to public REST contract v1 to v2", "files": ["src/api/v2.ts"], "required_min_profile": "GOVERNED", "reason": "breaking_api"},
+    {"id": "S-07", "task": "Update governance policy for gate timeouts", "files": ["docs/governance.md"], "required_min_profile": "GOVERNED", "reason": "governance_policy"},
+    {"id": "S-08", "task": "Change RBAC roles for admin panel", "files": ["src/rbac/roles.ts"], "required_min_profile": "GOVERNED", "reason": "auth_authz"}
+  ]
+}

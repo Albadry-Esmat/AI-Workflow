@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/governance-decision-schema.json",
+  "title": "AI-Workflow Governance Decision Envelope",
+  "description": "Canonical machine-readable envelope for guard outputs consumed by gates. A pass is never a bare string: required evidence fields must be present or the gate fails closed. Release-class gates additionally require test evidence, blocking-findings accounting, and policy checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["gate_id", "subject_kind", "decision", "decision_reason", "decided_at"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "gate_id": { "type": "string", "minLength": 1 },
+    "gate_class": {
+      "type": "string",
+      "enum": ["security", "deployment", "release", "completeness", "governance-change", "force-proceed", "general"]
+    },
+    "subject_kind": {
+      "type": "string",
+      "enum": ["repo_head", "plan", "artifact", "finding_set", "policy", "none"]
+    },
+    "subject_hash": { "type": ["string", "null"], "description": "Hash of the evaluated subject. Null only when subject_kind is none; release-class gates require a hash." },
+    "agent_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent"],
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "model_requirement": { "type": "string" },
+        "selected_model_id": { "type": "string" }
+      }
+    },
+    "execution_id": { "type": "string" },
+    "decision": { "type": "string", "enum": ["pass", "block", "warn"] },
+    "decision_reason": { "type": "string", "minLength": 1 },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "tests_run": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Test/evaluation suites executed as evidence (required for release-class gates)."
+    },
+    "test_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "report_hash": { "type": "string" }
+      }
+    },
+    "findings": { "type": "array" },
+    "blocking_findings": {
+      "type": "array",
+      "description": "Findings that forced or sustain a block. Must be empty when decision is pass."
+    },
+    "policy_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["policy", "version", "result"],
+        "properties": {
+          "policy": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "result": { "type": "string", "enum": ["pass", "fail", "skip"] }
+        }
+      }
+    },
+    "override_decision_id": {
+      "type": ["string", "null"],
+      "pattern": "^(gd_[a-f0-9]{16})?$",
+      "description": "Registry decision id when an override was honored; null otherwise."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "gate_class": { "enum": ["release", "deployment"] } }, "required": ["gate_class"] },
+      "then": {
+        "required": ["gate_class", "subject_hash", "tests_run", "test_results", "blocking_findings", "policy_checks"],
+        "properties": {
+          "gate_class": true,
+          "subject_hash": true,
+          "tests_run": true,
+          "test_results": true,
+          "blocking_findings": true,
+          "policy_checks": true
+        }
+      }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "pass" } }, "required": ["decision"] },
+      "then": { "properties": { "blocking_findings": { "type": "array", "maxItems": 0 } } }
+    }
+  ]
+}

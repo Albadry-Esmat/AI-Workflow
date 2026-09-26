@@ -98,6 +98,7 @@
     {
       "after_phase": "phase-2-security",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture before guard layer",
       "timeout": 3600
     },

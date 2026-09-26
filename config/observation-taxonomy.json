@@ -1,0 +1,16 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/observation-taxonomy-schema.json",
+  "taxonomy_version": "obs-taxonomy-v1.0.0",
+  "frozen": true,
+  "counting_rule": "observation_count counts unique tasks (by observation_id/task_hash) only. Coverage thresholds count qualifying labels (primary_category + secondary_labels[]). One task may satisfy multiple category minimums without duplicating observation_count. Threshold total may exceed min_observations without duplication.",
+  "categories": ["tiny_UI", "bug_fix", "refactor", "cross_cutting", "ambiguous", "feature_standard", "security", "migration", "deploy_prod", "governance", "destructive_breaking"],
+  "labeling": {
+    "primary_category": "Single best-fit category per observation (required).",
+    "secondary_labels": "Additional qualifying categories (optional, array). Coverage counts primary + all secondary."
+  },
+  "populations": {
+    "live": "Genuine user tasks only. Never manufacture prod/migration/destructive/security tasks to fill counts. Minimum unique-task count + general diversity from live set.",
+    "controlled_safety": "Versioned regression/golden cases (regression_mandatory.json + corpus_safety.json). Covers all floor classes. Repeatable against exact classifier/detector/policy versions."
+  },
+  "reporting_rule": "G0/G1 metrics must tag source: live vs controlled_safety. Safety invariants evaluated on controlled set regardless of live frequency; live metrics evaluate real-world distribution."
+}

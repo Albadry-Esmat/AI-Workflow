@@ -21,6 +21,7 @@
     {
       "after_skill": "architecture-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on architecture",
       "timeout": 3600
     }

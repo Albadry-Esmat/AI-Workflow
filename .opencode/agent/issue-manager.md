@@ -1,7 +1,6 @@
 ---
 description: Issue lifecycle ownership — deduplicate, create, link, label, update, close, reopen. Reviewer determines resolution; this agent owns the record.
 mode: subagent
-model: github-copilot/claude-haiku-4.5
 permission:
   edit: deny
   bash: deny

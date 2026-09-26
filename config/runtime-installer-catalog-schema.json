@@ -9,6 +9,20 @@
     "schema_version": {"type": "string", "const": "1.0.0"},
     "catalog_version": {"type": "string", "pattern": "^1\\.0\\.0$"},
     "generated_from": {"type": "string", "const": "official-documentation-review"},
+    "_boundary": {
+      "type": "object",
+      "description": "Operator-ownership marker. This catalog is external reference only and must never be executed by workflow code. TRANSITIONAL TECHNICAL DEBT: delete this catalog once O4 no longer needs installer records (tracked deprecation below).",
+      "additionalProperties": false,
+      "required": ["ownership", "execution", "installation_owner", "managed_by_aiw", "lifecycle", "deprecation_note"],
+      "properties": {
+        "ownership": {"type": "string", "const": "operator-owned-external-reference-only"},
+        "execution": {"type": "string", "const": "never-executed-by-workflow"},
+        "installation_owner": {"type": "string", "const": "operator/runtime"},
+        "managed_by_aiw": {"type": "boolean", "const": false},
+        "lifecycle": {"type": "string", "const": "transitional-technical-debt"},
+        "deprecation_note": {"type": "string", "minLength": 1}
+      }
+    },
     "records": {
       "type": "array",
       "items": {"$ref": "#/$defs/record"}

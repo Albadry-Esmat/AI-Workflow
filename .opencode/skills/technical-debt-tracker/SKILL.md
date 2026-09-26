@@ -329,7 +329,7 @@ Step 8 — Write state and emit feedback
 |------|---------|---------|----------|
 | Critical debt score spike | `debt_score > 80` AND `debt_trend = "degrading"` in same session | 3600s | Pause pipeline; present full remediation backlog and cost projection to tech lead for prioritization decision before feature-planning proceeds |
 
-Gate behavior: `pause` — pipeline halts, tech lead is notified with debt score, trend, and top 10 backlog items. Execution resumes on explicit acknowledgment. Auto-continues after timeout with `gate_skipped` log entry.
+Gate behavior: `pause` — pipeline halts, tech lead is notified with debt score, trend, and top 10 backlog items. Execution resumes on explicit acknowledgment. Timeout means BLOCKED + escalate — never auto-continue without a registered policy exception.
 
 ## 13. Skill Composition
 

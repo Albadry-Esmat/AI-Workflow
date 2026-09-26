@@ -36,7 +36,11 @@ function check(input) {
       const approvals = require('./policy-approval');
       const v = approvals.validate(input.threadId || 'default', input.approval, { tool, targetPath: p });
       if (!v.valid) return { decision: 'deny', reason: `approval invalid: ${v.reason}` };
-      approvals.consume(input.threadId || 'default', input.approval);
+      // Atomic compare-and-swap: exactly one contender consumes the token.
+      // A lost race (already used/expired between validate and consume) denies.
+      if (!approvals.consume(input.threadId || 'default', input.approval)) {
+        return { decision: 'deny', reason: 'approval already consumed or expired at use time (single-use, fail-closed)' };
+      }
       return { decision: 'allow', reason: `scoped approval consumed: ${tool} ${p}` };
     } catch (e) {
       return { decision: 'deny', reason: 'approval store error (fail-closed): ' + e.message };

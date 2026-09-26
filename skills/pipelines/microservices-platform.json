@@ -209,18 +209,21 @@
     {
       "after_phase": "phase-2-ddd",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve bounded context map and ubiquitous language before architecture",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-decomposition",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve service map and team alignment before contract design",
       "timeout": 3600
     },
     {
       "after_phase": "phase-5-contracts",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve API and event contracts \u2014 binding interface boundaries",
       "timeout": 3600
     },
@@ -233,6 +236,7 @@
     {
       "after_phase": "phase-10-chaos",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve chaos experiment schedule and blast radius controls before production deployment",
       "timeout": 3600
     },

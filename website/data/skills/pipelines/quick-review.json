@@ -26,6 +26,7 @@
     {
       "after_skill": "security-review",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "condition": "output.vulnerabilities.filter(v => v.severity === 'critical').length > 0",
       "label": "Critical vulnerabilities detected — approval required before merge",
       "timeout": 3600

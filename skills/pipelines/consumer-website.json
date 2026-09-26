@@ -260,30 +260,35 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate requirements scope with stakeholder",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on architecture before design layer",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve UX architecture and database schema before design system generation",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-design-system",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve design system token files and component stubs before planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap and impact surface before implementation",
       "timeout": 3600
     },
@@ -302,6 +307,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture and coverage before SEO and audit phases",
       "timeout": 3600
     },

@@ -25,6 +25,7 @@ if grep -q 'do-not-copy-this-test-token' "$TARGET/.env"; then
   exit 1
 fi
 cmp -s "$ROOT/.env.example" "$TARGET/.env"
-test "$(stat -c '%a' "$TARGET/.env")" = "600"
+# Portable permission check (node fs; GNU stat -c is Linux-only, BSD stat -f differs).
+node -e "if ((require('fs').statSync(process.argv[1]).mode & 0o777) !== 0o600) { console.error('FAIL: .env mode is not 0600'); process.exit(1); }" "$TARGET/.env"
 grep -q 'intentionally not copied' "$TARGET/init.log"
 echo 'PASS: aiw init does not copy populated .env secrets'

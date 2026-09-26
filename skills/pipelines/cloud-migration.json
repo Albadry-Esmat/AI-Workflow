@@ -216,18 +216,21 @@
     {
       "after_phase": "phase-3-cloud-review",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve Well-Architected findings and remediation priorities before infrastructure design",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-threat-model",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Review STRIDE threat catalog and accept risk mitigations before infrastructure design",
       "timeout": 3600
     },
     {
       "after_phase": "phase-5-infra-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve infrastructure topology \u2014 Kubernetes vs. serverless selection is binding",
       "timeout": 3600
     },
@@ -240,6 +243,7 @@
     {
       "after_phase": "phase-12-ci-pipeline",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve CI/CD pipeline with security gates before enabling deployment",
       "timeout": 3600
     },

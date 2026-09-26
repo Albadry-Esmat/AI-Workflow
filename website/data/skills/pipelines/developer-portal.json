@@ -253,30 +253,35 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate developer portal requirements \u2014 confirm API surface, SDK targets, and guide scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on architecture \u2014 confirm API versioning strategy and documentation structure",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve UX architecture (code explorer, search, navigation) and database schema",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-design-system",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve design system \u2014 confirm developer-appropriate token set and component stubs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap before implementation",
       "timeout": 3600
     },
@@ -295,6 +300,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security and coverage \u2014 important: developer portals expose API keys and auth flows",
       "timeout": 3600
     },
@@ -313,6 +319,7 @@
     {
       "after_phase": "phase-10-docs",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve documentation \u2014 developer portals require complete and accurate docs before deployment",
       "timeout": 7200
     },

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/terminal-failure-schema.json",
+  "title": "AI-Workflow Terminal Failure Record",
+  "description": "Canonical record for exhausted loops, unrecoverable errors, and aborted escalations. A pipeline result carrying an unresolved terminal record for a promotion-affecting phase must fail its release gate — degradation is never silent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["code", "reason_chain", "failed_phase", "decided_at", "resolved"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "code": {
+      "type": "string",
+      "enum": ["RETRY_EXHAUSTED", "FEEDBACK_LOOP_TERMINATED", "REVISION_BUDGET_EXHAUSTED", "EXTENSION_BUDGET_EXHAUSTED", "OUTPUT_SCHEMA_INVALID", "POLICY_DENIED", "BUDGET_EXCEEDED", "CANCELLED", "UNKNOWN_FAILURE"]
+    },
+    "reason_chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Ordered causes, root first: what failed, what was tried, why it terminated."
+    },
+    "failed_phase": { "type": "string", "minLength": 1 },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Artifact/trace/checkpoint references supporting the diagnosis."
+    },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "resolved": {
+      "type": "boolean",
+      "description": "True only when a human decision (recorded decision_id) explicitly dispositions the failure. Unresolved terminals block release gates."
+    },
+    "resolution_decision_id": {
+      "type": ["string", "null"],
+      "pattern": "^(gd_[a-f0-9]{16})?$",
+      "description": "Registry decision id that resolved the terminal record, if any."
+    }
+  }
+}

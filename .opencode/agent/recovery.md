@@ -1,7 +1,6 @@
 ---
 description: Last-resort recovery agent. Reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

@@ -69,7 +69,7 @@ function runClaude(prompt, { timeoutMs = 180000, cwd } = {}) {
 
 const RUNNERS = { 'codex': runCodex, 'claude-code': runClaude };
 
-function dispatch(threadId, { adapter = 'codex', prompt, model_tier = 'balanced', tool = 'read', targetPath = '', approval = null, timeoutMs } = {}) {
+function dispatch(threadId, { adapter = 'codex', prompt, model_id = null, model_tier = null, tier_hint = null, model_resolution = null, agent_identity = null, gate_id = null, subject_hash = null, execution_id = null, tool = 'read', targetPath = '', approval = null, timeoutMs } = {}) {
   if (!RUNNERS[adapter]) return { failed: true, reason: `live dispatch not yet implemented for adapter: ${adapter} (v1 supports: ${Object.keys(RUNNERS).join(', ')})` };
   if (!LIVE_TOOLS.has(tool)) return { denied: true, reason: `live dispatch allows read-only tools only (got: ${tool || '(empty)'})` };
   const auth = checkAuth(adapter);
@@ -79,8 +79,12 @@ function dispatch(threadId, { adapter = 'codex', prompt, model_tier = 'balanced'
   const verdict = gateway.check({ tool, path: targetPath, threadId, approval });
   if (verdict.decision !== 'allow') return { denied: true, reason: verdict.reason };
   const res = RUNNERS[adapter](prompt, { timeoutMs });
+  const effectiveModel = model_id || model_tier || 'unknown';
   const rec = trace.writeTrace(threadId, {
-    model: model_tier,
+    model: effectiveModel,
+    model_id: model_id || undefined,
+    model_resolution,
+    agent_identity, gate_id, subject_hash, execution_id,
     tool_calls: [{ tool: `${adapter}-exec`, path: targetPath, decision: res.ok ? 'allow' : 'deny', live: true, latency_ms: res.latency_ms, usage: res.usage || undefined, exit_code: res.code }],
     guardrail: res.ok ? 'allow' : 'deny',
     handoff: res.ok ? null : (res.timedOut ? 'live-timeout' : 'live-failed'),

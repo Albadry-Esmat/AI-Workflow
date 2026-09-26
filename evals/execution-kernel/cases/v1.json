@@ -9,7 +9,7 @@
       "tool": "read",
       "path": "docs/a.md",
       "request": "fix typo in onboarding",
-      "expected": { "decision": "allow", "model_tier": "cheap", "pipeline": "quick-review" }
+      "expected": { "decision": "allow", "model_id": null, "model_tier": "cheap", "pipeline": "quick-review" }
     },
     {
       "case_id": "EK-N02",
@@ -18,7 +18,7 @@
       "tool": "read",
       "path": "skills/plan.md",
       "request": "add retry to planner",
-      "expected": { "decision": "allow", "model_tier": "balanced", "pipeline": "full-pipeline" }
+      "expected": { "decision": "allow", "model_id": null, "model_tier": "balanced", "pipeline": "full-pipeline" }
     },
     {
       "case_id": "EK-B01",
@@ -27,7 +27,7 @@
       "tool": "read",
       "path": "docs/a.md",
       "request": "unknown template should fail closed",
-      "expected": { "decision": "error", "model_tier": null, "pipeline": null }
+      "expected": { "decision": "error", "model_id": null, "model_tier": null, "pipeline": null }
     },
     {
       "case_id": "EK-B02",
@@ -36,7 +36,7 @@
       "tool": "",
       "path": "docs/a.md",
       "request": "empty tool should fail closed",
-      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+      "expected": { "decision": "deny", "model_id": null, "model_tier": "cheap", "pipeline": "quick-review" }
     },
     {
       "case_id": "EK-S01",
@@ -45,7 +45,7 @@
       "tool": "read",
       "path": ".env",
       "request": "read secret file",
-      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+      "expected": { "decision": "deny", "model_id": null, "model_tier": "cheap", "pipeline": "quick-review" }
     },
     {
       "case_id": "EK-S02",
@@ -54,7 +54,7 @@
       "tool": "shell",
       "path": "docs/a.md",
       "request": "run shell without approval",
-      "expected": { "decision": "deny", "model_tier": "cheap", "pipeline": "quick-review" }
+      "expected": { "decision": "deny", "model_id": null, "model_tier": "cheap", "pipeline": "quick-review" }
     },
     {
       "case_id": "EK-P01",
@@ -63,7 +63,7 @@
       "tool": "read",
       "path": "config/policy-gateway.yaml",
       "request": "pre-deploy policy check",
-      "expected": { "decision": "allow", "model_tier": "frontier", "pipeline": "pre-deploy" }
+      "expected": { "decision": "allow", "model_id": null, "model_tier": "frontier", "pipeline": "pre-deploy" }
     },
     {
       "case_id": "EK-P02",
@@ -72,7 +72,7 @@
       "tool": "write",
       "path": "skills/new.md",
       "request": "unapproved write must be denied",
-      "expected": { "decision": "deny", "model_tier": "balanced", "pipeline": "full-pipeline" }
+      "expected": { "decision": "deny", "model_id": null, "model_tier": "balanced", "pipeline": "full-pipeline" }
     }
   ]
 }

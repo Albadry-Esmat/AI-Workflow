@@ -1,7 +1,6 @@
 ---
 description: Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

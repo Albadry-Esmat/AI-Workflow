@@ -1,7 +1,6 @@
 ---
 description: Merge-gate automation — evaluates live PR state and merges on unanimous green or holds with reason. Never bypasses branch policy.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

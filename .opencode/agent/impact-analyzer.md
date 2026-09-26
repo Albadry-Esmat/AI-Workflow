@@ -1,7 +1,6 @@
 ---
 description: Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

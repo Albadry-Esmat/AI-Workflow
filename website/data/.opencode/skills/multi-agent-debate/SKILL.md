@@ -200,6 +200,7 @@ Step 4 — Assemble output
 | `rounds_taken` | `integer` | Number of complete rounds executed. |
 | `final_consensus_score` | `float` | Consensus score at termination (0.0–1.0). |
 | `unresolved_concerns` | `array[object]` | Criteria still at `"concern"` or `"reject"` at termination. Surfaced to feature-planning as architectural risks. |
+| `participant_lineage` | `array[object]` | Independence record: `[{side: "architect" \| "reviewer", model_requirement, selected_model_id, input_ref}]`. Sides MUST resolve to recorded model requirements with distinct input refs — undisclosed shared lineage invalidates the debate. |
 | `metrics` | `object` | Execution metrics |
 | `feedback` | `array[object]` | Feedback entries (warnings for stalemate, escalations, etc.) |
 
@@ -210,7 +211,7 @@ Step 4 — Assemble output
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": ["final_architecture", "debate_transcript", "consensus_reached", "termination",
-               "rounds_taken", "final_consensus_score", "unresolved_concerns", "metrics", "feedback"],
+               "rounds_taken", "final_consensus_score", "unresolved_concerns", "participant_lineage", "metrics", "feedback"],
   "properties": {
     "final_architecture":    { "type": "object" },
     "debate_transcript": {
@@ -234,6 +235,20 @@ Step 4 — Assemble output
     "rounds_taken":          { "type": "integer", "minimum": 1 },
     "final_consensus_score": { "type": "number", "minimum": 0, "maximum": 1 },
     "unresolved_concerns":   { "type": "array", "items": { "type": "object" } },
+    "participant_lineage": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["side","model_requirement","selected_model_id","input_ref"],
+        "properties": {
+          "side":                { "type": "string", "enum": ["architect","reviewer"] },
+          "model_requirement":   { "type": "string" },
+          "selected_model_id":   { "type": "string" },
+          "input_ref":           { "type": "string" }
+        }
+      }
+    },
     "metrics": {
       "type": "object",
       "required": ["tokens_in", "tokens_out", "duration_ms", "items_produced", "version"],

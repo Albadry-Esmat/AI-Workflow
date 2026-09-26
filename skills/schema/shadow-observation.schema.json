@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Live shadow observation record (bound versions)",
+  "type": "object",
+  "required": ["observation_id", "observed_at", "task_ref", "classification", "detector", "versions", "router_authority"],
+  "properties": {
+    "observation_id": {"type": "string"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "task_ref": {"type": "object"},
+    "classification": {"type": "object"},
+    "detector": {"type": "object"},
+    "versions": {
+      "type": "object",
+      "required": ["classifier_version", "wrapper_version", "detector_version", "policy_version", "schema_version", "prompt_hash", "threshold_set_version", "corpus_version"],
+      "properties": {
+        "classifier_version": {"type": "string"},
+        "wrapper_version": {"type": "string"},
+        "detector_version": {"type": "string"},
+        "policy_version": {"type": "string"},
+        "schema_version": {"type": "string"},
+        "prompt_hash": {"type": "string"},
+        "threshold_set_version": {"type": "string"},
+        "corpus_version": {"type": "string"}
+      }
+    },
+    "router_authority": {"type": "string", "enum": ["current-first-match"]},
+    "enforcement": {"type": "string", "enum": ["none-shadow-observe-only"]}
+  }
+}

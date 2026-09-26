@@ -193,9 +193,17 @@ When you add a **new** agent:
 
 ### Model IDs
 
-Use only verified model IDs from `opencode models`. Current assignments:
+`config/model-requirements.yml` is the sole authority for model selection
+(agent/task/stage → exact model ID, `on_unavailable: fail_closed`). `opencode.json`
+per-agent `"model"` fields are a generated runtime projection of the manifest
+(see `scripts/sync-opencode-models.js --check/--write`) — never edit them
+independently; change the manifest then regenerate. Tier names are metadata
+only and never determine execution. To check what is currently available, ask
+the runtime capability interface (`runtime.listAvailableModels()` — e.g. via
+`AIW_AVAILABLE_MODELS` or the runtime integration layer), not a
+provider-specific command. Current assignments:
 
-- **Standard tier** (`claude-sonnet-4.6`): architect, planner, reviewer, tester, builder, recovery, documenter, data-engineer, api-designer, distributed-systems, cloud-platform, security-specialist, sre
+- **Standard tier** (`claude-sonnet-4.6`): architect, planner, reviewer, gatekeeper, tester, builder, recovery, documenter, data-engineer, api-designer, distributed-systems, cloud-platform, security-specialist, sre
 - **Lightweight tier** (`claude-haiku-4.5`): analyzer, impact-analyzer, test-generator, deployer, doc-maintainer
 
 ---

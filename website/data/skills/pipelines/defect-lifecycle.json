@@ -135,6 +135,7 @@
     {
       "after_phase": "phase-1-intake",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Confirm defect triage: priority, severity, and assignment before chain generation",
       "timeout": 3600
     },
@@ -147,6 +148,7 @@
     {
       "after_phase": "phase-7b-completeness-guard",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve fix before closure \u2014 confirm regression tests pass, review is clean, and completeness threshold is met",
       "timeout": 3600
     }

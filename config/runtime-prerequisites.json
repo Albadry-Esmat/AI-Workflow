@@ -1,0 +1,37 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/runtime-prerequisites-schema.json",
+  "schema_version": "1.0.0",
+  "ownership": "ai-workflow-declares-operator-owns",
+  "boundary": "Declare → Verify → Consume → Execute. Never Install → Connect → Authenticate → Configure.",
+  "installation_owner": "operator/runtime",
+  "managed_by_aiw": false,
+  "prerequisites": [
+    {
+      "id": "agent-runtime",
+      "required_runtime": "opencode | claude-code | codex | copilot-cli | antigravity | cursor | gemini-cli | aider | generic-command",
+      "required_capability": "model_execution",
+      "installation_owner": "operator/runtime",
+      "managed_by_aiw": false,
+      "verification": "read-only executable presence + version probe; never install, login, or configure",
+      "notes": "How the runtime is installed belongs to the operator/runtime. AIW only verifies availability and consumes the existing connection."
+    },
+    {
+      "id": "github-capability",
+      "required_runtime": "github-connection",
+      "required_capability": "repository_operations_as_permitted",
+      "installation_owner": "operator/runtime",
+      "managed_by_aiw": false,
+      "verification": "capability presence check only; never install GitHub CLI, run gh auth login, create PATs, or configure accounts",
+      "notes": "AIW verifies the GitHub capability exists, consumes the existing connection, and performs permitted operations. Establishing the connection is operator-owned."
+    },
+    {
+      "id": "provider-authentication",
+      "required_runtime": "selected-agent-runtime",
+      "required_capability": "authenticated_model_execution",
+      "installation_owner": "operator/runtime",
+      "managed_by_aiw": false,
+      "verification": "delegated redacted status only (authenticated/unauthenticated); raw secrets never handled",
+      "notes": "AIW declares that a capability requires an authenticated runtime and consumes values already provided by the environment. It never generates, requests, stores, rotates, logs in with, or configures credentials."
+    }
+  ]
+}

@@ -1,21 +1,30 @@
 # Task-class router (M5) — static mapping, no LLM classifier in P1.
-# Anthropic routing pattern: cheap for common, frontier for hard/review.
-version: "1.0.0"
+# OWNERSHIP: this file chooses WHAT work/agent/stage executes
+# (task classification, pipeline, agent, priority, risk, stage).
+# It MUST NOT declare execution model IDs. The model manifest
+# (config/model-requirements.yml) is the SINGLE authority for WHICH model
+# a task requires. Each route references its requirement via
+# `model_requirement: tasks.<name>`; scripts/task-router.js resolves it
+# through scripts/resolve-model.js. `tier_hint` is reporting metadata ONLY.
+# Boundary: Declare → Verify → Consume → Execute. Never provision.
+version: "1.2.0"
 routes:
   quick-fix:
     pipeline: "quick-review"
-    model_tier: "cheap"
+    agent: "analyzer"
+    model_requirement: "tasks.quick-fix"
+    tier_hint: "cheap"
     description: "Single-session fix: classify/extract + deterministic reviewers"
   feature-delivery:
     pipeline: "full-pipeline"
-    model_tier: "balanced"
+    agent: "planner"
+    model_requirement: "tasks.feature-delivery"
+    tier_hint: "balanced"
     description: "Default delivery: plan + code + guards"
   release-review:
     pipeline: "pre-deploy"
-    model_tier: "frontier"
+    agent: "reviewer"
+    model_requirement: "tasks.release-review"
+    tier_hint: "frontier"
     description: "Release gate: disputed evals + security + completeness"
 default_route: "feature-delivery"
-model_tiers:
-  cheap: "claude-haiku-class or local small"
-  balanced: "claude-sonnet-class"
-  frontier: "claude-opus-class or flagship"

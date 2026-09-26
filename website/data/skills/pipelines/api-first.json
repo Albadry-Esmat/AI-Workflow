@@ -167,18 +167,21 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Confirm API style requirements (REST/GraphQL/events) and consumer expectations",
       "timeout": 3600
     },
     {
       "after_phase": "phase-3-api-contracts",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve API contracts before security review \u2014 contracts are the binding interface",
       "timeout": 3600
     },
     {
       "after_phase": "phase-5-security",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture before code generation",
       "timeout": 3600
     },

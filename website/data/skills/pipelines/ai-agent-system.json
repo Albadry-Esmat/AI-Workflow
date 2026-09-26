@@ -279,30 +279,35 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate AI system requirements \u2014 confirm agent type, safety level, and compliance scope",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on initial architecture before domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve AI domain constraints: agent pattern, memory architecture, token budget, safety_level \u2014 critical for regulated domains",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2d-architecture-refine",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve domain-constrained architecture before DB design and planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap and impact surface before AI system implementation",
       "timeout": 3600
     },
@@ -322,6 +327,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture, LLM eval framework coverage, and test suite before audit",
       "timeout": 3600
     },

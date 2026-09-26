@@ -1,12 +1,76 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Trace envelope v1 (minimal, P1)",
+  "title": "Trace envelope v2.0 (precedence resolution, tier metadata only)",
   "type": "object",
   "required": ["trace_id", "thread_id", "model", "tool_calls", "guardrail", "ts"],
   "properties": {
     "trace_id": { "type": "string" },
     "thread_id": { "type": "string" },
-    "model": { "type": "string" },
+    "model": { "type": "string", "description": "Exact model ID (authoritative). Legacy tier strings are not valid execution values." },
+    "model_id": { "type": "string", "description": "Same-record copy of `model` for backward compatibility (not a second authority)." },
+    "model_resolution": {
+      "type": ["object", "null"],
+      "description": "Auditable precedence resolution (agent override → global → runtime/session). Inheritance is normal, not fallback. Never contains credentials.",
+      "properties": {
+        "model_requirement": { "type": ["string", "null"], "description": "Manifest key, e.g. tasks.release-review or agents.reviewer." },
+        "requested_model_id": { "type": ["string", "null"], "description": "Legacy alias: explicit agent/global override when present, else null (inherit)." },
+        "requested_agent_override": { "type": ["string", "null"] },
+        "global_override": { "type": ["string", "null"] },
+        "runtime_model": { "type": ["string", "null"] },
+        "runtime_model_source": { "type": "string" },
+        "selected_model_id": { "type": ["string", "null"] },
+        "selection_source": { "type": "string", "enum": ["agent_override", "global_override", "runtime"] },
+        "explicit_override": { "type": "boolean" },
+        "provider": { "type": "string" },
+        "fallback_used": { "type": "boolean" },
+        "fallback_reason": { "type": ["string", "null"] },
+        "fallback_index": { "type": "integer" },
+        "declared_candidates": { "type": "array", "items": { "type": "string" } },
+        "availability_source": { "type": "string" },
+        "availability_verified": { "type": "boolean" },
+        "resolution_result": { "type": "string", "enum": ["resolved", "fallback", "fail_closed"] }
+      },
+      "additionalProperties": false
+    },
+    "agent_identity": {
+      "type": ["object", "null"],
+      "description": "Canonical execution identity (Phase A). Never contains credentials. Legacy {agent}-only records remain valid.",
+      "properties": {
+        "agent": { "type": "string" },
+        "model_requirement": { "type": "string" },
+        "selected_model_id": { "type": "string" },
+        "identity_version": { "type": "integer", "const": 1 },
+        "principal": {
+          "type": "object",
+          "description": "Canonical principal (gate-decisions shape). Human principals are claimed, never authenticated here.",
+          "properties": {
+            "type": { "type": "string", "enum": ["human", "agent", "system"] },
+            "id": { "type": "string" },
+            "authenticated": { "type": "boolean" },
+            "source": { "type": "string" }
+          },
+          "required": ["type", "id", "authenticated", "source"],
+          "additionalProperties": false
+        },
+        "role": { "type": ["string", "null"] },
+        "execution_id": { "type": "string" },
+        "parent_execution_id": { "type": ["string", "null"] },
+        "worker": {
+          "type": ["object", "null"],
+          "properties": {
+            "index": { "type": "integer", "minimum": 0 },
+            "id": { "type": "string" }
+          },
+          "required": ["index", "id"],
+          "additionalProperties": false
+        },
+        "source": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "gate_id": { "type": ["string", "null"], "description": "Governance gate this turn executed under, if any." },
+    "subject_hash": { "type": ["string", "null"], "description": "Hash of the subject evaluated in this turn, if any." },
+    "execution_id": { "type": ["string", "null"], "description": "Pipeline execution this turn belongs to, if any." },
     "tool_calls": { "type": "array" },
     "guardrail": { "enum": ["allow", "deny"] },
     "handoff": { "type": ["string", "null"] },

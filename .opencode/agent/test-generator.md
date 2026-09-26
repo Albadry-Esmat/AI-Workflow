@@ -1,7 +1,6 @@
 ---
 description: Automated test suite generation from code artifacts and specifications. Invoked after code generation is validated.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

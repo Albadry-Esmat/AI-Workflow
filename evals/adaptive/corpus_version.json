@@ -1,0 +1,6 @@
+{
+  "corpus_version": "1.0.0",
+  "general": {"path": "corpus_general.json", "hash": "general-v1-30-cases", "count": 10},
+  "safety": {"path": "corpus_safety.json", "hash": "safety-v1-20-cases", "count": 10},
+  "note": "P0 v1 minimal seed (10+10). P14 expands to full 30+20. Hash pinned for PROMOTE binding."
+}

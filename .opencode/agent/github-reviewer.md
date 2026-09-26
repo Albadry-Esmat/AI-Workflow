@@ -1,7 +1,6 @@
 ---
 description: GitHub review automation — PR reviews, bug-issue triage, and merge-gate summaries. Advisory only; merge authority stays human.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

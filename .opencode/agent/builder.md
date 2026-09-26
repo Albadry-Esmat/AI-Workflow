@@ -1,7 +1,6 @@
 ---
 description: Incremental code generation and targeted code repair. Invoked after feature planning and impact analysis are complete.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: ask
   bash: deny

@@ -322,42 +322,49 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Validate SaaS requirements \u2014 confirm tenant scale, compliance frameworks, pricing model, and SSO requirements before domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2-architecture",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Sign off on initial architecture before SaaS domain specialist runs",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2c-domain",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve SaaS domain constraints: tenancy model, RBAC, billing provider, SSO scope, compliance controls \u2014 these decisions are expensive to change post-implementation",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2d-architecture-refine",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve multi-tenant architecture before UX/DB design layer",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2b-design",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve multi-tenant database schema and UX architecture \u2014 RLS policies and tenant scoping must be validated before planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-2e-design-system",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve design system (including white-label theming architecture if applicable) before planning",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-planning",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve roadmap and impact surface before SaaS platform implementation",
       "timeout": 3600
     },
@@ -376,6 +383,7 @@
     {
       "after_phase": "phase-7-quality",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve security posture, tenant isolation test coverage, and compliance control verification before audit",
       "timeout": 3600
     },

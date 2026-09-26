@@ -2,6 +2,14 @@
   "schema_version": "1.0.0",
   "catalog_version": "1.0.0",
   "generated_from": "official-documentation-review",
+  "_boundary": {
+    "ownership": "operator-owned-external-reference-only",
+    "execution": "never-executed-by-workflow",
+    "installation_owner": "operator/runtime",
+    "managed_by_aiw": false,
+    "lifecycle": "transitional-technical-debt",
+    "deprecation_note": "Transitional technical debt: installer records predate the Declare-Verify-Consume-Execute boundary. The workflow never executes these commands (manual-only reference; read-only version probes only). Delete this catalog once O4 planning/verification migrates to runtime-prerequisites declarations."
+  },
   "records": [
     {
       "installer_id": "INS-OPENCODE-NATIVE-SCRIPT",

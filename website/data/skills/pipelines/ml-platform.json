@@ -149,12 +149,14 @@
     {
       "after_phase": "phase-1-requirements",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Confirm ML problem type, feature sources, and serving latency requirements",
       "timeout": 3600
     },
     {
       "after_phase": "phase-4-ml-pipeline",
       "type": "human_approval",
+      "bypass_on_timeout": false,
       "label": "Approve ML architecture: feature store, training orchestration, and serving topology",
       "timeout": 3600
     },

@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
+.PHONY: help setup health validate validate-contracts validate-model-requirements test-model-boundary validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -52,6 +52,15 @@ health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per it
 validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operational validation suites
 	@bash scripts/validate-skills.sh
 	@$(MAKE) validate-contracts
+	@$(MAKE) validate-model-requirements
+	@$(MAKE) validate-pipeline-gates
+	@$(MAKE) test-model-boundary
+	@$(MAKE) test-governance-1a
+	@$(MAKE) test-governance-1b
+	@$(MAKE) test-governance-2
+	@$(MAKE) test-governance-3
+	@$(MAKE) test-governance-4
+	@$(MAKE) validate-governance-flags
 	@$(MAKE) validate-batch6
 	@$(MAKE) validate-batch7
 	@$(MAKE) validate-batch8
@@ -68,6 +77,33 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
 	@$(PYTHON) scripts/validate-execution-contracts.py
+
+validate-model-requirements: ## Validate single model authority, router references, and runtime boundary
+	@$(PYTHON) scripts/validate-model-requirements.py
+
+validate-pipeline-gates: ## Validate HITL gate timeout/bypass governance (fail-closed, explicit declarations)
+	@$(PYTHON) scripts/validate-pipeline-gates.py
+
+test-governance-1a: ## Run Phase 1A governance tests (timeout fail-closed, atomic approvals)
+	@bash tests/test-governance-1a.sh
+
+test-governance-1b: ## Run Phase 1B governance tests (decision registry, identity, chain)
+	@bash tests/test-governance-1b.sh
+
+test-governance-2: ## Run Phase 2 governance tests (override migration, identity, flags)
+	@bash tests/test-governance-2.sh
+
+test-governance-3: ## Run Phase 3 governance tests (SHA binding, evidence, cache)
+	@bash tests/test-governance-3.sh
+
+test-governance-4: ## Run Phase 4 governance tests (change protection, separation, terminal)
+	@bash tests/test-governance-4.sh
+
+validate-governance-flags: ## Validate ci_mode skips and weakening-input policy
+	@$(PYTHON) scripts/validate-governance-flags.py
+
+test-model-boundary: ## Run model + runtime-boundary regression suite (fail_closed, no provisioning)
+	@bash tests/test-model-boundary.sh
 
 validate-batch6: ## Validate Batch 6 budget, retry, and capability-policy controls
 	@$(PYTHON) scripts/validate-batch6-controls.py

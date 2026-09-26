@@ -1,7 +1,6 @@
 ---
 description: Task decomposition, dependency mapping, complexity estimation, and roadmap generation. Invoked after architecture is approved.
 mode: subagent
-model: github-copilot/claude-sonnet-4.6
 permission:
   edit: deny
   bash: deny

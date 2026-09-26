@@ -13,10 +13,64 @@ protected_paths:
   - config/policy-versions.yml
   - config/agent-runtime-policy.json
   - config/agent-runtime-catalog.json
+  # Model authority (single source of truth for model requirements).
+  - config/model-requirements.yml
+  - config/model-requirements-schema.json
+  # Governance evidence and policy contracts.
+  - config/governance-decision-schema.json
+  - config/terminal-failure-schema.json
+  - config/governance-flags-policy.json
+  - config/governance-flags-policy-schema.json
+  - config/task-router.yaml
+  - config/trace-envelope-schema.json
+  - config/policy-gateway.yaml
+  - config/retry-reasons.json
+  # Pipeline gate definitions (timeout/bypass/override semantics live here).
+  - skills/pipelines/
+  - skills/schema/
+  # Governance enforcement code (validators, registries, gateways, caches).
+  - scripts/policy-gateway.js
+  - scripts/policy-approval.js
+  - scripts/gate-decisions.js
+  - scripts/resolve-override.js
+  - scripts/file-lock.js
+  - scripts/sanitize-id.js
+  - scripts/invocation-cache.js
+  - scripts/escalate-case.js
+  - scripts/validate-pipeline-gates.py
+  - scripts/validate-governance-flags.py
+  - scripts/workflow-state.js
+  - scripts/case-store.js
+  - scripts/release-review.js
+  - scripts/task-router.js
+  - scripts/resolve-model.js
+  - scripts/runtime-models.js
+  - scripts/trace-envelope.js
+  - scripts/policy-loader.js
+  # Orchestrator, guards, reviewers, and delegation/debate contracts.
+  - .opencode/skills/orchestrator/
+  - .opencode/skills/security-guard/
+  - .opencode/skills/database-guard/
+  - .opencode/skills/performance-guard/
+  - .opencode/skills/ui-ux-compliance-guard/
+  - .opencode/skills/implementation-completeness-guard/
+  - .opencode/skills/implementation-completeness-auditor/
+  - .opencode/skills/cross-artifact-consistency/
+  - .opencode/skills/compliance-gate/
+  - .opencode/skills/work-item-lifecycle-guard/
+  - .opencode/skills/github-merge-gate/
+  - .opencode/skills/github-pr-review/
+  - .opencode/skills/delegate/
+  - .opencode/skills/plan-debate/
+  - .opencode/skills/multi-agent-debate/
   - opencode.json
   - .opencode/agent/
   - docs/bot-ownership.md
   - docs/security.md
+  - docs/governance.md
+  - docs/branch-protection.md
+  - docs/agents.md
+  - docs/models.md
 classification: GOVERNANCE_CHANGE
 governance_change_behavior:
   disable_normal_auto_merge: true

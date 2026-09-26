@@ -390,7 +390,7 @@ When one change_type triggers, these additional files may also need updates:
 
 - If `dry_run: true`, all gates are bypassed. Full dry_run_report is returned without pausing.
 - `update` and `multi_update` actions do NOT trigger gates — only structural `create` and splits.
-- Gate timeout action: `auto_continue` with `gate_skipped: true` recorded in consistency_report.
+- Gate timeout action: BLOCKED + escalate (record `gate_timeout`). Auto-continue is not permitted without a registered policy exception.
 
 ## 13. Skill Composition
 

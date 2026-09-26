@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/runtime-prerequisites-schema.json",
+  "title": "AI-Workflow Runtime Prerequisites (declare-only)",
+  "description": "AIW declares what it needs; the operator/runtime owns installation, connection, and authentication. No install/login/configure commands allowed here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ownership", "boundary", "installation_owner", "managed_by_aiw", "prerequisites"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "ownership": { "type": "string", "const": "ai-workflow-declares-operator-owns" },
+    "boundary": { "type": "string" },
+    "installation_owner": { "type": "string", "const": "operator/runtime" },
+    "managed_by_aiw": { "type": "boolean", "const": false },
+    "prerequisites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "required_runtime", "required_capability", "installation_owner", "managed_by_aiw", "verification"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "required_runtime": { "type": "string", "minLength": 1 },
+          "required_capability": { "type": "string", "minLength": 1 },
+          "installation_owner": { "type": "string", "const": "operator/runtime" },
+          "managed_by_aiw": { "type": "boolean", "const": false },
+          "verification": { "type": "string", "minLength": 1 },
+          "notes": { "type": "string" }
+        },
+        "not": {
+          "anyOf": [
+            { "required": ["install_command"] },
+            { "required": ["login_command"] },
+            { "required": ["api_key"] },
+            { "required": ["provider_setup"] }
+          ]
+        }
+      }
+    }
+  }
+}

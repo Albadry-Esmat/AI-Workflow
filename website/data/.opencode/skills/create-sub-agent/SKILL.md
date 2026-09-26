@@ -336,7 +336,7 @@ Output MUST be a JSON object. No free-form prose in structured fields.
 
 Gate behavior:
 - `pause`: halt after emitting spec, await orchestrator approval before file write
-- `auto_continue`: orchestrator may proceed if no response within 60s (logged as `gate_skipped`)
+- `auto_continue`: not permitted — timeout means BLOCKED + escalate (see timeout fail-closed rule; registered policy exceptions only, never for governance-class gates)
 - `reject`: return spec without writing if explicitly rejected
 
 ---

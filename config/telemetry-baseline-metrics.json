@@ -1,0 +1,19 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/telemetry-baseline-schema.json",
+  "schema_version": "1.0.0",
+  "ownership": "ai-workflow-observability",
+  "boundary": "P0 baseline completeness requirements. Extends SKL-047 allowlist without changing collector behavior.",
+  "required_baseline_fields": ["event_type", "session_id", "timestamp", "skill_name", "duration_ms", "outcome", "tokens_in", "tokens_out", "tokens_total", "model", "cache_hit", "pipeline_phase"],
+  "completeness_target": 0.99,
+  "g0_requirements": {
+    "min_observations": 50,
+    "category_coverage": ["tiny_UI", "bug", "refactor", "cross_cutting", "ambiguous", "security", "migration", "deploy"],
+    "safety_trigger_coverage": 1.0,
+    "telemetry_completeness": 0.99
+  },
+  "privacy": {
+    "opt_out_first": true,
+    "pii_scrubbed_required": true,
+    "forbidden": ["prompt", "response", "source_code", "user_input", "email", "token", "password", "api_key", "credential"]
+  }
+}

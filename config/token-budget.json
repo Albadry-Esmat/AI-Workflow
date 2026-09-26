@@ -1,0 +1,20 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/token-budget-schema.json",
+  "note": "PROPOSAL ONLY (v0.1.0-proposal). Not consumed by any code. Values seeded from current skills/schema/pipeline-schema.json tiers (standard16K/large32K/xl48K) so future adoption starts behavior-neutral. Wiring via scripts/sync-token-budget.js is BLOCKED until G0 close.",
+  "budget_model_version": "token-budget-v0.1.0-proposal",
+  "status": "proposal-unwired",
+  "authority_claim": "Target single authority for token budgets. Current tables in pipeline-schema.json, full-pipeline.json, context-memory, knowledge/context-compressor.md, docs/context-engineering.md remain normative until migration.",
+  "tiers": [
+    { "name": "standard16K", "ceiling_tokens": 16000, "cascade_mode": "single_pass" },
+    { "name": "large32K", "ceiling_tokens": 32000, "cascade_mode": "cascade" },
+    { "name": "xl48K", "ceiling_tokens": 48000, "cascade_mode": "cascade" }
+  ],
+  "trigger_at_percent": 85,
+  "auto_compress": true,
+  "externalize_threshold_tokens": 8000,
+  "snapshot_policy": { "target": "refs-plus-hashes (future)", "current": "full-payload (unchanged)" },
+  "project_context_policy": { "target": "inject-once-plus-stub (future)", "current": "per-skill-inject (unchanged)" },
+  "constitution_read_policy": { "target": "single-reader-orchestrator (future)", "current": "dual-read (unchanged)" },
+  "baseline_policy": { "target": "baseline_tokens_per_session seeded (future)", "current": "unseeded (unchanged)" },
+  "executor": ".opencode/skills/context-compressor/SKILL.md (only executor; knowledge doc becomes pointer at migration)"
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://github.com/Albadry-Esmat/AI-Workflow/schemas/adaptive-flags-schema.json",
+  "schema_version": "1.0.0",
+  "ownership": "ai-workflow-adaptive",
+  "boundary": "P0/P1 shadow-only. All execution-authority flags default OFF. Shadow/observe flags default ON (log-only).",
+  "flags": {
+    "FLAG_SHADOW": {
+      "default": true,
+      "mode": "log_only",
+      "description": "Classifier sidecar predicts + logs only. Never routes execution."
+    },
+    "FLAG_FLOOR_OBSERVE": {
+      "default": true,
+      "mode": "log_only",
+      "description": "Safety detector logs floor signals only. Never enforces profile."
+    },
+    "FLAG_FLOOR_ENFORCE": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P2+: enforce effective=max. MUST remain false during P0/P1."
+    },
+    "FLAG_ADAPTIVE_ROUTER": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P2+: adaptive router gains execution authority only after G-PROMOTE-ROUTER."
+    },
+    "FLAG_PREDEPLOY": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P2+: PRE_DEPLOY_PRODUCTION_AUTHORIZATION gate. OFF in P0/P1."
+    },
+    "FLAG_DAG": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P3+: DAG scheduler execution. OFF in P0/P1."
+    },
+    "FLAG_CACHE_V2": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P6: strong cache keys. OFF in P0/P1."
+    },
+    "FLAG_STATE_V2": {
+      "default": false,
+      "mode": "disabled",
+      "description": "P12: event/projection cutover. OFF in P0/P1."
+    }
+  },
+  "execution_authority": {
+    "current_router": "first-match table in .opencode/agent/primary.md (sole authority during P0/P1)",
+    "adaptive_router": "shadow only during P0/P1; fallback-only after promotion per Stage 3 v2"
+  }
+}

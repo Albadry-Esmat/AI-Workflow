@@ -73,8 +73,10 @@ The orchestrator is the execution engine for the Skill System Standard. It recei
           "after_phase": { "type": "string", "description": "Pause after this pipeline phase completes (phase-level gate, preferred for full-pipeline configs)." },
           "type": { "type": "string", "enum": ["human_approval", "validation_check", "condition"] },
           "condition": { "type": "string" },
-          "timeout": { "type": "integer", "description": "Seconds to wait for HITL approval" },
-          "bypass_on_timeout": { "type": "boolean", "default": true, "description": "When false, the gate remains blocked after timeout and requires an explicit human decision. Deployment gate always uses false." },
+          "timeout": { "type": "integer", "description": "Seconds to wait for HITL approval. 0 = wait indefinitely." },
+          "bypass_on_timeout": { "type": "boolean", "description": "REQUIRED on every human_approval gate — declare explicitly, never rely on defaults. false (normal): timeout → BLOCKED + escalate. true: allowed ONLY with timeout_expiry_action:'continue_by_policy' plus a registered policy_exception, and NEVER for security/deployment/release/completeness/governance-change/force-proceed gates (enforced by scripts/validate-pipeline-gates.py)." },
+          "timeout_expiry_action": { "type": "string", "description": "Only 'continue_by_policy', and only alongside a registered policy_exception." },
+          "policy_exception": { "type": "string", "description": "Registered exception id from config/gate-timeout-exceptions.json. No registry entry means no bypass is authorized." },
           "re_invoke_on_pattern": {
             "type": "object",
             "description": "When the HITL response text matches `pattern`, re-invoke `skill` with the `inject` fields merged into its prior input. Used for OVERRIDE responses on cross-artifact-consistency and similar guard skills.",
@@ -380,17 +382,26 @@ Step 3 — Execute skills (mode-dependent)
            Never externalize (must remain in-context for reasoning quality):
              requirements, architecture_proposal, final_architecture, feature_plan,
              security_findings, completeness_report
-    c) [TASK-0057] Check invocation memoization cache before invoking:
-         Compute input_hash = SHA-256(canonical JSON of projected input payload).
-         Look up invocation_cache["{skill_name}:{input_hash}"].
-         If CACHE_HIT:
-           Return cached output. Increment cache_entry.hit_count. Log CACHE_HIT event.
-           Skip steps c1–c4.
-         If CACHE_MISS: proceed with invocation.
-         Cache invalidation: if any session_context field declared in the skill's
-           Required Context section has changed since the cache entry was written,
-           invalidate that entry before lookup.
-         Cache capacity: 50 entries. LRU eviction on overflow.
+     c) [TASK-0057] Check invocation memoization cache before invoking:
+          Compute input_hash = SHA-256(canonical JSON of projected input payload).
+          Resolve repo HEAD = `git rev-parse HEAD` (best-effort; null when unavailable).
+          Compute cache key = SHA-256(skill_name + HEAD + input_hash) per
+            scripts/invocation-cache.js — the HEAD binding is MANDATORY, never optional.
+          Look up invocation_cache["{skill_name}:{head12}:{input_hash}"].
+          If CACHE_HIT:
+            Return cached output tagged cache_hit:true. Increment cache_entry.hit_count. Log CACHE_HIT event.
+            A cache-hit output is NEVER sole gate evidence: any gate consuming it
+              requires at least one fresh (non-cached) execution for the same
+              subject, or the gate stays BLOCKED. Entries recorded without a HEAD
+              binding (head_unbound) are never gate evidence at all.
+            Skip steps c1–c4.
+          If CACHE_MISS: proceed with invocation.
+          A HEAD move invalidates the cache for gate purposes: entries whose
+            head_sha != current HEAD are stale — re-execute instead of serving.
+          Cache invalidation: if any session_context field declared in the skill's
+            Required Context section has changed since the cache entry was written,
+            invalidate that entry before lookup.
+          Cache capacity: 50 entries. LRU eviction on overflow.
      c1) Invoke skill
      c2) Store result in invocation_cache["{skill_name}:{input_hash}"] with invoked_at timestamp.
      c3) [TASK-0066] Emit token consumption telemetry event (fire-and-forget, non-blocking):
@@ -501,6 +512,7 @@ Step 5 — Check HITL gates
     Emit approval request: { gate: name, context: summary, artifacts: [...], action_required: "approve"|"reject"|"modify" }
     Wait for response (up to timeout configured in pipeline_config)
     If approved: continue
+    If timeout expires: BLOCKED + escalate (record gate_timeout; surface gate id, phase, elapsed). Continue past a timed-out gate ONLY if that gate declares bypass_on_timeout:true with timeout_expiry_action:'continue_by_policy' and a registered policy_exception — never otherwise. A timeout is never an approval; a missing/invalid response is BLOCKED.
         [TASK-0062] Take named snapshot immediately after approval:
           Write snapshot to session_context.snapshots[]:
             {
@@ -520,14 +532,76 @@ Step 5 — Check HITL gates
     If modified: apply modifications, re-validate, continue
     [HIGH-09] If gate has re_invoke_on_pattern AND response text matches pattern:
       Extract capture groups from the matched response text.
-      Interpolate capture group references ($1, $2 …) into the gate's inject{} values.
+      Record the response as a decision in scripts/gate-decisions.js FIRST
+        (gate_id = this gate, scope = the gate invocation + affected subjects,
+        principal = the human respondent, reason = captured text). If recording
+        fails or no human respondent is attributable, remain BLOCKED.
+      Interpolate the resulting decision_id (never raw booleans/reasons) into the
+        gate's inject{} values.
       Re-invoke the named skill (gate.re_invoke_on_pattern.skill) with the prior phase
         output merged with the inject{} fields. This enables OVERRIDE <reason> responses
-        to cross-artifact-consistency: the skill is re-invoked with override_approved: true
-        and override_reason: <captured reason>, producing verdict: warn instead of block.
+        to cross-artifact-consistency: the skill is re-invoked with
+        override_decision_id: <recorded gd_...>, producing verdict: warn instead
+        of block ONLY when the decision resolves valid with matching scope.
       Replace the phase output in session_context with the re-invoked skill's new output.
       Continue pipeline from the gate point with the updated output.
   Output: gate decision log
+
+  Every gate_decisions[] entry MUST carry attribution — advancement without
+  attribution is rejected:    {
+      "gate": "<gate_id>", "phase": "<phase_id>",
+      "response": "approve" | "reject" | "modify" | "timeout",
+      "decided_by": {
+        "type": "human" | "agent-relay" | "policy",
+        "id": "<human identity, relaying agent, or policy id>",
+        "authenticated": <bool>,
+        "source": "chat-hitl" | "cli-flag" | "orchestrator-relay" | "policy:<id>",
+        "decision_id": "<gd_... when recorded in scripts/gate-decisions.js>"
+      },
+      "decided_at": "<ISO8601>", "reason": "<text>"
+    }
+  Rules: `decided_by.type: human` requires an actual human response artifact.
+  The primary agent records itself ONLY as `agent-relay` transcribing a human
+  response — never as the decider. `timeout` responses are BLOCKED (see timeout
+  rule above), except a registered policy exception whose `decided_by.type` is
+  `policy` with the exception id as source. Entries missing `decided_by` are
+  invalid and MUST NOT advance the pipeline.
+
+  Subject binding + staleness rule: every approval/override decision SHOULD
+  carry `subject_kind` + `subject_hash` (the plan hash, diff hash, or repo HEAD
+  it evaluated — see `scripts/gate-decisions.js`). Before advancing past any
+  gate, recompute the subject hash for that gate's subject; on mismatch with a
+  prior approval covering the same gate, mark the prior decision
+  `STALE_APPROVAL`: remain BLOCKED and re-gate. A code/plan/artifact change
+  after approval invalidates dependent downstream approvals — approvals never
+  survive their subject. Release attestations MUST bind `repo_head_sha` plus
+  the evidence report hash (see `scripts/release-review.js`); an attestation
+  without both is rejected.
+
+  Governance-weakening inputs rule: the following inputs weaken governance and
+  are owned by `config/governance-flags-policy.json` — anything not enumerated
+  there is forbidden: `ci_mode` gate skips, per-skill `skip_validation`,
+  `memoization_enabled:false`, `force_warm_start`, `restore_from_snapshot`,
+  `resume_from_phase`. Using any of them MUST emit a gate_decisions[] entry with
+  reason + `decided_by` (a ci_mode skip emits
+  `{decision: skipped_by_policy, reason, decided_by}`). No checked-in pipeline
+  may set `skip_validation:true`. `force_warm_start:true` without a logged
+  reason is rejected the same way as a missing approval.
+
+  Override acceptance rule (no exceptions): a guard output claiming an override
+  (`override_applied:true`, `verdict:warn` on previously blocking findings, or any
+  `override_decision_id`) is honored ONLY after the orchestrator resolves the
+  decision id itself:
+    node scripts/resolve-override.js --decision-id <id> --gate-id <this gate>
+      --gate-class <security|completeness|general|...> [--scope-json {...}]
+  Resolution invalid (unknown/expired/scope-mismatch/wrong gate/stale subject/
+  insufficient authority) → treat the guard output as `block` with reason
+  `override_unresolved`, regardless of what the guard claimed. Bearer override
+  objects (`override_approved`, `override_reason`, `approval_context`,
+  `approver` strings) arriving without a resolvable decision id are rejected
+  the same way. Raw `OVERRIDE <reason>` chat text alone never advances the
+  pipeline — it must first be recorded via scripts/gate-decisions.js, and only
+  the resulting decision id flows downstream.
 
 Step 6 — ADR sync
   After any skill that emits an ADR artifact: write to scope "adr_index" (canonical source).
@@ -674,6 +748,7 @@ Step 7 — Assemble final result + session summary
 | `externalized_artifacts` | `array[string]` | Artifact IDs written to disk at `.opencode/state/artifacts/<id>.json` because their token_count exceeded `externalize_threshold` (TASK-0069). |
 | `active_batches` | `array[object]` | Batch API jobs still in_flight at pipeline completion. Each entry: `batch_id`, `skill_name`, `submitted_at`, `expected_completion` (TASK-0070). |
 | `pending_batches` | `array[object]` | Alias view of `active_batches` — batch jobs not yet completed. Consumers should poll Step 7 reconciliation on subsequent orchestrator calls (TASK-0070). |
+| `terminal_failures` | `array[object]` | Terminal records per `config/terminal-failure-schema.json` for exhausted loops, unrecoverable errors, and aborted escalations. Unresolved records block release/deploy gates. |
 
 ## Human-in-the-Loop Gates
 
@@ -775,7 +850,7 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 - [ ] Dependency graph is acyclic
 - [ ] All required inputs are satisfied before each skill invocation
 - [ ] Validation runs after every skill (unless skip_validation=true)
-- [ ] HITL gates respect timeout and either pause or auto-continue
+- [ ] HITL gates declare `bypass_on_timeout` explicitly and time out to BLOCKED + escalate (auto-continue only with a registered policy exception; forbidden classes never bypass)
 - [ ] Feedback loops do not exceed max iteration count
 - [ ] Pipeline state is serializable for resumption
 
@@ -785,9 +860,12 @@ The orchestrator MUST present the `deployment_approval_request` artifact from th
 |-----------|-------------------|
 | Skill not found in registry | Return error: `{"error": "UNKNOWN_SKILL", "name": "..."}` |
 | Dependency cycle detected | Return error with cycle path, do not execute |
-| HITL gate timeout | Auto-continue with `"gate_skipped": true` in gate_decisions |
+| HITL gate timeout | Gate is BLOCKED + escalated (surfaced to human with gate id, phase, and elapsed time). Continue ONLY when bypass_on_timeout:true with a registered policy_exception — otherwise never auto-continue. Record `gate_timeout` event, never `gate_skipped:true → continue`. |
+| Missing / invalid / ambiguous gate response | BLOCKED. A non-response is not an approval. |
 | Validation failure after max retries | Halt pipeline, return partial results with failed step |
-| Feedback loop exceeds max iterations | Force-terminate loop, emit warning, continue with current state |
+| Feedback loop exceeds max iterations | Force-terminate loop, emit a `terminal_failure` record per `config/terminal-failure-schema.json` (`code: FEEDBACK_LOOP_TERMINATED`, reason chain, failed phase, evidence refs, `resolved: false`), and BLOCK promotion-affecting phases. Never "continue with current state" past a release gate with an unresolved terminal record. |
+| Revision/extension budget exhausted | Emit `terminal_failure` (`REVISION_BUDGET_EXHAUSTED` / `EXTENSION_BUDGET_EXHAUSTED`); remaining choices are ABORT or FORCE_PROCEED-with-justification only |
+| Async/batch job failed at reconciliation | Surface in `failed_jobs[]`/`failed_batches[]` AND emit `terminal_failure` when the failed job gates a downstream phase; release/deploy gates treat unresolved terminals as `block` |
 
 ## 7. Rules & Constraints
 

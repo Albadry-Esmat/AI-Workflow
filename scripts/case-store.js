@@ -5,17 +5,16 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { transition } = require('./workflow-state');
+const { sanitizeId } = require('./sanitize-id');
 
 const ROOT = path.resolve(__dirname, '..');
 const CASES_ROOT = path.join(ROOT, 'artifacts', 'cases');
 
 function caseDir(caseId) {
-  return path.join(CASES_ROOT, sanitize(caseId));
+  return path.join(CASES_ROOT, sanitizeId(caseId, { maxLength: 64 }));
 }
 function sanitize(id) {
-  const s = String(id).replace(/[^a-zA-Z0-9-_]/g, '_').slice(0, 64);
-  if (!s) throw new Error('invalid case id');
-  return s;
+  return sanitizeId(id, { maxLength: 64 });
 }
 function createCase(caseId, { issue = null, actor = 'orchestrator' } = {}) {
   const dir = caseDir(caseId);
@@ -45,11 +44,18 @@ function readEvents(caseId) {
   return fs.readFileSync(p, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 }
 // State advance = validate transition + persist + audit event (atomic unit).
-function advance(caseId, to, { actor = 'orchestrator', headSha = null, reason = null } = {}) {
+// case.json persists via tmp+rename (crash-safe: no partial state).
+// `evidence` (optional references: decision/review/SoD results) is carried
+// into the STATE_ event for audit; advancement authorization itself lives in
+// the owning flow (e.g. release attestation), not in this generic writer.
+function advance(caseId, to, { actor = 'orchestrator', headSha = null, reason = null, evidence = null } = {}) {
   const current = readCase(caseId);
   const next = transition(current, to, { actor });
-  fs.writeFileSync(path.join(caseDir(caseId), 'case.json'), JSON.stringify(next, null, 2));
-  emit(caseId, { event: `STATE_${to}`, actor, from: current.state, head_sha: headSha, reason });
+  const target = path.join(caseDir(caseId), 'case.json');
+  const tmp = `${target}.tmp-${process.pid}`;
+  fs.writeFileSync(tmp, JSON.stringify(next, null, 2), 'utf8');
+  fs.renameSync(tmp, target);
+  emit(caseId, { event: `STATE_${to}`, actor, from: current.state, head_sha: headSha, reason, evidence });
   return next;
 }
 // Audit chain: thread -> PR -> reviews -> merge, reconstructed from events.
