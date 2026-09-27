@@ -32,6 +32,9 @@ jobs:
           pip install pyyaml==6.0.2 jsonschema==4.23.0 --quiet
           npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
+      - name: Install root Node dependencies (project-owned schema validator needs ajv)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Run full skill validation
         run: bash scripts/validate-skills.sh
 
