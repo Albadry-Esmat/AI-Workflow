@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-contracts validate-model-requirements test-model-boundary validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
+.PHONY: help setup health validate validate-runtime-parity validate-contracts validate-model-requirements test-model-boundary validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -51,6 +51,7 @@ health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per it
 
 validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operational validation suites
 	@bash scripts/validate-skills.sh
+	@bash scripts/validate-runtime-parity.sh
 	@$(MAKE) validate-contracts
 	@$(MAKE) validate-model-requirements
 	@$(MAKE) validate-pipeline-gates
@@ -274,8 +275,14 @@ backup: ## Backup .opencode/state/ to backups/ directory
 	@./aiw backup
 
 # ── Data & Knowledge ─────────────────────────────────────────────────────────
-sync: ## Sync website/data/ from source files (skills/, docs/, .opencode/skills/) — CI does this automatically on push
+validate-runtime-parity: ## P0 runtime-neutral parity gates (canonical counts, no duplication, adapter drift, discovery, catalog, secrets)
+	@bash scripts/validate-runtime-parity.sh
+
+sync: ## Sync website/data/ from source files (skills/, docs/, .agents/skills/) — CI does this automatically on push
 	@bash scripts/sync-website-data.sh
+
+sync-runtimes: ## Sync runtime adapters from .agents/skills/ (P0: .claude/skills links; --check for CI)
+	@bash scripts/sync-runtimes.sh
 
 sync-push: ## Sync website/data/ AND push the result to ASE-OS-Website repo
 	@bash scripts/sync-website-data.sh --website

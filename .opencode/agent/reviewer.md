@@ -24,9 +24,9 @@ Execution order:
 
 Execution rules:
 - Follow skill specs at:
-  - `.opencode/skills/clean-code-review/SKILL.md`
-  - `.opencode/skills/security-review/SKILL.md`
-  - `.opencode/skills/implementation-completeness-auditor/SKILL.md`
+  - `.agents/skills/clean-code-review/SKILL.md`
+  - `.agents/skills/security-review/SKILL.md`
+  - `.agents/skills/implementation-completeness-auditor/SKILL.md`
 - Code review score formula: 10 − (critical×1.5 + high×0.8 + medium×0.3 + low×0.1), floor at 1
 - You produce evidence; the gatekeeper judges it. Do NOT emit pass/block verdicts yourself.
 - Do NOT change business logic in `improved_code` — structural refactoring only

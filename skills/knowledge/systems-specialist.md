@@ -3,7 +3,7 @@
 **Skill ID:** SKL-046  
 **Version:** 1.0.0 | **Last updated:** 2026-06-18  
 **Mastery Level:** advanced  
-**Executable Skill:** [systems-specialist](../../.opencode/skills/systems-specialist/SKILL.md)  
+**Executable Skill:** [systems-specialist](../../.agents/skills/systems-specialist/SKILL.md)
 **Primary Sources:** *Making Embedded Systems* — Elecia White (2011); *Real-Time Concepts for Embedded Systems* — Qing Li & Caroline Yao (2003); FreeRTOS Documentation; IEC 62443-4-2; ISO 26262:2018; *Game Engine Architecture* — Jason Gregory (3rd ed., 2018)
 
 ---

@@ -16,5 +16,5 @@
   "project_context_policy": { "target": "inject-once-plus-stub (future)", "current": "per-skill-inject (unchanged)" },
   "constitution_read_policy": { "target": "single-reader-orchestrator (future)", "current": "dual-read (unchanged)" },
   "baseline_policy": { "target": "baseline_tokens_per_session seeded (future)", "current": "unseeded (unchanged)" },
-  "executor": ".opencode/skills/context-compressor/SKILL.md (only executor; knowledge doc becomes pointer at migration)"
+  "executor": ".agents/skills/context-compressor/SKILL.md (only executor; knowledge doc becomes pointer at migration)"
 }

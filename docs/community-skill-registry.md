@@ -115,7 +115,7 @@ Type `YES` to proceed. Any other response (or a 60-second timeout) aborts the in
 | HITL gate | Confirmation prompt presented to user |
 | Download | `.tar.gz` downloaded to `.opencode/registry-cache/` |
 | Hash verify | SHA-256 of downloaded `SKILL.md` recomputed and compared to index value |
-| Extract | Archive extracted to `.opencode/skills/billing-validator/` |
+| Extract | Archive extracted to `.agents/skills/billing-validator/` |
 | Register | Entry appended to `skills/index.yaml` with `origin_metadata.source: "community"` |
 
 #### 5. Verify the installation
@@ -136,7 +136,7 @@ Check 10/10 will compute the SHA-256 of the installed `SKILL.md` and confirm it 
   version: "1.2.0"
   domain: quality
   description: Validates domain-specific billing rules for subscription SaaS products.
-  executable_skill: .opencode/skills/billing-validator/SKILL.md
+  executable_skill: .agents/skills/billing-validator/SKILL.md
   origin_metadata:
     source: "community"
     registry_url: "https://api.github.com/repos/AI-Workflow-Community/skills"
@@ -193,7 +193,7 @@ Like install, uninstall always requires confirmation:
 
 ```
 Uninstall 'billing-validator' v1.2.0?
-This will delete .opencode/skills/billing-validator/ and remove it from skills/index.yaml.
+This will delete .agents/skills/billing-validator/ and remove it from skills/index.yaml.
 Reply YES to confirm.
 ```
 
@@ -242,7 +242,7 @@ Create it at [GitHub fine-grained tokens](https://github.com/settings/personal-a
 ```json
 {
   "command": "publish",
-  "skill_dir": ".opencode/skills/my-custom-validator",
+  "skill_dir": ".agents/skills/my-custom-validator",
   "github_token_env": "REGISTRY_GITHUB_TOKEN"
 }
 ```
@@ -279,7 +279,7 @@ Preview the package without uploading anything:
 ```json
 {
   "command": "publish",
-  "skill_dir": ".opencode/skills/my-custom-validator",
+  "skill_dir": ".agents/skills/my-custom-validator",
   "dry_run": true
 }
 ```

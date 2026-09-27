@@ -40,9 +40,13 @@ banner "Setup"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── 1. Required prerequisites ─────────────────────────────────────────────────
+# P0: Python is LAZY — required only for validation (validate-skills.sh checks
+# 0/9/10/11). Core setup (node toolchain, .env, dirs, CLI link) must succeed
+# without Python. Validation invoked explicitly still fails closed on missing
+# Python (see validate-skills.sh).
 header "Checking required prerequisites"
 
-for tool in git node npm python3; do
+for tool in git node npm; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool found ($(command -v "$tool"))"
   else
@@ -50,37 +54,52 @@ for tool in git node npm python3; do
   fi
 done
 
+if command -v python3 &>/dev/null; then
+  _ok "python3 found ($(command -v python3)) — validation utilities available"
+else
+  _warn "python3 not found — core setup continues; validation (aiw validate) will require it"
+  echo "       Install Python at: https://python.org (only needed for aiw validate)"
+fi
+
 if [[ "$FAIL" -gt 0 ]]; then
   echo
   fail "Setup cannot continue — $FAIL required tool(s) are missing."
   echo "  Install Node.js: https://nodejs.org"
-  echo "  Install Python:  https://python.org"
   echo "  Install Git:     https://git-scm.com"
   exit 1
 fi
 
-# ── 2. Project-local Python toolchain ─────────────────────────────────────────
-header "Setting up project-local Python environment"
+# ── 2. Project-local Python toolchain (LAZY) ───────────────────────────────────
+header "Setting up project-local Python environment (lazy — validation only)"
 
 VENV="$ROOT/.venv"
-if [[ ! -x "$VENV/bin/python" ]]; then
+if ! command -v python3 &>/dev/null; then
+  _warn "Skipping Python venv — python3 unavailable (run setup again after installing Python to enable aiw validate)"
+elif [[ ! -x "$VENV/bin/python" ]]; then
   step "Creating $VENV..."
-  python3 -m venv "$VENV"
-  _ok "Created disposable project-local Python environment"
+  if python3 -m venv "$VENV"; then
+    _ok "Created disposable project-local Python environment"
+  else
+    _warn "Could not create Python venv — validation will be unavailable until fixed"
+  fi
 else
   _ok "$VENV already exists"
 fi
 
-if "$VENV/bin/python" -c 'import jsonschema, yaml' &>/dev/null; then
-  _ok "Pinned Python validation dependencies are available"
-else
-  step "Installing pinned Python requirements into $VENV..."
-  if "$VENV/bin/python" -m pip install --disable-pip-version-check --requirement "$ROOT/requirements-dev.txt" --quiet; then
-    _ok "Pinned Python requirements installed"
+if [[ -x "$VENV/bin/python" ]]; then
+  if "$VENV/bin/python" -c 'import jsonschema, yaml' &>/dev/null; then
+    _ok "Pinned Python validation dependencies are available"
   else
-    _fail "Pinned Python requirements could not be installed"
-    echo "       Fix: $VENV/bin/python -m pip install --requirement requirements-dev.txt"
+    step "Installing pinned Python requirements into $VENV..."
+    if "$VENV/bin/python" -m pip install --disable-pip-version-check --requirement "$ROOT/requirements-dev.txt" --quiet; then
+      _ok "Pinned Python requirements installed"
+    else
+      _warn "Pinned Python requirements could not be installed — validation unavailable until fixed"
+      echo "       Fix: $VENV/bin/python -m pip install --requirement requirements-dev.txt"
+    fi
   fi
+else
+  _warn "Python validation dependencies skipped (no venv) — aiw validate requires Python"
 fi
 
 # ── 3. Project-local root Node toolchain ───────────────────────────────────────

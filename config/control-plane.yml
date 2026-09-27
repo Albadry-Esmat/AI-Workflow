@@ -48,21 +48,21 @@ protected_paths:
   - scripts/trace-envelope.js
   - scripts/policy-loader.js
   # Orchestrator, guards, reviewers, and delegation/debate contracts.
-  - .opencode/skills/orchestrator/
-  - .opencode/skills/security-guard/
-  - .opencode/skills/database-guard/
-  - .opencode/skills/performance-guard/
-  - .opencode/skills/ui-ux-compliance-guard/
-  - .opencode/skills/implementation-completeness-guard/
-  - .opencode/skills/implementation-completeness-auditor/
-  - .opencode/skills/cross-artifact-consistency/
-  - .opencode/skills/compliance-gate/
-  - .opencode/skills/work-item-lifecycle-guard/
-  - .opencode/skills/github-merge-gate/
-  - .opencode/skills/github-pr-review/
-  - .opencode/skills/delegate/
-  - .opencode/skills/plan-debate/
-  - .opencode/skills/multi-agent-debate/
+  - .agents/skills/orchestrator/
+  - .agents/skills/security-guard/
+  - .agents/skills/database-guard/
+  - .agents/skills/performance-guard/
+  - .agents/skills/ui-ux-compliance-guard/
+  - .agents/skills/implementation-completeness-guard/
+  - .agents/skills/implementation-completeness-auditor/
+  - .agents/skills/cross-artifact-consistency/
+  - .agents/skills/compliance-gate/
+  - .agents/skills/work-item-lifecycle-guard/
+  - .agents/skills/github-merge-gate/
+  - .agents/skills/github-pr-review/
+  - .agents/skills/delegate/
+  - .agents/skills/plan-debate/
+  - .agents/skills/multi-agent-debate/
   - opencode.json
   - .opencode/agent/
   - docs/bot-ownership.md

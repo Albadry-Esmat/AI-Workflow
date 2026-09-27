@@ -2,7 +2,7 @@
 #
 # Version:  1.0.0
 # Domain:   quality / audit
-# Skill:    .opencode/skills/implementation-completeness-auditor/SKILL.md
+# Skill:    .agents/skills/implementation-completeness-auditor/SKILL.md
 #
 # Purpose:
 #   Knowledge base for cross-checking delivered implementation against

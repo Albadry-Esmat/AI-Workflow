@@ -90,6 +90,6 @@ The implementation is grounded in the repository’s existing contracts and oper
 
 1. `config/execution-contracts/run-manifest.schema.json` and `config/execution-contracts/step-execution.schema.json`.
 2. `config/execution-contracts/artifact-reference.schema.json` and `config/execution-contracts/policy-decision.schema.json`.
-3. `.opencode/skills/observability/SKILL.md`, `.opencode/skills/behavioral-telemetry-collector/SKILL.md`, and `.opencode/skills/slo-sla-designer/SKILL.md`.
-4. `.opencode/skills/devsecops-pipeline-designer/SKILL.md` and `.opencode/skills/runbook-generator/SKILL.md`.
+3. `.agents/skills/observability/SKILL.md`, `.agents/skills/behavioral-telemetry-collector/SKILL.md`, and `.agents/skills/slo-sla-designer/SKILL.md`.
+4. `.agents/skills/devsecops-pipeline-designer/SKILL.md` and `.agents/skills/runbook-generator/SKILL.md`.
 5. `AI-Workflow-Gated-Batch-Implementation-Plan.md`, Batch 8 section.

@@ -164,6 +164,6 @@ git add -f artifacts/spec-latest.md
 ## See Also
 
 - Directory README: `artifacts/README.md`
-- Orchestrator write logic: `.opencode/skills/orchestrator/SKILL.md` Step 7
+- Orchestrator write logic: `.agents/skills/orchestrator/SKILL.md` Step 7
 - FEATURE-007: `work-items/features/FEATURE-007-spec-artifact-on-disk/`
 - FEATURE-015: Living Spec / Drift Detection (`work-items/features/FEATURE-015-*`)

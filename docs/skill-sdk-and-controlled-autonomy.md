@@ -8,7 +8,7 @@ Batch 9 adds a local-first Skill SDK around the existing AI-Workflow catalog. Th
 
 ## Skill scaffold lifecycle
 
-The command `aiw skill create` generates a draft package under `artifacts/skill-scaffolds/<skill-name>/`. The generator validates its manifest against `config/skill-scaffold-schema.json` and uses the fail-closed values in `config/skill-sdk-policy.json`. Creation never edits `.opencode/skills`, `skills/index.yaml`, `skills/registry.json`, or `skills/graph/skill-graph.yaml`.
+The command `aiw skill create` generates a draft package under `artifacts/skill-scaffolds/<skill-name>/`. The generator validates its manifest against `config/skill-scaffold-schema.json` and uses the fail-closed values in `config/skill-sdk-policy.json`. Creation never edits `.agents/skills`, `skills/index.yaml`, `skills/registry.json`, or `skills/graph/skill-graph.yaml`.
 
 | Scaffold artifact | Purpose |
 |---|---|

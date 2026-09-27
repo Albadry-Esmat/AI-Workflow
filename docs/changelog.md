@@ -9,6 +9,53 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P0 runtime-neutral foundation (.agents/skills canonical, Claude adapter, Python lazy)
+
+- Moved all 121 skill directories `.opencode/skills/*` → `.agents/skills/*`
+  (git history preserved via `git mv`). OpenCode discovers `.agents/skills/`
+  natively (verified: `opencode debug skill` lists 121/121, 0 duplicate IDs).
+- Retargeted every authoritative reference: `skills/index.yaml`,
+  `skills/registry.json`, `skills/capability-index.json`,
+  `skills/schema/*`, `opencode.json` (62 agent paths),
+  `.opencode/agent/*.md` (23 files), `scripts/validate-skills.sh`,
+  `scripts/health-check.sh`, `scripts/sync-website-data.sh`,
+  `scripts/verify-website-sync.js`, `scripts/apply-skill-scaffold.py`,
+  `aiw`, `Makefile`, `.github/workflows/*`, `docs/*`, `config/*`, `tests/*`.
+- OpenCode compatibility: duplicate-discovery test proves single effective
+  registration per skill ID with and without a compat symlink, but the symlink
+  trial shows ambiguous source attribution (70 via `.opencode/` vs 51 via
+  `.agents/` for identical bodies). Per approved amendment Case B: **no**
+  `.opencode/skills` symlink shim — `.agents/skills/` is the sole
+  discoverable path; diagnostics guide old tooling. Evidence:
+  `artifacts/p0-opencode-discovery/SUMMARY.md`; CI: `tests/test-opencode-discovery.sh`.
+- Claude Code adapter (symlink-primary): `.claude/skills/<name>` →
+  `../../.agents/skills/<name>` (121 links, generated — never hand-edited).
+  Fallback order on link-unavailable platforms: junction → lightweight proxy
+  pointer. Maintained by `scripts/sync-runtimes.sh` (`aiw sync-runtimes`,
+  `--check` for CI, deterministic).
+- Python lazy: `scripts/setup.sh` + `scripts/health-check.sh` no longer fail
+  without Python — core setup/health pass with warnings; `aiw validate`
+  still fails closed when validation is explicitly invoked.
+- `config/agent-runtime-catalog.json` v0.1.0 → v0.2.0: `documentation-reviewed`
+  (2026-09-27) with per-adapter `interoperability{skills_path,
+  instructions_path, mcp_path, skills_support}` (native for opencode, codex,
+  cursor, copilot-cli, gemini-cli; adapter-required for claude-code; generic
+  for aider/antigravity/generic-command). Schema extended with optional
+  `interoperability` object. MCP architecture unchanged (P1).
+- CI: `scripts/validate-runtime-parity.sh` (9 gates) wired into `make validate`
+  and `.github/workflows/validate-skills.yml` (P0 parity, no-duplication,
+  adapter drift, discovery, catalog schema, secrets). Workflow path filters
+  gain `.claude/skills/**`. `website/data/.agents/skills/` mirror generated;
+  stale `website/data/.opencode/skills/` mirror removed.
+- Invariants preserved: model precedence (agent → global → runtime), no
+  runtime installation/login, no secret ownership, HITL/guardrails unchanged,
+  Declare → Verify → Consume → Execute throughout.
+- Known debt (pre-existing, not a P0 regression — see
+  `work-items/TASK-0049-validate-pipeline-references-debt.md`): unwired
+  `scripts/validate-pipeline-references.js` reports 5 unknown skill IDs in
+  `full-pipeline.json` (`architecture/maintainability/performance/security-reviewer`,
+  `change-request-handler`); byte-identical baseline vs P0 fingerprints.
+
 ### Stage metrics in nightly (shadow autonomy)
 
 - `scripts/stage-metrics.js`: merges case outcomes with merged-PR counts (gh, graceful degrade) into rollout evaluation; nightly step added.
@@ -282,7 +329,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **`skills/schema/system-state-schema.json`** — added 10 missing pipeline names to the `pipeline_name` enum.
 - **`scripts/reset.sh`** — removed `.env` deletion; tokens are always preserved on reset.
 - **`docs/README.md`** — escaped placeholder link example to prevent broken-link CI failure.
-- **`docs/versioning.md`** — fixed dead link to `skills/governance/versioning.md` → correct `.opencode/skills/versioning/SKILL.md` path.
+- **`docs/versioning.md`** — fixed dead link to `skills/governance/versioning.md` → correct `.agents/skills/versioning/SKILL.md` path.
 - **`.github/workflows/validate-skills.yml`** — added `permissions: contents: read` and pinned all action versions.
 - **README, CONTRIBUTING, docs/how-to-use.md** — replaced `your-org` placeholder git URLs with `Albadry-Esmat/AI-Workflow`; updated commands to use `aiw`.
 - **`.env.example`** — updated token instructions: classic PAT, no expiration.
@@ -317,7 +364,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **`scripts/validate-skills.sh`**: Added YAML parse check 0/10 matching CI check 0/10 — local validation now runs all 10 checks (0–9) instead of 9 (1–9).
 - **`scripts/cleanup-sessions.sh`**: Fixed word-splitting in display loop — changed `echo "$EXPIRED_FILES" | while read -r f` to `while IFS= read -r f; do ... done <<< "$EXPIRED_FILES"` for consistent handling of filenames with special characters.
 - **`docs/models.md`**: Corrected 3 wrong agent model assignments — `analyzer` and `impact-analyzer` changed from `claude-sonnet-4.6` to `claude-haiku-4.5`; `deployer` changed from `claude-sonnet-4.6` to `claude-haiku-4.5` (matching actual `opencode.json` values).
-- **`docs/skills-registry.md`**: Updated skill count from 101 to 102 in the index layer table. Fixed 11 stale `skills/<domain>/<name>.md` path references to use the correct `.opencode/skills/<name>/SKILL.md` format. Updated 5 version numbers to match current skill versions. Converted two broken ADR hyperlinks (`ADR-0001`, `ADR-0002`) to plain text placeholders to prevent CI broken-link failures.
+- **`docs/skills-registry.md`**: Updated skill count from 101 to 102 in the index layer table. Fixed 11 stale `skills/<domain>/<name>.md` path references to use the correct `.agents/skills/<name>/SKILL.md` format. Updated 5 version numbers to match current skill versions. Converted two broken ADR hyperlinks (`ADR-0001`, `ADR-0002`) to plain text placeholders to prevent CI broken-link failures.
 - **`docs/security.md`**: Updated Agent Permissions table — `Subagents` row split into read-only and write-enabled groups reflecting actual `opencode.json` permissions. Fixed stale skill path reference. Bumped version 1.0.0 → 1.2.0.
 - **`docs/architecture.md`**: Bumped stale version header from 2.2.0 to 5.3.0; updated date to 2026-07-05.
 - **`AGENTS.md`**: Added Pipeline Routing Table — maps trigger keywords to pipeline template files and entry agents. This table was previously only documented in the system prompt, leaving it undocumented at the project level.

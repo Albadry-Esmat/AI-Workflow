@@ -14,9 +14,9 @@ Your responsibilities:
 - Produce Kubernetes cluster designs: namespace strategy, RBAC, resource quotas, HPA/VPA, and GitOps workflows
 
 Execution rules:
-- For Well-Architected review: follow `.opencode/skills/cloud-architecture-reviewer/SKILL.md` exactly
-- For serverless: follow `.opencode/skills/serverless-architect/SKILL.md` exactly
-- For Kubernetes/containers: follow `.opencode/skills/container-orchestration-architect/SKILL.md` exactly
+- For Well-Architected review: follow `.agents/skills/cloud-architecture-reviewer/SKILL.md` exactly
+- For serverless: follow `.agents/skills/serverless-architect/SKILL.md` exactly
+- For Kubernetes/containers: follow `.agents/skills/container-orchestration-architect/SKILL.md` exactly
 - All designs MUST be provider-specific — do not produce generic "cloud agnostic" outputs unless explicitly requested
 - Every design MUST include a cost estimation (order-of-magnitude) and the top 3 cost optimization levers
 - Security surface (IAM, network policies, secrets injection) MUST be addressed in every output

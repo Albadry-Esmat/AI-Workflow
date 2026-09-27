@@ -15,9 +15,9 @@ grep -q "Authoritative" "$ROOT/specs/README.md" || fail "README must declare spe
 [ -f "$ROOT/config/token-budget.json" ] || fail "config/token-budget.json proposal missing"
 node -e "JSON.parse(require('fs').readFileSync('$ROOT/config/token-budget.json','utf8'))" || fail "token-budget.json invalid JSON"
 # Prove unwired: no existing runtime file may reference token-budget.json yet
-if grep -rql "token-budget.json" "$ROOT/scripts" "$ROOT/.opencode/skills" 2>/dev/null | grep -v check-routing; then
+if grep -rql "token-budget.json" "$ROOT/scripts" "$ROOT/.agents/skills" 2>/dev/null | grep -v check-routing; then
   # allow only this test + plan docs to mention it
-  REFS="$(grep -rll "token-budget.json" "$ROOT/scripts" "$ROOT/.opencode/skills" 2>/dev/null || true)"
+  REFS="$(grep -rll "token-budget.json" "$ROOT/scripts" "$ROOT/.agents/skills" 2>/dev/null || true)"
   [ -z "$REFS" ] || fail "token-budget.json must stay unwired (found refs: $REFS)"
 fi
 pass "specs TEMPLATE (8 files) + README + unwired token proposal hold"

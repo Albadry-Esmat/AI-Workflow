@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
-const skillRoot = path.join(ROOT, ".opencode", "skills");
+const skillRoot = path.join(ROOT, ".agents", "skills");
 const pipelineRoot = path.join(ROOT, "skills", "pipelines");
 const sourceSkills = new Set(
   fs.readdirSync(skillRoot, { withFileTypes: true })

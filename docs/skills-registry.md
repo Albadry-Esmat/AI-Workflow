@@ -10,7 +10,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 |-------|---------|---------|
 | Index | `skills/index.yaml` | Lightweight entries for all 109 skills — IDs, tags, dependencies, mastery levels |
 | Knowledge | `skills/knowledge/<skill>.md` | Rich reference: principles, practices, anti-patterns, examples, source citations |
-| Execution | `.opencode/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
+| Execution | `.agents/skills/<name>/SKILL.md` | 13-section AI-executable specifications |
 
 ## Core Pipeline Skills
 
@@ -19,7 +19,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `requirements` |
-| File | `.opencode/skills/requirement-analyzer/SKILL.md` |
+| File | `.agents/skills/requirement-analyzer/SKILL.md` |
 | Version | 1.2.0 |
 | Purpose | Extract, normalize, and validate requirements from raw input |
 | Consumes from | None (entry point) |
@@ -32,7 +32,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `requirements` |
-| File | `.opencode/skills/clarify/SKILL.md` |
+| File | `.agents/skills/clarify/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Identify ambiguous requirements and resolve them via HITL before architecture begins |
 | Consumes from | `requirement-analyzer` |
@@ -47,7 +47,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 | Property | Value |
 |----------|-------|
 | Domain | `requirements` |
-| File | `.opencode/skills/debate-synthesizer/SKILL.md` |
+| File | `.agents/skills/debate-synthesizer/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Run advocate + skeptic requirement analyses in parallel and synthesize a debate-hardened unified requirements set |
 | Consumes from | `requirement-analyzer`, `clarify` |
@@ -65,7 +65,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `requirements` |
-| File | `.opencode/skills/research-artifact/SKILL.md` |
+| File | `.agents/skills/research-artifact/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Generate structured technology research artifact (alternatives, pros/cons, references, decision rationale) before architecture |
 | Consumes from | `requirement-analyzer`, `clarify` |
@@ -84,7 +84,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `architecture` |
-| File | `.opencode/skills/architecture-design/SKILL.md` |
+| File | `.agents/skills/architecture-design/SKILL.md` |
 | Version | 1.3.0 |
 | Purpose | Define modules, data flow, integration points, tech decisions |
 | Consumes from | `requirement-analyzer` |
@@ -97,7 +97,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `planning` |
-| File | `.opencode/skills/feature-planning/SKILL.md` |
+| File | `.agents/skills/feature-planning/SKILL.md` |
 | Version | 2.2.0 |
 | Purpose | Break requirements into tasks, dependencies, roadmap |
 | Consumes from | `architecture-design` |
@@ -110,7 +110,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `planning` |
-| File | `.opencode/skills/task-dag/SKILL.md` |
+| File | `.agents/skills/task-dag/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Analyze feature-planning task breakdown, build execution DAG, identify parallel-safe groups and critical path |
 | Consumes from | `feature-planning` |
@@ -130,7 +130,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `review` |
-| File | `.opencode/skills/clean-code-review/SKILL.md` |
+| File | `.agents/skills/clean-code-review/SKILL.md` |
 | Version | 1.1.0 |
 | Purpose | Validate code against SOLID and clean architecture |
 | Consumes from | `feature-planning` |
@@ -143,7 +143,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `testing` |
-| File | `.opencode/skills/testing-strategy/SKILL.md` |
+| File | `.agents/skills/testing-strategy/SKILL.md` |
 | Version | 2.0.0 |
 | Purpose | Define test plan, edge cases, coverage, quality gates |
 | Consumes from | `feature-planning` |
@@ -158,7 +158,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `security` |
-| File | `.opencode/skills/security-review/SKILL.md` |
+| File | `.agents/skills/security-review/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Threat modeling, vulnerability detection, remediation |
 | Consumes from | `architecture-design`, `clean-code-review` |
@@ -171,7 +171,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `deployment` |
-| File | `.opencode/skills/deployment-strategy/SKILL.md` |
+| File | `.agents/skills/deployment-strategy/SKILL.md` |
 | Version | 1.1.0 |
 | Purpose | Environment model, promotion, rollback, IaC scaffold, deployment approval request |
 | Consumes from | `architecture-design`, `testing-strategy` |
@@ -186,7 +186,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `documentation` |
-| File | `.opencode/skills/documentation-generator/SKILL.md` |
+| File | `.agents/skills/documentation-generator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Auto-generate API docs, ADRs, READMEs |
 | Consumes from | `requirement-analyzer`, `architecture-design`, `clean-code-review` |
@@ -201,7 +201,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `system` |
-| File | `.opencode/skills/orchestrator/SKILL.md` |
+| File | `.agents/skills/orchestrator/SKILL.md` |
 | Version | 2.4.0 |
 | Purpose | Execute pipeline, route artifacts, validate, manage HITL |
 | Consumes from | Registry |
@@ -214,7 +214,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `validation` |
-| File | `.opencode/skills/schema-validator/SKILL.md` |
+| File | `.agents/skills/schema-validator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Validate JSON data against JSON Schema |
 | Consumes from | None (utility) |
@@ -227,7 +227,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 | Property | Value |
 |----------|-------|
 | Domain | `documentation` |
-| File | `.opencode/skills/doc-maintainer/SKILL.md` |
+| File | `.agents/skills/doc-maintainer/SKILL.md` |
 | Version | 1.1.0 |
 | Purpose | Autonomous engine that detects system changes and keeps `/docs` in sync |
 | Consumes from | Change events (any domain) |
@@ -272,7 +272,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-031 |
 | Domain | `design` |
-| File | `.opencode/skills/frontend-ux-architect/SKILL.md` |
+| File | `.agents/skills/frontend-ux-architect/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Design screen structure, navigation, component contracts, accessibility, and token rules |
 | Consumes from | `requirement-analyzer`, `architecture-design` |
@@ -286,7 +286,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-032 |
 | Domain | `database` |
-| File | `.opencode/skills/database-architect/SKILL.md` |
+| File | `.agents/skills/database-architect/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Design normalized schemas, ERDs, indexing strategies, audit logging, and migration plans |
 | Consumes from | `requirement-analyzer`, `architecture-design` |
@@ -300,7 +300,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-033 |
 | Domain | `quality` |
-| File | `.opencode/skills/implementation-completeness-auditor/SKILL.md` |
+| File | `.agents/skills/implementation-completeness-auditor/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Cross-check all requirements against code, tests, UI, DB, and docs; produce readiness score |
 | Consumes from | `requirement-analyzer`, `feature-planning`, `code-generator`, `state-manager`, `traceability-matrix` (optional) |
@@ -316,7 +316,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-111 |
 | Domain | `quality` |
-| File | `.opencode/skills/traceability-matrix/SKILL.md` |
+| File | `.agents/skills/traceability-matrix/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Auto-generate bidirectional RTM linking REQ → ADR → TEST → TASK; flag UNCOVERED and UNIMPLEMENTED requirements |
 | Consumes from | `requirement-analyzer`, `architecture-design`, `feature-planning`, `test-generator` |
@@ -341,7 +341,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-114 |
 | Domain | `governance` |
-| File | `.opencode/skills/cross-artifact-consistency/SKILL.md` |
+| File | `.agents/skills/cross-artifact-consistency/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Guard: check structural consistency across REQs, modules, tasks, and tests. Block on violations. |
 | Consumes from | `requirement-analyzer`, `architecture-design`, `feature-planning`, `test-generator` |
@@ -365,7 +365,7 @@ feature-planning                   │
 |----------|-------|
 | ID | SKL-115 |
 | Domain | `quality` |
-| File | `.opencode/skills/drift-detector/SKILL.md` |
+| File | `.agents/skills/drift-detector/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Detect structural drift between spec-latest.md (FEATURE-007) and current working tree |
 | Consumes from | `orchestrator` (spec-latest.md), `state-manager` (working_tree_map, optional) |
@@ -398,7 +398,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-034 |
 | Domain | `governance` |
-| File | `.opencode/skills/database-guard/SKILL.md` |
+| File | `.agents/skills/database-guard/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Block destructive migrations, missing FK indexes, unannotated PII, missing cascade rules |
 | Consumes from | `database-architect` |
@@ -410,7 +410,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-035 |
 | Domain | `governance` |
-| File | `.opencode/skills/performance-guard/SKILL.md` |
+| File | `.agents/skills/performance-guard/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Block N+1 query patterns, missing query indexes, bulk operation anti-patterns |
 | Consumes from | `architecture-design`, `clean-code-review` (code_map) |
@@ -422,7 +422,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-036 |
 | Domain | `governance` |
-| File | `.opencode/skills/ui-ux-compliance-guard/SKILL.md` |
+| File | `.agents/skills/ui-ux-compliance-guard/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Block hardcoded colors, missing component states, prop violations, accessibility issues |
 | Consumes from | `frontend-ux-architect` |
@@ -434,7 +434,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-037 |
 | Domain | `governance` |
-| File | `.opencode/skills/implementation-completeness-guard/SKILL.md` |
+| File | `.agents/skills/implementation-completeness-guard/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Block release when readiness score < threshold (default: 85) or critical requirements missing |
 | Consumes from | `implementation-completeness-auditor` |
@@ -446,7 +446,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-038 |
 | Domain | `design` |
-| File | `.opencode/skills/design-system-generator/SKILL.md` |
+| File | `.agents/skills/design-system-generator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Generate design token files, component stubs, and Storybook configuration from UX architecture output |
 | Consumes from | `frontend-ux-architect` |
@@ -460,7 +460,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-039 |
 | Domain | `quality` |
-| File | `.opencode/skills/seo-optimizer/SKILL.md` |
+| File | `.agents/skills/seo-optimizer/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Generate sitemap, robots.txt, JSON-LD structured data, Open Graph tags, and Core Web Vitals budget for public-facing web products |
 | Consumes from | `architecture-design`, `code-generator` |
@@ -474,7 +474,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-040 |
 | Domain | `meta` |
-| File | `.opencode/skills/prompt-normalizer/SKILL.md` |
+| File | `.agents/skills/prompt-normalizer/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Extract structured intent from a raw user prompt before pipeline routing; produce a normalized routing-ready prompt or a single targeted clarification question |
 | Consumes from | — (step 0, no upstream skill) |
@@ -488,7 +488,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-041 |
 | Domain | `governance` |
-| File | `.opencode/skills/security-guard/SKILL.md` |
+| File | `.agents/skills/security-guard/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Binary pass/block gate that enforces CVSS severity thresholds, compliance framework minimums, and non-bypassable domain rules (prompt injection for AI, hardcoded credentials for IoT) |
 | Consumes from | `security-review` |
@@ -502,7 +502,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-042 |
 | Domain | `deployment` |
-| File | `.opencode/skills/ci-pipeline-generator/SKILL.md` |
+| File | `.agents/skills/ci-pipeline-generator/SKILL.md` |
 | Version | 1.0.0 |
 | Purpose | Generate executable CI/CD files (GitHub Actions / GitLab CI YAML, Dockerfile, docker-compose.yml, .env.example, Kubernetes manifests) from deployment-strategy output; includes secret scan before any file write |
 | Consumes from | `deployment-strategy`, `architecture-design` |
@@ -516,7 +516,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-043 |
 | Domain | `domain-specialist` |
-| File | `.opencode/skills/ai-agent-specialist/SKILL.md` |
+| File | `.agents/skills/ai-agent-specialist/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Phase 2c (domain specialist layer) |
 | Purpose | Inject AI/agent-specific architecture patterns, prompt engineering standards, memory architecture, token budgets, evaluation frameworks, and AI safety controls when building LLM-powered applications, RAG pipelines, or multi-agent systems |
@@ -532,7 +532,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-044 |
 | Domain | `domain-specialist` |
-| File | `.opencode/skills/mobile-platform-specialist/SKILL.md` |
+| File | `.agents/skills/mobile-platform-specialist/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Phase 2c (domain specialist layer) |
 | Purpose | Inject technology stack selection (iOS/Android/RN/Flutter/MAUI), offline-first architecture, push notification design, App Store compliance requirements, mobile security controls, device matrix, and platform-specific UX constraints when building native or cross-platform mobile apps |
@@ -549,7 +549,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-045 |
 | Domain | `domain-specialist` |
-| File | `.opencode/skills/saas-enterprise-architect/SKILL.md` |
+| File | `.agents/skills/saas-enterprise-architect/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Phase 2c (domain specialist layer) |
 | Purpose | Inject multi-tenancy model selection, RBAC architecture, subscription billing design, enterprise SSO (SAML/OIDC/SCIM), compliance framework controls (SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS, FedRAMP), white-labeling, and audit logging requirements when building a SaaS platform or B2B enterprise product |
@@ -566,7 +566,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-046 |
 | Domain | `domain-specialist` |
-| File | `.opencode/skills/systems-specialist/SKILL.md` |
+| File | `.agents/skills/systems-specialist/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Phase 2c (domain specialist layer) |
 | Purpose | Inject embedded/IoT architecture patterns (bare-metal, RTOS, IoT edge/cloud), memory budget, HAL design, communication protocols (MQTT/CoAP/BLE/LoRaWAN/CAN), OTA firmware update architecture, safety standard controls (IEC 62443, ISO 26262, IEC 61508), and game development architecture (ECS, game loop, netcode) when building embedded systems, IoT platforms, or games |
@@ -587,7 +587,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-047 |
 | Domain | `system` |
-| File | `.opencode/skills/behavioral-telemetry-collector/SKILL.md` |
+| File | `.agents/skills/behavioral-telemetry-collector/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Async hook — `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked` events |
 | Purpose | Collect anonymized, PII-scrubbed behavioral events from the skill pipeline. Opt-out gate is unconditional first step. Ring-buffer storage (500 events/session). Never collects user text, code, or credentials. |
@@ -603,7 +603,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-048 |
 | Domain | `system` |
-| File | `.opencode/skills/session-insights/SKILL.md` |
+| File | `.agents/skills/session-insights/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | Async — once at `pipeline.ended` |
 | Purpose | Aggregate behavioral telemetry into per-skill performance metrics and session-level summary. Detects anomalies (failure rate > 30%, HITL rejection ratio > 30%). Read-only on events array. |
@@ -619,7 +619,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 |----------|-------|
 | ID | SKL-049 |
 | Domain | `system` |
-| File | `.opencode/skills/enhancement-dashboard/SKILL.md` |
+| File | `.agents/skills/enhancement-dashboard/SKILL.md` |
 | Version | 1.0.0 |
 | Runs at | On-demand or async after `session-insights` completes |
 | Purpose | Read-only renderer. Converts `session_summary` into a structured Markdown + JSON report with 5 sections: header, session overview, per-skill performance table, anomalies, health verdict. |
@@ -677,7 +677,7 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 | **Domain** | system |
 | **Version** | 1.0.0 |
 | **Mastery** | advanced |
-| **Executable** | `.opencode/skills/adaptive-proposal-generator/SKILL.md` |
+| **Executable** | `.agents/skills/adaptive-proposal-generator/SKILL.md` |
 | **Assigned to** | primary agent (orchestrated at session end) |
 
 Analyzes `session_summary` from `session-insights` (SKL-048) and up to 10 historical session summaries to detect failure patterns, HITL rejection hotspots, capability gaps, and repeated skill sequences. Generates ranked `AdaptationProposal[]` objects (up to 5 by default) with titles, rationales, evidence, effort estimates, and confidence scores. All proposals have `hitl_status: pending` — **nothing is applied without explicit human approval**.
@@ -701,7 +701,7 @@ Five proposal types:
 | **Domain** | system |
 | **Version** | 1.0.0 |
 | **Mastery** | advanced |
-| **Executable** | `.opencode/skills/adaptation-applicator/SKILL.md` |
+| **Executable** | `.agents/skills/adaptation-applicator/SKILL.md` |
 | **Assigned to** | primary agent (after HITL gate) |
 
 Applies a single HITL-approved `AdaptationProposal` to the live system. Enforces `hitl_status == "approved"` as the first and unconditional check. Creates a rollback checkpoint (registry + index + graph + opencode.json) before any write. Runs `validate-skills.sh` and `npm run build` after every change — if either fails, rolls back automatically and returns a failure report with the full output.
@@ -730,7 +730,7 @@ On failure: auto-rollback from checkpoint, returns `rollback_executed: true`.
 | **Domain** | lifecycle |
 | **Version** | 1.0.0 |
 | **Mastery** | advanced |
-| **Executable** | `.opencode/skills/defect-manager/SKILL.md` |
+| **Executable** | `.agents/skills/defect-manager/SKILL.md` |
 | **Assigned to** | `analyzer` agent |
 
 Receives defect reports from any source (test failure, security finding, code-repair escalation, human report) and manages the full defect lifecycle from intake to closure. For every bug: creates `BUG-NNNN`, generates the full 6-item companion chain (INVESTIGATION + FIX + TEST + REVIEW + VALIDATION + CLOSURE), links all items to originating requirement and implementation task, persists each item as a Markdown file in `work-items/`. For "missings" from implementation-completeness-auditor: generates a shorter 3-item chain (FIX + TEST + VALIDATION). HITL triage gate is mandatory for all bugs.
@@ -751,7 +751,7 @@ Receives defect reports from any source (test failure, security finding, code-re
 | **Domain** | lifecycle |
 | **Version** | 1.0.0 |
 | **Mastery** | advanced |
-| **Executable** | `.opencode/skills/change-request-manager/SKILL.md` |
+| **Executable** | `.agents/skills/change-request-manager/SKILL.md` |
 | **Assigned to** | `planner` agent |
 
 Receives change requests (new requirement, modified requirement, scope change) and manages the full CR lifecycle from intake to planning. Runs impact analysis via `change-impact-analyzer`, presents HITL gate for approval, generates a task delta (new/modified/cancelled tasks), and backpropagates the approved delta to `feature-planning` for re-planning. Does NOT modify existing work items directly. HITL impact-approval gate is mandatory.
@@ -772,7 +772,7 @@ Receives change requests (new requirement, modified requirement, scope change) a
 | **Domain** | integration |
 | **Version** | 1.0.0 |
 | **Mastery** | intermediate |
-| **Executable** | `.opencode/skills/work-item-exporter/SKILL.md` |
+| **Executable** | `.agents/skills/work-item-exporter/SKILL.md` |
 | **Assigned to** | `builder` agent |
 
 Transforms internal work item records from `work-items/` into export-ready formats. Primary output is Jira Bulk Import JSON. Secondary outputs: JSON Lines and Markdown summary table. Export is one-way outbound only (no status read-back). Runs as an async non-blocking final step at pipeline completion. Includes mandatory PII scrubbing before any file write.
@@ -793,7 +793,7 @@ Transforms internal work item records from `work-items/` into export-ready forma
 | **Domain** | governance |
 | **Version** | 1.0.0 |
 | **Mastery** | intermediate |
-| **Executable** | `.opencode/skills/work-item-lifecycle-guard/SKILL.md` |
+| **Executable** | `.agents/skills/work-item-lifecycle-guard/SKILL.md` |
 | **Assigned to** | `reviewer` agent |
 
 Enforces the work item lifecycle state machine from `docs/work-item-foundation.md §4`. Validates every proposed state transition before it is written. Returns `allow`, `warn`, or `block`. Terminal states (`closed`, `cancelled`, `rejected`) are always blocked. Initial deployment mode: `warning` (allows pipeline stabilization for first 2 weeks before switching to `block`). Pure rule evaluator — no file I/O or state reads required.

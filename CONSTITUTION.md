@@ -47,7 +47,7 @@ AI-assisted delivery workflows.
 
 <!-- Hard constraints the architect MUST respect. These cannot be overridden by a single run. -->
 
-- **Skill isolation:** Each skill in `.opencode/skills/` is self-contained. Skills MUST NOT
+- **Skill isolation:** Each skill in `.agents/skills/` is self-contained. Skills MUST NOT
   import from each other at runtime — all inter-skill communication is via the orchestrator.
 - **Flat-file persistence:** No database. State is stored in `.opencode/state/` as JSON files.
   Any proposal to add a database requires a CONSTITUTION amendment.

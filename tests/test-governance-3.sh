@@ -110,7 +110,7 @@ node -e "
 const fs = require('fs');
 const must = ['verdict', 'blocking_findings'];
 for (const g of ['security-guard', 'implementation-completeness-guard', 'cross-artifact-consistency', 'database-guard']) {
-  const s = fs.readFileSync('$ROOT/.opencode/skills/' + g + '/SKILL.md', 'utf8');
+  const s = fs.readFileSync('$ROOT/.agents/skills/' + g + '/SKILL.md', 'utf8');
   for (const k of must) if (!s.includes(k)) { console.error(g + ' lacks ' + k); process.exit(1); }
   if (!s.includes('override_decision_id')) { console.error(g + ' lacks decision-id override'); process.exit(1); }
 }
@@ -159,7 +159,7 @@ if (!ajv.compile(schema)(rec)) process.exit(1);
 " && ok "trace identity/gate/subject fields validate" || bad "trace fields"
 
 # 6. Merge-gate audit location fixed (no location-less audit claims).
-if grep -q "artifacts/merge-gate-audit.jsonl" "$ROOT/.opencode/skills/github-merge-gate/SKILL.md"; then
+if grep -q "artifacts/merge-gate-audit.jsonl" "$ROOT/.agents/skills/github-merge-gate/SKILL.md"; then
   ok "merge audit location fixed"
 else
   bad "merge audit location"

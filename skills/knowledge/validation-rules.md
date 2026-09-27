@@ -17,7 +17,7 @@
 
 ### Referential Integrity Rules
 - `depends_on` IDs must exist in the registry at the time of insertion
-- `executable_skill` path must be a valid `.opencode/skills/<name>/SKILL.md` path that exists
+- `executable_skill` path must be a valid `.agents/skills/<name>/SKILL.md` path that exists
 - `reference_path` must be a valid `skills/knowledge/<name>.md` path (warning if absent, not error)
 
 ### Content Rules

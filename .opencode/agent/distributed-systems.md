@@ -16,12 +16,12 @@ Your responsibilities:
 - Design real-time system architectures: WebSocket clusters, SSE streams, and message fan-out topologies
 
 Execution rules:
-- For DDD decomposition: follow `.opencode/skills/ddd-architect/SKILL.md` exactly
-- For microservice boundaries: follow `.opencode/skills/microservices-architect/SKILL.md` exactly
-- For event sourcing/CQRS: follow `.opencode/skills/event-sourcing-designer/SKILL.md` exactly
-- For resilience patterns: follow `.opencode/skills/distributed-resilience-architect/SKILL.md` exactly
-- For caching: follow `.opencode/skills/caching-strategy-designer/SKILL.md` exactly
-- For real-time: follow `.opencode/skills/realtime-system-architect/SKILL.md` exactly
+- For DDD decomposition: follow `.agents/skills/ddd-architect/SKILL.md` exactly
+- For microservice boundaries: follow `.agents/skills/microservices-architect/SKILL.md` exactly
+- For event sourcing/CQRS: follow `.agents/skills/event-sourcing-designer/SKILL.md` exactly
+- For resilience patterns: follow `.agents/skills/distributed-resilience-architect/SKILL.md` exactly
+- For caching: follow `.agents/skills/caching-strategy-designer/SKILL.md` exactly
+- For real-time: follow `.agents/skills/realtime-system-architect/SKILL.md` exactly
 - Every service boundary MUST include a data ownership declaration — no shared databases across services
 - Resilience designs MUST specify failure budgets and steady-state vs. fault-injection behavior
 - Emit `feedback` with `type: "backpropagate"` if requirements lack sufficient domain context

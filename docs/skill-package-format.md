@@ -20,7 +20,7 @@ The format is intentionally minimal — the canonical artifact is `SKILL.md` (th
 ### Source Skill Directory (before packaging)
 
 ```
-.opencode/skills/my-skill/
+.agents/skills/my-skill/
 ├── SKILL.md                  # Required — the canonical skill specification
 ├── skill-manifest.json       # Generated at publish time — do not hand-edit
 └── knowledge/                # Optional — reference files, few-shot examples, etc.
@@ -130,7 +130,7 @@ The manifest is a JSON file generated automatically by `skill-registry-client pu
 |----------|------------|---------|
 | Package archive | `{skill-name}-{version}.tar.gz` | `billing-validator-1.0.0.tar.gz` |
 | Manifest file | `skill-manifest.json` (always this name) | `skill-manifest.json` |
-| Skill directory | `{skill-name}/` (same as skill name) | `.opencode/skills/billing-validator/` |
+| Skill directory | `{skill-name}/` (same as skill name) | `.agents/skills/billing-validator/` |
 | Skill specification | `SKILL.md` (always uppercase, always this name) | `SKILL.md` |
 
 **Skill name rules:**
@@ -242,7 +242,7 @@ If you prefer not to use `skill-registry-client publish`, you can build a packag
 ```bash
 #!/usr/bin/env bash
 # Manual skill packaging script
-# Usage: bash package-skill.sh .opencode/skills/my-skill
+# Usage: bash package-skill.sh .agents/skills/my-skill
 
 set -euo pipefail
 

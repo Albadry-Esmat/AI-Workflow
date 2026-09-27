@@ -10,7 +10,7 @@ AI-Workflow is the source of truth for all facts about AI-Workflow capabilities.
 
 | Data category | Canonical owner | Website treatment |
 |---|---|---|
-| Skill implementation and skill metadata | `.opencode/skills/*/SKILL.md` | Exact generated mirror |
+| Skill implementation and skill metadata | `.agents/skills/*/SKILL.md` | Exact generated mirror |
 | Skill discovery/index metadata | `skills/index.yaml` | Generated mirror |
 | Runtime registry | `skills/registry.json` | Generated mirror |
 | Skill graph | `skills/graph/skill-graph.yaml` | Generated mirror |

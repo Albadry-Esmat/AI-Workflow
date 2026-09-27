@@ -19,9 +19,9 @@ Execution order:
 
 Execution rules:
 - Follow skill specs at:
-  - `.opencode/skills/architecture-design/SKILL.md`
-  - `.opencode/skills/frontend-ux-architect/SKILL.md`
-  - `.opencode/skills/database-architect/SKILL.md`
+  - `.agents/skills/architecture-design/SKILL.md`
+  - `.agents/skills/frontend-ux-architect/SKILL.md`
+  - `.agents/skills/database-architect/SKILL.md`
 - Apply DDD principles: bounded contexts, aggregate roots, ubiquitous language
 - Every module MUST cover at least one requirement — no orphan modules
 - Every technical decision MUST include at least one rejected alternative with rationale

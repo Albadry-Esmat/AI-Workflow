@@ -45,10 +45,10 @@ def index_block(skill_id: str, manifest: dict) -> str:
         f"- id: {skill_id}",
         f"  name: {name}",
         f"  short_description: {description}",
-        f"  reference_path: .opencode/skills/{name}/SKILL.md",
+        f"  reference_path: .agents/skills/{name}/SKILL.md",
         "  reference_sections:",
         *[f"  - '## {section}'" for section in manifest["required_sections"]],
-        f"  executable_skill: .opencode/skills/{name}/SKILL.md",
+        f"  executable_skill: .agents/skills/{name}/SKILL.md",
         "  tags:",
         "  - batch9",
         "  - scaffolded",
@@ -105,7 +105,7 @@ def main() -> int:
     index_path = root / "skills/index.yaml"
     registry_path = root / "skills/registry.json"
     graph_path = root / "skills/graph/skill-graph.yaml"
-    skill_destination = root / ".opencode/skills" / name
+    skill_destination = root / ".agents/skills" / name
     index_text = index_path.read_text()
     registry = json.loads(registry_path.read_text())
     graph_text = graph_path.read_text()
@@ -155,7 +155,7 @@ def main() -> int:
             "version": manifest["version"],
             "status": "draft",
             "domain": manifest["domain"],
-            "path": f".opencode/skills/{name}/SKILL.md",
+            "path": f".agents/skills/{name}/SKILL.md",
             "description": manifest["description"],
             "inputs": ["context"],
             "outputs": ["result"],

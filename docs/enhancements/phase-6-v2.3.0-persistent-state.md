@@ -73,7 +73,7 @@ This makes it impossible to:
 **Change to `context-engineering.md`:**
 - Add "Artifact Envelope" section documenting schema and lifecycle
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
+**Files:** `.agents/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
 **Validation:** Full pipeline run; verify each inter-skill transfer has `artifact_id` in event_log
 
 ---
@@ -114,7 +114,7 @@ immediately after the snapshot's `phase_id`.
 state to snapshots so resume works across session boundaries. Phase 7's TASK-0065 is the
 user-facing "warm-start from snapshot" capability that unifies both.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
+**Files:** `.agents/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
 **Validation:** Take snapshot after phase-4-planning → start new session → restore → continue from phase-5-impact; verify prior phase outputs are present
 
 ---
@@ -169,7 +169,7 @@ Step 16 — Invoke sync pipeline
 - Rate limit: max 10 webhook invocations per minute; excess → queue with backpressure warning
 
 **Version bump:** `work-item-exporter` `2.0.0 → 2.1.0` (MINOR: new optional `mode=webhook`)
-**Files:** `.opencode/skills/work-item-exporter/SKILL.md`, `skills/index.yaml`
+**Files:** `.agents/skills/work-item-exporter/SKILL.md`, `skills/index.yaml`
 **Validation:** POST mock Jira webhook payload → verify sync triggered; invalid signature → verify rejection
 
 ---
@@ -235,7 +235,7 @@ Tier 3: Archival Memory (cross-session, project-scoped, persistent)
   to a different `project_id`
 
 **Version bump:** `context-memory` `1.0.0 → 2.0.0` (MAJOR: new tier model, new input schema)
-**Files:** `.opencode/skills/context-memory/SKILL.md`, `docs/context-engineering.md`
+**Files:** `.agents/skills/context-memory/SKILL.md`, `docs/context-engineering.md`
 **Validation:** Run pipeline on project A → approve architecture → start new pipeline on same project → verify architecture phase is skipped
 
 ---

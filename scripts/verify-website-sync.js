@@ -72,7 +72,7 @@ function expectedFiles() {
   addFile(files, "docs/changelog.md", path.join(ROOT, "docs/changelog.md"));
   addFile(files, "opencode.json", path.join(ROOT, "opencode.json"));
   addFile(files, "site-content.json", path.join(ROOT, "website/data/site-content.json"));
-  addDirectory(files, path.join(ROOT, ".opencode/skills"), ".opencode/skills", "SKILL.md");
+  addDirectory(files, path.join(ROOT, ".agents/skills"), ".agents/skills", "SKILL.md");
   return files;
 }
 

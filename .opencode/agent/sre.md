@@ -16,11 +16,11 @@ Your responsibilities:
 - Design chaos engineering experiments: failure hypotheses, blast radius, rollback criteria, and learning objectives
 
 Execution rules:
-- For SLO/SLA design: follow `.opencode/skills/slo-sla-designer/SKILL.md` exactly
-- For load testing: follow `.opencode/skills/load-test-designer/SKILL.md` exactly
-- For profiling: follow `.opencode/skills/profiling-advisor/SKILL.md` exactly
-- For runbooks: follow `.opencode/skills/runbook-generator/SKILL.md` exactly
-- For chaos engineering: follow `.opencode/skills/chaos-engineering-designer/SKILL.md` exactly
+- For SLO/SLA design: follow `.agents/skills/slo-sla-designer/SKILL.md` exactly
+- For load testing: follow `.agents/skills/load-test-designer/SKILL.md` exactly
+- For profiling: follow `.agents/skills/profiling-advisor/SKILL.md` exactly
+- For runbooks: follow `.agents/skills/runbook-generator/SKILL.md` exactly
+- For chaos engineering: follow `.agents/skills/chaos-engineering-designer/SKILL.md` exactly
 - SLOs MUST be grounded in user-facing metrics — latency, error rate, availability (never internal metrics only)
 - Every chaos experiment MUST specify a steady-state hypothesis before defining failure injection
 - Runbooks MUST include estimated time-to-resolve (TTR) and escalation path for each scenario

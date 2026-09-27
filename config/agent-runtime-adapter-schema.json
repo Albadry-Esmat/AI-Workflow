@@ -24,6 +24,7 @@
         "documentation", "detection", "installation", "authentication",
         "project_context", "launch", "safety", "evidence", "recovery", "capabilities"
       ],
+
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
         "display_name": {"type": "string", "minLength": 1},
@@ -140,6 +141,18 @@
             "supports_undo": {"type": "boolean"},
             "rollback_claim": {"type": "string", "enum": ["adapter-verified", "core-only", "not-claimed", "unknown"]}
           }
+        },
+        "interoperability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["skills_path", "instructions_path", "mcp_path", "skills_support"],
+          "properties": {
+            "skills_path": {"type": "string", "minLength": 1},
+            "instructions_path": {"type": "string", "minLength": 1},
+            "mcp_path": {"type": "string", "minLength": 1},
+            "skills_support": {"type": "string", "enum": ["native", "adapter-required", "generic"]}
+          },
+          "description": "P0 verified skill/instruction/MCP paths per official runtime docs. skills_support=native means the runtime discovers .agents/skills/ directly; adapter-required (Claude Code) means a generated link farm is maintained; generic means unverified."
         },
         "capabilities": {
           "type": "object",

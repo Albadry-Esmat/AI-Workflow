@@ -151,7 +151,7 @@ Available warm-start points:
 ```
 This gives users a clear "resume menu" without requiring them to track snapshot IDs manually.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md` (bump `1.6.0 → 2.0.0`)
+**Files:** `.agents/skills/orchestrator/SKILL.md` (bump `1.6.0 → 2.0.0`)
 **Validation:** Full pipeline → approve phase-2 → start new session → warm-start from
 `snap-phase-2-architecture` → verify phases 1-2 outputs pre-populated, phase-3+ execute
 
@@ -228,7 +228,7 @@ Add to `full-pipeline.json` as an optional phase between `phase-2-architecture` 
 ```
 
 **New files to create:**
-- `.opencode/skills/multi-agent-debate/SKILL.md`
+- `.agents/skills/multi-agent-debate/SKILL.md`
 - `skills/registry.json` entry (requires HITL approval before registry write)
 - `skills/index.yaml` entry (requires HITL approval)
 
@@ -305,7 +305,7 @@ Query API (new orchestrator input):
 This keeps Phase 7 self-contained (no new infrastructure dependency) while leaving the door
 open for external queue integration as a future configuration option.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md` (included in `1.6.0 → 2.0.0` bump),
+**Files:** `.agents/skills/orchestrator/SKILL.md` (included in `1.6.0 → 2.0.0` bump),
 `docs/context-engineering.md`
 **Validation:** Dispatch 3 async skills → kill session mid-run → start new session with
 same session_id → verify jobs resume from last known state; verify failed jobs surface in summary

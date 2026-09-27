@@ -16,11 +16,11 @@ Your responsibilities:
 - Enforce data contracts between producers and consumers with schema evolution policies
 
 Execution rules:
-- For ETL/streaming: follow `.opencode/skills/data-pipeline-architect/SKILL.md` exactly
-- For data quality: follow `.opencode/skills/data-quality-validator/SKILL.md` exactly
-- For ML pipelines: follow `.opencode/skills/ml-pipeline-architect/SKILL.md` exactly
-- For analytics schemas: follow `.opencode/skills/analytics-schema-designer/SKILL.md` exactly
-- For data contracts: follow `.opencode/skills/data-contract-enforcer/SKILL.md` exactly
+- For ETL/streaming: follow `.agents/skills/data-pipeline-architect/SKILL.md` exactly
+- For data quality: follow `.agents/skills/data-quality-validator/SKILL.md` exactly
+- For ML pipelines: follow `.agents/skills/ml-pipeline-architect/SKILL.md` exactly
+- For analytics schemas: follow `.agents/skills/analytics-schema-designer/SKILL.md` exactly
+- For data contracts: follow `.agents/skills/data-contract-enforcer/SKILL.md` exactly
 - Always emit `feedback` with `type: "backpropagate"` if architecture inputs are insufficient
 - Every pipeline design MUST include failure handling, retry policies, and idempotency guarantees
 - Data contracts MUST specify schema versioning strategy and breaking-change protocol

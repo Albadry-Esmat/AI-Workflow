@@ -11,7 +11,7 @@
 #   5. Credentials are optional until a provider operation is requested
 #   6. Optional env vars (with warnings, not failures)
 #   7. .opencode plugin dependency state (optional — skip with external MCPs)
-#   8. Skill count sanity (index.yaml vs .opencode/skills/)
+#   8. Skill count sanity (index.yaml vs .agents/skills/)
 #   9. opencode.json skill paths exist on disk
 #  10. Required runtime directories
 #
@@ -55,20 +55,27 @@ _fail() { fail "$1"; FAILURES=$((FAILURES+1)); }
 banner "Health Check"
 
 # ── 1. Required tools ─────────────────────────────────────────────────────────
+# P0: python3 is LAZY (validation-only). Core health must pass without it;
+# validation invoked explicitly still fails closed (validate-skills.sh).
 header "Required tools"
 
-for tool in git node npm python3; do
+for tool in git node npm; do
   if command -v "$tool" &>/dev/null; then
     _ok "$tool  →  $(command -v "$tool")"
   else
     _fail "$tool not found"
     case "$tool" in
       node)   echo "       Install Node.js at: https://nodejs.org" ;;
-      python3) echo "       Install Python at: https://python.org" ;;
       git)    echo "       Install Git at: https://git-scm.com" ;;
     esac
   fi
 done
+
+if command -v python3 &>/dev/null; then
+  _ok "python3  →  $(command -v python3) (validation utilities)"
+else
+  _warn "python3 not found — core workflows available; aiw validate requires Python (https://python.org)"
+fi
 
 # ── 2. Project-local tools ─────────────────────────────────────────────────────
 header "Project-local tools"
@@ -76,7 +83,7 @@ header "Project-local tools"
 if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]] && "$PYTHON_BIN" -c 'import jsonschema, yaml' &>/dev/null; then
   _ok "project-local Python dependencies  →  $PYTHON_BIN"
 else
-  _fail "project-local Python dependencies missing — run: make setup"
+  _warn "project-local Python dependencies missing — aiw validate unavailable until fixed (run: make setup with Python installed)"
 fi
 
 if [[ -n "$AJV_BIN" ]] && [[ -x "$AJV_BIN" ]]; then
@@ -167,11 +174,11 @@ header "Skill count consistency"
 
 if command -v grep &>/dev/null; then
   INDEX_COUNT=$(grep -c "^- id:" "$ROOT/skills/index.yaml" 2>/dev/null || echo 0)
-  DIR_COUNT=$(find "$ROOT/.opencode/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+  DIR_COUNT=$(find "$ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
   if [[ "$INDEX_COUNT" -eq "$DIR_COUNT" ]] && [[ "$INDEX_COUNT" -gt 0 ]]; then
-    _ok "index.yaml ($INDEX_COUNT) matches .opencode/skills/ ($DIR_COUNT)"
+    _ok "index.yaml ($INDEX_COUNT) matches .agents/skills/ ($DIR_COUNT)"
   else
-    _fail "Skill count mismatch — index.yaml: $INDEX_COUNT, .opencode/skills/: $DIR_COUNT"
+    _fail "Skill count mismatch — index.yaml: $INDEX_COUNT, .agents/skills/: $DIR_COUNT"
     echo "       Run: make validate — for a full diagnostic"
   fi
 else

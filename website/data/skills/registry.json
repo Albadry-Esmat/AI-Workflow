@@ -28,7 +28,7 @@
       "version": "1.2.0",
       "status": "active",
       "domain": "requirements",
-      "path": ".opencode/skills/requirement-analyzer/SKILL.md",
+      "path": ".agents/skills/requirement-analyzer/SKILL.md",
       "description": "Extracts, normalizes, and validates requirements from raw input",
       "inputs": [
         "raw_input",
@@ -64,7 +64,7 @@
       "version": "1.1.0",
       "status": "active",
       "domain": "system",
-      "path": ".opencode/skills/adaptive-proposal-generator/SKILL.md",
+      "path": ".agents/skills/adaptive-proposal-generator/SKILL.md",
       "description": "Analyzes session_summary from session-insights (SKL-048) to generate ranked AdaptationProposal objects covering new skills, skill modifications, new pipeline templates, and agent changes. All proposals require HITL approval \u2014 nothing is applied automatically.",
       "inputs": [
         "session_summary",
@@ -105,7 +105,7 @@
       "version": "1.0.0",
       "status": "active",
       "domain": "architecture",
-      "path": ".opencode/skills/multi-agent-debate/SKILL.md",
+      "path": ".agents/skills/multi-agent-debate/SKILL.md",
       "description": "Runs an adversarial Architect vs. Reviewer debate loop to produce a critique-hardened architecture artifact before feature planning begins. Inspired by AutoGen ConversableAgent pattern. Optional phase enabled by pipeline_config.debate_architecture: true. Quality-scored 87/100; HITL-approved for registration.",
       "inputs": [
         "architecture_proposal",
@@ -155,7 +155,7 @@
       "version": "1.0.0",
       "status": "active",
       "domain": "architecture",
-      "path": ".opencode/skills/realtime-system-architect/SKILL.md",
+      "path": ".agents/skills/realtime-system-architect/SKILL.md",
       "description": "Use when designing real-time systems with WebSockets, Server-Sent Events, or WebRTC. Triggers on: \"real-time architecture\", \"WebSocket design\", \"WebRTC\", \"collaborative editing\", \"CRDT\", \"presence system\". Do NOT use for batch or polling-based systems. Do NOT use for simple REST APIs.",
       "inputs": [
         "use_case",
@@ -205,7 +205,7 @@
       "status": "active",
       "domain": "orchestration",
       "description": "Formally delegates a scoped sub-task to a named agent with success criteria and handback protocol",
-      "path": ".opencode/skills/delegate/SKILL.md",
+      "path": ".agents/skills/delegate/SKILL.md",
       "inputs": [
         "task",
         "target_agent",
@@ -265,7 +265,7 @@
       "status": "active",
       "domain": "planning",
       "description": "Reconciles two independently produced implementation plans through bounded cross-review and consensus.",
-      "path": ".opencode/skills/plan-debate/SKILL.md",
+      "path": ".agents/skills/plan-debate/SKILL.md",
       "inputs": [
         "plan_a",
         "plan_b",
@@ -292,7 +292,7 @@
       "status": "active",
       "domain": "planning",
       "description": "Computes deterministic section and plan confidence from specialized review findings.",
-      "path": ".opencode/skills/confidence-scorer/SKILL.md",
+      "path": ".agents/skills/confidence-scorer/SKILL.md",
       "inputs": [
         "findings",
         "plan_sections",
@@ -316,7 +316,7 @@
       "status": "active",
       "domain": "review",
       "description": "Validates, deduplicates, and summarizes specialized review findings deterministically.",
-      "path": ".opencode/skills/finding-aggregator/SKILL.md",
+      "path": ".agents/skills/finding-aggregator/SKILL.md",
       "inputs": [
         "architecture_findings",
         "security_findings",
@@ -345,7 +345,7 @@
       "status": "active",
       "domain": "planning",
       "description": "Applies deterministic hard and soft plan-quality checks and controls the revision loop.",
-      "path": ".opencode/skills/validation-checklist-engine/SKILL.md",
+      "path": ".agents/skills/validation-checklist-engine/SKILL.md",
       "inputs": [
         "revised_plan",
         "review_report",
@@ -371,7 +371,7 @@
       "status": "active",
       "domain": "planning",
       "description": "Creates an immutable, approval-gated implementation contract with canonical hashes.",
-      "path": ".opencode/skills/contract-freezer/SKILL.md",
+      "path": ".agents/skills/contract-freezer/SKILL.md",
       "inputs": [
         "revised_plan",
         "validation_result",
@@ -399,7 +399,7 @@
       "status": "active",
       "domain": "review",
       "description": "Reviews a GitHub PR end-to-end by composing clean-code-review and security-review, scoring, and publishing findings plus triage labels. Advisory only.",
-      "path": ".opencode/skills/github-pr-review/SKILL.md",
+      "path": ".agents/skills/github-pr-review/SKILL.md",
       "inputs": [
         "pr_number",
         "repo",
@@ -426,7 +426,7 @@
       "status": "active",
       "domain": "review",
       "description": "Merges a PR only on unanimous green (approve verdict, checks, fresh bot approval, no criticals); otherwise holds with reason. Never uses admin bypass.",
-      "path": ".opencode/skills/github-merge-gate/SKILL.md",
+      "path": ".agents/skills/github-merge-gate/SKILL.md",
       "inputs": [
         "pr_number",
         "repo",

@@ -14,8 +14,8 @@ Your responsibilities:
 - Produce production-ready, schema-validated code in the language and framework specified by the input
 
 Execution rules:
-- For new code: follow the skill spec at `.opencode/skills/code-generator/SKILL.md` exactly
-- For repair: follow the skill spec at `.opencode/skills/code-repair/SKILL.md` exactly
+- For new code: follow the skill spec at `.agents/skills/code-generator/SKILL.md` exactly
+- For repair: follow the skill spec at `.agents/skills/code-repair/SKILL.md` exactly
 - Run `code-generator` first; switch to `code-repair` only when a failure condition is present
 - Generated code MUST satisfy all requirements in the `feature_plan` input — no orphan functions
 - Every generated module MUST include its corresponding test scaffold (unit test stubs at minimum)

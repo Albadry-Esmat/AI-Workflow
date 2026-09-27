@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "catalog_version": "0.1.0",
+  "catalog_version": "0.2.0",
   "adapters": [
     {
       "id": "opencode",
@@ -9,13 +9,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://opencode.ai/docs/",
-        "reviewed_at": "2026-08-17",
-        "verification_state": "fixture-pending"
+        "official_url": "https://opencode.ai/docs/skills/",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "opencode",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -23,15 +25,35 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "native-installer", "name": "OpenCode installer", "user_action_required": true},
-          {"kind": "package-manager", "name": "npm/Homebrew/platform package", "user_action_required": true},
-          {"kind": "container", "name": "OpenCode container image", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "native-installer",
+            "name": "OpenCode installer",
+            "user_action_required": true
+          },
+          {
+            "kind": "package-manager",
+            "name": "npm/Homebrew/platform package",
+            "user_action_required": true
+          },
+          {
+            "kind": "container",
+            "name": "OpenCode container image",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["browser-device", "runtime-login", "api-key-env"],
+        "modes": [
+          "browser-device",
+          "runtime-login",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -56,7 +78,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -73,6 +103,12 @@
         "structured_output": "unknown",
         "mcp": "native",
         "streaming": "native"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native; also .opencode/skills/, .claude/skills/)",
+        "instructions_path": "AGENTS.md",
+        "mcp_path": "opencode.json:mcp (legacy P0 source; manifest in P1)",
+        "skills_support": "native"
       }
     },
     {
@@ -82,13 +118,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://code.claude.com/docs/en/quickstart",
-        "reviewed_at": "2026-08-17",
-        "verification_state": "fixture-pending"
+        "official_url": "https://code.claude.com/docs/en/skills",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "claude",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -96,15 +134,35 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "native-installer", "name": "Claude Code native installer", "user_action_required": true},
-          {"kind": "package-manager", "name": "Homebrew/apt/dnf/apk/WinGet", "user_action_required": true},
-          {"kind": "container", "name": "User-managed container setup", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "native-installer",
+            "name": "Claude Code native installer",
+            "user_action_required": true
+          },
+          {
+            "kind": "package-manager",
+            "name": "Homebrew/apt/dnf/apk/WinGet",
+            "user_action_required": true
+          },
+          {
+            "kind": "container",
+            "name": "User-managed container setup",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["browser-device", "api-key-env", "enterprise-gateway"],
+        "modes": [
+          "browser-device",
+          "api-key-env",
+          "enterprise-gateway"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -129,7 +187,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -144,8 +210,14 @@
         "approval_gates": "native",
         "sandboxing": "unknown",
         "structured_output": "unknown",
-        "mcp": "unknown",
+        "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".claude/skills/ (adapter: symlinks -> ../../.agents/skills/)",
+        "instructions_path": "CLAUDE.md",
+        "mcp_path": ".mcp.json (project scope, generated in P1)",
+        "skills_support": "adapter-required"
       }
     },
     {
@@ -155,13 +227,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://github.com/openai/codex",
-        "reviewed_at": "2026-08-17",
-        "verification_state": "fixture-pending"
+        "official_url": "https://developers.openai.com/codex/skills",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "codex",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -169,16 +243,39 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "native-installer", "name": "Codex standalone installer", "user_action_required": true},
-          {"kind": "package-manager", "name": "npm/Homebrew", "user_action_required": true},
-          {"kind": "binary", "name": "Codex release binary", "user_action_required": true},
-          {"kind": "container", "name": "User-managed container setup", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "native-installer",
+            "name": "Codex standalone installer",
+            "user_action_required": true
+          },
+          {
+            "kind": "package-manager",
+            "name": "npm/Homebrew",
+            "user_action_required": true
+          },
+          {
+            "kind": "binary",
+            "name": "Codex release binary",
+            "user_action_required": true
+          },
+          {
+            "kind": "container",
+            "name": "User-managed container setup",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["browser-device", "api-key-env"],
+        "modes": [
+          "browser-device",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -203,7 +300,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -218,8 +323,14 @@
         "approval_gates": "unknown",
         "sandboxing": "unknown",
         "structured_output": "unknown",
-        "mcp": "unknown",
+        "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native)",
+        "instructions_path": "AGENTS.md",
+        "mcp_path": ".codex/config.toml [mcp_servers.*] (generated in P1)",
+        "skills_support": "native"
       }
     },
     {
@@ -229,13 +340,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli",
-        "reviewed_at": "2026-09-23",
-        "verification_state": "fixture-pending"
+        "official_url": "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "copilot",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -243,13 +356,24 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "package-manager", "name": "npm/Homebrew/WinGet", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "package-manager",
+            "name": "npm/Homebrew/WinGet",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["runtime-login", "api-key-env"],
+        "modes": [
+          "runtime-login",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -274,7 +398,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -291,6 +423,12 @@
         "structured_output": "unknown",
         "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native; also .github/skills/, .claude/skills/)",
+        "instructions_path": "AGENTS.md + .github/copilot-instructions.md",
+        "mcp_path": "~/.copilot/mcp-config.json; VS Code .vscode/mcp.json (generated in P1)",
+        "skills_support": "native"
       }
     },
     {
@@ -301,12 +439,14 @@
       "support_level": "candidate",
       "documentation": {
         "official_url": "https://antigravity.google/docs/cli/install",
-        "reviewed_at": "2026-09-23",
-        "verification_state": "fixture-pending"
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "agy",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -314,14 +454,29 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "native-installer", "name": "Antigravity installer script", "user_action_required": true},
-          {"kind": "package-manager", "name": "WinGet", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "native-installer",
+            "name": "Antigravity installer script",
+            "user_action_required": true
+          },
+          {
+            "kind": "package-manager",
+            "name": "WinGet",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["browser-device", "api-key-env"],
+        "modes": [
+          "browser-device",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -346,7 +501,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -363,6 +526,12 @@
         "structured_output": "unknown",
         "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": "unverified (generic)",
+        "instructions_path": "unverified",
+        "mcp_path": "unverified",
+        "skills_support": "generic"
       }
     },
     {
@@ -372,13 +541,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://cursor.com/docs/cli/overview",
-        "reviewed_at": "2026-09-23",
-        "verification_state": "fixture-pending"
+        "official_url": "https://cursor.com/docs/skills",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "agent",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -386,13 +557,24 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "native-installer", "name": "Cursor install script", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "native-installer",
+            "name": "Cursor install script",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["runtime-login", "api-key-env"],
+        "modes": [
+          "runtime-login",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -417,7 +599,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -432,8 +622,14 @@
         "approval_gates": "unknown",
         "sandboxing": "unknown",
         "structured_output": "unknown",
-        "mcp": "unknown",
+        "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native; equals .cursor/skills/)",
+        "instructions_path": "AGENTS.md + .cursor/rules/*.mdc",
+        "mcp_path": ".cursor/mcp.json (generated in P1)",
+        "skills_support": "native"
       }
     },
     {
@@ -443,13 +639,15 @@
       "status": "planned",
       "support_level": "candidate",
       "documentation": {
-        "official_url": "https://geminicli.com/docs/get-started/installation",
-        "reviewed_at": "2026-09-23",
-        "verification_state": "fixture-pending"
+        "official_url": "https://geminicli.com/docs/cli/skills/",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "gemini",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -457,13 +655,24 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "package-manager", "name": "npm/Homebrew/MacPorts", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "package-manager",
+            "name": "npm/Homebrew/MacPorts",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["browser-device", "api-key-env"],
+        "modes": [
+          "browser-device",
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -488,7 +697,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -505,6 +722,12 @@
         "structured_output": "unknown",
         "mcp": "native",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native alias for .gemini/skills/)",
+        "instructions_path": "GEMINI.md (P1: context.fileName -> AGENTS.md)",
+        "mcp_path": "settings.json / gemini-extension.json (generated in P1)",
+        "skills_support": "native"
       }
     },
     {
@@ -515,12 +738,14 @@
       "support_level": "candidate",
       "documentation": {
         "official_url": "https://aider.chat/docs/install.html",
-        "reviewed_at": "2026-09-23",
-        "verification_state": "fixture-pending"
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "aider",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -528,13 +753,23 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "package-manager", "name": "pip/npm", "user_action_required": true},
-          {"kind": "user-managed", "name": "Existing installation", "user_action_required": true}
+          {
+            "kind": "package-manager",
+            "name": "pip/npm",
+            "user_action_required": true
+          },
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": true,
-        "modes": ["api-key-env"],
+        "modes": [
+          "api-key-env"
+        ],
         "credential_owner": "runtime",
         "aiw_handles_secret_values": false,
         "status_probe": "runtime-status"
@@ -559,7 +794,15 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "authenticated", "started", "completed", "failed", "cancelled"],
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
         "evidence_level": "launch-only",
         "external_writes_default": false
       },
@@ -576,6 +819,12 @@
         "structured_output": "unknown",
         "mcp": "unknown",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": "generic-command (AGENTS.md conventions)",
+        "instructions_path": "AGENTS.md",
+        "mcp_path": "n/a",
+        "skills_support": "generic"
       }
     },
     {
@@ -586,12 +835,14 @@
       "support_level": "generic",
       "documentation": {
         "official_url": "https://github.com/Albadry-Esmat/AI-Workflow",
-        "reviewed_at": "2026-08-17",
+        "reviewed_at": "2026-09-27",
         "verification_state": "documentation-reviewed"
       },
       "detection": {
         "executable": "user-defined",
-        "version_args": ["--version"],
+        "version_args": [
+          "--version"
+        ],
         "safe_probe": true,
         "version_output_required": true
       },
@@ -599,12 +850,18 @@
         "managed_by_aiw": false,
         "requires_explicit_consent": true,
         "channels": [
-          {"kind": "user-managed", "name": "User-provided executable", "user_action_required": true}
+          {
+            "kind": "user-managed",
+            "name": "User-provided executable",
+            "user_action_required": true
+          }
         ]
       },
       "authentication": {
         "required_for_start": false,
-        "modes": ["none"],
+        "modes": [
+          "none"
+        ],
         "credential_owner": "user",
         "aiw_handles_secret_values": false,
         "status_probe": "none"
@@ -629,7 +886,12 @@
       },
       "evidence": {
         "run_manifest_adapter_id": true,
-        "events": ["detected", "selected", "started", "failed"],
+        "events": [
+          "detected",
+          "selected",
+          "started",
+          "failed"
+        ],
         "evidence_level": "none",
         "external_writes_default": false
       },
@@ -646,6 +908,12 @@
         "structured_output": "unknown",
         "mcp": "unknown",
         "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (portable convention)",
+        "instructions_path": "AGENTS.md",
+        "mcp_path": "runtime-owned",
+        "skills_support": "generic"
       }
     }
   ]

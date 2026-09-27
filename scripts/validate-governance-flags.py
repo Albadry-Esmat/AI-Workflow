@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "config/governance-flags-policy.json"
 SCHEMA = ROOT / "config/governance-flags-policy-schema.json"
 PIPELINES = ROOT / "skills" / "pipelines"
-ORCHESTRATOR = ROOT / ".opencode" / "skills" / "orchestrator" / "SKILL.md"
+ORCHESTRATOR = ROOT / ".agents" / "skills" / "orchestrator" / "SKILL.md"
 
 LOGGING_RULE_ANCHORS = [
     "weakening inputs",

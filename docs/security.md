@@ -12,7 +12,7 @@
 
 ## Threat Model
 
-The security review skill (`.opencode/skills/security-review/SKILL.md`) performs STRIDE threat modeling:
+The security review skill (`.agents/skills/security-review/SKILL.md`) performs STRIDE threat modeling:
 
 | Threat | Description | Mitigation |
 |--------|-------------|------------|

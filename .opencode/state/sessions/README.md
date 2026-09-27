@@ -9,4 +9,4 @@
 # - The orchestrator writes here after every skill step
 # - last_session.txt in the parent directory tracks the most recent session_id
 #
-# See: .opencode/skills/context-memory/SKILL.md for the full protocol
+# See: .agents/skills/context-memory/SKILL.md for the full protocol

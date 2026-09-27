@@ -14,7 +14,7 @@ Your responsibilities:
 - Produce a structured rollback report documenting what was reverted, why, and what the operator must do next
 
 Execution rules:
-- Follow the skill spec at `.opencode/skills/rollback-manager/SKILL.md` exactly
+- Follow the skill spec at `.agents/skills/rollback-manager/SKILL.md` exactly
 - ALWAYS confirm the rollback target before executing — never roll back to an ambiguous state
 - The rollback scope is determined by `recovery.rollback_scope` in the pipeline config (`pipeline_stage` by default)
 - Emit a `rollback_summary` with `reverted_phase`, `reverted_artifacts`, and `operator_action_required` fields

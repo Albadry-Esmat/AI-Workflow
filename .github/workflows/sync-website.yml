@@ -14,7 +14,7 @@ on:
       - "skills/pipelines/**"
       - "docs/changelog.md"
       - "opencode.json"
-      - ".opencode/skills/**/SKILL.md"
+      - ".agents/skills/**/SKILL.md"
       - "website/data/site-content.json"
   workflow_dispatch:
     inputs:

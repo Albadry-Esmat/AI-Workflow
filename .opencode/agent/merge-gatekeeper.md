@@ -15,7 +15,7 @@ Your responsibilities:
 - Audit-log every decision
 
 Execution rules:
-- Follow the skill spec at `.opencode/skills/github-merge-gate/SKILL.md`
+- Follow the skill spec at `.agents/skills/github-merge-gate/SKILL.md`
 - A push invalidates prior green state — re-evaluate from scratch
 - Reconcile before retrying any failed write
 

@@ -60,7 +60,7 @@ For the source implementation, revert `82cc34a` and `6e0638f` on `AI-Workflow/De
 
 For the website, revert `57b6e09`, `f402898`, and the generated sync commit `cdfd251` as needed, preserving the last known compatible ReleaseManifest. If only the manifest binding is wrong, regenerate `data/release-manifest.json` from the remaining source `Dev` tip and rerun the compatibility checker rather than hand-editing generated data.
 
-For a failed local scaffold application, use the backup path printed by `aiw skill apply` under `artifacts/skill-apply-backups/`, restore the three canonical catalog files, remove the copied `.opencode/skills/<name>/` directory, and rerun `make validate`. Draft scaffolds can be deleted from `artifacts/skill-scaffolds/` without affecting the live catalog. Pending feedback reports, autonomy reports, and consolidation reports are ignored runtime artifacts and can be removed without changing source state.
+For a failed local scaffold application, use the backup path printed by `aiw skill apply` under `artifacts/skill-apply-backups/`, restore the three canonical catalog files, remove the copied `.agents/skills/<name>/` directory, and rerun `make validate`. Draft scaffolds can be deleted from `artifacts/skill-scaffolds/` without affecting the live catalog. Pending feedback reports, autonomy reports, and consolidation reports are ignored runtime artifacts and can be removed without changing source state.
 
 ## Follow-ups
 

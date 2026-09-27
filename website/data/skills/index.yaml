@@ -12,7 +12,7 @@ skills:
   - '## Principles'
   - '## Anti-patterns'
   - '## Source References'
-  executable_skill: .opencode/skills/requirement-analyzer/SKILL.md
+  executable_skill: .agents/skills/requirement-analyzer/SKILL.md
   tags:
   - requirements
   - analysis
@@ -37,7 +37,7 @@ skills:
   - '## Principles'
   - '## Practices'
   - '## Source References'
-  executable_skill: .opencode/skills/architecture-design/SKILL.md
+  executable_skill: .agents/skills/architecture-design/SKILL.md
   tags:
   - architecture
   - ddd
@@ -64,7 +64,7 @@ skills:
   reference_sections:
   - '## Practices'
   - '## Anti-patterns'
-  executable_skill: .opencode/skills/feature-planning/SKILL.md
+  executable_skill: .agents/skills/feature-planning/SKILL.md
   tags:
   - planning
   - tasks
@@ -94,7 +94,7 @@ skills:
   - '## Anti-patterns'
   - '## Examples'
   - '## Source References'
-  executable_skill: .opencode/skills/clean-code-review/SKILL.md
+  executable_skill: .agents/skills/clean-code-review/SKILL.md
   tags:
   - code-quality
   - solid
@@ -122,7 +122,7 @@ skills:
   - '## Practices'
   - '## Anti-patterns'
   - '## Source References'
-  executable_skill: .opencode/skills/testing-strategy/SKILL.md
+  executable_skill: .agents/skills/testing-strategy/SKILL.md
   tags:
   - testing
   - tdd
@@ -158,7 +158,7 @@ skills:
   - '## Principles'
   - '## Practices'
   - '## Source References'
-  executable_skill: .opencode/skills/security-review/SKILL.md
+  executable_skill: .agents/skills/security-review/SKILL.md
   tags:
   - security
   - owasp
@@ -187,7 +187,7 @@ skills:
   - '## Practices'
   - '## Anti-patterns'
   - '## Source References'
-  executable_skill: .opencode/skills/deployment-strategy/SKILL.md
+  executable_skill: .agents/skills/deployment-strategy/SKILL.md
   tags:
   - deployment
   - ci-cd
@@ -211,7 +211,7 @@ skills:
   name: Documentation Generation
   short_description: Auto-generate API docs, ADRs, and READMEs from structured pipeline artifacts
   reference_path: skills/knowledge/documentation-generation.md
-  executable_skill: .opencode/skills/documentation-generator/SKILL.md
+  executable_skill: .agents/skills/documentation-generator/SKILL.md
   tags:
   - documentation
   - api-docs
@@ -235,7 +235,7 @@ skills:
   name: Schema Validation
   short_description: Validate any JSON data against a JSON Schema (draft-07) and report field-level issues
   reference_path: skills/knowledge/schema-validation.md
-  executable_skill: .opencode/skills/schema-validator/SKILL.md
+  executable_skill: .agents/skills/schema-validator/SKILL.md
   tags:
   - validation
   - json-schema
@@ -256,7 +256,7 @@ skills:
   name: Orchestration
   short_description: Execute the skill pipeline with routing, validation, retries, and HITL gate enforcement
   reference_path: skills/knowledge/orchestration.md
-  executable_skill: .opencode/skills/orchestrator/SKILL.md
+  executable_skill: .agents/skills/orchestrator/SKILL.md
   tags:
   - orchestration
   - pipeline
@@ -287,7 +287,7 @@ skills:
   name: Documentation Maintenance
   short_description: Detect system changes and keep the /docs folder consistent, versioned, and up to date
   reference_path: skills/knowledge/doc-maintenance.md
-  executable_skill: .opencode/skills/doc-maintainer/SKILL.md
+  executable_skill: .agents/skills/doc-maintainer/SKILL.md
   tags:
   - documentation
   - maintenance
@@ -316,7 +316,7 @@ skills:
   - '## Principles'
   - '## Anti-patterns'
   - '## Examples'
-  executable_skill: .opencode/skills/skill-authoring/SKILL.md
+  executable_skill: .agents/skills/skill-authoring/SKILL.md
   tags:
   - meta
   - skill-design
@@ -344,7 +344,7 @@ skills:
   name: Context Memory
   short_description: Manage session state, compress artifacts, and enable multi-turn pipeline resumption
   reference_path: skills/knowledge/context-memory.md
-  executable_skill: .opencode/skills/context-memory/SKILL.md
+  executable_skill: .agents/skills/context-memory/SKILL.md
   tags:
   - session
   - context
@@ -367,7 +367,7 @@ skills:
   name: Observability
   short_description: Define and collect standardized metrics across all skills and the orchestrator pipeline
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/observability/SKILL.md
+  executable_skill: .agents/skills/observability/SKILL.md
   tags:
   - metrics
   - monitoring
@@ -389,7 +389,7 @@ skills:
   name: Quality Scoring
   short_description: Score a skill against the 7-dimension rubric to determine if it meets the registration threshold
   reference_path: skills/knowledge/quality-scoring.md
-  executable_skill: .opencode/skills/quality-scoring/SKILL.md
+  executable_skill: .agents/skills/quality-scoring/SKILL.md
   tags:
   - quality
   - scoring
@@ -413,7 +413,7 @@ skills:
   name: Skill Lifecycle
   short_description: Govern a skill through its 12-stage lifecycle from intent discovery to retirement
   reference_path: skills/knowledge/skill-lifecycle.md
-  executable_skill: .opencode/skills/skill-lifecycle/SKILL.md
+  executable_skill: .agents/skills/skill-lifecycle/SKILL.md
   tags:
   - lifecycle
   - governance
@@ -438,7 +438,7 @@ skills:
   name: Trigger Engineering
   short_description: Define and refine activation trigger conditions with positive, negative, and edge-case routing scenarios
   reference_path: skills/knowledge/trigger-engineering.md
-  executable_skill: .opencode/skills/trigger-engineering/SKILL.md
+  executable_skill: .agents/skills/trigger-engineering/SKILL.md
   tags:
   - triggers
   - routing
@@ -463,7 +463,7 @@ skills:
   name: Validation Rules
   short_description: Validate and enforce structural and content rules on skills/index.yaml entries
   reference_path: skills/knowledge/validation-rules.md
-  executable_skill: .opencode/skills/validation-rules/SKILL.md
+  executable_skill: .agents/skills/validation-rules/SKILL.md
   tags:
   - validation
   - index
@@ -487,7 +487,7 @@ skills:
   name: Versioning
   short_description: Assign, bump, and govern semver version numbers for skills and the registry
   reference_path: skills/knowledge/versioning.md
-  executable_skill: .opencode/skills/versioning/SKILL.md
+  executable_skill: .agents/skills/versioning/SKILL.md
   tags:
   - versioning
   - semver
@@ -512,7 +512,7 @@ skills:
   name: Sub-Agent Creation
   short_description: Compile a capability requirement into a fully-specified, orchestrator-controlled sub-agent spec
   reference_path: skills/knowledge/create-sub-agent.md
-  executable_skill: .opencode/skills/create-sub-agent/SKILL.md
+  executable_skill: .agents/skills/create-sub-agent/SKILL.md
   tags:
   - sub-agent
   - agent-design
@@ -539,7 +539,7 @@ skills:
   name: State Manager
   short_description: Read, write, diff, snapshot, and restore shared system state across all pipeline skills
   reference_path: skills/knowledge/state-manager.md
-  executable_skill: .opencode/skills/state-manager/SKILL.md
+  executable_skill: .agents/skills/state-manager/SKILL.md
   tags:
   - state
   - persistence
@@ -562,7 +562,7 @@ skills:
   short_description: Cascade-compress large context payloads (light → medium → aggressive) to fit within token budget tiers
     without losing decision-critical information. Supports auto_compress, pipeline_state, and session_history types.
   reference_path: skills/knowledge/context-compressor.md
-  executable_skill: .opencode/skills/context-compressor/SKILL.md
+  executable_skill: .agents/skills/context-compressor/SKILL.md
   tags:
   - context
   - compression
@@ -588,7 +588,7 @@ skills:
   name: Dependency Analyzer
   short_description: Build and maintain a directed dependency graph; detect cycles; compute ripple effects of any change
   reference_path: skills/knowledge/dependency-analyzer.md
-  executable_skill: .opencode/skills/dependency-analyzer/SKILL.md
+  executable_skill: .agents/skills/dependency-analyzer/SKILL.md
   tags:
   - dependencies
   - graph
@@ -612,7 +612,7 @@ skills:
   short_description: Compute the full impact surface of a proposed change across modules, APIs, tests, docs, and security
     boundaries
   reference_path: skills/knowledge/change-impact-analyzer.md
-  executable_skill: .opencode/skills/change-impact-analyzer/SKILL.md
+  executable_skill: .agents/skills/change-impact-analyzer/SKILL.md
   tags:
   - impact
   - change
@@ -638,7 +638,7 @@ skills:
   short_description: Route system events to their registered skill handlers; maintain the event-to-skill dispatch map; deduplicate
     events
   reference_path: skills/knowledge/event-router.md
-  executable_skill: .opencode/skills/event-router/SKILL.md
+  executable_skill: .agents/skills/event-router/SKILL.md
   tags:
   - events
   - routing
@@ -663,7 +663,7 @@ skills:
   short_description: Generate implementation files, scaffolding, and interface stubs from architecture modules, feature plans,
     or interface contracts
   reference_path: skills/knowledge/code-generator.md
-  executable_skill: .opencode/skills/code-generator/SKILL.md
+  executable_skill: .agents/skills/code-generator/SKILL.md
   tags:
   - code-generation
   - scaffolding
@@ -687,7 +687,7 @@ skills:
   name: ADR Generator
   short_description: Produce immutable Architecture Decision Records from architectural choices, tradeoffs, and alternatives
   reference_path: skills/knowledge/adr-generator.md
-  executable_skill: .opencode/skills/adr-generator/SKILL.md
+  executable_skill: .agents/skills/adr-generator/SKILL.md
   tags:
   - adr
   - architecture
@@ -710,7 +710,7 @@ skills:
   name: Test Generator
   short_description: Generate unit, integration, property-based, contract, and parameterized test suites with BDD naming, AAA structure, test data factories, and mutation gap filling
   reference_path: skills/knowledge/test-generator.md
-  executable_skill: .opencode/skills/test-generator/SKILL.md
+  executable_skill: .agents/skills/test-generator/SKILL.md
   tags:
   - testing
   - unit-tests
@@ -742,7 +742,7 @@ skills:
   name: Code Repair
   short_description: Diagnose and apply minimal, validated fixes to failing tests, compile errors, type errors, and lint violations
   reference_path: skills/knowledge/code-repair.md
-  executable_skill: .opencode/skills/code-repair/SKILL.md
+  executable_skill: .agents/skills/code-repair/SKILL.md
   tags:
   - repair
   - debugging
@@ -768,7 +768,7 @@ skills:
   short_description: Safely revert system state to a prior snapshot on deployment failure, critical pipeline error, or unrecoverable
     code change
   reference_path: skills/knowledge/rollback-manager.md
-  executable_skill: .opencode/skills/rollback-manager/SKILL.md
+  executable_skill: .agents/skills/rollback-manager/SKILL.md
   tags:
   - rollback
   - recovery
@@ -799,7 +799,7 @@ skills:
   - '## Screen Architecture'
   - '## Accessibility Standards'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/frontend-ux-architect/SKILL.md
+  executable_skill: .agents/skills/frontend-ux-architect/SKILL.md
   tags:
   - ui-ux
   - design
@@ -832,7 +832,7 @@ skills:
   - '## Normalization Reference'
   - '## Indexing Strategy'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/database-architect/SKILL.md
+  executable_skill: .agents/skills/database-architect/SKILL.md
   tags:
   - database
   - schema
@@ -864,7 +864,7 @@ skills:
   - '## Coverage Dimensions'
   - '## Gap Classifications'
   - '## Readiness Score Calculation'
-  executable_skill: .opencode/skills/implementation-completeness-auditor/SKILL.md
+  executable_skill: .agents/skills/implementation-completeness-auditor/SKILL.md
   tags:
   - completeness
   - audit
@@ -895,7 +895,7 @@ skills:
   reference_sections:
   - '## Anti-Patterns'
   - '## Security Rules'
-  executable_skill: .opencode/skills/database-guard/SKILL.md
+  executable_skill: .agents/skills/database-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -922,7 +922,7 @@ skills:
   reference_path: skills/knowledge/architecture-design.md
   reference_sections:
   - '## Principles'
-  executable_skill: .opencode/skills/performance-guard/SKILL.md
+  executable_skill: .agents/skills/performance-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -952,7 +952,7 @@ skills:
   - '## Anti-Patterns'
   - '## Accessibility Standards'
   - '## Theme System'
-  executable_skill: .opencode/skills/ui-ux-compliance-guard/SKILL.md
+  executable_skill: .agents/skills/ui-ux-compliance-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -981,7 +981,7 @@ skills:
   reference_sections:
   - '## Readiness Score Calculation'
   - '## Principles'
-  executable_skill: .opencode/skills/implementation-completeness-guard/SKILL.md
+  executable_skill: .agents/skills/implementation-completeness-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -1008,7 +1008,7 @@ skills:
   reference_sections:
   - '## Principles'
   - '## Theme System'
-  executable_skill: .opencode/skills/design-system-generator/SKILL.md
+  executable_skill: .agents/skills/design-system-generator/SKILL.md
   tags:
   - design-system
   - tokens
@@ -1039,7 +1039,7 @@ skills:
   reference_path: skills/knowledge/frontend-ux-architect.md
   reference_sections:
   - '## Principles'
-  executable_skill: .opencode/skills/seo-optimizer/SKILL.md
+  executable_skill: .agents/skills/seo-optimizer/SKILL.md
   tags:
   - seo
   - sitemap
@@ -1071,7 +1071,7 @@ skills:
   - '## Principles'
   - '## Anti-patterns'
   - '## Examples'
-  executable_skill: .opencode/skills/prompt-normalizer/SKILL.md
+  executable_skill: .agents/skills/prompt-normalizer/SKILL.md
   tags:
   - prompt-normalization
   - intent-extraction
@@ -1104,7 +1104,7 @@ skills:
   - '## Principles'
   - '## OWASP Top 10'
   - '## CVSS Scoring'
-  executable_skill: .opencode/skills/security-guard/SKILL.md
+  executable_skill: .agents/skills/security-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -1136,7 +1136,7 @@ skills:
   reference_sections:
   - '## Principles'
   - '## CI/CD Practices'
-  executable_skill: .opencode/skills/ci-pipeline-generator/SKILL.md
+  executable_skill: .agents/skills/ci-pipeline-generator/SKILL.md
   tags:
   - ci-cd
   - github-actions
@@ -1171,7 +1171,7 @@ skills:
   - '## Prompt Engineering'
   - '## Safety Controls'
   - '## Evaluation Frameworks'
-  executable_skill: .opencode/skills/ai-agent-specialist/SKILL.md
+  executable_skill: .agents/skills/ai-agent-specialist/SKILL.md
   tags:
   - ai
   - llm
@@ -1209,7 +1209,7 @@ skills:
   - '## App Store Compliance'
   - '## Mobile Security Controls'
   - '## Offline Architecture'
-  executable_skill: .opencode/skills/mobile-platform-specialist/SKILL.md
+  executable_skill: .agents/skills/mobile-platform-specialist/SKILL.md
   tags:
   - mobile
   - ios
@@ -1251,7 +1251,7 @@ skills:
   - '## Enterprise SSO'
   - '## Compliance Frameworks'
   - '## Subscription Billing'
-  executable_skill: .opencode/skills/saas-enterprise-architect/SKILL.md
+  executable_skill: .agents/skills/saas-enterprise-architect/SKILL.md
   tags:
   - saas
   - enterprise
@@ -1300,7 +1300,7 @@ skills:
   - '## OTA Firmware Updates'
   - '## Game Architecture'
   - '## Safety Standards'
-  executable_skill: .opencode/skills/systems-specialist/SKILL.md
+  executable_skill: .agents/skills/systems-specialist/SKILL.md
   tags:
   - embedded
   - iot
@@ -1344,7 +1344,7 @@ skills:
   short_description: Collect, scrub, and emit PII-free pipeline execution events into the behavioral_telemetry ring buffer
     for downstream analysis
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/behavioral-telemetry-collector/SKILL.md
+  executable_skill: .agents/skills/behavioral-telemetry-collector/SKILL.md
   tags:
   - telemetry
   - observability
@@ -1372,7 +1372,7 @@ skills:
   short_description: Analyze behavioral_telemetry events to produce anomaly flags, HITL rejection ratios, and skill performance
     summaries for a completed session
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/session-insights/SKILL.md
+  executable_skill: .agents/skills/session-insights/SKILL.md
   tags:
   - insights
   - analysis
@@ -1399,7 +1399,7 @@ skills:
   short_description: Render a read-only session insights report (skill performance, HITL trends, anomaly flags, and improvement
     suggestions) for human review
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/enhancement-dashboard/SKILL.md
+  executable_skill: .agents/skills/enhancement-dashboard/SKILL.md
   tags:
   - dashboard
   - reporting
@@ -1425,7 +1425,7 @@ skills:
   short_description: Analyze session telemetry to generate ranked HITL-pending AdaptationProposals covering new skills, skill
     modifications, new pipelines, and agent changes
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/adaptive-proposal-generator/SKILL.md
+  executable_skill: .agents/skills/adaptive-proposal-generator/SKILL.md
   tags:
   - adaptive
   - proposals
@@ -1454,7 +1454,7 @@ skills:
   short_description: Apply a single HITL-approved AdaptationProposal to the live skill system with rollback checkpoint, validate-skills.sh
     + build validation, and doc-maintainer sync
   reference_path: skills/knowledge/observability.md
-  executable_skill: .opencode/skills/adaptation-applicator/SKILL.md
+  executable_skill: .agents/skills/adaptation-applicator/SKILL.md
   tags:
   - adaptation
   - apply
@@ -1490,7 +1490,7 @@ skills:
   - '## Micro-Interaction Patterns'
   - '## Accessibility Motion Standards'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/motion-design-architect/SKILL.md
+  executable_skill: .agents/skills/motion-design-architect/SKILL.md
   tags:
   - motion
   - animation
@@ -1523,7 +1523,7 @@ skills:
   - '## Friction Pattern Library (F1–F15)'
   - '## UX Health Score Formula'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/ux-research-synthesizer/SKILL.md
+  executable_skill: .agents/skills/ux-research-synthesizer/SKILL.md
   tags:
   - ux-research
   - journey-mapping
@@ -1554,7 +1554,7 @@ skills:
   - '## Layout Pattern Reference'
   - '## Premium Component Patterns'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/creative-experience-architect/SKILL.md
+  executable_skill: .agents/skills/creative-experience-architect/SKILL.md
   tags:
   - creative-design
   - premium-ux
@@ -1585,7 +1585,7 @@ skills:
   - '## 8. Defect Chain Pattern (Defect-Manager)'
   - '## 4. Lifecycle State Machine'
   - '## 2. Jira-Compatible Base Schema'
-  executable_skill: .opencode/skills/defect-manager/SKILL.md
+  executable_skill: .agents/skills/defect-manager/SKILL.md
   tags:
   - defect
   - bug-tracking
@@ -1616,7 +1616,7 @@ skills:
   reference_sections:
   - '## 4. Lifecycle State Machine'
   - '## 6. Traceability Link Types'
-  executable_skill: .opencode/skills/change-request-manager/SKILL.md
+  executable_skill: .agents/skills/change-request-manager/SKILL.md
   tags:
   - change-request
   - lifecycle
@@ -1647,7 +1647,7 @@ skills:
   reference_sections:
   - '## 2. Jira-Compatible Base Schema'
   - '## 1. Work Item Type Taxonomy'
-  executable_skill: .opencode/skills/work-item-exporter/SKILL.md
+  executable_skill: .agents/skills/work-item-exporter/SKILL.md
   tags:
   - export
   - jira
@@ -1676,7 +1676,7 @@ skills:
   reference_sections:
   - '## 4. Lifecycle State Machine'
   - '## 4.5 Invalid Transition Rules'
-  executable_skill: .opencode/skills/work-item-lifecycle-guard/SKILL.md
+  executable_skill: .agents/skills/work-item-lifecycle-guard/SKILL.md
   tags:
   - guard
   - governance
@@ -1699,12 +1699,12 @@ skills:
   name: Gap-to-Skill Pipeline
   short_description: Reactive pipeline entry skill — converts a logged capability gap into a registered draft skill, enforcing
     dedup check, quality scoring, and non-bypassable HITL approval before registration
-  reference_path: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+  reference_path: .agents/skills/gap-to-skill-pipeline/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Human-in-the-Loop'
-  executable_skill: .opencode/skills/gap-to-skill-pipeline/SKILL.md
+  executable_skill: .agents/skills/gap-to-skill-pipeline/SKILL.md
   tags:
   - reactive
   - gap-detection
@@ -1734,12 +1734,12 @@ skills:
   name: Semantic Diff Analyzer
   short_description: Compares before/after code to detect behavioral changes — logic shifts, contract changes, security boundary
     alterations — beyond line-level diffs
-  reference_path: .opencode/skills/semantic-diff-analyzer/SKILL.md
+  reference_path: .agents/skills/semantic-diff-analyzer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/semantic-diff-analyzer/SKILL.md
+  executable_skill: .agents/skills/semantic-diff-analyzer/SKILL.md
   tags:
   - diff
   - behavioral-analysis
@@ -1768,12 +1768,12 @@ skills:
   name: Acceptance Criteria Generator
   short_description: Transforms structured requirements into formal BDD-style Given/When/Then acceptance criteria with AC
     IDs, negative scenarios, and testability ratings
-  reference_path: .opencode/skills/acceptance-criteria-generator/SKILL.md
+  reference_path: .agents/skills/acceptance-criteria-generator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/acceptance-criteria-generator/SKILL.md
+  executable_skill: .agents/skills/acceptance-criteria-generator/SKILL.md
   tags:
   - acceptance-criteria
   - bdd
@@ -1801,12 +1801,12 @@ skills:
   name: Technical Debt Tracker
   short_description: Maintains a persistent cross-session technical debt register with debt score, trend analysis, maintenance
     cost projections, and prioritized remediation backlog
-  reference_path: .opencode/skills/technical-debt-tracker/SKILL.md
+  reference_path: .agents/skills/technical-debt-tracker/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/technical-debt-tracker/SKILL.md
+  executable_skill: .agents/skills/technical-debt-tracker/SKILL.md
   tags:
   - technical-debt
   - quality
@@ -1834,12 +1834,12 @@ skills:
   name: Architecture Evolution Planner
   short_description: Produces a phased, sprint-sized migration plan from current to target architecture using strangler-fig,
     branch-by-abstraction, and expand-contract patterns
-  reference_path: .opencode/skills/architecture-evolution-planner/SKILL.md
+  reference_path: .agents/skills/architecture-evolution-planner/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/architecture-evolution-planner/SKILL.md
+  executable_skill: .agents/skills/architecture-evolution-planner/SKILL.md
   tags:
   - architecture
   - migration
@@ -1869,12 +1869,12 @@ skills:
   name: Compliance Mapper
   short_description: Maps system features and architecture against GDPR, HIPAA, PCI-DSS, SOC 2, and ISO 27001 clauses to produce
     a compliance traceability matrix and audit evidence checklist
-  reference_path: .opencode/skills/compliance-mapper/SKILL.md
+  reference_path: .agents/skills/compliance-mapper/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/compliance-mapper/SKILL.md
+  executable_skill: .agents/skills/compliance-mapper/SKILL.md
   tags:
   - compliance
   - gdpr
@@ -1906,12 +1906,12 @@ skills:
   name: API Deprecation Manager
   short_description: Manages the full API version lifecycle — current, deprecated, sunset — auto-generates migration guides
     from breaking changes and creates consumer migration work items
-  reference_path: .opencode/skills/api-deprecation-manager/SKILL.md
+  reference_path: .agents/skills/api-deprecation-manager/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/api-deprecation-manager/SKILL.md
+  executable_skill: .agents/skills/api-deprecation-manager/SKILL.md
   tags:
   - api
   - deprecation
@@ -1940,12 +1940,12 @@ skills:
   name: Infrastructure Cost Estimator
   short_description: Projects monthly cloud infrastructure costs (AWS/GCP/Azure) from deployment-strategy output with per-provider
     breakdowns, alternatives, and cost optimization suggestions
-  reference_path: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+  reference_path: .agents/skills/infrastructure-cost-estimator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/infrastructure-cost-estimator/SKILL.md
+  executable_skill: .agents/skills/infrastructure-cost-estimator/SKILL.md
   tags:
   - cost
   - infrastructure
@@ -1974,12 +1974,12 @@ skills:
   name: Mutation Test Generator
   short_description: Performs static mutation analysis on source code and test suite, infers kill status, produces mutation
     score and assertion gaps to eliminate surviving mutants
-  reference_path: .opencode/skills/mutation-test-generator/SKILL.md
+  reference_path: .agents/skills/mutation-test-generator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/mutation-test-generator/SKILL.md
+  executable_skill: .agents/skills/mutation-test-generator/SKILL.md
   tags:
   - mutation-testing
   - test-quality
@@ -2007,12 +2007,12 @@ skills:
   name: Skill Simulator
   short_description: Runs a complete pipeline in simulation mode with no disk writes, producing a preview report of files
     that would change, HITL gates predicted, block risks, and token estimates
-  reference_path: .opencode/skills/skill-simulator/SKILL.md
+  reference_path: .agents/skills/skill-simulator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/skill-simulator/SKILL.md
+  executable_skill: .agents/skills/skill-simulator/SKILL.md
   tags:
   - simulation
   - dry-run
@@ -2040,12 +2040,12 @@ skills:
   name: Multi-Repo Coordinator
   short_description: Coordinates changes across multiple repositories — maintains cross-repo dependency registry, detects
     cross-boundary breaking changes, and generates synchronized work items per affected repo
-  reference_path: .opencode/skills/multi-repo-coordinator/SKILL.md
+  reference_path: .agents/skills/multi-repo-coordinator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/multi-repo-coordinator/SKILL.md
+  executable_skill: .agents/skills/multi-repo-coordinator/SKILL.md
   tags:
   - multi-repo
   - polyrepo
@@ -2074,12 +2074,12 @@ skills:
   name: Domain Knowledge Extractor
   short_description: Extracts reusable domain patterns from completed pipelines into a persistent knowledge base and injects
     relevant patterns into subsequent pipelines in the same domain
-  reference_path: .opencode/skills/domain-knowledge-extractor/SKILL.md
+  reference_path: .agents/skills/domain-knowledge-extractor/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/domain-knowledge-extractor/SKILL.md
+  executable_skill: .agents/skills/domain-knowledge-extractor/SKILL.md
   tags:
   - domain-knowledge
   - learning
@@ -2111,12 +2111,12 @@ skills:
   name: Pipeline Branching
   short_description: Forks pipeline at architecture-design into two A/B branches, runs both through quality skills in parallel,
     produces a comparison scorecard and recommendation, enforces mandatory HITL branch selection
-  reference_path: .opencode/skills/pipeline-branching/SKILL.md
+  reference_path: .agents/skills/pipeline-branching/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/pipeline-branching/SKILL.md
+  executable_skill: .agents/skills/pipeline-branching/SKILL.md
   tags:
   - branching
   - a-b-testing
@@ -2148,12 +2148,12 @@ skills:
   name: Data Pipeline Architect
   short_description: Designs production-grade data pipeline architectures for batch ETL, streaming, and lakehouse patterns
     with full topology specifications.
-  reference_path: .opencode/skills/data-pipeline-architect/SKILL.md
+  reference_path: .agents/skills/data-pipeline-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/data-pipeline-architect/SKILL.md
+  executable_skill: .agents/skills/data-pipeline-architect/SKILL.md
   tags:
   - data-engineering
   - etl
@@ -2177,12 +2177,12 @@ skills:
   name: Data Quality Validator
   short_description: Generates dbt tests, Great Expectations suites, and freshness monitors to enforce data quality SLAs at
     every pipeline stage.
-  reference_path: .opencode/skills/data-quality-validator/SKILL.md
+  reference_path: .agents/skills/data-quality-validator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/data-quality-validator/SKILL.md
+  executable_skill: .agents/skills/data-quality-validator/SKILL.md
   tags:
   - data-quality
   - dbt
@@ -2205,12 +2205,12 @@ skills:
   name: ML Pipeline Architect
   short_description: Designs end-to-end ML pipelines covering feature engineering, training orchestration, model serving,
     and drift monitoring.
-  reference_path: .opencode/skills/ml-pipeline-architect/SKILL.md
+  reference_path: .agents/skills/ml-pipeline-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/ml-pipeline-architect/SKILL.md
+  executable_skill: .agents/skills/ml-pipeline-architect/SKILL.md
   tags:
   - machine-learning
   - feature-store
@@ -2234,12 +2234,12 @@ skills:
   name: Analytics Schema Designer
   short_description: Designs dimensional models, star/snowflake schemas, and BI semantic layer configurations optimized for
     analytical query patterns.
-  reference_path: .opencode/skills/analytics-schema-designer/SKILL.md
+  reference_path: .agents/skills/analytics-schema-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/analytics-schema-designer/SKILL.md
+  executable_skill: .agents/skills/analytics-schema-designer/SKILL.md
   tags:
   - analytics
   - dimensional-modeling
@@ -2263,12 +2263,12 @@ skills:
   name: Data Contract Enforcer
   short_description: Defines, validates, and enforces schema contracts between data producers and consumers, detecting breaking
     changes and generating migration plans.
-  reference_path: .opencode/skills/data-contract-enforcer/SKILL.md
+  reference_path: .agents/skills/data-contract-enforcer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/data-contract-enforcer/SKILL.md
+  executable_skill: .agents/skills/data-contract-enforcer/SKILL.md
   tags:
   - data-contract
   - schema-enforcement
@@ -2292,12 +2292,12 @@ skills:
   name: API Design Architect
   short_description: Produces complete OpenAPI 3.1 specifications with endpoint catalog, error codes, versioning strategy,
     rate limiting, and SDK generation hints.
-  reference_path: .opencode/skills/api-design-architect/SKILL.md
+  reference_path: .agents/skills/api-design-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/api-design-architect/SKILL.md
+  executable_skill: .agents/skills/api-design-architect/SKILL.md
   tags:
   - api-design
   - openapi
@@ -2323,12 +2323,12 @@ skills:
   name: GraphQL Architect
   short_description: Designs GraphQL schemas with federation topology, resolver architecture, DataLoader patterns, subscription
     design, and authorization directives.
-  reference_path: .opencode/skills/graphql-architect/SKILL.md
+  reference_path: .agents/skills/graphql-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/graphql-architect/SKILL.md
+  executable_skill: .agents/skills/graphql-architect/SKILL.md
   tags:
   - graphql
   - apollo-federation
@@ -2354,12 +2354,12 @@ skills:
   name: Event Schema Designer
   short_description: Produces AsyncAPI specifications, event catalogs, topic designs, schema registry configurations, and
     DLQ strategies for event-driven systems.
-  reference_path: .opencode/skills/event-schema-designer/SKILL.md
+  reference_path: .agents/skills/event-schema-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/event-schema-designer/SKILL.md
+  executable_skill: .agents/skills/event-schema-designer/SKILL.md
   tags:
   - event-driven
   - asyncapi
@@ -2383,12 +2383,12 @@ skills:
   name: Microservices Architect
   short_description: Decomposes systems into bounded-context microservices using DDD, produces service maps, saga patterns,
     and Conway's Law team alignment analysis.
-  reference_path: .opencode/skills/microservices-architect/SKILL.md
+  reference_path: .agents/skills/microservices-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/microservices-architect/SKILL.md
+  executable_skill: .agents/skills/microservices-architect/SKILL.md
   tags:
   - microservices
   - ddd
@@ -2414,12 +2414,12 @@ skills:
   name: Event Sourcing Designer
   short_description: Designs CQRS/event-sourcing systems with aggregate designs, event stores, projection patterns, snapshot
     strategies, and upcasting plans.
-  reference_path: .opencode/skills/event-sourcing-designer/SKILL.md
+  reference_path: .agents/skills/event-sourcing-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/event-sourcing-designer/SKILL.md
+  executable_skill: .agents/skills/event-sourcing-designer/SKILL.md
   tags:
   - event-sourcing
   - cqrs
@@ -2445,12 +2445,12 @@ skills:
   name: Distributed Resilience Architect
   short_description: Designs circuit breakers, timeout hierarchies, retry policies, bulkheads, and saga compensation patterns
     with FMEA failure mode analysis.
-  reference_path: .opencode/skills/distributed-resilience-architect/SKILL.md
+  reference_path: .agents/skills/distributed-resilience-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/distributed-resilience-architect/SKILL.md
+  executable_skill: .agents/skills/distributed-resilience-architect/SKILL.md
   tags:
   - resilience
   - circuit-breaker
@@ -2477,12 +2477,12 @@ skills:
   name: Cloud Architecture Reviewer
   short_description: Reviews cloud architectures against the Well-Architected Framework across all five pillars, scoring each
     and producing a prioritized remediation roadmap.
-  reference_path: .opencode/skills/cloud-architecture-reviewer/SKILL.md
+  reference_path: .agents/skills/cloud-architecture-reviewer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/cloud-architecture-reviewer/SKILL.md
+  executable_skill: .agents/skills/cloud-architecture-reviewer/SKILL.md
   tags:
   - cloud
   - well-architected
@@ -2508,12 +2508,12 @@ skills:
   name: Serverless Architect
   short_description: Designs serverless function topologies with cold-start mitigation, event source mapping, state management,
     and cost modelling across AWS/GCP/Azure.
-  reference_path: .opencode/skills/serverless-architect/SKILL.md
+  reference_path: .agents/skills/serverless-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/serverless-architect/SKILL.md
+  executable_skill: .agents/skills/serverless-architect/SKILL.md
   tags:
   - serverless
   - lambda
@@ -2537,12 +2537,12 @@ skills:
   name: Container Orchestration Architect
   short_description: Designs Kubernetes cluster topologies, Helm chart structures, autoscaling policies, GitOps pipelines,
     and RBAC models for container workloads.
-  reference_path: .opencode/skills/container-orchestration-architect/SKILL.md
+  reference_path: .agents/skills/container-orchestration-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/container-orchestration-architect/SKILL.md
+  executable_skill: .agents/skills/container-orchestration-architect/SKILL.md
   tags:
   - kubernetes
   - helm
@@ -2567,12 +2567,12 @@ skills:
   name: Threat Model Designer
   short_description: Produces STRIDE threat catalogs, trust boundary analyses, MITRE ATT&CK mappings, and security user stories
     from system architecture diagrams.
-  reference_path: .opencode/skills/threat-model-designer/SKILL.md
+  reference_path: .agents/skills/threat-model-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/threat-model-designer/SKILL.md
+  executable_skill: .agents/skills/threat-model-designer/SKILL.md
   tags:
   - threat-modeling
   - stride
@@ -2597,12 +2597,12 @@ skills:
   name: Secrets Management Architect
   short_description: Designs Vault architectures, secret rotation policies, PKI hierarchies, dynamic secrets configurations,
     and injection patterns for Kubernetes and CI/CD.
-  reference_path: .opencode/skills/secrets-management-architect/SKILL.md
+  reference_path: .agents/skills/secrets-management-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/secrets-management-architect/SKILL.md
+  executable_skill: .agents/skills/secrets-management-architect/SKILL.md
   tags:
   - secrets-management
   - vault
@@ -2627,12 +2627,12 @@ skills:
   name: DevSecOps Pipeline Designer
   short_description: Designs SAST, DAST, SCA, SBOM, container scanning, and SLSA compliance stages integrated into CI/CD pipelines
     with severity-gated quality gates.
-  reference_path: .opencode/skills/devsecops-pipeline-designer/SKILL.md
+  reference_path: .agents/skills/devsecops-pipeline-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/devsecops-pipeline-designer/SKILL.md
+  executable_skill: .agents/skills/devsecops-pipeline-designer/SKILL.md
   tags:
   - devsecops
   - sast
@@ -2658,12 +2658,12 @@ skills:
   name: Load Test Designer
   short_description: Designs load test scenarios, SLO acceptance thresholds, data parameterization, and CI integration for
     k6, Gatling, and Locust.
-  reference_path: .opencode/skills/load-test-designer/SKILL.md
+  reference_path: .agents/skills/load-test-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/load-test-designer/SKILL.md
+  executable_skill: .agents/skills/load-test-designer/SKILL.md
   tags:
   - load-testing
   - performance
@@ -2688,12 +2688,12 @@ skills:
   name: Profiling Advisor
   short_description: Analyzes CPU profiles, heap dumps, and query execution plans to identify hotspots, GC pressure, and N+1
     query patterns with prioritized optimization backlog.
-  reference_path: .opencode/skills/profiling-advisor/SKILL.md
+  reference_path: .agents/skills/profiling-advisor/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/profiling-advisor/SKILL.md
+  executable_skill: .agents/skills/profiling-advisor/SKILL.md
   tags:
   - profiling
   - flamegraph
@@ -2716,12 +2716,12 @@ skills:
   name: SLO/SLA Designer
   short_description: Defines SLIs, SLOs, error budgets, SLA tiers, toil inventory, and reliability roadmaps grounded in user
     journey criticality.
-  reference_path: .opencode/skills/slo-sla-designer/SKILL.md
+  reference_path: .agents/skills/slo-sla-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/slo-sla-designer/SKILL.md
+  executable_skill: .agents/skills/slo-sla-designer/SKILL.md
   tags:
   - slo
   - sli
@@ -2748,12 +2748,12 @@ skills:
   name: Runbook Generator
   short_description: Generates structured runbooks with step-by-step remediation, escalation trees, postmortem templates,
     and communication templates linked to alert policies.
-  reference_path: .opencode/skills/runbook-generator/SKILL.md
+  reference_path: .agents/skills/runbook-generator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/runbook-generator/SKILL.md
+  executable_skill: .agents/skills/runbook-generator/SKILL.md
   tags:
   - runbooks
   - incident-response
@@ -2778,12 +2778,12 @@ skills:
   name: Chaos Engineering Designer
   short_description: Designs chaos experiments (LitmusChaos, Gremlin, AWS FIS) with steady-state hypotheses, blast radius
     controls, GameDay plans, and CI chaos gates.
-  reference_path: .opencode/skills/chaos-engineering-designer/SKILL.md
+  reference_path: .agents/skills/chaos-engineering-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/chaos-engineering-designer/SKILL.md
+  executable_skill: .agents/skills/chaos-engineering-designer/SKILL.md
   tags:
   - chaos-engineering
   - fault-injection
@@ -2810,12 +2810,12 @@ skills:
   name: State Management Architect
   short_description: Selects state management libraries and patterns (Redux, Zustand, Jotai, TanStack Query) aligned with
     app complexity, offline requirements, and colocation principles.
-  reference_path: .opencode/skills/state-management-architect/SKILL.md
+  reference_path: .agents/skills/state-management-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/state-management-architect/SKILL.md
+  executable_skill: .agents/skills/state-management-architect/SKILL.md
   tags:
   - state-management
   - redux
@@ -2841,12 +2841,12 @@ skills:
   name: Micro-Frontend Architect
   short_description: Designs micro-frontend architectures using Module Federation, single-spa, or iframes with shell-app routing,
     shared dependency strategy, and auth propagation.
-  reference_path: .opencode/skills/micro-frontend-architect/SKILL.md
+  reference_path: .agents/skills/micro-frontend-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/micro-frontend-architect/SKILL.md
+  executable_skill: .agents/skills/micro-frontend-architect/SKILL.md
   tags:
   - micro-frontend
   - module-federation
@@ -2871,12 +2871,12 @@ skills:
   name: Web Performance Optimizer
   short_description: Produces Core Web Vitals optimization plans covering bundle splitting, rendering modes, image optimization,
     font strategies, and caching headers.
-  reference_path: .opencode/skills/web-performance-optimizer/SKILL.md
+  reference_path: .agents/skills/web-performance-optimizer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/web-performance-optimizer/SKILL.md
+  executable_skill: .agents/skills/web-performance-optimizer/SKILL.md
   tags:
   - web-performance
   - core-web-vitals
@@ -2901,12 +2901,12 @@ skills:
   name: DDD Architect
   short_description: Produces bounded context maps, ubiquitous language glossaries, subdomain classifications, aggregate designs,
     and domain event catalogs using DDD strategic and tactical patterns.
-  reference_path: .opencode/skills/ddd-architect/SKILL.md
+  reference_path: .agents/skills/ddd-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/ddd-architect/SKILL.md
+  executable_skill: .agents/skills/ddd-architect/SKILL.md
   tags:
   - ddd
   - bounded-context
@@ -2931,12 +2931,12 @@ skills:
   name: Caching Strategy Designer
   short_description: Designs multi-tier caching topologies with Redis configurations, HTTP cache headers, CDN rules, cache
     stampede prevention, and invalidation strategies.
-  reference_path: .opencode/skills/caching-strategy-designer/SKILL.md
+  reference_path: .agents/skills/caching-strategy-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/caching-strategy-designer/SKILL.md
+  executable_skill: .agents/skills/caching-strategy-designer/SKILL.md
   tags:
   - caching
   - redis
@@ -2962,12 +2962,12 @@ skills:
   name: Localization Architect
   short_description: Designs i18n/l10n architectures with ICU message format, RTL support, locale file structures, number/date/currency
     strategies, and translation pipelines.
-  reference_path: .opencode/skills/localization-architect/SKILL.md
+  reference_path: .agents/skills/localization-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/localization-architect/SKILL.md
+  executable_skill: .agents/skills/localization-architect/SKILL.md
   tags:
   - i18n
   - l10n
@@ -2992,12 +2992,12 @@ skills:
   name: Product Analytics Designer
   short_description: Designs event taxonomy, metrics frameworks, funnel definitions, A/B experiment frameworks, and privacy-compliant
     analytics data models.
-  reference_path: .opencode/skills/product-analytics-designer/SKILL.md
+  reference_path: .agents/skills/product-analytics-designer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/product-analytics-designer/SKILL.md
+  executable_skill: .agents/skills/product-analytics-designer/SKILL.md
   tags:
   - product-analytics
   - event-taxonomy
@@ -3024,12 +3024,12 @@ skills:
   name: Realtime System Architect
   short_description: Designs WebSocket and WebRTC architectures with connection management, fan-out strategies, conflict resolution
     (CRDTs/OT), presence systems, and horizontal scaling.
-  reference_path: .opencode/skills/realtime-system-architect/SKILL.md
+  reference_path: .agents/skills/realtime-system-architect/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/realtime-system-architect/SKILL.md
+  executable_skill: .agents/skills/realtime-system-architect/SKILL.md
   tags:
   - realtime
   - websocket
@@ -3056,12 +3056,12 @@ skills:
   name: Multi-Agent Debate
   short_description: Runs an adversarial Architect vs. Reviewer debate loop to produce a critique-hardened architecture artifact
     before feature planning begins
-  reference_path: .opencode/skills/multi-agent-debate/SKILL.md
+  reference_path: .agents/skills/multi-agent-debate/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/multi-agent-debate/SKILL.md
+  executable_skill: .agents/skills/multi-agent-debate/SKILL.md
   tags:
   - multi-agent
   - debate
@@ -3089,12 +3089,12 @@ skills:
   name: Clarify
   short_description: Identifies ambiguous requirements after requirement-analyzer runs, generates ≤5 targeted questions,
     and suspends the pipeline at a HITL gate until answered — advancing automatically when no ambiguities are found
-  reference_path: .opencode/skills/clarify/SKILL.md
+  reference_path: .agents/skills/clarify/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/clarify/SKILL.md
+  executable_skill: .agents/skills/clarify/SKILL.md
   tags:
   - requirements
   - clarification
@@ -3118,12 +3118,12 @@ skills:
   name: Debate Synthesizer
   short_description: Synthesizes two adversarial requirement analyses (advocate + skeptic) into a single debate-hardened
     unified requirements set; flags and resolves conflicts via HITL gate
-  reference_path: .opencode/skills/debate-synthesizer/SKILL.md
+  reference_path: .agents/skills/debate-synthesizer/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## 12. Human-in-the-Loop Gates'
-  executable_skill: .opencode/skills/debate-synthesizer/SKILL.md
+  executable_skill: .agents/skills/debate-synthesizer/SKILL.md
   tags:
   - requirements
   - multi-agent
@@ -3151,12 +3151,12 @@ skills:
   name: Traceability Matrix
   short_description: Auto-generates a bidirectional RTM linking REQ → ADR → TEST → TASK; flags UNCOVERED and UNIMPLEMENTED
     requirements; writes artifacts/rtm-<timestamp>.md and .json for auditor consumption
-  reference_path: .opencode/skills/traceability-matrix/SKILL.md
+  reference_path: .agents/skills/traceability-matrix/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/traceability-matrix/SKILL.md
+  executable_skill: .agents/skills/traceability-matrix/SKILL.md
   tags:
   - quality
   - traceability
@@ -3183,12 +3183,12 @@ skills:
   name: Research Artifact
   short_description: Generates a structured technology research artifact (alternatives, pros/cons matrix, references, decision
     rationale) before architecture decisions. Writes artifacts/research-<timestamp>.md and .json.
-  reference_path: .opencode/skills/research-artifact/SKILL.md
+  reference_path: .agents/skills/research-artifact/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/research-artifact/SKILL.md
+  executable_skill: .agents/skills/research-artifact/SKILL.md
   tags:
   - requirements
   - research
@@ -3213,12 +3213,12 @@ skills:
   name: Task DAG
   short_description: Analyzes task breakdown from feature-planning and produces a dependency DAG with parallel-safe groups,
     critical path, and Mermaid diagram. Writes artifacts/task-dag-<timestamp>.json and .md.
-  reference_path: .opencode/skills/task-dag/SKILL.md
+  reference_path: .agents/skills/task-dag/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/task-dag/SKILL.md
+  executable_skill: .agents/skills/task-dag/SKILL.md
   tags:
   - planning
   - dag
@@ -3241,12 +3241,12 @@ skills:
   name: Cross-Artifact Consistency
   short_description: Guard skill that checks structural consistency across REQs, modules, tasks, and tests. Blocks pipeline
     when any REQ has no test, any module has no task, or any task is orphaned. HITL override with reason allowed.
-  reference_path: .opencode/skills/cross-artifact-consistency/SKILL.md
+  reference_path: .agents/skills/cross-artifact-consistency/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/cross-artifact-consistency/SKILL.md
+  executable_skill: .agents/skills/cross-artifact-consistency/SKILL.md
   tags:
   - governance
   - guard
@@ -3274,12 +3274,12 @@ skills:
   short_description: Detects structural drift between the living spec artifact (artifacts/spec-latest.md, FEATURE-007) and
     the current working tree. Produces a drift score (0–100) and writes artifacts/drift-report-<timestamp>.md.
     Fails if score < 70 (configurable). Also usable as a scheduled CI check.
-  reference_path: .opencode/skills/drift-detector/SKILL.md
+  reference_path: .agents/skills/drift-detector/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/drift-detector/SKILL.md
+  executable_skill: .agents/skills/drift-detector/SKILL.md
   tags:
   - quality
   - drift
@@ -3305,12 +3305,12 @@ skills:
   name: Compliance Profiler
   short_description: Collects applicable compliance frameworks (SOC 2 Type II, HIPAA, GDPR, ISO 27001, custom) via HITL and
     emits a structured compliance_requirements artifact. Must run before any design skill in the compliance-first pipeline.
-  reference_path: .opencode/skills/compliance-profiler/SKILL.md
+  reference_path: .agents/skills/compliance-profiler/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/compliance-profiler/SKILL.md
+  executable_skill: .agents/skills/compliance-profiler/SKILL.md
   tags:
   - governance
   - compliance
@@ -3334,12 +3334,12 @@ skills:
   name: Compliance Gate
   short_description: Validates pipeline stage output against the compliance_requirements artifact from compliance-profiler.
     Computes control coverage and blocks pipeline if must-control coverage is below threshold.
-  reference_path: .opencode/skills/compliance-gate/SKILL.md
+  reference_path: .agents/skills/compliance-gate/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/compliance-gate/SKILL.md
+  executable_skill: .agents/skills/compliance-gate/SKILL.md
   tags:
   - governance
   - guard
@@ -3365,12 +3365,12 @@ skills:
   name: Cost Estimator
   short_description: Pre-run token cost estimator. Computes estimated token count for a pipeline run using skill count and
     historical multiplier. Presents cost band to user for approval before execution begins.
-  reference_path: .opencode/skills/cost-estimator/SKILL.md
+  reference_path: .agents/skills/cost-estimator/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/cost-estimator/SKILL.md
+  executable_skill: .agents/skills/cost-estimator/SKILL.md
   tags:
   - utility
   - cost
@@ -3392,12 +3392,12 @@ skills:
   name: Skill Registry Client
   short_description: Client for the AI Workflow Community Skill Registry. Supports publish, install, search, and uninstall
     commands. Verifies SHA-256 hash on install. Tags community skills with origin_metadata.source.
-  reference_path: .opencode/skills/skill-registry-client/SKILL.md
+  reference_path: .agents/skills/skill-registry-client/SKILL.md
   reference_sections:
   - '## Purpose'
   - '## Execution Logic'
   - '## Outputs'
-  executable_skill: .opencode/skills/skill-registry-client/SKILL.md
+  executable_skill: .agents/skills/skill-registry-client/SKILL.md
   tags:
   - platform
   - registry
@@ -3425,7 +3425,7 @@ skills:
   - '## Protocol'
   - '## Best Practices'
   - '## Anti-Patterns'
-  executable_skill: .opencode/skills/delegate/SKILL.md
+  executable_skill: .agents/skills/delegate/SKILL.md
   tags:
   - orchestration
   - delegation
@@ -3446,9 +3446,9 @@ skills:
 - id: SKL-121
   name: Plan Debate
   short_description: Reconciles two independently produced implementation plans through bounded cross-review and consensus.
-  reference_path: .opencode/skills/plan-debate/SKILL.md
+  reference_path: .agents/skills/plan-debate/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/plan-debate/SKILL.md
+  executable_skill: .agents/skills/plan-debate/SKILL.md
   tags: [planning, debate, consensus]
   version: 1.0.0
   depends_on: [SKL-003]
@@ -3459,9 +3459,9 @@ skills:
 - id: SKL-122
   name: Confidence Scorer
   short_description: Computes deterministic section and plan confidence from specialized review findings.
-  reference_path: .opencode/skills/confidence-scorer/SKILL.md
+  reference_path: .agents/skills/confidence-scorer/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/confidence-scorer/SKILL.md
+  executable_skill: .agents/skills/confidence-scorer/SKILL.md
   tags: [planning, review, deterministic, confidence]
   version: 1.0.0
   depends_on: [SKL-003]
@@ -3472,9 +3472,9 @@ skills:
 - id: SKL-123
   name: Finding Aggregator
   short_description: Validates, deduplicates, and summarizes specialized review findings deterministically.
-  reference_path: .opencode/skills/finding-aggregator/SKILL.md
+  reference_path: .agents/skills/finding-aggregator/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/finding-aggregator/SKILL.md
+  executable_skill: .agents/skills/finding-aggregator/SKILL.md
   tags: [review, findings, aggregation, deterministic]
   version: 1.0.0
   depends_on: [SKL-122]
@@ -3485,9 +3485,9 @@ skills:
 - id: SKL-124
   name: Validation Checklist Engine
   short_description: Applies deterministic hard and soft plan-quality checks and controls the revision loop.
-  reference_path: .opencode/skills/validation-checklist-engine/SKILL.md
+  reference_path: .agents/skills/validation-checklist-engine/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/validation-checklist-engine/SKILL.md
+  executable_skill: .agents/skills/validation-checklist-engine/SKILL.md
   tags: [planning, validation, quality, governance]
   version: 1.0.0
   depends_on: [SKL-123]
@@ -3498,9 +3498,9 @@ skills:
 - id: SKL-125
   name: Contract Freezer
   short_description: Creates an immutable, approval-gated implementation contract with canonical hashes.
-  reference_path: .opencode/skills/contract-freezer/SKILL.md
+  reference_path: .agents/skills/contract-freezer/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/contract-freezer/SKILL.md
+  executable_skill: .agents/skills/contract-freezer/SKILL.md
   tags: [planning, contract, governance, immutable]
   version: 1.0.0
   depends_on: [SKL-124]
@@ -3511,9 +3511,9 @@ skills:
 - id: SKL-126
   name: GitHub PR Review
   short_description: Review a GitHub pull request end-to-end by composing code-quality and security analysis, scoring the PR, and publishing findings plus triage labels.
-  reference_path: .opencode/skills/github-pr-review/SKILL.md
+  reference_path: .agents/skills/github-pr-review/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/github-pr-review/SKILL.md
+  executable_skill: .agents/skills/github-pr-review/SKILL.md
   tags: [github, pr-review, code-quality, security, triage, automation]
   version: 1.2.0
   depends_on: [SKL-004, SKL-006]
@@ -3524,9 +3524,9 @@ skills:
 - id: SKL-127
   name: GitHub Merge Gate
   short_description: Decide merge vs hold for a pull request from review verdict, required checks, bot approval freshness, and unresolved criticals; merges only on unanimous green.
-  reference_path: .opencode/skills/github-merge-gate/SKILL.md
+  reference_path: .agents/skills/github-merge-gate/SKILL.md
   reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
-  executable_skill: .opencode/skills/github-merge-gate/SKILL.md
+  executable_skill: .agents/skills/github-merge-gate/SKILL.md
   tags: [github, merge-gate, automation, ci, audit]
   version: 1.0.0
   depends_on: [SKL-126]

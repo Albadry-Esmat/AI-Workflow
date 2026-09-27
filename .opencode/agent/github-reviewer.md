@@ -21,7 +21,7 @@ Execution order:
 4. Publish review + labels + summary (each write needs HITL approval)
 
 Execution rules:
-- Follow the skill spec at `.opencode/skills/github-pr-review/SKILL.md`
+- Follow the skill spec at `.agents/skills/github-pr-review/SKILL.md`
 - Code review score formula: 10 − (critical×1.5 + high×0.8 + medium×0.3 + low×0.1), floor at 1
 - Findings carry file + line; never describe exploit paths; never include secrets
 

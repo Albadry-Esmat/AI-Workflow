@@ -17,7 +17,7 @@ Your responsibilities:
 Execution rules:
 - Run `dependency-analyzer` first to produce or refresh the dependency graph
 - Run `change-impact-analyzer` second, feeding the graph output as its primary input
-- Follow skill specs at `.opencode/skills/dependency-analyzer/SKILL.md` and `.opencode/skills/change-impact-analyzer/SKILL.md`
+- Follow skill specs at `.agents/skills/dependency-analyzer/SKILL.md` and `.agents/skills/change-impact-analyzer/SKILL.md`
 - If a cycle is detected in the dependency graph, emit `impact_severity: "critical"` and halt — do not proceed
 - `affected_modules` list MUST include transitive dependencies, not just direct ones
 

@@ -12,7 +12,7 @@ The intended business outcome is to take engineering work from an idea through r
 
 - A Bash CLI, `aiw`, dispatches setup, health, validation, onboarding, evaluation, maintenance, graph, and website-data synchronization commands.
 - OpenCode configuration in `opencode.json` defines a primary orchestrator and specialized subagents, their model assignments, permissions, and MCP integration configuration.
-- `.opencode/skills/*/SKILL.md` contains executable skill specifications; `skills/index.yaml`, `skills/registry.json`, and `skills/graph/skill-graph.yaml` describe and cross-reference them.
+- `.agents/skills/*/SKILL.md` contains executable skill specifications; `skills/index.yaml`, `skills/registry.json`, and `skills/graph/skill-graph.yaml` describe and cross-reference them.
 - `skills/pipelines/*.json` supplies 22 pipeline templates, including a full idea-to-production flow, review, deployment, compliance, and domain-specific variants.
 - Python/Bash/Node scripts validate contracts and registries; evaluate quick review, traceability, quality, context preservation, onboarding, security, supply chain, operational evidence, and model compatibility; and synchronize generated website data.
 - A layered onboarding implementation (O0–O7) supports runtime-neutral, increasingly controlled local setup, installation verification, digest-bound execution, offline attestation, and verifier-adapter checks.
@@ -92,7 +92,7 @@ This diagram represents pipeline specification intent. It does **not** prove a m
 | [`aiw`](aiw) | Stable command dispatcher; resolves repository root, selects Python/validator, invokes scripts and OpenCode. |
 | [`opencode.json`](opencode.json) | Runtime/MCP configuration and 19 agent definitions (primary plus 18 specialists). |
 | [`.opencode/agent/`](.opencode/agent) | Agent behavior and constraints. |
-| [`.opencode/skills/`](.opencode/skills) | Executable skill contracts. Orchestrator is `.opencode/skills/orchestrator/SKILL.md`. |
+| [`.agents/skills/`](.agents/skills) | Executable skill contracts. Orchestrator is `.agents/skills/orchestrator/SKILL.md`. |
 | [`skills/pipelines/`](skills/pipelines) | Pipeline routing/configuration contracts. |
 | [`skills/index.yaml`](skills/index.yaml), [`skills/registry.json`](skills/registry.json), [`skills/graph/skill-graph.yaml`](skills/graph/skill-graph.yaml) | Skill metadata, discovery, dependency graph, versions, and validation targets. |
 | [`skills/schema/`](skills/schema) and [`config/`](config) | Schemas, policies, execution contracts, capability/toolchain/runtime catalogs, and controlled fixtures. |
@@ -118,7 +118,7 @@ The central domain is **governed work execution**, not business entities such as
 
 ```mermaid
 flowchart LR
-  K[.opencode/skills] --> I[skills/index.yaml]
+  K[.agents/skills] --> I[skills/index.yaml]
   K --> R[skills/registry.json]
   K --> G[skills/graph/skill-graph.yaml]
   P[skills/pipelines] --> R
@@ -200,7 +200,7 @@ The initial validation run exposed missing local Node dependencies, an expanded 
 ### Documentation drift and implementation gaps
 
 - [`README.md`](README.md) and [`docs/how-to-use.md`](docs/how-to-use.md) still advertise 113 skills, while the source catalog and executable-skill directory now report 119. Update public counts and the generated website mirror together.
-- [`docs/architecture.md`](docs/architecture.md) names obsolete paths such as `skills/orchestrator/orchestrator.md`, `skills/memory/context-protocol.md`, and `skills/validation/schema-validator.md`; executable counterparts are under `.opencode/skills/`. It must be reconciled against current source before relying on it operationally.
+- [`docs/architecture.md`](docs/architecture.md) names obsolete paths such as `skills/orchestrator/orchestrator.md`, `skills/memory/context-protocol.md`, and `skills/validation/schema-validator.md`; executable counterparts are under `.agents/skills/`. It must be reconciled against current source before relying on it operationally.
 - [`docs/deployment.md`](docs/deployment.md) presents full multi-environment application deployment behavior, but this repository contains strategy/validation tooling, not a target service deployment implementation. Mark it as a template/reference or link it to concrete automation.
 - [`docs/enhancements/phase-4-v2.1.0-token-efficiency.md`](docs/enhancements/phase-4-v2.1.0-token-efficiency.md) explicitly records an unimplemented token-strategy component in the orchestrator. Preserve it as a known gap until verified otherwise.
 - The public website freshness indicator is intentionally not implemented; machine-readable release compatibility is the current source of truth (see [`docs/quality-and-release-gates.md`](docs/quality-and-release-gates.md)).
@@ -231,7 +231,7 @@ The initial validation run exposed missing local Node dependencies, an expanded 
 | CLI | `aiw` | Command dispatch and root resolution | Critical | Read before changing command behavior. |
 | Runtime config | `opencode.json` | Agents, models, MCP definitions, permissions | Critical | Contains credential variable names only; no values. |
 | Agent behavior | `.opencode/agent/` | Per-agent instructions | High | Keep aligned with config. |
-| Skill execution | `.opencode/skills/*/SKILL.md` | Actual executable prompt contracts | Critical | Primary feature surface. |
+| Skill execution | `.agents/skills/*/SKILL.md` | Actual executable prompt contracts | Critical | Primary feature surface. |
 | Skill metadata | `skills/index.yaml` | Human/tool catalog | Critical | Count/version constraints apply. |
 | Registry | `skills/registry.json` | Discovery and dependency metadata | Critical | Documented authoritative discovery catalog. |
 | Skill graph | `skills/graph/skill-graph.yaml` | Dependency/version graph | High | Must match index count. |

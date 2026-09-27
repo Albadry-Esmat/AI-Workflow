@@ -287,6 +287,6 @@ These are suggestions only. The team decides which tasks to actually parallelize
 ---
 
 **See also:**
-- `.opencode/skills/task-dag/SKILL.md` — full execution spec (SKL-113)
+- `.agents/skills/task-dag/SKILL.md` — full execution spec (SKL-113)
 - `docs/rtm-schema.md` — RTM artifact schema
 - `docs/spec-artifact.md` — spec artifact schema

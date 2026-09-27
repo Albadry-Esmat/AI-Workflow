@@ -3,7 +3,7 @@
 **Skill ID:** SKL-044  
 **Version:** 1.0.0 | **Last updated:** 2026-06-18  
 **Mastery Level:** advanced  
-**Executable Skill:** [mobile-platform-specialist](../../.opencode/skills/mobile-platform-specialist/SKILL.md)  
+**Executable Skill:** [mobile-platform-specialist](../../.agents/skills/mobile-platform-specialist/SKILL.md)
 **Primary Sources:** Apple App Store Review Guidelines (2024); Google Play Developer Policy (2024); *iOS App Security* — David Thiel (2015); *Android Security Internals* — Nikolay Elenkov (2014)
 
 ---

@@ -112,32 +112,32 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "mode": "subagent",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.",
-      "skill": ".opencode/skills/requirement-analyzer/SKILL.md"
+      "skill": ".agents/skills/requirement-analyzer/SKILL.md"
     },
     "architect": {
       "mode": "subagent",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.",
       "skills": [
-        ".opencode/skills/architecture-design/SKILL.md",
-        ".opencode/skills/frontend-ux-architect/SKILL.md",
-        ".opencode/skills/database-architect/SKILL.md"
+        ".agents/skills/architecture-design/SKILL.md",
+        ".agents/skills/frontend-ux-architect/SKILL.md",
+        ".agents/skills/database-architect/SKILL.md"
       ]
     },
     "planner": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Task decomposition, dependency mapping, complexity estimation, roadmap generation. Invoked after architecture is approved.",
-      "skill": ".opencode/skills/feature-planning/SKILL.md"
+      "skill": ".agents/skills/feature-planning/SKILL.md"
     },
     "reviewer": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Evidence producer: code quality analysis, security review, and implementation completeness audit. Produces findings and scores — never gates, never approves, never merges.",
       "skills": [
-        ".opencode/skills/clean-code-review/SKILL.md",
-        ".opencode/skills/security-review/SKILL.md",
-        ".opencode/skills/implementation-completeness-auditor/SKILL.md"
+        ".agents/skills/clean-code-review/SKILL.md",
+        ".agents/skills/security-review/SKILL.md",
+        ".agents/skills/implementation-completeness-auditor/SKILL.md"
       ]
     },
     "gatekeeper": {
@@ -145,20 +145,20 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Policy enforcement: evaluates raw evidence against policy and produces pass/block verdicts. Cannot modify implementation, cannot promote, cannot approve PRs.",
       "skills": [
-        ".opencode/skills/security-guard/SKILL.md",
-        ".opencode/skills/database-guard/SKILL.md",
-        ".opencode/skills/performance-guard/SKILL.md",
-        ".opencode/skills/ui-ux-compliance-guard/SKILL.md",
-        ".opencode/skills/implementation-completeness-guard/SKILL.md",
-        ".opencode/skills/cross-artifact-consistency/SKILL.md",
-        ".opencode/skills/compliance-gate/SKILL.md",
-        ".opencode/skills/work-item-lifecycle-guard/SKILL.md",
-        ".opencode/skills/contract-freezer/SKILL.md",
-        ".opencode/skills/validation-checklist-engine/SKILL.md",
-        ".opencode/skills/confidence-scorer/SKILL.md",
-        ".opencode/skills/finding-aggregator/SKILL.md",
-        ".opencode/skills/traceability-matrix/SKILL.md",
-        ".opencode/skills/drift-detector/SKILL.md"
+        ".agents/skills/security-guard/SKILL.md",
+        ".agents/skills/database-guard/SKILL.md",
+        ".agents/skills/performance-guard/SKILL.md",
+        ".agents/skills/ui-ux-compliance-guard/SKILL.md",
+        ".agents/skills/implementation-completeness-guard/SKILL.md",
+        ".agents/skills/cross-artifact-consistency/SKILL.md",
+        ".agents/skills/compliance-gate/SKILL.md",
+        ".agents/skills/work-item-lifecycle-guard/SKILL.md",
+        ".agents/skills/contract-freezer/SKILL.md",
+        ".agents/skills/validation-checklist-engine/SKILL.md",
+        ".agents/skills/confidence-scorer/SKILL.md",
+        ".agents/skills/finding-aggregator/SKILL.md",
+        ".agents/skills/traceability-matrix/SKILL.md",
+        ".agents/skills/drift-detector/SKILL.md"
       ]
     },
     "github-reviewer": {
@@ -166,7 +166,7 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "GitHub review automation — PR reviews, bug-issue triage, merge-gate summaries. Advisory only; merge authority stays human.",
       "skills": [
-        ".opencode/skills/github-pr-review/SKILL.md"
+        ".agents/skills/github-pr-review/SKILL.md"
       ]
     },
     "tester": {
@@ -174,8 +174,8 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Test strategy, test code generation, mutation scoring, coverage targets, edge cases, quality gates, and CI enforcement. Invoked after feature planning is approved.",
       "skills": [
-        ".opencode/skills/testing-strategy/SKILL.md",
-        ".opencode/skills/mutation-test-generator/SKILL.md"
+        ".agents/skills/testing-strategy/SKILL.md",
+        ".agents/skills/mutation-test-generator/SKILL.md"
       ]
     },
     "builder": {
@@ -183,10 +183,10 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Incremental code generation, targeted code repair, design system file generation, and SEO artifact generation. Invoked after feature planning and impact analysis are complete.",
       "skills": [
-        ".opencode/skills/code-generator/SKILL.md",
-        ".opencode/skills/code-repair/SKILL.md",
-        ".opencode/skills/design-system-generator/SKILL.md",
-        ".opencode/skills/seo-optimizer/SKILL.md"
+        ".agents/skills/code-generator/SKILL.md",
+        ".agents/skills/code-repair/SKILL.md",
+        ".agents/skills/design-system-generator/SKILL.md",
+        ".agents/skills/seo-optimizer/SKILL.md"
       ]
     },
     "impact-analyzer": {
@@ -194,50 +194,50 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.",
       "skills": [
-        ".opencode/skills/dependency-analyzer/SKILL.md",
-        ".opencode/skills/change-impact-analyzer/SKILL.md"
+        ".agents/skills/dependency-analyzer/SKILL.md",
+        ".agents/skills/change-impact-analyzer/SKILL.md"
       ]
     },
     "test-generator": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
-      "skill": ".opencode/skills/test-generator/SKILL.md"
+      "skill": ".agents/skills/test-generator/SKILL.md"
     },
     "recovery": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Last-resort recovery agent — reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.",
-      "skill": ".opencode/skills/rollback-manager/SKILL.md"
+      "skill": ".agents/skills/rollback-manager/SKILL.md"
     },
     "deployer": {
       "mode": "subagent",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Deployment strategy — environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
-      "skill": ".opencode/skills/deployment-strategy/SKILL.md"
+      "skill": ".agents/skills/deployment-strategy/SKILL.md"
     },
     "documenter": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
-      "skill": ".opencode/skills/documentation-generator/SKILL.md"
+      "skill": ".agents/skills/documentation-generator/SKILL.md"
     },
     "doc-maintainer": {
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.",
-      "skill": ".opencode/skills/doc-maintainer/SKILL.md"
+      "skill": ".agents/skills/doc-maintainer/SKILL.md"
     },
     "data-engineer": {
       "mode": "subagent",
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Data platform specialist — designs batch ETL pipelines, streaming architectures, ML pipelines, analytics schemas, and data contracts. Invoked when requirements include data engineering, ML, or analytics workloads.",
       "skills": [
-        ".opencode/skills/data-pipeline-architect/SKILL.md",
-        ".opencode/skills/data-quality-validator/SKILL.md",
-        ".opencode/skills/ml-pipeline-architect/SKILL.md",
-        ".opencode/skills/analytics-schema-designer/SKILL.md",
-        ".opencode/skills/data-contract-enforcer/SKILL.md"
+        ".agents/skills/data-pipeline-architect/SKILL.md",
+        ".agents/skills/data-quality-validator/SKILL.md",
+        ".agents/skills/ml-pipeline-architect/SKILL.md",
+        ".agents/skills/analytics-schema-designer/SKILL.md",
+        ".agents/skills/data-contract-enforcer/SKILL.md"
       ]
     },
     "api-designer": {
@@ -245,9 +245,9 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "API contract specialist — produces OpenAPI 3.1 REST specs, GraphQL schemas with federation, and AsyncAPI event catalogs. Invoked after architecture-design when modules expose public interfaces.",
       "skills": [
-        ".opencode/skills/api-design-architect/SKILL.md",
-        ".opencode/skills/graphql-architect/SKILL.md",
-        ".opencode/skills/event-schema-designer/SKILL.md"
+        ".agents/skills/api-design-architect/SKILL.md",
+        ".agents/skills/graphql-architect/SKILL.md",
+        ".agents/skills/event-schema-designer/SKILL.md"
       ]
     },
     "distributed-systems": {
@@ -255,12 +255,12 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Distributed systems architect — microservice decomposition with DDD, event sourcing/CQRS, resilience patterns, caching topologies, and real-time system design. Invoked for complex multi-service architectures.",
       "skills": [
-        ".opencode/skills/ddd-architect/SKILL.md",
-        ".opencode/skills/microservices-architect/SKILL.md",
-        ".opencode/skills/event-sourcing-designer/SKILL.md",
-        ".opencode/skills/distributed-resilience-architect/SKILL.md",
-        ".opencode/skills/caching-strategy-designer/SKILL.md",
-        ".opencode/skills/realtime-system-architect/SKILL.md"
+        ".agents/skills/ddd-architect/SKILL.md",
+        ".agents/skills/microservices-architect/SKILL.md",
+        ".agents/skills/event-sourcing-designer/SKILL.md",
+        ".agents/skills/distributed-resilience-architect/SKILL.md",
+        ".agents/skills/caching-strategy-designer/SKILL.md",
+        ".agents/skills/realtime-system-architect/SKILL.md"
       ]
     },
     "cloud-platform": {
@@ -268,9 +268,9 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Cloud infrastructure specialist — Well-Architected reviews (AWS/GCP/Azure), serverless function topologies, and Kubernetes/Helm/GitOps cluster designs. Invoked for cloud-hosted system design.",
       "skills": [
-        ".opencode/skills/cloud-architecture-reviewer/SKILL.md",
-        ".opencode/skills/serverless-architect/SKILL.md",
-        ".opencode/skills/container-orchestration-architect/SKILL.md"
+        ".agents/skills/cloud-architecture-reviewer/SKILL.md",
+        ".agents/skills/serverless-architect/SKILL.md",
+        ".agents/skills/container-orchestration-architect/SKILL.md"
       ]
     },
     "security-specialist": {
@@ -278,9 +278,9 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Security depth specialist — STRIDE threat modeling, secrets management architecture, and DevSecOps pipeline design with SAST/DAST/SCA/SBOM. Invoked before and during security review for high-risk systems.",
       "skills": [
-        ".opencode/skills/threat-model-designer/SKILL.md",
-        ".opencode/skills/secrets-management-architect/SKILL.md",
-        ".opencode/skills/devsecops-pipeline-designer/SKILL.md"
+        ".agents/skills/threat-model-designer/SKILL.md",
+        ".agents/skills/secrets-management-architect/SKILL.md",
+        ".agents/skills/devsecops-pipeline-designer/SKILL.md"
       ]
     },
     "sre": {
@@ -288,11 +288,11 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "permission": { "edit": "deny", "bash": "deny" },
       "description": "Site Reliability Engineering specialist — SLO/SLA design, load test scenarios, profiling analysis, runbook generation, and chaos engineering experiments. Invoked during pre-deploy and reliability review phases.",
       "skills": [
-        ".opencode/skills/slo-sla-designer/SKILL.md",
-        ".opencode/skills/load-test-designer/SKILL.md",
-        ".opencode/skills/profiling-advisor/SKILL.md",
-        ".opencode/skills/runbook-generator/SKILL.md",
-        ".opencode/skills/chaos-engineering-designer/SKILL.md"
+        ".agents/skills/slo-sla-designer/SKILL.md",
+        ".agents/skills/load-test-designer/SKILL.md",
+        ".agents/skills/profiling-advisor/SKILL.md",
+        ".agents/skills/runbook-generator/SKILL.md",
+        ".agents/skills/chaos-engineering-designer/SKILL.md"
       ]
     }
   }

@@ -15,7 +15,7 @@ Your responsibilities:
 - Include at least one happy-path, one error-path, and one boundary test per exported function
 
 Execution rules:
-- Follow the skill spec at `.opencode/skills/test-generator/SKILL.md` exactly
+- Follow the skill spec at `.agents/skills/test-generator/SKILL.md` exactly
 - Test files MUST be placed in the location specified by the project's test convention (e.g., `__tests__/`, `*.test.ts`)
 - Every test MUST have a descriptive name that explains the scenario being tested (not `test1`, `test2`)
 - Mock all external dependencies — no network calls, no file system writes in unit tests

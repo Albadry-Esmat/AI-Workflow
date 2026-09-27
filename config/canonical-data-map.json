@@ -6,9 +6,9 @@
   "entries": [
     {
       "id": "skill-content",
-      "canonical_path": ".opencode/skills/*/SKILL.md",
+      "canonical_path": ".agents/skills/*/SKILL.md",
       "field_scope": "skill instructions and frontmatter",
-      "derived_paths": ["website/data/.opencode/skills/*/SKILL.md"],
+      "derived_paths": ["website/data/.agents/skills/*/SKILL.md"],
       "owner": "AI-Workflow",
       "edit_policy": "canonical-only",
       "sync_mode": "exact-mirror"

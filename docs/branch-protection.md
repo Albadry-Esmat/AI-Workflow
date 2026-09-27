@@ -39,7 +39,7 @@ workflow in this repository applies `governance-approved` itself.
 ## What this does NOT cover
 
 GitHub cannot express "bot may merge only on unanimous green" as branch
-policy. That rule lives in `.opencode/skills/github-merge-gate/SKILL.md` and
+policy. That rule lives in `.agents/skills/github-merge-gate/SKILL.md` and
 is enforced by the merge-gatekeeper agent reading live state. The standing
 delegation for bot merges is scoped exactly to: squash merge, unanimous green
 (C1–C5 on the current head SHA), never `--admin`, never to `main`.

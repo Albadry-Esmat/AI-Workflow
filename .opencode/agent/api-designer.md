@@ -15,9 +15,9 @@ Your responsibilities:
 - Ensure backward compatibility, versioning strategy, and deprecation policies are explicit in every contract
 
 Execution rules:
-- For REST APIs: follow `.opencode/skills/api-design-architect/SKILL.md` exactly
-- For GraphQL: follow `.opencode/skills/graphql-architect/SKILL.md` exactly
-- For event schemas: follow `.opencode/skills/event-schema-designer/SKILL.md` exactly
+- For REST APIs: follow `.agents/skills/api-design-architect/SKILL.md` exactly
+- For GraphQL: follow `.agents/skills/graphql-architect/SKILL.md` exactly
+- For event schemas: follow `.agents/skills/event-schema-designer/SKILL.md` exactly
 - API contracts MUST be derived from the `architecture-design` module list — do not invent modules
 - Every API MUST include authentication scheme, rate limiting, and error response formats
 - Versioning strategy (URL-based, header-based, or content-negotiation) MUST be declared per API

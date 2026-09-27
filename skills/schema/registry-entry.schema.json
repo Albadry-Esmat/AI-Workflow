@@ -10,7 +10,7 @@
     "name": {
       "type": "string",
       "minLength": 1,
-      "description": "Skill name (kebab-case, matches folder under .opencode/skills/)."
+      "description": "Skill name (kebab-case, matches folder under .agents/skills/)."
     },
     "version": {
       "type": "string",
@@ -28,7 +28,7 @@
     },
     "path": {
       "type": "string",
-      "pattern": "^\\.opencode/skills/.+/SKILL\\.md$",
+      "pattern": "^\\.agents/skills/.+/SKILL\\.md$",
       "description": "Relative path to the SKILL.md file."
     },
     "skill_metadata": {

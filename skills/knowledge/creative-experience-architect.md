@@ -2,7 +2,7 @@
 #
 # Version:  1.0.0
 # Domain:   design / creative
-# Skill:    .opencode/skills/creative-experience-architect/SKILL.md
+# Skill:    .agents/skills/creative-experience-architect/SKILL.md
 #
 # Purpose:
 #   Authoritative knowledge base for world-class interface design patterns,

@@ -40,7 +40,14 @@
 #   config/runtime-installer-catalog-schema.json → website/data/runtime-installer-catalog-schema.json
 #   config/toolchain-manifest.json → website/data/toolchain.json
 #   config/toolchain-policy.json → website/data/toolchain-policy.json
-#   .opencode/skills/              → website/data/.opencode/skills/  (all SKILL.md)
+#   .agents/skills/              → website/data/.agents/skills/  (all SKILL.md)
+#
+#   NOTE (P0): website/data/.agents/skills/ is GENERATED NON-EXECUTABLE website
+#   data for the companion website repo (skill detail pages). It is a byte copy
+#   produced solely by this script — never hand-edited, never a runtime skill
+#   source. No AI runtime discovers website/data/ as a skill root at normal
+#   working directories; the canonical executable body remains
+#   .agents/skills/<name>/SKILL.md (one per portable skill).
 #   website/data/site-content.json → (already in website/data/, synced via rsync)
 #
 # Flags:
@@ -287,9 +294,9 @@ sync_file "$ROOT/config/runtime-installer-catalog-schema.json" "$DATA_DIR/runtim
 sync_file "$ROOT/config/toolchain-manifest.json" "$DATA_DIR/toolchain.json"
 sync_file "$ROOT/config/toolchain-policy.json" "$DATA_DIR/toolchain-policy.json"
 
-# ── Sync: .opencode/skills/ SKILL.md files ────────────────────────────────────
-header "Skill files (.opencode/skills/)"
-sync_dir "$ROOT/.opencode/skills" "$DATA_DIR/.opencode/skills" "SKILL.md"
+# ── Sync: .agents/skills/ SKILL.md files ────────────────────────────────────
+header "Skill files (.agents/skills/)"
+sync_dir "$ROOT/.agents/skills" "$DATA_DIR/.agents/skills" "SKILL.md"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo

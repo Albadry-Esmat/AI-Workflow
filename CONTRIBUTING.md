@@ -58,10 +58,10 @@ Type `aiw help` for a full list of available commands.
 
 ### 1 — Create the SKILL.md file
 
-Every skill lives at `.opencode/skills/<skill-name>/SKILL.md`. Copy the structure from the template:
+Every skill lives at `.agents/skills/<skill-name>/SKILL.md`. Copy the structure from the template:
 
 ```bash
-cp skills/template/skill-template.md .opencode/skills/<skill-name>/SKILL.md
+cp skills/template/skill-template.md .agents/skills/<skill-name>/SKILL.md
 ```
 
 Fill in all 12 sections:
@@ -103,7 +103,7 @@ Add a new entry at the end of `skills/index.yaml`. Follow the exact format of ex
   status: active
   category: <category>
   agent: <agent-name>
-  executable_skill: .opencode/skills/your-skill-name/SKILL.md
+  executable_skill: .agents/skills/your-skill-name/SKILL.md
   description: "One sentence description."
 ```
 
@@ -230,7 +230,7 @@ aiw sync
 The website source lives in a separate companion repository. The `website/` directory in this repo contains only the data mirror used at build time. To update it:
 
 ```bash
-aiw website sync   # syncs website/data/ from skills/, docs/, .opencode/skills/, opencode.json
+aiw website sync   # syncs website/data/ from skills/, docs/, .agents/skills/, opencode.json
 ```
 
 Then deploy through Vercel or clone the companion repo into `website/` to run locally.

@@ -112,7 +112,7 @@ Conditionally loaded sections:
 Core sections only = ~500 tokens (–37% per skill load).
 Over 15 skills in a full pipeline = ~4,500 tokens saved per run.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md` (bump `1.4.0 → 1.5.0`)
+**Files:** `.agents/skills/orchestrator/SKILL.md` (bump `1.4.0 → 1.5.0`)
 **Validation:** All 15 full-pipeline skills produce correct output with section-restricted loading
 
 ---
@@ -147,7 +147,7 @@ Add orchestrator step: "Reconcile async tasks" — at pipeline completion, updat
 `async_task_registry` entry with final status. Surface any `failed` entries in the
 pipeline summary output.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
+**Files:** `.agents/skills/orchestrator/SKILL.md`, `docs/context-engineering.md`
 
 ---
 
@@ -189,7 +189,7 @@ Orchestrator skips phases 1-3 (uses cached outputs) → re-runs phase-4 onward
 
 **Token saving:** phases 1-3 in full-pipeline = ~35,000 tokens avoided per resume.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md`, all pipeline JSONs (add `"resumable": true`)
+**Files:** `.agents/skills/orchestrator/SKILL.md`, all pipeline JSONs (add `"resumable": true`)
 **Validation:** Integration test: run full pipeline → HITL reject → resume → verify phases 1-3 not re-executed
 
 ---
@@ -233,7 +233,7 @@ Add orchestrator step: "Check memoization cache" — before invoking any skill:
 Typical feedback loops trigger 1–3 upstream re-invocations; memoization eliminates all of them
 when inputs are unchanged.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md` (included in `1.4.0 → 1.5.0` bump)
+**Files:** `.agents/skills/orchestrator/SKILL.md` (included in `1.4.0 → 1.5.0` bump)
 **Validation:** Run a pipeline that triggers a feedback loop; verify `CACHE_HIT` log events appear on second invocation
 
 ---

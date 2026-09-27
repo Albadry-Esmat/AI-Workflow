@@ -3,7 +3,7 @@
 **Skill ID:** SKL-045  
 **Version:** 1.0.0 | **Last updated:** 2026-06-18  
 **Mastery Level:** advanced  
-**Executable Skill:** [saas-enterprise-architect](../../.opencode/skills/saas-enterprise-architect/SKILL.md)  
+**Executable Skill:** [saas-enterprise-architect](../../.agents/skills/saas-enterprise-architect/SKILL.md)
 **Primary Sources:** *SaaS Architecture Patterns* — Anubhav Sharma (2023); *Multi-Tenant SaaS Architecture* — AWS Well-Architected (2022); SOC 2 Trust Services Criteria (AICPA, 2022); ISO/IEC 27001:2022
 
 ---

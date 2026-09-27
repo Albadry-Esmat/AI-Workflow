@@ -137,7 +137,7 @@ After skill N output is consumed by skill N+1 (input mapped):
 **Benefits:** Keeps pipeline state under control throughout execution — prevents the late-phase
 state bloat that currently triggers aggressive auto-compression on every token check.
 
-**Files:** `.opencode/skills/orchestrator/SKILL.md` (bump `1.3.0 → 1.4.0`), `docs/context-engineering.md`
+**Files:** `.agents/skills/orchestrator/SKILL.md` (bump `1.3.0 → 1.4.0`), `docs/context-engineering.md`
 **Validation:** Full pipeline run; verify state size does not grow linearly with phase count
 
 ---
@@ -167,7 +167,7 @@ Before passing skill N output to skill N+1:
 - feature-planning required inputs: `requirements`, `modules`, `integration_points` (~3 fields)
 - After pruning: ~1,600 tokens (–60%)
 
-**files:** `.opencode/skills/orchestrator/SKILL.md` (included in `1.3.0 → 1.4.0` bump from TASK-0053)
+**files:** `.agents/skills/orchestrator/SKILL.md` (included in `1.3.0 → 1.4.0` bump from TASK-0053)
 **Validation:** Schema check — every projected field exists in target skill's input schema
 
 ---

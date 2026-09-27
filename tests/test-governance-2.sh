@@ -109,7 +109,7 @@ fi
 #    bearer inputs gone from all four guards.
 MIGRATED=0
 for g in $GUARDS; do
-  f="$ROOT/.opencode/skills/$g/SKILL.md"
+  f="$ROOT/.agents/skills/$g/SKILL.md"
   if grep -q "override_decision_id" "$f" && grep -q "resolve-override.js" "$f"; then
     MIGRATED=$((MIGRATED+1))
   else
@@ -137,7 +137,7 @@ if grep -q "only agent authorized to approve gates" "$ROOT/.opencode/agent/prima
 else
   ok "stale approver-authority language removed"
 fi
-if grep -q "decided_by" "$ROOT/.opencode/skills/orchestrator/SKILL.md"; then
+if grep -q "decided_by" "$ROOT/.agents/skills/orchestrator/SKILL.md"; then
   ok "decided_by envelope in orchestrator gate log"
 else
   bad "decided_by envelope"

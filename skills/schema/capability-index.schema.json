@@ -52,7 +52,7 @@
         "name": { "type": "string", "minLength": 1 },
         "display_name": { "type": "string", "minLength": 1 },
         "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-        "executable_skill": { "type": "string", "pattern": "^\\.opencode/skills/.+/SKILL\\.md$" },
+        "executable_skill": { "type": "string", "pattern": "^\\.agents/skills/.+/SKILL\\.md$" },
         "reference_path": { "type": ["string", "null"] },
         "tags": { "type": "array", "items": { "type": "string" } },
         "mastery_level": { "type": ["string", "null"] },

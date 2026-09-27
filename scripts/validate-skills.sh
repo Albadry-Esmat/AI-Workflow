@@ -8,7 +8,7 @@
 #   1. All pipeline JSON configs validate against pipeline-schema.json
 #   2. All SKILL.md files contain the required 12 section keywords
 #   3. All skill IDs in skills/index.yaml are unique
-#   4. Skill count: index.yaml entries == .opencode/skills/ directory count
+#   4. Skill count: index.yaml entries == .agents/skills/ directory count
 #   5. All skill paths referenced in opencode.json exist on disk
 #   6. skill-graph.yaml total_nodes matches index.yaml entry count
 #   7. Version consistency: registry.json versions match skill-graph.yaml nodes
@@ -116,7 +116,7 @@ META_SKILLS=(
   "versioning"
 )
 
-for skill_dir in .opencode/skills/*/; do
+for skill_dir in .agents/skills/*/; do
   skill_name=$(basename "$skill_dir")
   skill_file="${skill_dir}SKILL.md"
 
@@ -167,15 +167,15 @@ else
 fi
 
 # ── 4. Count consistency ───────────────────────────────────────────────────────
-header "4/10 — Skill count: index.yaml vs .opencode/skills/"
+header "4/10 — Skill count: index.yaml vs .agents/skills/"
 INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
-DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+DIR_COUNT=$(find .agents/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
 echo "  index.yaml entries : $INDEX_COUNT"
-echo "  .opencode/skills/  : $DIR_COUNT"
+echo "  .agents/skills/  : $DIR_COUNT"
 if [[ "$INDEX_COUNT" -eq "$DIR_COUNT" ]]; then
   _ok "Counts match ($INDEX_COUNT)"
 else
-  _fail "Count mismatch — index.yaml ($INDEX_COUNT) vs .opencode/skills/ directory ($DIR_COUNT)"
+  _fail "Count mismatch — index.yaml ($INDEX_COUNT) vs .agents/skills/ directory ($DIR_COUNT)"
   echo "         Fix: ensure every SKILL.md directory has a corresponding entry in index.yaml"
 fi
 

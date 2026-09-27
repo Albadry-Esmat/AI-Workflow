@@ -2,7 +2,7 @@
 #
 # Version:  1.0.0
 # Domain:   database / data-modeling
-# Skill:    .opencode/skills/database-architect/SKILL.md
+# Skill:    .agents/skills/database-architect/SKILL.md
 #
 # Purpose:
 #   Authoritative knowledge base for designing, validating, and governing

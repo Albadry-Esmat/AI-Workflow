@@ -73,14 +73,14 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 
 | Tool | Required | Purpose |
 |------|----------|---------|
-| [opencode](https://opencode.ai) | **Yes** | Runs the AI agent runtime |
+| Any supported agent runtime (`opencode`, `claude`, `codex`, … — see `aiw agent detect`) | **Yes** | Runs the AI agent runtime (runtime-owned; never installed by AIW) |
 | [Node.js](https://nodejs.org) ≥ 20 | **Yes** | Pipeline schema validation + plugin runtime |
-| [Python 3](https://python.org) ≥ 3.9 | **Yes** | SKILL.md version consistency checks |
+| [Python 3](https://python.org) ≥ 3.9 | Lazy (validation only) | SKILL.md version consistency checks (`aiw validate` requires it; setup/health do not) |
 | [Git](https://git-scm.com) | **Yes** | Version control |
 | [ajv-cli](https://github.com/ajv-validator/ajv-cli) | Optional | JSON Schema validation (auto-installed by `aiw setup`) |
 | [graphify](https://graphify.ai) | Optional | Knowledge graph queries |
 
-A GitHub Copilot subscription (or another LLM provider supported by opencode) is also required.
+An LLM provider authenticated in your selected runtime (e.g. GitHub Copilot, Anthropic, OpenAI) is also required. Provider auth is runtime-owned — AIW never logs in or handles secrets.
 
 ---
 
@@ -185,10 +185,10 @@ See `.env.example` for full documentation of every variable.
 
 ### Skills
 
-A **skill** is a markdown file (`SKILL.md`) with 12 sections that define exactly what an agent does: its purpose, inputs, outputs, quality gates, and composition rules. Skills live in `.opencode/skills/<name>/`.
+A **skill** is a markdown file (`SKILL.md`) with 12 sections that define exactly what an agent does: its purpose, inputs, outputs, quality gates, and composition rules. Skills live in `.agents/skills/<name>/`.
 
 ```
-.opencode/skills/
+.agents/skills/
 ├── requirement-analyzer/SKILL.md
 ├── architecture-design/SKILL.md
 ├── feature-planning/SKILL.md
@@ -270,8 +270,11 @@ AI-Workflow/
 ├── opencode.json              ← agent config, model assignments, MCP servers
 ├── .env.example               ← environment variable template (copy to .env)
 ├── Makefile                   ← make targets (backward compat with aiw CLI)
+├── .agents/
+│   └── skills/                ← 121 canonical SKILL.md files (portable Agent Skills)
+├── .claude/
+│   └── skills/                ← 121 generated symlinks → .agents/skills/* (Claude Code adapter; see `aiw sync-runtimes`)
 ├── .opencode/
-│   ├── skills/                ← 121 SKILL.md files (AI-executable skill specs)
 │   └── agent/                 ← per-agent instruction files (24 files)
 ├── skills/
 │   ├── index.yaml             ← skill registry (single source of truth)
@@ -280,9 +283,11 @@ AI-Workflow/
 │   ├── graph/skill-graph.yaml ← 121 nodes, 373 edges
 │   └── schema/                ← JSON schemas for pipelines and registry
 ├── scripts/
-│   ├── setup.sh               ← one-command project setup
+│   ├── setup.sh               ← one-command project setup (Python lazy)
 │   ├── health-check.sh        ← environment validation
 │   ├── validate-skills.sh     ← 11-check skill validation suite
+│   ├── validate-runtime-parity.sh ← P0 runtime-neutral parity gates
+│   ├── sync-runtimes.sh       ← runtime adapter sync (`.claude/skills` links; `--check` for CI)
 │   ├── sync-website-data.sh   ← sync website/data/ from source
 │   ├── clean.sh               ← remove build artifacts
 │   ├── reset.sh               ← reset to clean state
@@ -329,7 +334,7 @@ Open `.env` and add your token. Create one at [github.com/settings/tokens](https
 Run: `npm install -g ajv-cli ajv-formats` (or just re-run `aiw setup`).
 
 ### `Skill count mismatch` in validation
-Every SKILL.md directory under `.opencode/skills/` must have a corresponding `- id:` entry in `skills/index.yaml`. Run `aiw validate` for the specific skill that is missing.
+Every SKILL.md directory under `.agents/skills/` must have a corresponding `- id:` entry in `skills/index.yaml`. Run `aiw validate` for the specific skill that is missing.
 
 ### `.opencode/node_modules missing`
 Run: `aiw update`.

@@ -4,21 +4,25 @@ on:
   push:
     paths:
       - "skills/**"
-      - ".opencode/skills/**"
+      - ".agents/skills/**"
+      - ".claude/skills/**"
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
       - "config/**"
+      - "tests/test-opencode-discovery.sh"
       - "website/data/**"
       - "evals/**"
   pull_request:
     paths:
       - "skills/**"
-      - ".opencode/skills/**"
+      - ".agents/skills/**"
+      - ".claude/skills/**"
       - "opencode.json"
       - "docs/**"
       - "scripts/**"
       - "config/**"
+      - "tests/test-opencode-discovery.sh"
       - "website/data/**"
       - "evals/**"
 
@@ -194,7 +198,7 @@ jobs:
             "skill-lifecycle" "trigger-engineering" "validation-rules" "versioning"
           )
           FAILED=0
-          for skill_dir in .opencode/skills/*/; do
+          for skill_dir in .agents/skills/*/; do
             skill_name=$(basename "$skill_dir")
             skill_file="${skill_dir}SKILL.md"
             skip=0
@@ -237,15 +241,15 @@ jobs:
           echo "  PASS: All skill IDs are unique"
 
       # ── Check 4 ─────────────────────────────────────────────────────────────
-      - name: "4/10 — Skill count: index.yaml vs .opencode/skills/"
+      - name: "4/10 — Skill count: index.yaml vs .agents/skills/"
         if: success() || failure()
         run: |
           INDEX_COUNT=$(grep -c "^- id:" skills/index.yaml || echo 0)
-          DIR_COUNT=$(find .opencode/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+          DIR_COUNT=$(find .agents/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
           echo "  index.yaml entries : $INDEX_COUNT"
-          echo "  .opencode/skills/  : $DIR_COUNT"
+          echo "  .agents/skills/  : $DIR_COUNT"
           if [ "$INDEX_COUNT" -ne "$DIR_COUNT" ]; then
-            echo "  FAIL: Count mismatch — index.yaml ($INDEX_COUNT) vs .opencode/skills/ ($DIR_COUNT)"
+            echo "  FAIL: Count mismatch — index.yaml ($INDEX_COUNT) vs .agents/skills/ ($DIR_COUNT)"
             exit 1
           fi
           echo "  PASS: Counts match ($INDEX_COUNT)"
@@ -392,6 +396,19 @@ jobs:
               print(m)
           sys.exit(1 if mismatches else 0)
           PYEOF
+
+      # ── P0 runtime-neutral parity gates ─────────────────────────────────────
+      - name: "P0 — Runtime parity gates (canonical counts, no duplication, adapter drift, discovery, catalog, secrets)"
+        if: success() || failure()
+        run: bash scripts/validate-runtime-parity.sh
+
+      - name: "P0 — sync-runtimes drift check (explicit)"
+        if: success() || failure()
+        run: bash scripts/sync-runtimes.sh --check
+
+      - name: "P0 — OpenCode discovery compatibility (Case B)"
+        if: success() || failure()
+        run: bash tests/test-opencode-discovery.sh
 
       - name: Summary
         if: always()

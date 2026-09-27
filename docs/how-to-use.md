@@ -116,7 +116,7 @@ This copies `opencode.json`, `.opencode/` (all 121 skills + 24 agents), and your
 ### How to Create a New Skill
 
 ```
-1. Copy skills/template/skill-template.md to .opencode/skills/<name>/SKILL.md
+1. Copy skills/template/skill-template.md to .agents/skills/<name>/SKILL.md
 2. Fill in all 13 sections (see CONTRIBUTING.md for section list)
 3. Add entry to skills/index.yaml (follow exact format)
 4. Add entry to skills/registry.json

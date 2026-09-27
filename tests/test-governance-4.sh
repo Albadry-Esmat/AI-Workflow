@@ -18,8 +18,8 @@ const {policies}=loadPolicies();
 const yes=['skills/pipelines/quick-review.json','skills/schema/pipeline-schema.json',
  'scripts/gate-decisions.js','scripts/resolve-override.js','scripts/validate-pipeline-gates.py',
  'scripts/policy-gateway.js','scripts/release-review.js','scripts/escalate-case.js',
- '.opencode/skills/orchestrator/SKILL.md','.opencode/skills/security-guard/SKILL.md',
- '.opencode/skills/delegate/SKILL.md','.opencode/agent/gatekeeper.md',
+ '.agents/skills/orchestrator/SKILL.md','.agents/skills/security-guard/SKILL.md',
+ '.agents/skills/delegate/SKILL.md','.opencode/agent/gatekeeper.md',
  'docs/governance.md','docs/branch-protection.md','opencode.json',
  'config/model-requirements.yml','config/governance-decision-schema.json',
  'config/terminal-failure-schema.json','config/governance-flags-policy.json'];
@@ -65,15 +65,15 @@ if (!manifest.agents.gatekeeper || manifest.agents.gatekeeper.on_unavailable !==
 " && ok "reviewer/gatekeeper separation in config" || bad "separation"
 
 # 4. Delegated outputs tagged + ineligible; debate sides carry lineage.
-if grep -q "delegated: true" "$ROOT/.opencode/skills/delegate/SKILL.md" \
-  && grep -q "ineligible as gate evidence" "$ROOT/.opencode/skills/delegate/SKILL.md" \
-  && grep -q "gate laundering" "$ROOT/.opencode/skills/delegate/SKILL.md"; then
+if grep -q "delegated: true" "$ROOT/.agents/skills/delegate/SKILL.md" \
+  && grep -q "ineligible as gate evidence" "$ROOT/.agents/skills/delegate/SKILL.md" \
+  && grep -q "gate laundering" "$ROOT/.agents/skills/delegate/SKILL.md"; then
   ok "delegation tagging rule"
 else
   bad "delegation tagging"
 fi
-if grep -q "participant_lineage" "$ROOT/.opencode/skills/plan-debate/SKILL.md" \
-  && grep -q "participant_lineage" "$ROOT/.opencode/skills/multi-agent-debate/SKILL.md"; then
+if grep -q "participant_lineage" "$ROOT/.agents/skills/plan-debate/SKILL.md" \
+  && grep -q "participant_lineage" "$ROOT/.agents/skills/multi-agent-debate/SKILL.md"; then
   ok "debate lineage required"
 else
   bad "debate lineage"
@@ -113,8 +113,8 @@ const bare = { code: 'UNKNOWN_FAILURE', failed_phase: 'x', decided_at: new Date(
 if (!v(good)) process.exit(1);
 if (v(bare)) process.exit(1);
 " && ok "terminal schema enforces reason chain + resolved flag" || bad "terminal schema"
-if grep -q "terminal-failure-schema.json" "$ROOT/.opencode/skills/orchestrator/SKILL.md" \
-  && grep -q "terminal_failures" "$ROOT/.opencode/skills/orchestrator/SKILL.md"; then
+if grep -q "terminal-failure-schema.json" "$ROOT/.agents/skills/orchestrator/SKILL.md" \
+  && grep -q "terminal_failures" "$ROOT/.agents/skills/orchestrator/SKILL.md"; then
   ok "terminal records in orchestrator contract"
 else
   bad "orchestrator terminal contract"

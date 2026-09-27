@@ -2,7 +2,7 @@
 #
 # Version:  1.0.0
 # Domain:   design / ux-research
-# Skill:    .opencode/skills/ux-research-synthesizer/SKILL.md
+# Skill:    .agents/skills/ux-research-synthesizer/SKILL.md
 #
 # Purpose:
 #   Authoritative knowledge base for user flow analysis, heuristic evaluation,

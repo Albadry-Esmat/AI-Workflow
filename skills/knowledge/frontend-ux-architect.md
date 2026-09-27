@@ -2,7 +2,7 @@
 #
 # Version:  2.0.0
 # Domain:   design / ui-ux
-# Skill:    .opencode/skills/frontend-ux-architect/SKILL.md
+# Skill:    .agents/skills/frontend-ux-architect/SKILL.md
 #
 # Purpose:
 #   Authoritative knowledge base for designing, validating, and enforcing

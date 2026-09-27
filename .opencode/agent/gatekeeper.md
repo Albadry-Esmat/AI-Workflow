@@ -20,7 +20,7 @@ Your responsibilities:
 - Record every enforcement decision with its evidence references
 
 Execution rules:
-- Follow each skill spec under `.opencode/skills/<skill>/SKILL.md`
+- Follow each skill spec under `.agents/skills/<skill>/SKILL.md`
 - A `block` verdict from ANY guard halts the pipeline unconditionally — report it and stop
 - Overrides arrive only as registry decision ids; bearer approval objects are rejected
 

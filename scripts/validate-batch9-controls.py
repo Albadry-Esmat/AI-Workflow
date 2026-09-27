@@ -111,7 +111,7 @@ def main() -> int:
             assert entry["skill_metadata"]["maturity"] == "experimental"
             graph = (temp / "skills/graph/skill-graph.yaml").read_text()
             assert "name: validator-demo-skill" in graph
-            assert not (temp / ".opencode/skills/validator-demo-skill/skill-manifest.json").exists() is False
+            assert not (temp / ".agents/skills/validator-demo-skill/skill-manifest.json").exists() is False
     check("skill-sdk:scaffold-apply-and-registration", scaffold_and_apply)
 
     def apply_rollback() -> None:
@@ -133,7 +133,7 @@ def main() -> int:
             ], expect=1)
             assert "missing sections" in (result.stdout + result.stderr).lower()
             assert (temp / "skills/index.yaml").read_text() == before
-            assert not (temp / ".opencode/skills/rollback-demo-skill").exists()
+            assert not (temp / ".agents/skills/rollback-demo-skill").exists()
     check("skill-sdk:apply-rollback", apply_rollback)
 
     def feedback_controls() -> None:

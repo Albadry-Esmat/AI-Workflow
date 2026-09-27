@@ -3,7 +3,7 @@
 **Skill ID:** SKL-043  
 **Version:** 1.0.0 | **Last updated:** 2026-06-18  
 **Mastery Level:** advanced  
-**Executable Skill:** [ai-agent-specialist](../../.opencode/skills/ai-agent-specialist/SKILL.md)  
+**Executable Skill:** [ai-agent-specialist](../../.agents/skills/ai-agent-specialist/SKILL.md)
 **Primary Sources:** *Building LLM Applications* — Valentina Alto (2024); *Patterns for Building LLM-based Systems & Products* — Eugene Yan (2023); OpenAI Safety Best Practices; Anthropic AI Safety Fundamentals
 
 ---

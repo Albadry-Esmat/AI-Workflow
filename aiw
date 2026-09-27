@@ -99,6 +99,7 @@ show_help() {
   echo -e "  ${BOLD}DEVELOPMENT${NC}"
   echo -e "    ${CYAN}sync${NC}                         Sync website/data/ from source files"
   echo -e "    ${CYAN}sync --website${NC}               Sync + push to ASE-OS-Website repo automatically"
+  echo -e "    ${CYAN}sync-runtimes${NC}                Sync runtime adapters from .agents/skills/ (P0: .claude/skills links; --check for CI)"
   echo -e "    ${CYAN}graph${NC}                        Rebuild the knowledge graph after code changes"
   echo -e "    ${CYAN}quick-review${NC}                 Run bounded quick-review with local evidence"
   echo -e "    ${CYAN}validate-batch6${NC}              Validate budgets, retries, and capability policy"
@@ -459,6 +460,10 @@ cmd_sync() {
   bash "$ROOT/scripts/sync-website-data.sh" "$@"
 }
 
+cmd_sync_runtimes() {
+  bash "$ROOT/scripts/sync-runtimes.sh" "$@"
+}
+
 cmd_quick_review() {
   "$PYTHON_BIN" "$ROOT/scripts/run-quick-review.py" "$@"
 }
@@ -681,7 +686,7 @@ cmd_status() {
   
   # Skills
   local skill_count
-  skill_count=$(find "$ROOT/.opencode/skills" -maxdepth 1 -type d | wc -l | tr -d ' ')
+  skill_count=$(find "$ROOT/.agents/skills" -maxdepth 1 -type d | wc -l | tr -d ' ')
   skill_count=$((skill_count - 1))
   echo -e "  ${CYAN}Skills${NC}"
   echo "    Registered: ${skill_count}"
@@ -733,6 +738,7 @@ case "$COMMAND" in
   lint)             cmd_lint "$@" ;;
   doctor|diagnose)  cmd_doctor "$@" ;;
   sync)             cmd_sync "$@" ;;
+  sync-runtimes)    cmd_sync_runtimes "$@" ;;
   quick-review|review) cmd_quick_review "$@" ;;
   validate-batch6)  cmd_validate_batch6 "$@" ;;
   validate-batch7)  cmd_validate_batch7 "$@" ;;

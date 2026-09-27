@@ -2,7 +2,7 @@
 #
 # Version:  1.0.0
 # Domain:   design / motion
-# Skill:    .opencode/skills/motion-design-architect/SKILL.md
+# Skill:    .agents/skills/motion-design-architect/SKILL.md
 #
 # Purpose:
 #   Authoritative knowledge base for designing motion systems, specifying

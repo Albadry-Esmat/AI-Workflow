@@ -77,6 +77,6 @@ Or permanently remove the gitignore exclusion:
 
 ## See Also
 
-- Orchestrator: `.opencode/skills/orchestrator/SKILL.md` — Step 7 (artifact write)
+- Orchestrator: `.agents/skills/orchestrator/SKILL.md` — Step 7 (artifact write)
 - Schema doc: `docs/spec-artifact.md`
 - FEATURE-007: `work-items/features/FEATURE-007-spec-artifact-on-disk/`

@@ -289,6 +289,6 @@ inputs. This increases accuracy and reduces token cost.
 ---
 
 **See also:**
-- `.opencode/skills/traceability-matrix/SKILL.md` — full execution spec (SKL-111)
+- `.agents/skills/traceability-matrix/SKILL.md` — full execution spec (SKL-111)
 - `docs/spec-artifact.md` — spec artifact schema (written by orchestrator)
 - `docs/skills-registry.md` — SKL-111 registry entry

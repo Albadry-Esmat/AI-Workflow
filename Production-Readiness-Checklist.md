@@ -136,7 +136,7 @@
 | ID | Description | Status | Priority | Notes |
 |----|-------------|--------|----------|-------|
 | CI-001 | Validate GitHub Actions workflow runs successfully | Passed | Critical | validate-skills.yml — 3 jobs: skill validation, docs link check, website sync check |
-| CI-002 | Verify CI triggers cover all critical paths | Passed | Critical | Triggers on push/PR to: skills/**, .opencode/skills/**, opencode.json, docs/**, scripts/** |
+| CI-002 | Verify CI triggers cover all critical paths | Passed | Critical | Triggers on push/PR to: skills/**, .agents/skills/**, opencode.json, docs/**, scripts/** |
 | CI-003 | Confirm docs broken-link check passes | Needs Review | High | CI job exists but requires GitHub Actions run to verify |
 | CI-004 | Verify website data sync check passes | Needs Review | High | CI job exists but requires GitHub Actions run to verify |
 | CI-005 | Validate CI runs on correct versions | Passed | High | Node 20, Python 3.11 specified in workflow |

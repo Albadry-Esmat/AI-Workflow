@@ -56,7 +56,7 @@ grep -q "validator rejects" "$ROOT/.github/pull_request_template.md" && ok "PR p
 # 7. skill version consistency (github-pr-review 1.2.0)
 node -e "
 const fs = require('fs');
-const md = fs.readFileSync('$ROOT/.opencode/skills/github-pr-review/SKILL.md', 'utf8');
+const md = fs.readFileSync('$ROOT/.agents/skills/github-pr-review/SKILL.md', 'utf8');
 if (!md.includes('version: 1.2.0') || !md.includes('fingerprint v2')) process.exit(1);
 " && ok "skill 1.2.0 + fingerprint v2" || bad "skill version"
 
