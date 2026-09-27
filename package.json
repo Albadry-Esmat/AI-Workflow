@@ -15,7 +15,7 @@
     "graph": "graphify update ."
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^5.4.2"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
