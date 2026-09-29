@@ -19,10 +19,10 @@ patched version of the framework.
 
 | ID | Title | Points | Status |
 |----|-------|--------|--------|
-| TASK-0038 | Fix Step 7c `file_path`: directory → `request.md` file path | 1 | pending |
-| TASK-0039 | Fix Step 7c `features.md` rebuild: idempotent read→merge→write | 1 | pending |
-| TASK-0040 | Bump `full-pipeline.json` feature-planning pin from `^2.0.0` → `^2.1.0` | 1 | pending |
-| TASK-0041 | Add `[1.1.0]` entry to `docs/changelog.md` | 1 | pending |
+| TASK-0038 | Fix Step 7c `file_path`: directory → `request.md` file path | 1 | complete |
+| TASK-0039 | Fix Step 7c `features.md` rebuild: idempotent read→merge→write | 1 | complete |
+| TASK-0040 | Bump `full-pipeline.json` feature-planning pin from `^2.0.0` → `^2.1.0` | 1 | complete |
+| TASK-0041 | Add `[1.1.0]` entry to `docs/changelog.md` | 1 | complete |
 
 **Delivery:** Single `fix(feature-planning): v2.1.1 patch + pipeline pin + changelog` commit on `main`.
 
@@ -33,8 +33,8 @@ patched version of the framework.
 | ID | Title | Points | Status |
 |----|-------|--------|--------|
 | TASK-0042 | CI: `index.yaml` ↔ SKILL.md frontmatter version consistency check | 3 | pending |
-| TASK-0043 | HITL gate: surface `feature_folders[]` in roadmap approval presentation | 2 | pending |
-| TASK-0044 | Create `docs/enhancements/phase-1-v1.1.0-correctness-and-quick-wins.md` | 2 | pending |
+| TASK-0043 | HITL gate: surface `feature_folders[]` in roadmap approval presentation | 2 | complete |
+| TASK-0044 | Create `docs/enhancements/phase-1-v1.1.0-correctness-and-quick-wins.md` | 2 | complete |
 
 **Delivery:** Two commits — one for CI changes (`scripts/` + `.github/`), one for SKILL.md + docs.
 

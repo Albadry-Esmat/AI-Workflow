@@ -126,7 +126,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - New read-only `investigation` agent (1 round, then resolve/escalate); `docs/autonomous-workflow.md`.
 - `tests/test-workflow-p2.sh` 5/5.
 
-### P1 autonomous-governance foundation (policies as data, control-plane protection)
+### Governance foundation (policies as data, control-plane protection)
 
 - 10 policy files under `config/` (validation-profile, development, review, risk, budget, merge, rollback, backlog, control-plane, policy-versions) with discovery via `scripts/policy-loader.js` (config/ first, `.ai/` adapter layout supported).
 - Tiered PR template (7 always-required + conditional sections, placeholder rejection); branch/commit policy (no `bugfix/` dup, sync-before-review, squash default).
