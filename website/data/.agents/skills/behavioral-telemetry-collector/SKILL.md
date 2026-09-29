@@ -1,6 +1,6 @@
 ---
 name: behavioral-telemetry-collector
-version: 1.3.0
+version: 1.3.1
 domain: system
 description: 'Use when collecting anonymized behavioral telemetry from pipeline sessions for later insight generation. Triggers on: "collect telemetry", "record session events", "behavioral telemetry", "pipeline behavior tracking". Always checks opt-out flag first — if set, exits immediately without collecting any data. Never collects PII, user inputs, code content, or credentials.'
 author: ASE-OS
@@ -149,6 +149,10 @@ This skill does **not** produce alerts, health status, or aggregations — that 
 - `current_state` is a scoped read from state-manager (`scope: "behavioral_telemetry"`). If absent (first event in session), initialize a fresh `behavioral_telemetry` object with `enabled: true`, `opt_out: false`, `pii_scrubbed: false`, `events: []`.
 - `session_id` must match the active session — reject any mismatched session_id.
 - Opt-out check (Step 1) is the **first and unconditional** step. If `current_state.opt_out === true`, halt immediately without writing any data.
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "session", auto_archive: true }` — telemetry events are transient session state; `expires_at` is null (resolved at session end) and entries auto-archive per the context-memory TTL policy table.
 
 ---
 

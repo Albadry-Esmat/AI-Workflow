@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "catalog_version": "0.2.0",
+  "catalog_version": "0.3.0",
   "adapters": [
     {
       "id": "opencode",
@@ -109,6 +109,25 @@
         "instructions_path": "AGENTS.md",
         "mcp_path": "opencode.json:mcp (legacy P0 source; manifest in P1)",
         "skills_support": "native"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        "opencode.json"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": "opencode.json",
+        "future_path": null,
+        "remote_url_field": "url",
+        "env_syntax": "${VAR} (verbatim passthrough; v1 file convention)",
+        "project_scoped": true,
+        "shared_with": null,
+        "note": "S1 generated projection of the MCP manifest (authority migrated from this file); disabled servers retained with enabled:false."
+      },
+      "adapter_paths": {
+        "agents": ".opencode/agents/",
+        "rules": null,
+        "hooks": null
       }
     },
     {
@@ -218,6 +237,27 @@
         "instructions_path": "CLAUDE.md",
         "mcp_path": ".mcp.json (project scope, generated in P1)",
         "skills_support": "adapter-required"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        ".claude/"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": ".mcp.json",
+        "future_path": null,
+        "remote_url_field": "url",
+        "env_syntax": "${VAR}",
+        "project_scoped": true,
+        "shared_with": [
+          "copilot-cli"
+        ],
+        "note": "Q2 shared projection; stdio+http shapes verified compatible 2026-09-27."
+      },
+      "adapter_paths": {
+        "agents": ".claude/agents/",
+        "rules": null,
+        "hooks": ".claude/settings.json"
       }
     },
     {
@@ -331,6 +371,25 @@
         "instructions_path": "AGENTS.md",
         "mcp_path": ".codex/config.toml [mcp_servers.*] (generated in P1)",
         "skills_support": "native"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        ".codex/"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": null,
+        "future_path": ".codex/config.toml",
+        "remote_url_field": "url",
+        "env_syntax": "env map",
+        "project_scoped": true,
+        "shared_with": null,
+        "note": "S2 projection target; catalog describes it in S1."
+      },
+      "adapter_paths": {
+        "agents": ".codex/agents/",
+        "rules": null,
+        "hooks": null
       }
     },
     {
@@ -429,6 +488,28 @@
         "instructions_path": "AGENTS.md + .github/copilot-instructions.md",
         "mcp_path": "~/.copilot/mcp-config.json; VS Code .vscode/mcp.json (generated in P1)",
         "skills_support": "native"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        ".github/",
+        ".mcp.json"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": ".mcp.json",
+        "future_path": null,
+        "remote_url_field": "url",
+        "env_syntax": "${VAR}",
+        "project_scoped": true,
+        "shared_with": [
+          "claude-code"
+        ],
+        "note": "Q2 shared projection; project files trust-gated by the runtime at launch."
+      },
+      "adapter_paths": {
+        "agents": ".github/agents/",
+        "rules": ".github/instructions/",
+        "hooks": null
       }
     },
     {
@@ -532,6 +613,23 @@
         "instructions_path": "unverified",
         "mcp_path": "unverified",
         "skills_support": "generic"
+      },
+      "launch_kind": "generic",
+      "project_markers": [],
+      "openers": [],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": null,
+        "env_syntax": null,
+        "project_scoped": null,
+        "shared_with": null,
+        "note": "Unverified; generic handling only."
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": null,
+        "hooks": null
       }
     },
     {
@@ -630,6 +728,25 @@
         "instructions_path": "AGENTS.md + .cursor/rules/*.mdc",
         "mcp_path": ".cursor/mcp.json (generated in P1)",
         "skills_support": "native"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        ".cursor/"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": ".cursor/mcp.json",
+        "future_path": null,
+        "remote_url_field": "url",
+        "env_syntax": "${env:NAME}",
+        "project_scoped": true,
+        "shared_with": null,
+        "note": "S1 generated projection."
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": ".cursor/rules/",
+        "hooks": ".cursor/hooks.json"
       }
     },
     {
@@ -728,6 +845,25 @@
         "instructions_path": "GEMINI.md (P1: context.fileName -> AGENTS.md)",
         "mcp_path": "settings.json / gemini-extension.json (generated in P1)",
         "skills_support": "native"
+      },
+      "launch_kind": "cli-direct",
+      "project_markers": [
+        ".gemini/"
+      ],
+      "openers": [],
+      "mcp_projection": {
+        "path": null,
+        "future_path": ".gemini/settings.json",
+        "remote_url_field": "httpUrl",
+        "env_syntax": "${VAR}",
+        "project_scoped": true,
+        "shared_with": null,
+        "note": "S2 projection target; note httpUrlremote-field divergence."
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": null,
+        "hooks": null
       }
     },
     {
@@ -825,6 +961,23 @@
         "instructions_path": "AGENTS.md",
         "mcp_path": "n/a",
         "skills_support": "generic"
+      },
+      "launch_kind": "generic",
+      "project_markers": [],
+      "openers": [],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": null,
+        "env_syntax": null,
+        "project_scoped": null,
+        "shared_with": null,
+        "note": "Terminal CLI used generically; no MCP projection."
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": null,
+        "hooks": null
       }
     },
     {
@@ -914,6 +1067,373 @@
         "instructions_path": "AGENTS.md",
         "mcp_path": "runtime-owned",
         "skills_support": "generic"
+      },
+      "launch_kind": "generic",
+      "project_markers": [],
+      "openers": [],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": null,
+        "env_syntax": null,
+        "project_scoped": null,
+        "shared_with": null,
+        "note": "User-provided command; no MCP projection."
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": null,
+        "hooks": null
+      }
+    },
+    {
+      "id": "cursor-ide",
+      "display_name": "Cursor IDE",
+      "vendor": "Anysphere",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://cursor.com/docs",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
+      },
+      "detection": {
+        "executable": "cursor",
+        "version_args": [
+          "--version"
+        ],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": [
+          "runtime-login"
+        ],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "opener-launch",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native)",
+        "instructions_path": "AGENTS.md + .cursor/rules/",
+        "mcp_path": ".cursor/mcp.json (shared with Cursor CLI projection)",
+        "skills_support": "native"
+      },
+      "launch_kind": "opener-launch",
+      "project_markers": [
+        ".cursor/"
+      ],
+      "openers": [
+        {
+          "executable": "cursor",
+          "verified": true
+        }
+      ],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": null,
+        "env_syntax": null,
+        "project_scoped": null,
+        "shared_with": null,
+        "note": ".cursor/mcp.json (shared with Cursor CLI projection)"
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": ".cursor/rules/",
+        "hooks": null
+      }
+    },
+    {
+      "id": "vscode-copilot",
+      "display_name": "VS Code + Copilot",
+      "vendor": "Microsoft",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://code.visualstudio.com/docs/agent-customization/mcp-servers",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
+      },
+      "detection": {
+        "executable": "code",
+        "version_args": [
+          "--version"
+        ],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": [
+          "runtime-login"
+        ],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "opener-launch",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "native",
+        "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": ".agents/skills/ (native)",
+        "instructions_path": "AGENTS.md + .github/copilot-instructions.md",
+        "mcp_path": ".vscode/mcp.json (S2 projection target)",
+        "skills_support": "native"
+      },
+      "launch_kind": "opener-launch",
+      "project_markers": [
+        ".vscode/",
+        ".github/"
+      ],
+      "openers": [
+        {
+          "executable": "code",
+          "verified": true
+        }
+      ],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": null,
+        "env_syntax": null,
+        "project_scoped": null,
+        "shared_with": null,
+        "note": ".vscode/mcp.json (S2 projection target)"
+      },
+      "adapter_paths": {
+        "agents": ".github/agents/",
+        "rules": ".github/instructions/",
+        "hooks": null
+      }
+    },
+    {
+      "id": "windsurf-devin",
+      "display_name": "Windsurf / Devin Desktop",
+      "vendor": "Windsurf",
+      "status": "planned",
+      "support_level": "candidate",
+      "documentation": {
+        "official_url": "https://docs.devin.ai/windsurf/plugins/cascade/mcp",
+        "reviewed_at": "2026-09-27",
+        "verification_state": "documentation-reviewed"
+      },
+      "detection": {
+        "executable": "windsurf",
+        "version_args": [
+          "--version"
+        ],
+        "safe_probe": true,
+        "version_output_required": true
+      },
+      "installation": {
+        "managed_by_aiw": false,
+        "requires_explicit_consent": true,
+        "channels": [
+          {
+            "kind": "user-managed",
+            "name": "Existing installation",
+            "user_action_required": true
+          }
+        ]
+      },
+      "authentication": {
+        "required_for_start": true,
+        "modes": [
+          "runtime-login"
+        ],
+        "credential_owner": "runtime",
+        "aiw_handles_secret_values": false,
+        "status_probe": "runtime-status"
+      },
+      "project_context": {
+        "target_directory_required": true,
+        "initialization_required": false,
+        "configuration_owner": "runtime",
+        "secret_copy_allowed": false
+      },
+      "launch": {
+        "command": "external-launch-required",
+        "target_cwd": true,
+        "neutral_start_supported": true,
+        "explicit_agent_selection_supported": true
+      },
+      "safety": {
+        "plan_or_review_mode": "native",
+        "approval_model": "native",
+        "external_write_claim": "not-claimed",
+        "fallback_behavior": "fail-closed"
+      },
+      "evidence": {
+        "run_manifest_adapter_id": true,
+        "events": [
+          "detected",
+          "selected",
+          "authenticated",
+          "started",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "evidence_level": "launch-only",
+        "external_writes_default": false
+      },
+      "recovery": {
+        "supports_cancel": true,
+        "supports_resume": false,
+        "supports_undo": false,
+        "rollback_claim": "not-claimed"
+      },
+      "capabilities": {
+        "plan_mode": "native",
+        "approval_gates": "unknown",
+        "sandboxing": "unknown",
+        "structured_output": "unknown",
+        "mcp": "unknown",
+        "streaming": "unknown"
+      },
+      "interoperability": {
+        "skills_path": "AGENTS.md + rules (no skill-dir discovery claimed)",
+        "instructions_path": "AGENTS.md + .devin/rules/ (+ .windsurf/rules/ fallback)",
+        "mcp_path": "user-global ~/.codeium/windsurf/mcp_config.json only; AIW never writes outside the repo",
+        "skills_support": "native"
+      },
+      "launch_kind": "ide-guidance",
+      "project_markers": [
+        ".windsurf/",
+        ".devin/"
+      ],
+      "openers": [
+        {
+          "executable": "windsurf",
+          "verified": false
+        }
+      ],
+      "mcp_projection": {
+        "path": null,
+        "future_path": null,
+        "remote_url_field": "serverUrl",
+        "env_syntax": "${env:VAR}",
+        "project_scoped": null,
+        "shared_with": null,
+        "note": "user-global ~/.codeium/windsurf/mcp_config.json only; AIW never writes outside the repo"
+      },
+      "adapter_paths": {
+        "agents": null,
+        "rules": ".devin/rules/",
+        "hooks": null
       }
     }
   ]

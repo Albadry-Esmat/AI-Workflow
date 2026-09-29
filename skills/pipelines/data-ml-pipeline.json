@@ -1,0 +1,322 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "data-ml-pipeline",
+  "version": "1.0.0",
+  "description": "Data engineering and machine learning delivery pipeline with warehouse modeling, model evaluation, fairness controls, and feature-store deployment.",
+  "domain": "data_ml",
+  "mode": "hybrid",
+  "on_failure": "halt",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        {
+          "name": "requirement-analyzer",
+          "version": "1.3.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-2a-architecture",
+      "label": "Data/ML Architecture",
+      "skills": [
+        {
+          "name": "architecture-design",
+          "version": "1.4.0",
+          "max_retries": 2,
+          "config": {
+            "domain": "data_ml",
+            "architecture_hints": ["batch_etl", "streaming", "model_training", "inference"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-2b-data-schema",
+      "label": "Data Warehouse Schema",
+      "skills": [
+        {
+          "name": "database-architect",
+          "version": "1.2.0",
+          "max_retries": 2,
+          "config": {
+            "mode": "data_warehouse",
+            "architecture": "medallion",
+            "layers": ["bronze", "silver", "gold"],
+            "modeling": ["fact_dimension", "scd_type_1", "scd_type_2", "partitioning", "materialized_views"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-2c-domain",
+      "label": "ML Domain Specialist",
+      "condition": "project_type && project_type.includes('ml_model')",
+      "skills": [
+        {
+          "name": "ml-specialist",
+          "version": "0.0.0",
+          "max_retries": 0,
+          "config": {
+            "placeholder": true,
+            "reason": "Future domain skill pending TASK-0024 acceptance"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-3-feature-plan",
+      "label": "Feature Planning",
+      "skills": [
+        {
+          "name": "feature-planning",
+          "version": "2.2.1",
+          "max_retries": 2,
+          "config": {
+            "data_ml_task_breakdown": true,
+            "include_data_quality_and_model_lifecycle": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4-impact",
+      "label": "Dependency and Impact Analysis",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "dependency-analyzer",
+          "version": "1.1.0",
+          "max_retries": 1
+        },
+        {
+          "name": "change-impact-analyzer",
+          "version": "1.2.0",
+          "max_retries": 1,
+          "config": {
+            "change_type": "architecture"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-5a-code-gen",
+      "label": "Code and Test Scaffolding",
+      "skills": [
+        {
+          "name": "code-generator",
+          "version": "1.1.0",
+          "max_retries": 2,
+          "config": {
+            "data_pipeline_patterns": true,
+            "model_serving_patterns": true
+          }
+        },
+        {
+          "name": "test-generator",
+          "version": "2.1.0",
+          "max_retries": 2,
+          "config": {
+            "modes": ["unit", "integration", "property", "data_contract"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-5b-model-eval",
+      "label": "Model Evaluation",
+      "condition": "project_type && project_type.includes('ml_model')",
+      "note": "Runs only for ML model projects; missing evaluation evidence fails closed at the downstream gate.",
+      "skills": [
+        {
+          "name": "ml-pipeline-architect",
+          "version": "1.0.0",
+          "max_retries": 2,
+          "config": {
+            "evaluation_framework": {
+              "metrics": ["accuracy", "latency", "fairness"],
+              "require_baseline": true,
+              "require_holdout_evaluation": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-6-test-strategy",
+      "label": "Data/ML Test Strategy",
+      "skills": [
+        {
+          "name": "testing-strategy",
+          "version": "2.0.0",
+          "max_retries": 2,
+          "config": {
+            "data_pipeline_testing": true,
+            "model_reproducibility": true,
+            "data_quality_checks": true,
+            "contract_testing": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-7a-review",
+      "label": "Code and Security Review",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "clean-code-review",
+          "version": "1.1.0",
+          "max_retries": 1
+        },
+        {
+          "name": "security-review",
+          "version": "1.1.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-7b-guards",
+      "label": "Data/ML Guard Layer",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "database-guard",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "mode": "data_warehouse",
+            "block_destructive_migrations": true,
+            "require_partition_and_key_safety": true
+          }
+        },
+        {
+          "name": "security-guard",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "1.1.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "data_pipeline_checks": true,
+            "model_latency_checks": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-8-deployment",
+      "label": "Feature Store and Deployment",
+      "skills": [
+        {
+          "name": "deployment-strategy",
+          "version": "1.1.0",
+          "max_retries": 2,
+          "config": {
+            "feature_store_integration": true,
+            "model_registry": true,
+            "deployment_targets": ["batch", "online_inference"],
+            "rollback_on_model_regression": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-9-docs",
+      "label": "Documentation",
+      "skills": [
+        {
+          "name": "documentation-generator",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "config": {
+            "include_data_lineage": true,
+            "include_model_card": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-10-async",
+      "label": "Async Synchronization",
+      "async": true,
+      "skills": [
+        {
+          "name": "doc-maintainer",
+          "version": "1.1.0",
+          "max_retries": 1,
+          "async": true
+        },
+        {
+          "name": "work-item-exporter",
+          "version": "2.0.0",
+          "max_retries": 1,
+          "async": true
+        }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["dependency-analyzer", "change-impact-analyzer"],
+    ["clean-code-review", "security-review"],
+    ["database-guard", "security-guard", "performance-guard"]
+  ],
+  "gates": [
+    {
+      "gate_id": "DATA-REQUIREMENTS-APPROVAL",
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "bypass_on_timeout": false,
+      "timeout": 3600,
+      "label": "Approve data sources, ML scope, and evaluation objectives"
+    },
+    {
+      "gate_id": "DATA-GUARDS-PASS",
+      "after_phase": "phase-7b-guards",
+      "type": "condition",
+      "condition": "guards && guards.every(g => g.verdict === 'pass')",
+      "label": "Fail closed unless every data/ML guard passes",
+      "note": "Guard output, missing guard output, or an unknown verdict blocks progression."
+    },
+    {
+      "gate_id": "DATA-FAIRNESS-GATE",
+      "after_phase": "phase-7b-guards",
+      "type": "condition",
+      "condition": "project_type && (!project_type.includes('ml_model') || (fairness_metrics && fairness_metrics.demographic_parity_difference <= 0.1 && fairness_metrics.equalized_odds_difference <= 0.1))",
+      "label": "Block ML deployment when fairness thresholds are exceeded",
+      "note": "Non-ML projects bypass by condition; ML projects require both fairness metrics and thresholds at or below 0.1."
+    },
+    {
+      "gate_id": "DATA-DEPLOYMENT-APPROVAL",
+      "after_phase": "phase-8-deployment",
+      "type": "human_approval",
+      "bypass_on_timeout": false,
+      "timeout": 0,
+      "label": "Approve feature-store and model deployment"
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["doc-maintainer", "work-item-exporter"],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "default_tier": "large",
+    "budget_tiers": [
+      {"name": "standard", "ceiling": 16000, "cascade_mode": "single_pass"},
+      {"name": "large", "ceiling": 32000, "cascade_mode": "cascade"},
+      {"name": "xl", "ceiling": 48000, "cascade_mode": "cascade"}
+    ]
+  }
+}

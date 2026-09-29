@@ -1,6 +1,6 @@
 # Workflows — End-to-End Lifecycle
 
-**Version:** 2.3.0 | **Last updated:** 2026-06-23
+**Version:** 2.3.0 | **Last updated:** 2026-09-29
 
 ## Full Pipeline Flow (Idea → Production)
 
@@ -110,6 +110,14 @@ Not all executions require the full pipeline:
 | **Report a defect** | **`defect-lifecycle.json`** — defect intake → triage HITL → investigation → fix → test → review HITL → validate → export |
 | **Change request** | **`change-request.json`** — CR intake → impact analysis → HITL approval → re-plan → execute → validate → export |
 | **Export work items** | Direct invocation: `work-item-exporter` only |
+
+### Specialized Pipeline Templates
+
+| Use Case | Pipeline |
+|----------|----------|
+| **Data and ML delivery** | **`data-ml-pipeline.json`** — data/ML architecture, warehouse schema, model evaluation, data-quality and fairness gates, feature-store deployment |
+| **Microservices delivery** | **`microservices.json`** — service-boundary design, service-mesh constraints, per-service contracts and isolation, distributed tracing |
+| **Serverless and edge delivery** | **`serverless-edge.json`** — edge-runtime constraints, cold-start checks, bundle-size and environment-configuration guards, provider deployment |
 
 ## Pipeline Configuration
 

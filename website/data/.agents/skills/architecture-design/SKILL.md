@@ -1,6 +1,6 @@
 ---
 name: architecture-design
-version: 1.3.0
+version: 1.4.0
 domain: architecture
 description: 'Use when asked to design a system architecture, define modules or services, plan data flow, choose technology stack, or map integration points. Triggers on: "design the architecture", "system design", "define modules", "how should the system be structured", "what tech stack".'
 author: system
@@ -113,6 +113,20 @@ Step 4 — Identify integration points
   For each inter-module dependency, specify contract (API, event, shared database, message queue).
   Include interface shape, error handling protocol, and retry policy.
 
+  API versioning strategy (TASK-0029):
+    For every REST integration point, select exactly one strategy: `url_path`, `header`,
+    `query_param`, or `content_negotiation`, and attach it as `api_versioning_strategy`.
+    Default to `url_path` (`/v1/...`) because it is explicit, cache-friendly, and broadly
+    supported. Use `header` (`API-Version`) only for programmatic consumers that require clean
+    URLs; use `query_param` when a reverse proxy/CDN cannot route by headers; use
+    `content_negotiation` for rare HATEOAS APIs. For GraphQL integration points, use
+    `schema_evolution` with additive fields and `@deprecated` directives instead of REST versioning.
+    Emit a top-level `api_versioning` object whenever REST or GraphQL integration points exist,
+    including the strategy, version prefix/current version, deprecation policy, and breaking vs.
+    non-breaking change criteria. Domain versioning constraints override these defaults.
+    When `sunset_header` is true, the deployment emits `Sunset` and `Deprecation` headers for
+    deprecated versions.
+
   Integration pattern selection table (apply when domain_constraints is present or pattern is ambiguous):
 
   | Pattern             | Use When                                         | Avoid When                                  |
@@ -160,6 +174,7 @@ Step 7 — Assemble architecture document
 | `modules` | `array[object]` | Module definitions (name, responsibility, requirements_covered) |
 | `data_flow` | `array[object]` | Data flow entries (source, target, protocol, data_type, frequency) |
 | `integration_points` | `array[object]` | Integration contracts (between, contract_type, interface, error_protocol) |
+| `api_versioning` | `object` | Top-level API versioning strategy, deprecation policy, and breaking-change criteria; emitted for REST or GraphQL integrations |
 | `technical_decisions` | `array[object]` | Decisions (module, pattern_or_tech, rationale, alternatives, status) |
 | `component_diagram` | `string` | Mermaid or ASCII component diagram description |
 | `metadata` | `object` | Version, requirement coverage, token usage |
@@ -208,10 +223,31 @@ Step 7 — Assemble architecture document
           "between": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 },
           "contract_type": { "type": "string", "enum": ["REST", "gRPC", "GraphQL", "event", "message_queue", "shared_db", "file"] },
           "interface": { "type": "string" },
-          "error_protocol": { "type": "string" }
+          "error_protocol": { "type": "string" },
+          "api_versioning_strategy": { "type": "string", "enum": ["url_path", "header", "query_param", "content_negotiation", "schema_evolution"] }
         },
         "required": ["between", "contract_type", "interface"]
       }
+    },
+    "api_versioning": {
+      "type": "object",
+      "properties": {
+        "strategy": { "type": "string", "enum": ["url_path", "header", "query_param", "content_negotiation", "schema_evolution"] },
+        "version_prefix": { "type": "string" },
+        "current_version": { "type": "string" },
+        "deprecation_policy": {
+          "type": "object",
+          "properties": {
+            "notice_period_days": { "type": "integer", "minimum": 0 },
+            "sunset_header": { "type": "boolean" },
+            "documentation_url": { "type": "string" }
+          },
+          "required": ["notice_period_days", "sunset_header", "documentation_url"]
+        },
+        "breaking_change_criteria": { "type": "array", "items": { "type": "string" } },
+        "non_breaking_change_criteria": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["strategy", "deprecation_policy", "breaking_change_criteria"]
     },
     "technical_decisions": {
       "type": "array",
@@ -273,6 +309,10 @@ Step 7 — Assemble architecture document
 - Data flow entries MUST reference module names from `modules` array.
 - `technical_decisions` MUST include at least one alternative considered (even if rejected).
 - Component diagram MUST be parseable — prefer Mermaid.
+- When REST or GraphQL integrations exist, `api_versioning` MUST be present and its deprecation_policy MUST include `notice_period_days`, `sunset_header`, and `documentation_url`.
+- REST `api_versioning.strategy` MUST be one of `url_path`, `header`, `query_param`, or `content_negotiation`; GraphQL uses `schema_evolution`.
+- `breaking_change_criteria[]` MUST identify removed required response fields, type changes, endpoint removal, and HTTP method changes; non-breaking criteria SHOULD include optional request fields, additive response fields, and new endpoints.
+- `domain_constraints` versioning requirements override the default strategy and selection heuristic.
 
 ## Security Considerations
 

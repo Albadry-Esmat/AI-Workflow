@@ -64,7 +64,7 @@ def main() -> int:
     check("contract has all O3 commands", {"plan", "apply", "doctor", "recover"}.issubset(contract["commands"]))
     check("contract keeps installation, auth, init, and launch deferred", contract["commands"]["runtime_install"]["status"] == "deferred-user-controlled" and contract["commands"]["auth_login"]["status"] == "deferred-runtime-owned" and contract["commands"]["target_init"]["status"] == "deferred-guarded-batch" and contract["commands"]["start"]["status"] == "deferred-launch-adapter")
     check("contract defines all onboarding lanes", set(contract["lanes"]) == {"native", "project-local", "dev-container"})
-    check("catalog remains four agent-neutral adapters", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "generic-command"})
+    check("catalog contains the current agent-neutral adapter matrix", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command", "cursor-ide", "vscode-copilot", "windsurf-devin"})
     required_fixtures = {"plan-native-zero-write", "apply-requires-explicit-consent", "explicit-missing-fails", "auto-selection-defers", "installation-never-executed", "auth-delegated", "target-init-deferred", "recover-owned-state"}
     check("fixtures cover required O3 scenarios", required_fixtures.issubset({item["id"] for item in fixtures["fixtures"]}))
 

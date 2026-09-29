@@ -1,6 +1,6 @@
 ---
 name: change-impact-analyzer
-version: 1.1.0
+version: 1.2.0
 domain: architecture
 description: 'Use when computing the full impact surface of a proposed change before executing it. Triggers on: "what is the impact of this change", "impact analysis", "what will break", "change impact", "blast radius", "before I change this".'
 author: system
@@ -21,6 +21,8 @@ Before any modification is executed, compute the complete impact surface across 
 | `dependency_graph` | `object` | No | Current dependency graph from dependency-analyzer |
 | `test_state` | `object` | No | Current test state (coverage map, last run results) |
 | `security_state` | `object` | No | Current security state (open findings, boundaries) |
+| `historical_velocity` | `number` | No | Team story points delivered per two-week sprint |
+| `complexity_multipliers` | `object` | No | Optional team-size, technical-debt, and test-coverage multipliers |
 
 **Input Schema:**
 
@@ -35,7 +37,16 @@ Before any modification is executed, compute the complete impact surface across 
     "architecture": { "type": "object" },
     "dependency_graph": { "type": "object" },
     "test_state": { "type": "object" },
-    "security_state": { "type": "object" }
+    "security_state": { "type": "object" },
+    "historical_velocity": { "type": "number", "exclusiveMinimum": 0 },
+    "complexity_multipliers": {
+      "type": "object",
+      "properties": {
+        "team_size": { "type": "number", "exclusiveMinimum": 0 },
+        "technical_debt": { "type": "number", "exclusiveMinimum": 0 },
+        "test_coverage": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    }
   },
   "required": ["change_description", "change_type", "affected_files"]
 }
@@ -82,6 +93,24 @@ Step 5 — Identify documentation impact
   Flag sections that reference removed or renamed interfaces.
   Output: documentation_impact { stale_sections: [], requires_update: [] }
 
+ Step 5a — Estimate remediation effort (TASK-0030)
+   When impact_surface.affected_modules.length > 0:
+     For each affected module, classify the dominant change type and assign base story points:
+       API contract change (method/path) = 5; input/output schema = 3;
+       business logic refactor = 5–8; database migration = 5;
+       configuration/env var = 1; documentation-only = 1;
+       test suite update = 2 per affected test file.
+     Apply complexity_multipliers to the module estimate when supplied. Use neutral multiplier 1
+     for an omitted factor. Sum the rounded, non-negative module estimates into total_story_points.
+     Set confidence to high when fewer than 5 modules and all changes are schema/configuration,
+     medium for 5–15 modules or any business-logic refactor, and low for more than 15 modules,
+     circular dependencies, or unknown modules. Low-risk conditions take precedence.
+     Compute critical_path_days as the longest sequential dependency chain × 0.5 days per SP.
+     If historical_velocity is provided, retain the story-point estimate, set velocity_adjusted to
+     true, and calculate adjusted_weeks = total_story_points / (historical_velocity / 10).
+   When no modules are affected, set effort_estimate to null.
+   Output: effort_estimate { total_story_points, confidence, critical_path_days, breakdown[], velocity_adjusted, assumptions[] }
+
 Step 6 — Detect security boundary crossings
   For each changed file: check if it touches auth, session, data access, encryption, or external API boundaries from security_state.
   Flag any change that modifies a security-critical path.
@@ -111,6 +140,7 @@ Step 8 — Assemble impact report
 | `test_impact` | `object` | Invalidated, at-risk, and safe test groups |
 | `documentation_impact` | `object` | Stale sections and sections requiring update |
 | `security_impact` | `object` | Security boundaries crossed and severity |
+| `effort_estimate` | `object|null` | Story-point estimate, confidence band, module breakdown, and critical path; null when no modules are affected |
 | `required_skills` | `array[object]` | Downstream skills to invoke with reason |
 | `impact_severity` | `string` | Overall severity: `low`, `medium`, `high`, `critical` |
 | `metrics` | `object` | Execution metrics |
@@ -168,6 +198,30 @@ Step 8 — Assemble impact report
       },
       "required": ["boundaries_crossed", "severity"]
     },
+    "effort_estimate": {
+      "type": ["object", "null"],
+      "properties": {
+        "total_story_points": { "type": "number", "minimum": 0 },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+        "critical_path_days": { "type": "number", "minimum": 0 },
+        "breakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["module", "story_points", "reason"],
+            "properties": {
+              "module": { "type": "string" },
+              "story_points": { "type": "number", "minimum": 0 },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "velocity_adjusted": { "type": "boolean" },
+        "adjusted_weeks": { "type": "number", "minimum": 0 },
+        "assumptions": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["total_story_points", "confidence", "critical_path_days", "breakdown", "velocity_adjusted", "assumptions"]
+    },
     "required_skills": {
       "type": "array",
       "items": {
@@ -219,6 +273,10 @@ Step 8 — Assemble impact report
 - This skill is read-only — it never modifies code, state, or artifacts.
 - If `dependency_graph` is absent, impact analysis runs in degraded mode (module-level only, no transitive depth).
 - Impact severity is `critical` if: breaking API changes AND security boundary crossed AND test coverage > 30% invalidated.
+- For a non-empty impact surface, `effort_estimate.total_story_points` is always numeric and every affected module appears in `breakdown`.
+- Effort uses the dominant change-type heuristic, then multiplies by supplied team-size, technical-debt, and test-coverage factors; omitted factors are 1.
+- The historical velocity formula is `adjusted_weeks = total_story_points / (historical_velocity / 10)` and assumes the change consumes approximately 10% of sprint capacity.
+- `critical_path_days` assumes no parallel execution and uses `1 SP = 0.5 working days`; QA and review overhead are excluded from the estimate.
 
 ## Security Considerations
 

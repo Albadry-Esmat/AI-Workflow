@@ -1,6 +1,6 @@
 ---
 name: defect-manager
-version: 1.0.0
+version: 1.0.1
 domain: lifecycle
 description: 'Use when a defect is reported, a bug is found, or an implementation gap is identified. Triggers on: "report a bug", "defect found", "this is broken", "bug report", "create defect", "test failure", "regression detected", "security finding". Do NOT use for general task creation — only when a defect record and repair chain are required.'
 author: system
@@ -67,6 +67,10 @@ Receive defect reports from any source — test failure, security finding, code-
 - `project_spec.requirements` from state-manager: to resolve `linked_req_ids` if not provided.
 - `code_map` scope from state-manager: to identify files associated with the affected module.
 - Foundation schema from `docs/work-item-foundation.md`: governs ID patterns, lifecycle states, Jira field mappings, and file structure.
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "project", auto_archive: false }` — defect records persist until work is complete; `expires_at` is null (no expiry until work complete), no auto-archive, per the context-memory TTL policy table.
 
 ## Execution Logic
 

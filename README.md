@@ -2,7 +2,7 @@
 
 **An open framework that takes ideas to production using a pipeline of specialized AI agents.**
 
-AI Workflow provides a structured skill system — 121 skills, 24 agents, and 22 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
+AI Workflow provides a structured skill system — 126 skills, 24 agents, and 25 pipeline templates — that routes any engineering task through analysis, architecture, planning, implementation, review, testing, and deployment, with human-in-the-loop gates at critical checkpoints.
 
 ---
 
@@ -38,7 +38,7 @@ aiw start /path/to/your-project
 # Option B — install the full workflow into another project permanently
 aiw init /path/to/your-project
 cd /path/to/your-project
-opencode   # all 121 skills + 24 agents, fully self-contained
+opencode   # all 126 skills + 24 agents, fully self-contained
 ```
 
 **Option A** keeps AI Workflow in its own folder. Your project's files are what the agents read and edit.
@@ -63,9 +63,9 @@ Each stage is handled by a specialized agent running a defined **skill** — a s
 
 | What | Count |
 |------|-------|
-| Skills | 121 |
+| Skills | 126 |
 | Agents | 23 specialized + 1 primary orchestrator |
-| Pipeline templates | 22 |
+| Pipeline templates | 25 |
 
 ---
 
@@ -195,7 +195,7 @@ A **skill** is a markdown file (`SKILL.md`) with 12 sections that define exactly
 ├── feature-planning/SKILL.md
 ├── clean-code-review/SKILL.md
 ├── security-review/SKILL.md
-└── ... (121 total)
+└── ... (126 total)
 ```
 
 The skill registry (`skills/index.yaml`) is the single source of truth for all skill metadata.
@@ -210,7 +210,7 @@ skills/pipelines/
 ├── quick-review.json         ← code & security review only
 ├── architecture-only.json    ← requirements + architecture
 ├── pre-deploy.json           ← testing + deployment strategy
-└── ... (22 total)
+└── ... (25 total)
 ```
 
 ### Agents
@@ -272,16 +272,16 @@ AI-Workflow/
 ├── .env.example               ← environment variable template (copy to .env)
 ├── Makefile                   ← make targets (backward compat with aiw CLI)
 ├── .agents/
-│   └── skills/                ← 121 canonical SKILL.md files (portable Agent Skills)
+│   └── skills/                ← 126 canonical SKILL.md files (portable Agent Skills)
 ├── .claude/
-│   └── skills/                ← 121 generated symlinks → .agents/skills/* (Claude Code adapter; see `aiw sync-runtimes`)
+│   └── skills/                ← 126 generated symlinks → .agents/skills/* (Claude Code adapter; see `aiw sync-runtimes`)
 ├── .opencode/
 │   └── agent/                 ← per-agent instruction files (24 files)
 ├── skills/
 │   ├── index.yaml             ← skill registry (single source of truth)
 │   ├── registry.json          ← machine-readable runtime registry
-│   ├── pipelines/             ← 22 pipeline template JSON files
-│   ├── graph/skill-graph.yaml ← 121 nodes, 373 edges
+│   ├── pipelines/             ← 25 pipeline template JSON files
+│   ├── graph/skill-graph.yaml ← 126 nodes, 399 edges
 │   └── schema/                ← JSON schemas for pipelines and registry
 ├── scripts/
 │   ├── setup.sh               ← one-command project setup (Python lazy)

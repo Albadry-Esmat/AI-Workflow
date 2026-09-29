@@ -1,5 +1,5 @@
 {
-  "version": "5.3.0",
+  "version": "5.3.1",
   "description": "Orchestrator skill registry \u2014 contains skills with full I/O contracts, feedback routes, and orchestration metadata required for pipeline routing. This is a curated subset of skills/index.yaml; not every skill needs a registry entry (only those the orchestrator needs to resolve explicitly). The complete skill catalog is in skills/index.yaml.",
   "parallel_groups": [
     {
@@ -25,7 +25,7 @@
   "skills": [
     {
       "name": "requirement-analyzer",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "status": "active",
       "domain": "requirements",
       "path": ".agents/skills/requirement-analyzer/SKILL.md",

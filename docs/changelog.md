@@ -9,6 +9,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Wave 3d — specialized pipeline wiring
+
+- Added routing, schema, workflow, and registry documentation for the `data-ml-pipeline`, `microservices`, and `serverless-edge` templates.
+- Synchronized the requested skill versions across the index and graph, and wired the existing API contract, bundle-size, and environment-configuration guard nodes in the graph.
+- Updated new-template version pins where they were stale against current skill frontmatter.
+- Refreshed current-facing inventory references to 126 skills, 25 pipeline templates, and a 126-node/399-edge graph.
+- Added effort estimation, stakeholder conflict detection, API-versioning guidance,
+  dark-mode checks, dependency-CVE normalization, hreflang generation, performance
+  baselines, snapshot/PBT framework coverage, and the observability artifact rebuild.
+- Added Jira import-direction support, website catalog synchronization, CI build
+  checks, fail-closed placeholder resolution, conflict approval gating, and state
+  fields for imported IDs and performance measurements.
+
 ### P1 Slice S2 — IDE opener launch and MCP strict start gates (UNRELEASED WORK)
 
 - `aiw start` launches IDE runtimes with catalog-verified openers

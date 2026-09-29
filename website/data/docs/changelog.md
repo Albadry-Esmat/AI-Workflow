@@ -9,6 +9,77 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Wave 3d — specialized pipeline wiring
+
+- Added routing, schema, workflow, and registry documentation for the `data-ml-pipeline`, `microservices`, and `serverless-edge` templates.
+- Synchronized the requested skill versions across the index and graph, and wired the existing API contract, bundle-size, and environment-configuration guard nodes in the graph.
+- Updated new-template version pins where they were stale against current skill frontmatter.
+- Refreshed current-facing inventory references to 126 skills, 25 pipeline templates, and a 126-node/399-edge graph.
+- Added effort estimation, stakeholder conflict detection, API-versioning guidance,
+  dark-mode checks, dependency-CVE normalization, hreflang generation, performance
+  baselines, snapshot/PBT framework coverage, and the observability artifact rebuild.
+- Added Jira import-direction support, website catalog synchronization, CI build
+  checks, fail-closed placeholder resolution, conflict approval gating, and state
+  fields for imported IDs and performance measurements.
+
+### P1 Slice S2 — IDE opener launch and MCP strict start gates (UNRELEASED WORK)
+
+- `aiw start` launches IDE runtimes with catalog-verified openers
+  (`cursor-ide` via `cursor`, `vscode-copilot` via `code`; new
+  `opener-launch` kind): resolve emits `launch: opener-launch` + opener only
+  when the verified opener is on PATH, otherwise fail-closed guidance
+  (windsurf stays guidance-only: opener unverified). Foreground launch with
+  target path only; no model flags ever (argv-tested, 28/28 runtime suite).
+- MCP strict enforcement for every MCP-surface adapter: global projection
+  freshness gate for all adapters plus `--strict` dependency gates for
+  `opencode`, `claude-code`, `cursor`, `copilot-cli`, `cursor-ide`,
+  `vscode-copilot`; new `.vscode/mcp.json` projection (VS Code `servers`
+  shape, `${env:VAR}` refs-only) with manifest compatibility extended;
+  stale projections block start even in dry-run (tested).
+- `aiw init` covers IDE runtimes (`cursor-ide` → shared `.cursor/mcp.json`,
+  `vscode-copilot` → `.vscode/mcp.json`, `--for all` extended) and explains
+  MCP conflicts per server (adds/target-only/differing, values never shown)
+  while still failing closed with the target untouched.
+- `sync-runtimes` MCP phase default-on pinned by tests (`--skills-only`
+  opt-out preserved); O2 contract `governed-launch-s2` + policy amendment
+  (unverified-opener launch forbidden); `aiw doctor` reports `ide_openers`;
+  `aiw agent forget` clears the remembered selection; health reports IDE
+  opener readiness (warn-only).
+- Governance preserved: no installs/logins/secret ownership/silent switches
+  or model overrides; windsurf user-global MCP untouched (AIW never writes
+  outside the repo).
+
+### P1 Slice S1 — runtime-neutral execution and canonical MCP (UNRELEASED WORK)
+
+- `aiw start` no longer requires OpenCode: catalog-driven resolution
+  (explicit `--for` → persisted selection → project markers → installed
+  runtimes → generic command → fail closed) with singleton-or-ambiguous
+  semantics (`O2-RUNTIME-AMBIGUOUS`, precedence display-only), stale
+  persisted selections failing closed without silent switching, CLI-direct
+  launch for verified runtimes, and guidance (+best-effort openers) for
+  IDE-only runtimes. No model flags are ever passed (argv-tested).
+- `aiw init` installs the portable core (`.agents/skills/`, `AGENTS.md`,
+  `skills/`, MCP manifest) plus selected S1 runtime projections with
+  non-destructive default (fail closed) and `--merge` add/keep/fail-on-differ
+  semantics; never copies `.opencode/` wholesale or secret material.
+- `config/mcp-manifest.json` (+ schema) is the canonical MCP authority
+  (7 servers migrated verbatim from `opencode.json`, refs-only, no new
+  servers); `scripts/sync-mcp.js --write/--check` deterministically projects
+  `opencode.json:mcp`, `.mcp.json` (Claude+Copilot shared, compat-verified),
+  `.cursor/mcp.json`; `scripts/check-mcp-deps.js` gates required vs optional
+  dependencies (env presence by name only; Q4 fail-closed start).
+- Runtime catalog v0.3.0: 12 adapters (9 CLI/generic + 3 IDE guidance) with
+  `launch_kind`, `project_markers`, `openers`, `mcp_projection`,
+  `adapter_paths`; toolchain manifest covers 7 CLI adapters; O2 policy
+  narrowly amended (`governed_launch`; launch no longer a non-goal) with
+  matching O2 contract (`governed-launch-s1`) and schema updates.
+- `aiw sync-runtimes` gains the MCP phase (`--skills-only` preserves P0);
+  `aiw health`/`aiw doctor` surface selection, markers, manifest validity,
+  and projection freshness (names only, never values).
+- Governance preserved: no installs/logins/secret ownership/silent switches
+  or model overrides; O2 `non_goals` prohibitions retained except the
+  narrowed launch amendment. TASK-0049 untouched.
+
 ### P0 runtime-neutral foundation (.agents/skills canonical, Claude adapter, Python lazy)
 
 - Moved all 121 skill directories `.opencode/skills/*` → `.agents/skills/*`
@@ -50,6 +121,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Invariants preserved: model precedence (agent → global → runtime), no
   runtime installation/login, no secret ownership, HITL/guardrails unchanged,
   Declare → Verify → Consume → Execute throughout.
+- Known debt (pre-existing, not a P0 regression — see
+  `work-items/TASK-0049-validate-pipeline-references-debt.md`): unwired
+  `scripts/validate-pipeline-references.js` reports 5 unknown skill IDs in
+  `full-pipeline.json` (`architecture/maintainability/performance/security-reviewer`,
+  `change-request-handler`); byte-identical baseline vs P0 fingerprints.
 
 ### Stage metrics in nightly (shadow autonomy)
 
@@ -90,7 +166,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - New read-only `investigation` agent (1 round, then resolve/escalate); `docs/autonomous-workflow.md`.
 - `tests/test-workflow-p2.sh` 5/5.
 
-### P1 autonomous-governance foundation (policies as data, control-plane protection)
+### Governance foundation (policies as data, control-plane protection)
 
 - 10 policy files under `config/` (validation-profile, development, review, risk, budget, merge, rollback, backlog, control-plane, policy-versions) with discovery via `scripts/policy-loader.js` (config/ first, `.ai/` adapter layout supported).
 - Tiered PR template (7 always-required + conditional sections, placeholder rejection); branch/commit policy (no `bugfix/` dup, sync-before-review, squash default).

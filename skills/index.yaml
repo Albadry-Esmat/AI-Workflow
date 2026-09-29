@@ -1,7 +1,7 @@
 meta:
   version: 3.7.0
   schema: skills/schema/skill-schema.yaml
-  last_updated: '2026-07-09'
+  last_updated: '2026-09-29'
   description: Central skills index for the AI Workflow system
 skills:
 - id: SKL-001
@@ -20,7 +20,7 @@ skills:
   - clarification
   - normalization
   - invest
-  version: 1.2.0
+  version: 1.3.0
   depends_on: []
   mastery_level: intermediate
   use_when: 'Starting any new feature, epic, or system change where requirements are unclear, unstructured, or assumed.
@@ -46,7 +46,7 @@ skills:
   - design
   - boundaries
   - clean-architecture
-  version: 1.3.0
+  version: 1.4.0
   depends_on:
   - SKL-001
   mastery_level: advanced
@@ -167,7 +167,7 @@ skills:
   - vulnerabilities
   - cwe
   - authentication
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-002
   - SKL-004
@@ -375,7 +375,7 @@ skills:
   - logging
   - telemetry
   - pipeline
-  version: 1.1.0
+  version: 2.0.0
   depends_on: []
   mastery_level: intermediate
   use_when: 'Adding metrics collection to a skill, monitoring pipeline health, or auditing execution performance across orchestrated
@@ -621,7 +621,7 @@ skills:
   - tests
   - security
   - modules
-  version: 1.1.0
+  version: 1.2.0
   depends_on:
   - SKL-023
   - SKL-021
@@ -727,7 +727,7 @@ skills:
   - vitest
   - factory
   - mutation-gaps
-  version: 2.0.0
+  version: 2.1.0
   depends_on:
   - SKL-005
   - SKL-026
@@ -931,7 +931,7 @@ skills:
   - indexes
   - bulk-operations
   - blocking
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-002
   - SKL-004
@@ -963,7 +963,7 @@ skills:
   - visual-quality
   - ux-quality
   - motion-quality
-  version: 2.0.0
+  version: 2.1.0
   depends_on:
   - SKL-031
   mastery_level: intermediate
@@ -1049,7 +1049,7 @@ skills:
   - core-web-vitals
   - robots-txt
   - json-ld
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-001
   - SKL-031
@@ -1116,7 +1116,7 @@ skills:
   - findings
   - pci-dss
   - hipaa
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-006
   mastery_level: advanced
@@ -1658,7 +1658,7 @@ skills:
   - outbound
   - jsonl
   - markdown
-  version: 2.2.0
+  version: 2.3.0
   depends_on:
   - SKL-021
   - SKL-055

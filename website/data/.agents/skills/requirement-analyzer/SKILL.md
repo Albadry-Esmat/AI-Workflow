@@ -1,6 +1,6 @@
 ---
 name: requirement-analyzer
-version: 1.2.0
+version: 1.3.0
 domain: requirements
 description: 'Use when given raw requirements, a feature request, or a user story that needs to be analyzed, clarified, and structured. Triggers on: "analyze requirements", "extract requirements", "what are the requirements", "clarify this requirement", "requirement analysis", "turn this into requirements".'
 author: system
@@ -86,6 +86,19 @@ Step 6 — Generate clarification questions
   For each ambiguity and low-confidence assumption, produce one targeted question.
   Output: clarification questions list
 
+Step 6a — Detect stakeholder conflicts (TASK-0031)
+  Compare normalized requirements pairwise by entity, feature area, priority, stakeholder, and constraint.
+  Detect:
+    - direct contradictions (offline/online, sync/async, must/must-not, and other antonym pairs),
+    - mutually exclusive high-priority requirements in the same feature area,
+    - conflicting stakeholder goals,
+    - incompatible technical constraints such as a strict latency target with O(N²)+ computation,
+    - MVP and non-MVP scope conflicts.
+  Classify each conflict as critical, high, medium, or low. Emit at least two concrete
+  resolution_options for every conflict and retain the conflicting requirement IDs.
+  Add a specific conflict-derived question to open_questions for each unresolved conflict.
+  Output: conflicts[] { id, type, req_ids[], severity, description, resolution_options[] }
+
 Step 7 — Assemble structured document
   Combine all artifacts into the standard output schema.
   Determine technology_research_needed:
@@ -104,6 +117,7 @@ Step 7 — Assemble structured document
 |-------|------|-------------|
 | `requirements` | `array[object]` | Normalized requirements (id, type, statement, priority) |
 | `open_questions` | `array[string]` | Clarification questions for the stakeholder |
+| `conflicts` | `array[object]` | Conflicting requirements with IDs, type, severity, description, and at least two resolution options; always present and empty when no conflicts are found |
 | `assumptions` | `array[object]` | Assumptions detected (statement, confidence) |
 | `risks` | `array[object]` | Risks identified (description, severity, impact) |
 | `technology_research_needed` | `boolean` | `true` when requirements reference novel technologies, unfamiliar domains, or material build-vs-buy decisions. When `true`, the pipeline conditionally invokes `research-artifact` (SKL-112, FEATURE-009) before architecture begins. Default: `false`. |
@@ -132,6 +146,21 @@ Step 7 — Assemble structured document
       }
     },
     "open_questions": { "type": "array", "items": { "type": "string" } },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "pattern": "^CONFLICT-\\d{3}$" },
+          "type": { "type": "string", "enum": ["direct_contradiction", "priority_conflict", "stakeholder_goal_conflict", "technical_constraint_conflict", "scope_conflict"] },
+          "req_ids": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "description": { "type": "string" },
+          "resolution_options": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+        },
+        "required": ["id", "type", "req_ids", "severity", "description", "resolution_options"]
+      }
+    },
     "assumptions": {      "type": "array",
       "items": {
         "type": "object",
@@ -170,7 +199,7 @@ Step 7 — Assemble structured document
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
   },
-  "required": ["requirements", "open_questions", "assumptions", "risks", "metadata", "metrics", "feedback"],
+  "required": ["requirements", "open_questions", "conflicts", "assumptions", "risks", "metadata", "metrics", "feedback"],
   "$defs": {
     "metrics": {
       "type": "object",
@@ -204,6 +233,11 @@ Step 7 — Assemble structured document
 - Maximum 100 requirements per invocation. Beyond that, split input into batches.
 - `open_questions` MUST be phrased as closed (yes/no) or specific questions. No open-ended "What else?" questions.
 - Do NOT assign priority before stakeholder validation unless `context` contains agreed priority metadata.
+- `conflicts` MUST always be emitted as an array; emit `[]` when no conflict is detected.
+- A conflict entry MUST contain at least two requirement IDs and at least two actionable resolution options.
+- Severity is `critical` when requirements are logically impossible to satisfy together, `high` when significant architectural trade-offs are required, `medium` when complexity materially increases, and `low` for a small design decision.
+- Any `conflicts.length > 0` is a pre-architecture review condition in `full-pipeline`; a `critical` conflict blocks progression until resolved.
+- Conflict-derived questions MUST be specific and appended to `open_questions`; unresolved conflicts may not be silently converted into assumptions.
 
 ## Security Considerations
 
@@ -239,6 +273,7 @@ Step 7 — Assemble structured document
 | Gate | Trigger | Timeout | Behavior |
 |------|---------|---------|----------|
 | Clarification required | `open_questions` count > 5 OR any assumption has `confidence: low` | 3600s | Pause, present open_questions to stakeholder, resume when answered |
+| Requirement conflict resolution | `conflicts.length > 0` | 3600s | Pause before architecture and present each conflict with resolution options; any `critical` conflict is blocking until resolved |
 
 - If stakeholder provides answers, re-run Steps 6–7 with updated input.
 - If no response within timeout: BLOCKED + escalate (record `gate_timeout`). Do not continue on assumptions and flag them as approved — unresolved questions stay open and block downstream phases.

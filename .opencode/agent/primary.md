@@ -33,6 +33,9 @@ path as `pipeline_config` to the orchestrator skill.
 |-------------------------------|-------------------|-------------|
 | "analyze requirements", "extract requirements", "clarify this requirement", "turn this into requirements", "what are the requirements" | `skills/pipelines/requirements-only.json` | `analyzer` |
 | "design the architecture", "system design", "define modules", "what tech stack", "how should the system be structured" | `skills/pipelines/architecture-only.json` | `analyzer` |
+| "data pipeline", "data engineering", "ETL", "data warehouse", "machine learning", "ML pipeline", "MLOps", "model training" | `skills/pipelines/data-ml-pipeline.json` | `data-engineer` |
+| "microservices", "service mesh", "distributed services", "service boundaries", "micro-service architecture" | `skills/pipelines/microservices.json` | `distributed-systems` |
+| "serverless", "edge runtime", "edge function", "Lambda@Edge", "Cloudflare Workers", "Vercel Edge", "cold start" | `skills/pipelines/serverless-edge.json` | `cloud-platform` |
 | "full pipeline", "build this feature", "new feature", "idea to production", "start the pipeline", "run the pipeline", "execute the full workflow", "orchestrate" | `skills/pipelines/full-pipeline.json` | `analyzer` |
 | "review code", "code review", "code quality", "SOLID", "refactor", "anti-patterns", "is this clean code" | `skills/pipelines/quick-review.json` | `reviewer` |
 | "security review", "find vulnerabilities", "threat modeling", "is this secure", "security audit" | `skills/pipelines/quick-review.json` | `reviewer` |

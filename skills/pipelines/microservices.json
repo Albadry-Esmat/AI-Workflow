@@ -1,0 +1,359 @@
+{
+  "$schema": "../schema/pipeline-schema.json",
+  "name": "microservices",
+  "version": "1.0.0",
+  "description": "Microservices delivery pipeline with service-boundary design, service mesh controls, per-service API contracts, database isolation, and distributed tracing.",
+  "domain": "microservices",
+  "mode": "hybrid",
+  "on_failure": "halt",
+  "phases": [
+    {
+      "id": "phase-1-requirements",
+      "label": "Requirements",
+      "skills": [
+        {
+          "name": "requirement-analyzer",
+          "version": "1.3.0",
+          "max_retries": 2
+        }
+      ]
+    },
+    {
+      "id": "phase-2a-architecture",
+      "label": "Microservices Architecture",
+      "skills": [
+        {
+          "name": "architecture-design",
+          "version": "1.4.0",
+          "max_retries": 2,
+          "config": {
+            "pattern": "microservices",
+            "api_gateway": true,
+            "event_driven_option": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-2b-service-mesh",
+      "label": "Service Mesh",
+      "skills": [
+        {
+          "name": "architecture-design",
+          "version": "1.4.0",
+          "max_retries": 2,
+          "config": {
+            "pattern": "microservices",
+            "service_mesh_hints": true,
+            "mesh_options": ["istio", "linkerd", "consul_connect"],
+            "mTLS": true,
+            "circuit_breaker_strategy": "per_service",
+            "retry_policy": "bounded_per_service"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-2c-service-boundaries",
+      "label": "Service Boundaries",
+      "skills": [
+        {
+          "name": "microservices-architect",
+          "version": "1.0.0",
+          "max_retries": 2,
+          "config": {
+            "bounded_contexts": true,
+            "database_per_service": true,
+            "saga_analysis": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-3-feature-plan",
+      "label": "Per-Service Feature Plan",
+      "skills": [
+        {
+          "name": "feature-planning",
+          "version": "2.2.1",
+          "max_retries": 2,
+          "config": {
+            "per_service_task_breakdown": true,
+            "include_contract_and_migration_tasks": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-4-impact",
+      "label": "Dependency and Impact Analysis",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "dependency-analyzer",
+          "version": "1.1.0",
+          "max_retries": 1
+        },
+        {
+          "name": "change-impact-analyzer",
+          "version": "1.2.0",
+          "max_retries": 1,
+          "config": {
+            "change_type": "architecture",
+            "service_boundary_impact": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-5-code-gen",
+      "label": "Per-Service Code and Test Scaffolding",
+      "skills": [
+        {
+          "name": "code-generator",
+          "version": "1.1.0",
+          "max_retries": 2,
+          "config": {
+            "per_service_stubs": true,
+            "service_contracts": true
+          }
+        },
+        {
+          "name": "test-generator",
+          "version": "2.1.0",
+          "max_retries": 2,
+          "config": {
+            "modes": ["unit", "integration", "contract"],
+            "consumer_driven_contracts": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-6-test-strategy",
+      "label": "Service Test Strategy",
+      "skills": [
+        {
+          "name": "testing-strategy",
+          "version": "2.0.0",
+          "max_retries": 2,
+          "config": {
+            "contract_testing": true,
+            "consumer_driven_contracts": true,
+            "integration_matrix": "per_service_and_mesh"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-7a-review",
+      "label": "Code and Security Review",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "clean-code-review",
+          "version": "1.1.0",
+          "max_retries": 1
+        },
+        {
+          "name": "security-review",
+          "version": "1.1.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "id": "phase-7b-api-contract-guards",
+      "label": "Per-Service Contract and Isolation Guards",
+      "parallel": true,
+      "skills": [
+        {
+          "name": "api-contract-guard",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "per_service": true,
+            "loop": {
+              "over": "modules[]",
+              "where": "module.type === 'service'",
+              "binding": "service"
+            },
+            "contract_scope": "service"
+          }
+        },
+        {
+          "name": "database-guard",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "per_service": true,
+            "mode": "microservices",
+            "loop": {
+              "over": "modules[]",
+              "where": "module.type === 'service'",
+              "binding": "service"
+            },
+            "database_per_service": true,
+            "block_cross_service_database_access": true,
+            "block_cross_service_joins": true
+          }
+        },
+        {
+          "name": "security-guard",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "performance-guard",
+          "version": "1.1.0",
+          "max_retries": 1,
+          "type": "validation_check",
+          "config": {
+            "per_service": true,
+            "mesh_timeout_and_retry_checks": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-8a-deployment",
+      "label": "Service Mesh Deployment",
+      "skills": [
+        {
+          "name": "deployment-strategy",
+          "version": "1.1.0",
+          "max_retries": 2,
+          "config": {
+            "service_mesh": true,
+            "mTLS": true,
+            "deployment_per_service": true,
+            "progressive_delivery": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-8b-distributed-tracing",
+      "label": "Distributed Tracing",
+      "skills": [
+        {
+          "name": "observability",
+          "version": "2.0.0",
+          "max_retries": 1,
+          "config": {
+            "mode": "artifact_generation",
+            "tech_stack": { "telemetry": "opentelemetry" },
+            "slo_targets_from_architecture": true,
+            "distributed_tracing": true
+          }
+        },
+        {
+          "name": "deployment-strategy",
+          "version": "1.1.0",
+          "max_retries": 2,
+          "config": {
+            "observability_hints": {
+              "distributed_tracing": true,
+              "otel_sdk": true,
+              "correlation_ids": true,
+              "trace_propagation_header": "traceparent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-9-docs",
+      "label": "Documentation",
+      "skills": [
+        {
+          "name": "documentation-generator",
+          "version": "1.0.0",
+          "max_retries": 1,
+          "config": {
+            "include_service_catalog": true,
+            "include_contracts": true,
+            "include_mesh_and_tracing_runbook": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase-10-async",
+      "label": "Async Synchronization",
+      "async": true,
+      "skills": [
+        {
+          "name": "doc-maintainer",
+          "version": "1.1.0",
+          "max_retries": 1,
+          "async": true
+        },
+        {
+          "name": "work-item-exporter",
+          "version": "2.0.0",
+          "max_retries": 1,
+          "async": true
+        }
+      ]
+    }
+  ],
+  "parallel_groups": [
+    ["dependency-analyzer", "change-impact-analyzer"],
+    ["clean-code-review", "security-review"],
+    ["api-contract-guard", "database-guard", "security-guard", "performance-guard"]
+  ],
+  "gates": [
+    {
+      "gate_id": "MS-BOUNDARY-APPROVAL",
+      "after_phase": "phase-2c-service-boundaries",
+      "type": "human_approval",
+      "bypass_on_timeout": false,
+      "timeout": 3600,
+      "label": "Approve service boundaries, ownership, and mesh topology"
+    },
+    {
+      "gate_id": "MS-CONTRACT-GUARDS-PASS",
+      "after_phase": "phase-7b-api-contract-guards",
+      "type": "condition",
+      "condition": "guards && guards.every(g => g.verdict === 'pass')",
+      "label": "Fail closed unless every per-service contract and isolation guard passes",
+      "note": "Missing per-service guard evidence or any non-pass verdict blocks progression."
+    },
+    {
+      "gate_id": "MS-API-CONTRACT-APPROVAL",
+      "after_phase": "phase-7b-api-contract-guards",
+      "type": "human_approval",
+      "bypass_on_timeout": false,
+      "timeout": 3600,
+      "label": "Approve consumer-driven API contracts"
+    },
+    {
+      "gate_id": "MS-DEPLOYMENT-APPROVAL",
+      "after_phase": "phase-8b-distributed-tracing",
+      "type": "human_approval",
+      "bypass_on_timeout": false,
+      "timeout": 0,
+      "label": "Approve mesh-enabled deployment and tracing propagation"
+    }
+  ],
+  "recovery": {
+    "on_critical_failure": "rollback-manager",
+    "max_repair_iterations": 2,
+    "rollback_scope": "pipeline_stage"
+  },
+  "async_skills": ["doc-maintainer", "work-item-exporter"],
+  "token_policy": {
+    "auto_compress": true,
+    "trigger_at_percent": 85,
+    "default_tier": "large",
+    "budget_tiers": [
+      {"name": "standard", "ceiling": 16000, "cascade_mode": "single_pass"},
+      {"name": "large", "ceiling": 32000, "cascade_mode": "cascade"},
+      {"name": "xl", "ceiling": 48000, "cascade_mode": "cascade"}
+    ]
+  }
+}

@@ -80,6 +80,17 @@ dev ──(auto: tests pass)──► staging ──(manual gate)──► pre-p
                                                               [Production Deploy]
 ```
 
+## Continuous Integration
+
+Two GitHub Actions workflows protect changes before they reach `main`:
+
+| Workflow | Trigger | Checks |
+|----------|---------|--------|
+| `Validate Skills` (`.github/workflows/validate-skills.yml`) | Pushes and pull requests touching skills, docs, scripts, configuration, or website data | Runs the full skill, schema, governance, runtime, and website-data validation suite |
+| `Website Build Check` (`.github/workflows/build-check.yml`) | Pushes and pull requests to `main` touching `website/**`, `rebuild.sh`, or Node manifests | Installs the companion website dependencies and runs `npm run build` when `website/package.json` is present |
+
+Both workflows also support `workflow_dispatch` and use pinned checkout and Node setup actions. They request read-only repository contents and contain no application secrets. The website source is maintained in the companion website repository; data-only changes in this repository are reported as a notice when no local `website/package.json` is available. If website source is present, a non-zero `npm run build` exit fails the check.
+
 ## Deployment Skill
 
 The `deployment-strategy` skill (`skills/deployment/deployment-strategy.md`) generates the deployment plan automatically from architecture and test plan. It outputs promotion rules, rollback criteria, feature flag definitions, and environment topology.

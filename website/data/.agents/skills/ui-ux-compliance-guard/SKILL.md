@@ -1,6 +1,6 @@
 ---
 name: ui-ux-compliance-guard
-version: 2.0.0
+version: 2.1.0
 domain: governance
 description: 'Use when validating UI implementation against design system rules and UX architecture contracts. Triggers on: "UI compliance check", "design system guard", "UX compliance", "check hardcoded colors", "accessibility compliance check", "component contract validation", "visual quality score", "motion quality review".'
 author: system
@@ -180,6 +180,20 @@ Step 9 — Assemble verdict
     - premium:     visual_quality_score.total ≥ 70 required for pass
     - world-class: visual_quality_score.total ≥ 85 required for pass
   Output: guard verdict with full violation list and quality scores
+
+Step 9a — Check dark mode compliance (TASK-0012)
+  Activate only when token_requirements is provided and its categories include `color` or `background`.
+  For every semantic color token and in-scope component, check:
+    - a `[data-theme="dark"]` selector or equivalent `data-theme="dark"` rule,
+    - absence of light-mode hardcoded hex/rgb/rgba/hsl/named colors that override dark mode,
+    - an `@media (prefers-color-scheme: dark)` block for components with motion_safe: false patterns,
+    - dark variants for color, background, and border token categories.
+  Score: token_coverage (0–30), selector_coverage (0–30), hardcode_violations (30 minus
+  five points per violation, minimum 0), and prefers_scheme_coverage (0–10). Sum the
+  four values into dark_mode_score.total and record findings in violations or warnings.
+  Apply the dark-mode thresholds during verdict assembly: scores below 60 add a warning;
+  scores below 40 force a block for premium or world-class creativity levels.
+  When inactive, output dark_mode_score: null.
 ```
 
 ## Outputs
@@ -192,6 +206,7 @@ Step 9 — Assemble verdict
 | `visual_quality_score` | `object` | Scored dimensions: consistency, modernity, brand_alignment, professional_appearance, total |
 | `ux_quality_score` | `object` | Scored dimensions: discoverability, learnability, efficiency, accessibility, total |
 | `motion_quality_score` | `object` | Scored dimensions: smoothness, purpose, performance, user_impact, total (null when no motion_spec) |
+| `dark_mode_score` | `object|null` | Dark-mode compliance score and breakdown; null when token requirements do not include color/background |
 | `improvement_recommendations` | `array[object]` | Prioritized suggestions for next iteration (dimension, current_score, recommendation) |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
 | `feedback` | `array[object]` | Backpropagate to frontend-ux-architect, design-system-generator, or code-generator |
@@ -202,7 +217,7 @@ Step 9 — Assemble verdict
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["verdict", "violations", "visual_quality_score", "ux_quality_score", "metrics", "feedback"],
+  "required": ["verdict", "violations", "visual_quality_score", "ux_quality_score", "dark_mode_score", "metrics", "feedback"],
   "properties": {
     "verdict": { "type": "string", "enum": ["pass", "block"] },
     "violations": {
@@ -252,6 +267,23 @@ Step 9 — Assemble verdict
         "user_impact":  { "type": "integer", "minimum": 0, "maximum": 25 },
         "total":        { "type": "integer", "minimum": 0, "maximum": 100 }
       }
+    },
+    "dark_mode_score": {
+      "type": ["object", "null"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "breakdown": {
+          "type": "object",
+          "required": ["token_coverage", "selector_coverage", "hardcode_violations", "prefers_scheme_coverage"],
+          "properties": {
+            "token_coverage": { "type": "integer", "minimum": 0, "maximum": 30 },
+            "selector_coverage": { "type": "integer", "minimum": 0, "maximum": 30 },
+            "hardcode_violations": { "type": "integer", "minimum": 0, "maximum": 30 },
+            "prefers_scheme_coverage": { "type": "integer", "minimum": 0, "maximum": 10 }
+          }
+        }
+      },
+      "required": ["total", "breakdown"]
     },
     "improvement_recommendations": {
       "type": "array",
@@ -305,6 +337,7 @@ Step 9 — Assemble verdict
 | Critical accessibility violation unresolved | `accessibility_violation_unresolved` |
 | Missing loading or error state on async component | `missing_required_state` |
 | Animation missing prefers-reduced-motion guard | `motion_accessibility_violation` |
+| Dark-mode score below 40 for premium/world-class work | `dark_mode_below_threshold` |
 | visual_quality_score.total below threshold for creativity_level | `visual_quality_below_threshold` |
 
 ## Rules & Constraints
@@ -315,6 +348,10 @@ Step 9 — Assemble verdict
 - Only components defined in `component_contracts` are in scope.
 - Quality scores are always emitted even when verdict is `pass` — they feed the improvement loop.
 - `motion_quality_score` is `null` when no `motion_spec` is provided.
+- `dark_mode_score` is `null` when `token_requirements` is absent or does not include `color` or `background`.
+- A hardcoded color pattern is `#[0-9A-Fa-f]{3,8}`, `rgb(`, `rgba(`, `hsl(`, or a named color such as `black`, `white`, or `gray` in CSS/style props.
+- `dark_mode_score.total < 40` forces `verdict: "block"` when `creativity_level` is `premium` or `world-class`; scores below 60 add a warning.
+- All token categories `color`, `background`, and `border` require dark-mode variants when present in token_requirements.
 - `improvement_recommendations` are generated for all dimensions scoring below 80.
 
 ## Security Considerations

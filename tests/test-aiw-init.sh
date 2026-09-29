@@ -28,7 +28,7 @@ else
   _fail "empty target install incomplete"
 fi
 count="$(find "$FIX/t1/.agents/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
-if [[ "$count" -eq 121 ]]; then _ok "121 skills installed"; else _fail "skill count $count"; fi
+if [[ "$count" -eq 126 ]]; then _ok "126 skills installed"; else _fail "skill count $count"; fi
 if [[ -L "$FIX/t1/.claude/skills/clean-code-review" && -f "$FIX/t1/.claude/skills/clean-code-review/SKILL.md" ]]; then
   _ok "claude links resolve inside target"
 else

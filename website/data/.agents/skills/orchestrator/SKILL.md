@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 2.5.0
+version: 2.5.1
 domain: system
 description: 'Use when running the full skill pipeline end-to-end — routing inputs through multiple skills in sequence, validating outputs, managing retries, and enforcing HITL gates. Triggers on: "run the pipeline", "execute the full workflow", "orchestrate", "run all skills", "start the pipeline".'
 author: system
@@ -174,6 +174,11 @@ Step 0.5 — Retry check (FEATURE-005)
 
 Step 1 — Resolve pipeline from registry
   Look up each skill name in registry.json. Resolve file path, version, input/output schemas.
+  A pipeline step may be a reserved future capability only when its step config
+  has `placeholder: true` and a non-empty `reason`. Such a step is not invoked;
+  it produces a `placeholder_skipped` trace record and is eligible only when its
+  phase condition is true. Any unregistered step without this explicit marker
+  returns `{"error":"UNKNOWN_SKILL"}`.
   Validate that all dependencies (consumes_from) are satisfied.
 
   ─── ROUTING DEAD-END / GAP DETECTION (FEATURE-001) ────────────────────────
@@ -269,6 +274,10 @@ Step 2 — Load session context
   Output: hydrated context
 
 Step 3 — Execute skills (mode-dependent)
+  Default context TTL policy: `policy: "session"` for transient skill outputs,
+  `"project"` for persistent state (work items, CRs, `req_task_map`). See the
+  TTL policy table in `context-memory`. Producing skills declare
+  `context_ttl`; `state-manager` returns null for expired context.
   Sequential mode: iterate skills in order, passing output → input.
   Parallel mode: execute independent skill groups concurrently.
   Hybrid mode: execute per parallel_groups definition.

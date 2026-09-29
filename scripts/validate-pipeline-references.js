@@ -33,6 +33,16 @@ function addSkillReference(pipeline, phase, skill) {
   }
   const name = skill.name.split("@")[0];
   references.push({ pipeline, phase, name });
+  // Specialized pipeline templates may intentionally reserve a future skill
+  // behind a conditional phase.  Such references are valid only when the
+  // pipeline explicitly marks the step as a placeholder; all other unknown
+  // references remain fail-closed.
+  if (skill.config && skill.config.placeholder === true) {
+    if (typeof skill.config.reason !== "string" || skill.config.reason.trim() === "") {
+      errors.push(`${pipeline}:${phase} placeholder skill requires a non-empty config.reason`);
+    }
+    return;
+  }
   if (!sourceSkills.has(name) && !pipelineRoles.has(name)) {
     errors.push(`${pipeline}:${phase} references unknown skill: ${skill.name}`);
   }

@@ -71,7 +71,10 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="aiw-o2-controls-") as raw:
         state_root = Path(raw) / "state"
-        env = {"AIW_O2_STATE_ROOT": str(state_root)}
+        env = {
+            "AIW_O2_STATE_ROOT": str(state_root),
+            "AIW_O2_TARGET_ROOT": str(Path(raw) / "target"),
+        }
         check("check-only setup is no-write/no-network", run([PYTHON, "scripts/onboarding-o2.py", "setup", "--check-only", "--json"], env=env).returncode == 0 and not state_root.exists())
         detection = run([PYTHON, "scripts/onboarding-o2.py", "agent-detect", "--json"], env=env)
         detection_data = json.loads(detection.stdout)

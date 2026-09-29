@@ -1,6 +1,6 @@
 ---
 name: security-guard
-version: 1.0.0
+version: 1.1.0
 domain: governance
 description: 'Use when converting security-review findings into a binary pipeline gate. Triggers on: "security gate", "block on security findings", "security guard", "enforce security findings", "is this safe to deploy". Do NOT use when security-review has not been run — this guard requires security_review output as its mandatory input.'
 author: ASE-OS
@@ -60,7 +60,7 @@ The guard is positioned in **phase-7b-guards**, running in parallel with `databa
     "security_review": {
       "type": "object",
       "description": "Direct output from security-review (SKL-006)",
-      "required": ["vulnerabilities", "risks"],
+      "required": ["vulnerabilities", "dependency_vulnerabilities", "risks"],
       "properties": {
         "vulnerabilities": {
           "type": "array",
@@ -75,6 +75,21 @@ The guard is positioned in **phase-7b-guards**, running in parallel with `databa
               "status":        { "type": "string", "enum": ["open","mitigated","accepted","false_positive"] },
               "owasp_category":{ "type": "string" },
               "remediation":   { "type": "string" }
+            }
+          }
+        },
+        "dependency_vulnerabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["cve_id", "package", "affected_version", "fixed_version", "cvss_score", "severity"],
+            "properties": {
+              "cve_id": { "type": "string" },
+              "package": { "type": "string" },
+              "affected_version": { "type": "string" },
+              "fixed_version": { "type": ["string", "null"] },
+              "cvss_score": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+              "severity": { "type": "string" }
             }
           }
         },
@@ -123,7 +138,11 @@ Step 1 — Determine effective CVSS threshold
   Output: effective_threshold (number)
 
 Step 2 — Classify vulnerabilities into blocking / warning / informational
-  For each vulnerability in security_review.vulnerabilities:
+  Evaluate security_review.vulnerabilities plus normalized
+  security_review.dependency_vulnerabilities. Dependency entries are treated as
+  open findings, use cve_id as the finding id, package as the location, and
+  cvss_score as the score. Missing dependency scores fail closed as 10.0.
+  For each vulnerability in the combined finding set:
     IF status == "open" AND cvss_score >= effective_threshold:
       → blocking_findings (unless covered by a resolved override decision)
     IF status == "open" AND cvss_score < effective_threshold:
@@ -321,6 +340,7 @@ Step 6 — Assemble verdict
 ## 10. Token Optimization
 
 - Process only `security_review.vulnerabilities` array — do not load full `threat_model` or `remediation` narrative text.
+- Process `security_review.dependency_vulnerabilities` as a second finding source; CVSS >= the effective threshold must reach `blocking_findings`.
 - Each blocking finding summary: id + title + cvss_score + reason only (≤ 50 tokens per finding).
 - Cap `blocking_findings` at 50, `warning_findings` at 50 — summarize excess as `{ count: N, max_cvss: X }`.
 - `compliance_scope` is a short enum array — no verbose loading required.

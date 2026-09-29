@@ -293,7 +293,10 @@
     },
     "gatekeeper": {
       "mode": "subagent",
-      "permission": "allow",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
       "description": "Policy enforcement: evaluates raw evidence against policy and produces pass/block verdicts. Cannot modify implementation, cannot promote, cannot approve PRs.",
       "skills": [
         ".agents/skills/security-guard/SKILL.md",

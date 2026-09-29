@@ -11,7 +11,11 @@ from typing import Any
 from jsonschema import Draft7Validator, FormatChecker
 
 
-EXPECTED_ADAPTERS = {"opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"}
+EXPECTED_ADAPTERS = {
+    "opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor",
+    "gemini-cli", "aider", "generic-command", "cursor-ide", "vscode-copilot",
+    "windsurf-devin",
+}
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -73,7 +77,7 @@ def main() -> int:
             print(f"  detail: {error}")
 
     adapter_ids = {adapter["id"] for adapter in adapter_catalog["adapters"]}
-    check(adapter_ids == EXPECTED_ADAPTERS, "catalog contains exactly the four O0 adapters", failures)
+    check(adapter_ids == EXPECTED_ADAPTERS, "catalog contains exactly the twelve O0 adapters", failures)
     check(set(policy["initial_adapters"]) == EXPECTED_ADAPTERS, "policy initial_adapters matches the catalog set", failures)
     check(policy["core_neutrality"]["agent_runtime_is_adapter"], "agent runtime is modeled as an adapter", failures)
     check(policy["core_neutrality"]["core_must_not_require_named_runtime"], "core does not require a named runtime", failures)
@@ -114,7 +118,7 @@ def main() -> int:
 
     fixture_ids = {fixture["id"] for fixture in fixtures["fixtures"]}
     required_fixture_ids = {
-        "catalog-has-four-initial-adapters",
+        "catalog-has-twelve-initial-adapters",
         "explicit-selection-missing-adapter-blocks",
         "explicit-selection-does-not-fallback",
         "no-secret-demo",

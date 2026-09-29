@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "fixtures": [
     {
-      "id": "catalog-has-four-initial-adapters",
+      "id": "catalog-has-twelve-initial-adapters",
       "kind": "catalog",
       "expected": "pass",
       "assertions": ["opencode", "claude-code", "codex", "generic-command"]

@@ -1,16 +1,16 @@
 ---
 name: test-generator
-version: 2.0.0
+version: 2.1.0
 domain: testing
-description: 'Use when generating unit tests, integration tests, edge-case test suites, property-based tests, contract tests, or parameterized tests from code artifacts or specifications. Triggers on: "generate tests", "write tests for this", "create test suite", "generate unit tests", "test coverage", "generate from spec", "generate property tests", "generate contract tests", "fill mutation gaps". Do NOT use when defining what to test or setting coverage targets — use testing-strategy for that.'
+description: 'Use when generating unit, integration, snapshot, property-based, contract, or parameterized tests from code artifacts or specifications. Triggers on: "generate tests", "snapshot tests", "property tests", "write tests for this", "create test suite", "test coverage", "generate from spec", "generate contract tests", "fill mutation gaps". Do NOT use when defining what to test or setting coverage targets — use testing-strategy for that.'
 author: system
 ---
 
 ## Purpose
 
-Generate complete, runnable, mutation-resistant test suites from code artifacts, interface contracts, feature specifications, or mutation analysis gap reports. The test-generator v2.0.0 is the **execution arm** of `testing-strategy` v2.0.0 — where testing-strategy defines *what* to test and *how*, test-generator produces the actual test files.
+Generate complete, runnable, mutation-resistant test suites from code artifacts, interface contracts, feature specifications, or mutation analysis gap reports. The test-generator v2.1.0 is the **execution arm** of `testing-strategy` v2.0.0 — where testing-strategy defines *what* to test and *how*, test-generator produces the actual test files.
 
-Key capabilities added in v2.0.0:
+Key capabilities added in v2.0.0 and v2.1.0:
 - **BDD naming enforcement**: every generated test name follows Given-When-Then semantics — no "test1", no "it works"
 - **Property-based test (PBT) generation**: fast-check (TypeScript), hypothesis (Python), gopter/rapid (Go), proptest (Rust), jqwik (Java)
 - **Consumer-driven contract test generation**: Pact interactions for every consumer-provider integration point
@@ -20,6 +20,8 @@ Key capabilities added in v2.0.0:
 - **AAA structure enforcement**: every test body scaffolded with `// Arrange / // Act / // Assert` sections
 - **Vitest support**: first-class alongside Jest for TypeScript projects using Vite/SWC
 - **Flakiness-free output**: all 8 flakiness prevention rules applied to every generated test
+- **Snapshot-test generation**: Jest, Vitest, or Storybook snapshots for React, Vue, and Angular components, including documented prop variants and RTL snapshots when i18n is detected
+- **Explicit test modes**: `snapshot`, `property`, and `all`; `all` is the default and retains the existing unit/integration/property/contract behavior
 
 The core principle is: **test behavior, not implementation**. Every generated test asserts observable output from observable input. No assertions on private state, no mock call count checks without behavioral reason, no implementation coupling.
 
@@ -30,7 +32,12 @@ The core principle is: **test behavior, not implementation**. Every generated te
 | `generation_mode` | `string` | Yes | `from_code`, `from_spec`, `from_strategy`, `fill_gaps`, or `from_mutation_gaps` |
 | `target` | `object` | Yes | The artifact to generate tests for (code file, interface spec, or module spec) |
 | `language` | `string` | Yes | Test language: `typescript`, `python`, `go`, `rust`, `java` |
+| `test_mode` | `string` | No | `snapshot`, `property`, or `all`; defaults to `all` |
 | `test_framework` | `string` | No | Framework override: `jest`, `vitest`, `pytest`, `go_test`, `cargo_test`, `junit5` (auto-detected if absent) |
+| `framework` | `object` | No | Snapshot/property framework overrides: `{ "snapshot": "jest|vitest|storybook", "property": "fast-check|hypothesis|quickcheck" }` |
+| `code_artifacts` | `array[object]` | No | Component/function artifacts used for snapshot and property discovery; `target.code_artifacts` is also accepted |
+| `snapshot_framework` | `string` | No | Explicit snapshot framework: `jest`, `vitest`, or `storybook` |
+| `property_framework` | `string` | No | Explicit property framework: `fast-check`, `hypothesis`, or `quickcheck` |
 | `pbt_library` | `string` | No | PBT library override: `fast-check`, `hypothesis`, `gopter`, `rapid`, `proptest`, `jqwik` (auto-detected from language if absent) |
 | `contract_framework` | `string` | No | Contract framework override — defaults to `pact` |
 | `testing_strategy` | `object` | No | Full output from testing-strategy v2.0.0 — provides all tier targets, naming conventions, property_tests, contract_tests, parameterized_tests, test_data_strategy, test_double_map, flakiness_rules |
@@ -63,10 +70,26 @@ The core principle is: **test behavior, not implementation**. Every generated te
       "type": "string",
       "enum": ["typescript", "python", "go", "rust", "java"]
     },
+    "test_mode": {
+      "type": "string",
+      "enum": ["snapshot", "property", "all"],
+      "default": "all"
+    },
     "test_framework": {
       "type": "string",
       "enum": ["jest", "vitest", "pytest", "go_test", "cargo_test", "junit5"]
     },
+    "framework": {
+      "type": "object",
+      "properties": {
+        "snapshot": { "type": "string", "enum": ["jest", "vitest", "storybook"] },
+        "property": { "type": "string", "enum": ["fast-check", "hypothesis", "quickcheck"] }
+      },
+      "additionalProperties": false
+    },
+    "code_artifacts": { "type": "array", "items": { "type": "object" } },
+    "snapshot_framework": { "type": "string", "enum": ["jest", "vitest", "storybook"] },
+    "property_framework": { "type": "string", "enum": ["fast-check", "hypothesis", "quickcheck", "gopter", "rapid", "proptest", "jqwik"] },
     "pbt_library": {
       "type": "string",
       "enum": ["fast-check", "hypothesis", "gopter", "rapid", "proptest", "jqwik"]
@@ -106,6 +129,7 @@ The core principle is: **test behavior, not implementation**. Every generated te
 - Coverage report from system state `coverage` scope — required for `fill_gaps` mode.
 - Assertion gaps from `mutation-test-generator` output — required for `from_mutation_gaps` mode.
 - Code artifacts from system state `code_map` scope — for `from_code` mode.
+- Component and pure-function artifacts from `code_artifacts` or `target.code_artifacts` — required when `test_mode` is `snapshot` or `property`.
 
 ## Execution Logic
 
@@ -114,7 +138,14 @@ Step 1 — Validate inputs and resolve framework configuration
   Validate generation_mode-specific required fields:
     fill_gaps:          requires coverage_report
     from_mutation_gaps: requires assertion_gaps (min 1 entry)
-    from_strategy:      requires testing_strategy
+   from_strategy:      requires testing_strategy
+  Resolve test_mode: input.test_mode, default "all".
+  Mode selection is exclusive:
+    snapshot: generate snapshot tests only; skip standard, property, contract,
+              parameterized, factory, and mutation-gap generation.
+    property: generate property tests only; skip standard, snapshot, contract,
+              parameterized, factory, and mutation-gap generation.
+    all: preserve the complete v2.0.0 generation pipeline and add snapshots.
   Resolve test_framework if absent:
     typescript → jest (default) | vitest (if target.build_tool == "vite" or "swc")
     python     → pytest
@@ -128,6 +159,15 @@ Step 1 — Validate inputs and resolve framework configuration
     rust       → proptest
     java       → jqwik
   Resolve contract_framework: default "pact"
+  Resolve snapshot framework in this order:
+    input.snapshot_framework → input.framework.snapshot → package dependency
+    (storybook, then vitest, then jest) → jest.
+  Resolve property framework in this order:
+    input.property_framework → input.framework.property → pbt_library.
+  Output framework_config {
+    test_mode, test_framework, snapshot_framework, property_framework,
+    pbt_library, contract_framework
+  }.
   Resolve naming_convention: use input.naming_convention if provided;
     otherwise apply defaults:
       unit:        "should <behavior> when <condition>"
@@ -135,7 +175,10 @@ Step 1 — Validate inputs and resolve framework configuration
       e2e:         "user <persona> can <goal> via <path>"
       property:    "always <invariant> for any <input_domain>"
       contract:    "<consumer> expects <provider> to <contract_clause>"
-  Output: validated_inputs, framework_config { test_framework, pbt_library, contract_framework }
+  Output: validated_inputs, framework_config {
+    test_mode, test_framework, snapshot_framework, property_framework,
+    pbt_library, contract_framework
+  }
 
 Step 2 — Extract testable surface
   from_code:          Parse target file. Extract exported functions, classes, methods.
@@ -152,7 +195,7 @@ Step 2 — Extract testable surface
       OR has commutativity/idempotency/round-trip properties)
     Output: testable_units[] { name, inputs, outputs, side_effects, is_async, is_pure, pbt_candidate }
 
-Step 3 — Generate standard test cases (unit / integration / e2e)
+Step 3 — Generate standard test cases (unit / integration / e2e, all mode only)
   For each testable_unit (skipped entirely in from_mutation_gaps mode):
     Apply naming convention per tier. ENFORCE: every test name must match the pattern for its tier.
     Reject any test name containing "test1", "it works", "should work", "temp", or "TODO".
@@ -188,10 +231,31 @@ Step 3 — Generate standard test cases (unit / integration / e2e)
     into the generated list, deduplicating by (module + tier + name).
   Output: test_case_list[]
 
-Step 4 — Generate property-based test files
+Step 4 — Generate snapshot test files (snapshot and all modes)
+  Source: code_artifacts or target.code_artifacts. Detect React, Vue, and Angular
+  components from exported component symbols and component metadata. If no
+  component is present, return snapshot_tests: [] and an informational feedback
+  entry; do not fail a property-only or mixed run.
+  For each component:
+    1. Select framework_config.snapshot_framework: jest or vitest uses the
+       component test renderer and toMatchSnapshot(); storybook uses a valid
+       interaction/story snapshot scaffold.
+    2. Generate at least these cases when the props are supported or the
+       component is documented as a Button-like control: default props,
+       disabled props, and loading props. Always include the default case.
+    3. Add one case for each documented prop variant, deduplicated by props.
+    4. When i18n is detected, add an RTL case with dir="rtl" and the locale
+       provider/fixture named by the artifact contract.
+    5. Use stable fixture values, no current time, randomness, network calls,
+       credentials, or production URLs. Each case must call toMatchSnapshot().
+  Output snapshot_tests[] entries:
+    { path, content, framework, component, cases[], rtl_supported }.
+  In snapshot-only mode this is the only test family written.
+
+Step 5 — Generate property-based test files (property and all modes)
   Source: input.property_tests (from testing-strategy) OR auto-detected pbt_candidates.
   For each PBT target:
-    Build test using framework template:
+    Build test using framework_config.property_framework:
       fast-check (TypeScript/Jest):
         it('always <invariant> for any <input_domain>', () => {
           fc.assert(fc.property(<generator>, (input) => {
@@ -208,30 +272,17 @@ Step 4 — Generate property-based test files
         def test_always_<invariant>_for_any_<domain>(input):
             result = <function>(input)
             assert <invariant_check>(result)
-      go_test (Go with gopter):
-        properties.Property("always <invariant>",
-          prop.ForAll(<generator>, func(input <type>) bool {
-            result := <function>(input)
-            return <invariant_check>(result)
-          }))
-      cargo_test (Rust with proptest):
-        proptest! {
-          #[test]
-          fn always_<invariant>(input in <strategy>()) {
-            let result = <function>(input);
-            prop_assert!(<invariant_check>(result));
-          }
-        }
-      junit5 (Java with jqwik):
-        @Property
-        void always_<invariant>(@ForAll <Type> input) {
-          <Type> result = <function>(input);
-          assertThat(<invariant_check>(result)).isTrue();
-        }
-    Set shrinking: enabled (fast-check), reproduce_with hint from shrinking_hint if present.
-  Output: property_test_files[]
+   quickcheck (Go): use a property function and type-matched generators.
+      gopter/rapid (Go): emit a `Prop`/`rapid.Check` function with typed generators.
+      proptest (Rust): emit a `proptest!` block with typed strategies and assertions.
+      jqwik (Java): emit an `@Property` method with `@ForAll` parameters.
+  Set shrinking/reproduction support: enabled for fast-check and hypothesis;
+  use the framework's seed/reproduce hint when one is supplied.
+  Emit both `property_tests[]` (canonical) and `property_test_files[]`
+  (backward-compatible alias) with { path, content, framework, pbt_library,
+  function, invariant }.
 
-Step 5 — Generate contract test files
+Step 6 — Generate contract test files (all mode only)
   Source: input.contract_tests (from testing-strategy v2.0.0).
   For each contract test spec:
     Generate Pact consumer test:
@@ -267,7 +318,7 @@ Step 5 — Generate contract test files
     Emit pact_dsl_hint from contract_tests entry as inline comment when present.
   Output: contract_test_files[]
 
-Step 6 — Generate parameterized test files
+Step 7 — Generate parameterized test files (all mode only)
   Source: input.parameterized_tests (from testing-strategy v2.0.0).
   For each parameterized target:
     Apply framework_syntax:
@@ -321,7 +372,7 @@ Step 6 — Generate parameterized test files
         }
   Output: parameterized_test_files[]
 
-Step 7 — Generate test data factory files
+Step 8 — Generate test data factory files (all mode only)
   Source: input.test_data_strategy (from testing-strategy v2.0.0).
   For each factory in test_data_strategy.factories:
     TypeScript (jest/vitest) with @faker-js/faker:
@@ -350,7 +401,7 @@ Step 7 — Generate test data factory files
       mock_only:            no DB seed needed; emit comment only
   Output: factory_files[]
 
-Step 8 — Generate mutation gap assertion tests (from_mutation_gaps mode only)
+Step 9 — Generate mutation gap assertion tests (from_mutation_gaps mode only)
   Source: input.assertion_gaps from mutation-test-generator.
   For each assertion_gap:
     Parse gap.function to identify the target function.
@@ -365,7 +416,7 @@ Step 8 — Generate mutation gap assertion tests (from_mutation_gaps mode only)
     Apply flakiness_rules: use fake timers, seeded RNG, no sleep(), cleanup hooks.
   Output: mutation_gap_test_files[] (merged into test_files with tier="unit")
 
-Step 9 — Apply flakiness rules to all generated test files
+Step 10 — Apply flakiness rules to all generated test files
   Apply the 8 core rules to every test file produced in Steps 3–8:
     1. Wall-clock time:    replace Date.now(), time.time(), time.Now() with fake timer calls.
     2. Test order:         verify no shared mutable state between describe blocks.
@@ -378,7 +429,7 @@ Step 9 — Apply flakiness rules to all generated test files
   Track violations: any generated test that would violate a rule → add to flakiness_violations[].
   Output: cleaned test files, flakiness_violations[]
 
-Step 10 — Validate all generated tests
+Step 11 — Validate all generated tests
   Parse every generated test file for syntax errors (language-appropriate parser simulation).
   Naming validation: every test name MUST match its tier's naming convention template.
     Violations added to naming_violations[].
@@ -388,15 +439,25 @@ Step 10 — Validate all generated tests
     where a specific value is knowable → add to weak_assertion_warnings[].
   Output: validation_result { valid, errors, naming_violations, weak_assertion_warnings, coverage_estimate }
 
-Step 11 — Write and emit
+Step 12 — Write and emit
+  Enforce test_mode before writing:
+    snapshot → write snapshot_tests only.
+    property → write property_tests/property_test_files only.
+    all → write the complete family set, including snapshot_tests and the
+          canonical property_tests plus its property_test_files alias.
   If validation_result.valid == false: do NOT write any files; return errors only.
   If !dry_run and validation passes:
-    Write all test_files, property_test_files, contract_test_files,
-          parameterized_test_files, factory_files to state via state-manager.
+    Write all test_files, snapshot_tests, property_tests,
+          contract_test_files, parameterized_test_files, factory_files to state
+          via state-manager. `property_test_files` is emitted as a compatibility
+          alias and must not cause duplicate files to be written.
     Emit event: "file.written" with { paths: all_written_paths, type: "test" }.
   Emit feedback: if coverage_estimate < 40 → backpropagate to testing-strategy.
   If from_mutation_gaps and ≥1 gap not covered → warning to mutation-test-generator.
-  Output: written_tests, metrics, feedback
+   Output: written_tests, resolved `snapshot_framework`, resolved
+   `property_framework`, metrics, feedback. The two resolved framework fields
+   mirror `framework_config` at the top level for consumers that do not load
+   nested configuration.
 ```
 
 ## Outputs
@@ -404,11 +465,15 @@ Step 11 — Write and emit
 | Field | Type | Description |
 |-------|------|-------------|
 | `test_files` | `array[object]` | Standard test files: `{ path, content, framework, tier }` — unit, integration, e2e |
+| `snapshot_framework` | `string` | Resolved snapshot framework used for the run |
+| `property_framework` | `string` | Resolved property-test framework/library used for the run |
+| `snapshot_tests` | `array[object]` | Component snapshot files: `{ path, content, framework, component, cases, rtl_supported }` |
+| `property_tests` | `array[object]` | Canonical PBT files: `{ path, content, framework, pbt_library, function, invariant }` |
 | `property_test_files` | `array[object]` | PBT test files: `{ path, content, pbt_library, function, invariant }` |
 | `contract_test_files` | `array[object]` | Pact consumer test files: `{ path, content, consumer, provider }` |
 | `parameterized_test_files` | `array[object]` | Parameterized test files: `{ path, content, framework_syntax, test_function }` |
 | `factory_files` | `array[object]` | Test data factory files: `{ path, content, entity, language }` |
-| `test_case_summary` | `object` | Count by tier and type: `{ unit, integration, e2e, property, contract, parameterized, total }` |
+| `test_case_summary` | `object` | Count by tier and type: `{ unit, integration, e2e, snapshot, property, contract, parameterized, total }` |
 | `validation_result` | `object` | `{ valid, errors, naming_violations, weak_assertion_warnings, coverage_estimate }` |
 | `coverage_estimate` | `number` | Estimated coverage increase from generated tests (0–100) |
 | `naming_violations` | `array[object]` | Tests that do not follow Given-When-Then naming convention |
@@ -423,12 +488,28 @@ Step 11 — Write and emit
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": [
-    "test_files", "property_test_files", "contract_test_files",
+    "test_mode", "snapshot_framework", "property_framework", "framework_config", "test_files", "snapshot_tests",
+    "property_tests", "property_test_files", "contract_test_files",
     "parameterized_test_files", "factory_files",
     "test_case_summary", "validation_result", "coverage_estimate",
     "naming_violations", "flakiness_violations", "metrics", "feedback"
   ],
   "properties": {
+    "test_mode": { "type": "string", "enum": ["snapshot", "property", "all"] },
+    "snapshot_framework": { "type": "string", "enum": ["jest", "vitest", "storybook"] },
+    "property_framework": { "type": "string", "enum": ["fast-check", "hypothesis", "quickcheck", "gopter", "rapid", "proptest", "jqwik"] },
+    "framework_config": {
+      "type": "object",
+      "required": ["test_mode", "test_framework", "snapshot_framework", "property_framework"],
+      "properties": {
+        "test_mode": { "type": "string", "enum": ["snapshot", "property", "all"] },
+        "test_framework": { "type": "string" },
+        "snapshot_framework": { "type": "string", "enum": ["jest", "vitest", "storybook"] },
+         "property_framework": { "type": "string", "enum": ["fast-check", "hypothesis", "quickcheck", "gopter", "rapid", "proptest", "jqwik"] },
+        "pbt_library": { "type": "string" },
+        "contract_framework": { "type": "string" }
+      }
+    },
     "test_files": {
       "type": "array",
       "items": {
@@ -439,6 +520,36 @@ Step 11 — Write and emit
           "content":   { "type": "string" },
           "framework": { "type": "string" },
           "tier":      { "type": "string", "enum": ["unit", "integration", "e2e"] }
+        }
+      }
+    },
+    "snapshot_tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "content", "framework", "component", "cases", "rtl_supported"],
+        "properties": {
+          "path": { "type": "string" },
+          "content": { "type": "string" },
+          "framework": { "type": "string", "enum": ["jest", "vitest", "storybook"] },
+          "component": { "type": "string" },
+          "cases": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "rtl_supported": { "type": "boolean" }
+        }
+      }
+    },
+    "property_tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "content", "framework", "pbt_library", "function", "invariant"],
+        "properties": {
+          "path": { "type": "string" },
+          "content": { "type": "string" },
+          "framework": { "type": "string" },
+          "pbt_library": { "type": "string" },
+          "function": { "type": "string" },
+          "invariant": { "type": "string" }
         }
       }
     },
@@ -497,11 +608,12 @@ Step 11 — Write and emit
     },
     "test_case_summary": {
       "type": "object",
-      "required": ["unit", "integration", "e2e", "property", "contract", "parameterized", "total"],
+      "required": ["unit", "integration", "e2e", "snapshot", "property", "contract", "parameterized", "total"],
       "properties": {
         "unit":          { "type": "integer" },
         "integration":   { "type": "integer" },
         "e2e":           { "type": "integer" },
+        "snapshot":      { "type": "integer" },
         "property":      { "type": "integer" },
         "contract":      { "type": "integer" },
         "parameterized": { "type": "integer" },
@@ -590,6 +702,10 @@ Step 11 — Write and emit
 12. PBT tests MUST enable shrinking. For fast-check: `fc.assert(fc.property(...), { numRuns: 100 })`. For hypothesis: `settings(max_examples=100)`.
 13. Contract test files MUST be placed in a `__contracts__/` (Python) or `*.pact.spec.ts` (TypeScript) directory/naming convention.
 14. Factory files MUST be placed in `test/factories/` or `tests/factories/`.
+15. `test_mode: snapshot` MUST emit snapshot tests only; `test_mode: property` MUST emit property tests only; `test_mode: all` emits both plus the existing test families.
+16. Snapshot tests MUST use the selected snapshot framework, include a default case, and call `toMatchSnapshot()` for every generated case. Documented variants and detected RTL support must be represented in `cases`.
+17. `snapshot_framework` is restricted to `jest`, `vitest`, or `storybook`; `property_framework` is restricted to `fast-check`, `hypothesis`, or `quickcheck`.
+18. `property_tests` is canonical. `property_test_files` is a compatibility alias and must not create duplicate files.
 
 ## Security Considerations
 
@@ -612,6 +728,10 @@ Step 11 — Write and emit
 - [ ] Every test name follows Given-When-Then convention for its tier
 - [ ] AAA structure (`// Arrange / // Act / // Assert`) present in every test body
 - [ ] Framework auto-detected correctly when not provided
+- [ ] `test_mode` defaults to `all` and correctly gates output families
+- [ ] Snapshot framework selected from explicit override, dependency metadata, or Jest fallback
+- [ ] Snapshot tests include default, documented variants, and RTL cases when i18n is detected
+- [ ] Every snapshot case uses `toMatchSnapshot()` and stable fixtures
 - [ ] Vitest used (not Jest) when target.build_tool is "vite" or "swc"
 - [ ] PBT tests generated for all pbt_candidate functions
 - [ ] Contract tests generated for all consumer-provider integration points
@@ -631,6 +751,9 @@ Step 11 — Write and emit
 | `coverage_report` absent in `fill_gaps` mode | Reject: `{"error": "COVERAGE_REPORT_REQUIRED"}` |
 | `assertion_gaps` absent in `from_mutation_gaps` mode | Reject: `{"error": "ASSERTION_GAPS_REQUIRED"}` |
 | `testing_strategy` absent in `from_strategy` mode | Reject: `{"error": "TESTING_STRATEGY_REQUIRED"}` |
+| `test_mode: snapshot` with no component artifacts | Return an empty `snapshot_tests` array and informational feedback; do not generate unrelated tests |
+| `test_mode: property` with no pure-function candidates | Return an empty `property_tests` array and informational feedback; do not generate unrelated tests |
+| Unsupported snapshot framework | Fall back to Jest and emit a framework warning |
 | > 30 files requested | Reject: `{"error": "BATCH_TOO_LARGE", "max": 30}` |
 | PBT library not available for language | Fall back to table-driven parameterized tests, warn in feedback |
 | Pact not available | Generate manual contract snapshot tests, warn in feedback |
@@ -646,12 +769,12 @@ Step 11 — Write and emit
 
 ## 13. Skill Composition
 
-`test-generator` v2.0.0 is invoked after `code-generator`, `testing-strategy` v2.0.0, and after `mutation-test-generator` emits assertion_gaps:
+`test-generator` v2.1.0 is invoked after `code-generator`, `testing-strategy` v2.0.0, and after `mutation-test-generator` emits assertion_gaps:
 
 ```yaml
 composes:
   - skill: test-generator
-    version: "^2.0.0"
+    version: "^2.1.0"
 
     # Standard invocation after code-generator
     from_code_invocation:
@@ -659,6 +782,11 @@ composes:
         generation_mode:   "from_code"
         target:            "code_generator.artifacts[0]"
         language:          "session.language"
+        test_mode:         "request.test_mode"
+        framework:         "request.framework"
+        code_artifacts:    "code_generator.artifacts"
+        snapshot_framework: "request.snapshot_framework"
+        property_framework: "request.property_framework"
         testing_strategy:  "state.testing_strategy"
         property_tests:    "state.testing_strategy.property_tests"
         contract_tests:    "state.testing_strategy.contract_tests"
@@ -668,8 +796,10 @@ composes:
         naming_convention:   "state.testing_strategy.naming_convention"
         flakiness_rules:     "state.testing_strategy.flakiness_rules"
       output_map:
-        test_files:             "state.test_files"
-        property_test_files:    "state.property_test_files"
+         test_files:             "state.test_files"
+         snapshot_tests:         "state.snapshot_tests"
+         property_tests:         "state.property_tests"
+         property_test_files:    "state.property_test_files"
         contract_test_files:    "state.contract_test_files"
         parameterized_test_files: "state.parameterized_test_files"
         factory_files:          "state.factory_files"

@@ -1,24 +1,30 @@
 ---
 name: work-item-exporter
-version: 2.2.0
+version: 2.3.0
 domain: integration
-description: 'Use when work items need to be exported to an external platform or file, or when syncing Jira status back to local work items, or when a Jira/GitHub/Linear webhook event needs to trigger an automated sync. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync", "webhook trigger", "Jira webhook", "auto-sync on status change", "export to GitHub", "create GitHub issues". Supports three modes: export (one-way outbound, default), sync (bidirectional — reads Jira status back and proposes local updates via HITL gate), and webhook (event-driven — validates incoming webhook payload, maps event to a sync or export operation, and dispatches automatically). FEATURE work items are mapped to Jira Epics automatically.'
+description: 'Use when work items need to be exported to an external platform or file, imported from Jira/GitHub/Linear, synced back to local work items, or when a webhook event needs to trigger an automated sync. Triggers on: "export tasks", "export work items", "sync to Jira", "export to Jira", "generate Jira import", "export project plan", "export bugs", "sync from Jira", "pull Jira status", "bidirectional sync", "import Jira issues", "webhook trigger", "Jira webhook", "auto-sync on status change", "export to GitHub", "create GitHub issues". Supports export (one-way outbound, default), import (external issues to local work-items folders), and bidirectional directions, plus the existing sync and webhook modes. FEATURE work items are mapped to Jira Epics automatically.'
 author: system
 ---
 
 ## Purpose
 
-Transform all tracked work items from the internal `work-items/` store into export-ready formats for external work management platforms, and optionally pull status updates back from Jira into local work item files. The skill operates in two modes:
+Transform all tracked work items from the internal `work-items/` store into export-ready formats for external work management platforms, and optionally pull status updates back from Jira into local work item files. The skill retains its three operation modes:
 
 - **`export` mode (default):** One-way outbound. Produces a Jira Bulk Import JSON file, JSON Lines, and Markdown summary. Async and non-blocking.
 - **`sync` mode:** Bidirectional. After export, fetches the current status of each exported issue from the Jira REST API, diffs against local `lifecycle_state`, and proposes state updates for human approval via HITL gate. No local file is modified without explicit human approval.
 - **`webhook` mode:** Event-driven. Receives a raw webhook payload from Jira, GitHub, or Linear; validates the HMAC signature; maps the event type to an export or sync operation; and dispatches automatically. Deletion events are HITL-gated (no auto-delete).
 
+The independent **`direction`** input controls work-item movement and defaults to `export` for backward compatibility. `import` creates local work-item folders from supplied Jira, GitHub, or Linear payloads; `bidirectional` runs the existing export flow and then the import flow. Existing `mode=sync` and `mode=webhook` behavior remains unchanged.
+
 ## Inputs
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `direction` | `string` | No | Work-item direction: `"export"` (default), `"import"`, or `"bidirectional"`. |
 | `mode` | `string` | No | Operation mode: `"export"` (default), `"sync"`, or `"webhook"`. Sync mode requires `jira_base_url` and `jira_api_token_env`. Webhook mode requires `webhook_config` and `payload`. |
+| `import_source` | `string` | Import/bidirectional only | Source platform: `"jira"`, `"github"`, or `"linear"`. |
+| `import_payload` | `object | array` | Import/bidirectional only | One issue payload, an array of issue payloads, or a source envelope containing an `issues` array. Import performs no network fetch. |
+| `dry_run` | `boolean` | No | Import preview mode. Default `false`; when true, no local files, state, or indexes are written. Existing GitHub export dry-run behavior is preserved. |
 | `export_formats` | `array[string]` | No | Formats to generate. Default: `["jira", "jsonl", "markdown"]` |
 | `jira_project_key` | `string` | No (required in sync mode) | Jira project key for the export (e.g. `PROJ`). Included in manifest; required for sync API calls. |
 | `jira_base_url` | `string` | Sync only | Base URL of the Jira instance (e.g. `https://myorg.atlassian.net`). Required when `mode=sync`. |
@@ -46,6 +52,11 @@ Transform all tracked work items from the internal `work-items/` store into expo
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
+    "direction": {
+      "type": "string",
+      "enum": ["export", "import", "bidirectional"],
+      "default": "export"
+    },
     "mode": {
       "type": "string",
       "enum": ["export", "sync", "webhook"],
@@ -96,6 +107,20 @@ Transform all tracked work items from the internal `work-items/` store into expo
     "github_milestone": {
       "type": "string",
       "description": "GitHub milestone title. Created automatically if absent."
+    },
+    "import_source": {
+      "type": "string",
+      "enum": ["jira", "github", "linear"],
+      "description": "Required when direction is import or bidirectional."
+    },
+    "import_payload": {
+      "type": ["object", "array"],
+      "description": "Raw issue payload or source envelope. Required when direction is import or bidirectional."
+    },
+    "dry_run": {
+      "type": "boolean",
+      "default": false,
+      "description": "Preview import changes without writing files, state, or indexes."
     }
   },
   "if": { "properties": { "mode": { "const": "sync" } }, "required": ["mode"] },
@@ -104,6 +129,13 @@ Transform all tracked work items from the internal `work-items/` store into expo
     {
       "if": { "properties": { "mode": { "const": "webhook" } }, "required": ["mode"] },
       "then": { "required": ["webhook_config", "payload"] }
+    },
+    {
+      "if": {
+        "properties": { "direction": { "enum": ["import", "bidirectional"] } },
+        "required": ["direction"]
+      },
+      "then": { "required": ["import_source", "import_payload"] }
     }
   ]
 }
@@ -114,6 +146,8 @@ Transform all tracked work items from the internal `work-items/` store into expo
 - `work_items` scope from state-manager: compressed index to enumerate all items and their `file_path` references.
 - `work-items/{TYPE}-{NNNN}.md` files: full detail for each item (read per item as needed).
 - `session_id` from state: included in export file naming and manifest.
+- `work_items.imported_external_ids[]` from state: source-qualified IDs used to prevent duplicate imports. Import may append successfully created IDs; export remains read-only.
+- `work-items/features/`, `work-items/bugs/`, and their `indexes/*.md` files: local folder and index conventions used by import.
 - Foundation schema from `docs/work-item-foundation.md` §2: Jira field mapping table used for format transformation.
 - *(sync mode only)* Jira REST API access: base URL + credentials from environment variable named by `jira_api_token_env`. Credentials are read from the environment at runtime and are NEVER written to state, logs, or export files.
 
@@ -200,7 +234,7 @@ Step 4b — Build GitHub Issues (if "github" in export_formats)
                   + "## Description\n\n{item.description}\n\n"
                   + (if item.acceptance_criteria non-empty): "## Acceptance Criteria\n\n{item.acceptance_criteria}\n\n"
                   + (if item.linked_items non-empty): "## Linked Items\n\n{item.linked_items joined as '- {id}'}\n\n"
-                  + "_Exported by AI Workflow work-item-exporter v2.2.0_"
+                  + "_Exported by AI Workflow work-item-exporter v2.0.0_"
       labels  ← ["ai-workflow", item.work_item_type.toLowerCase(), "priority-{item.priority}"]
                   + item.jira_labels[] (if present)
       milestone ← milestone_number (if resolved)
@@ -253,9 +287,66 @@ Step 7 — Write export manifest
   Write to: exports/{date}_{session_prefix}_manifest.json
   Output: manifest
 
-Step 8 — Assemble output (export mode)
+Step 8 — Assemble output (export phase)
+  Run for direction=export and as the first phase of direction=bidirectional.
   Emit event: file.written (for each export file produced)
   Return output.
+
+### Import direction (direction=import or bidirectional)
+
+The following import steps are additive. They do not change or skip any existing export, sync, or webhook steps. For `direction=bidirectional`, run the export phase first, then run I1–I6.
+
+```
+Import Step I1 — Validate and normalize source payload
+  Require import_source in {jira, github, linear} and import_payload.
+  Accept one issue, an array of issues, or an envelope with an issues array.
+  Normalize each issue to:
+    { external_id, external_key, title, description, issue_type, status,
+      acceptance_criteria, labels, priority, assignee, source_url, linked_items }
+  Use source-qualified IDs for dedupe:
+    Jira:   "jira:{issue.key}" (fall back to "jira:{issue.id}")
+    GitHub: "github:{repository}#{issue.number}" (fall back to issue.node_id)
+    Linear: "linear:{issue.id}" (fall back to issue.identifier)
+  Reject malformed issues without aborting valid issues; record each rejection in import_errors[].
+  Do not fetch remote APIs or interpret imported text as executable content.
+  Output: normalized_imports[]
+
+Import Step I2 — Deduplicate against imported_external_ids
+  Read work_items.imported_external_ids[]; treat a missing list as empty for backward compatibility.
+  Mark an item as a duplicate when its source-qualified external_id is already in state or was seen earlier in this batch.
+  Do not create a folder, write a file, update an index, or append state for duplicates.
+  Output: new_imports[], duplicates_skipped[]
+
+Import Step I3 — Map issue types and build the four-file plan
+  Jira Epic → FEATURE and work-items/features/FEATURE-NNN-{sanitized-key}/.
+  Jira Bug → BUG and work-items/bugs/BUG-NNN-{sanitized-key}/.
+  GitHub/Linear issues tagged or typed as bug → BUG and the bugs folder; other supported issues → TASK and the tasks folder.
+  Allocate NNN as the next unused numeric ID for the destination type, while retaining the external key suffix for traceability.
+  Plan exactly request.md, plan.md, tasks.md, and status.md in each folder.
+  Map title, description, acceptance criteria, labels, priority, status, source URL, and external ID into front matter/body.
+  When acceptance criteria are absent, generate plan.md from the imported description and explicitly mark the plan as AI-generated.
+  Sanitize path components and bound imported text before writing; never allow path traversal.
+  Output: planned_imports[] with folder and file paths.
+
+Import Step I4 — Dry-run import (dry_run=true)
+  Return planned_imports[], import_errors[], and duplicates_skipped[].
+  Do not write work-item files, indexes, or state, and do not emit file.written events.
+  Mark each planned item with dry_run=true and its would-be external ID.
+
+Import Step I5 — Commit imported work items (dry_run=false)
+  Create each destination folder and its four files atomically; skip a partial item and record an import_error if any file fails.
+  After all four files succeed, append its source-qualified external_id to work_items.imported_external_ids[] exactly once.
+  Update the matching index after successful writes:
+    FEATURE → indexes/features.md
+    BUG     → indexes/bugs.md
+    TASK    → indexes/tasks.md when that index exists
+  Preserve existing index entries, sort deterministically by local ID, and never add duplicate rows.
+  Emit file.written for each created work-item file and each changed index.
+
+Import Step I6 — Assemble import output
+  Return imported_items[] for successful creations (or planned creations in dry-run), import_errors[], and duplicates_skipped[].
+  In bidirectional mode, merge these fields with the export output while preserving all existing export fields.
+```
 
 Step 9 — Fetch Jira issue statuses (sync mode only; skip entirely if mode=export)
   Validate sync inputs: jira_base_url, jira_api_token_env, jira_user_email, jira_project_key all present.
@@ -375,6 +466,9 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 | `feedback` | `array[object]` | Feedback loop entries (warnings for PII redactions, empty work item store, sync errors, etc.) |
 | `github_export_path` | `string` \| `null` | Path to `artifacts/github-export-<timestamp>.json`. `null` if GitHub export was not requested or failed. |
 | `github_issues_created` | `integer` \| `null` | Number of GitHub issues successfully created. `null` if GitHub export not run. |
+| `imported_items` | `array[object]` | Successfully created or dry-run planned local items. Each entry includes `external_id`, `source`, `local_id`, `type`, `folder`, and `dry_run`. |
+| `import_errors` | `array[object]` | Per-issue import validation or write failures. Import errors do not discard successful items. |
+| `duplicates_skipped` | `array[object]` | Source-qualified external IDs skipped because they already exist in `work_items.imported_external_ids[]` or the current batch. |
 
 **Output Schema:**
 
@@ -382,7 +476,7 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "webhook_response", "metrics", "feedback", "github_export_path", "github_issues_created"],
+  "required": ["export_id", "files_produced", "items_exported", "type_breakdown", "manifest", "sync_report", "webhook_response", "metrics", "feedback", "github_export_path", "github_issues_created", "imported_items", "import_errors", "duplicates_skipped"],
   "properties": {
     "export_id": { "type": "string" },
     "files_produced": {
@@ -451,7 +545,44 @@ Step 16 — Invoke sync/export operation (webhook mode only)
       }
     },
     "github_export_path": { "type": ["string", "null"] },
-    "github_issues_created": { "type": ["integer", "null"], "minimum": 0 }
+    "github_issues_created": { "type": ["integer", "null"], "minimum": 0 },
+    "imported_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["external_id", "source", "local_id", "type", "folder", "dry_run"],
+        "properties": {
+          "external_id": { "type": "string" },
+          "source": { "type": "string", "enum": ["jira", "github", "linear"] },
+          "local_id": { "type": "string" },
+          "type": { "type": "string", "enum": ["FEATURE", "BUG", "TASK"] },
+          "folder": { "type": "string" },
+          "dry_run": { "type": "boolean" }
+        }
+      }
+    },
+    "import_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["external_id", "reason"],
+        "properties": {
+          "external_id": { "type": ["string", "null"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "duplicates_skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["external_id", "reason"],
+        "properties": {
+          "external_id": { "type": "string" },
+          "reason": { "type": "string", "enum": ["already_imported", "duplicate_in_batch"] }
+        }
+      }
+    }
   }
 }
 ```
@@ -459,6 +590,11 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 ## Rules & Constraints
 
 - **Export mode** is one-way (outbound only) and **non-blocking and async**. It runs at pipeline completion (parallel with doc-maintainer) and MUST NOT gate any preceding pipeline phase.
+- **Direction** defaults to `export`; existing export behavior and output files are unchanged. `import` runs only the import flow, while `bidirectional` runs export followed by import.
+- **Import direction** accepts Jira, GitHub, or Linear payloads, creates local work-item folders, and is idempotent by source-qualified `work_items.imported_external_ids[]` values.
+- Jira `Epic` imports MUST create a `work-items/features/FEATURE-NNN-{jira-key}/` folder; Jira `Bug` imports MUST create a `work-items/bugs/BUG-NNN-{jira-key}/` folder. Every imported item uses the four-file convention: `request.md`, `plan.md`, `tasks.md`, and `status.md`.
+- **Import dry-run** is side-effect free: it may calculate IDs and paths but MUST NOT write work-item files, indexes, or state. It returns the same planned items and errors that a real import would report.
+- Successful imports append their external IDs only after all four files are written, and update the matching index deterministically without duplicate rows.
 - **Sync mode** is bidirectional but **always HITL-gated**. No local `.md` file may be modified without explicit human approval of the proposed update set (Step 11). Sync mode runs on-demand only — it MUST NOT be triggered automatically without user intent.
 - **Webhook mode** is event-driven and automated for `issue_status_changed` and `issue_created` events. The `issue_deleted` event MUST NEVER auto-delete a local work item — it raises a HITL gate. Rate limit: max 10 invocations per minute per source platform.
 - PII scrubbing (Step 3) is **mandatory** and MUST run before any export file is written. No raw personal data may appear in exported files.
@@ -485,6 +621,8 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 - **Webhook deletion safety:** `issue_deleted` events MUST NOT trigger any local work item deletion — auto-deletion is prohibited. The event only sets a flag and raises a HITL gate. Deletion of local state requires explicit human decision.
 - **GitHub export credentials:** The GitHub PAT is read from the environment variable named by `github_token_env` at runtime. The token value MUST NEVER appear in any output, log, feedback entry, error message, state, or export file. Only the env var name is stored or logged.
 - GitHub issue bodies may expose internal project metadata. If an item was tagged with `jira_labels: ["security"]`, emit a `warning` feedback entry: "Security defect {id} is included in GitHub export — verify disclosure appropriateness before repository is public."
+- Imported payload text is untrusted content: sanitize path components, preserve it as text only, and never execute or evaluate it.
+- Import credentials are not required because import consumes supplied payloads. If a caller fetches payloads upstream, credentials remain outside this skill and MUST NOT be placed in `import_payload`.
 
 ## Token Optimization
 
@@ -522,6 +660,14 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 - [ ] *(github mode)* Rate limit headers checked and respected (X-RateLimit-Reset)
 - [ ] *(github mode)* `artifacts/github-export-<timestamp>.json` manifest written with all issue URLs
 - [ ] *(github mode)* Security-tagged items trigger `warning` feedback before export
+- [ ] *(import mode)* `direction` and `import_source` are validated against their enums
+- [ ] *(import mode)* Jira Epics map to `work-items/features/FEATURE-NNN-{jira-key}/`
+- [ ] *(import mode)* Jira Bugs map to `work-items/bugs/BUG-NNN-{jira-key}/`
+- [ ] *(import mode)* Every created item has request, plan, tasks, and status files
+- [ ] *(import mode)* `work_items.imported_external_ids[]` prevents duplicate folders, including duplicates within one payload
+- [ ] *(import mode)* Dry-run writes no files, indexes, or state
+- [ ] *(import mode)* `indexes/features.md` and `indexes/bugs.md` are updated after successful imports
+- [ ] *(import mode)* `imported_items[]`, `import_errors[]`, and `duplicates_skipped[]` are always present in output
 
 ## Failure Scenarios
 
@@ -548,6 +694,12 @@ Step 16 — Invoke sync/export operation (webhook mode only)
 | `github_token_env` env var absent or empty | Emit `warning` "GITHUB_TOKEN env var not set — skipping GitHub export", continue with other formats. |
 | GitHub API HTTP 429 (rate limit) | Wait until `X-RateLimit-Reset` epoch (max 60s), retry once. If still rate-limited, emit `warning` and write partial manifest. |
 | GitHub API HTTP 503 | Exponential backoff: 2, 4, 8s (max 3 retries). On persistent failure, emit `warning` and write partial manifest. |
+| Import payload is missing, malformed, or has no external ID | Record an `import_errors[]` entry and continue with other payload items. |
+| Import external ID already exists in `work_items.imported_external_ids[]` | Skip without writes and append a `duplicates_skipped[]` entry. |
+| Duplicate external ID appears twice in one import payload | Create one item, skip the later occurrence, and record `reason="duplicate_in_batch"`. |
+| Import dry-run is enabled | Return planned `imported_items[]` and do not write files, indexes, state, or events. |
+| Imported Jira issue type is unsupported | Record an `import_errors[]` entry; do not guess a feature or bug mapping. |
+| Import file or index write fails | Keep the source item unmarked as imported, record the error, and do not expose a partial folder as successful. |
 
 ## 12. Human-in-the-Loop Gates
 
@@ -566,9 +718,9 @@ Exception: if a security-sourced defect (`jira_labels` includes `"security"`) is
 composes:
   - skill: state-manager
     version: "^1.1.0"
-    role: state_read
+    role: state_read_export_state_write_import_dedupe
     scopes: ["work_items", "session_id"]
-    note: "Read-only. work-item-exporter never writes to state."
+    note: "Export, sync, and webhook status reads remain read-only unless their existing flow explicitly applies an approved update. Import may append only successfully created source-qualified IDs to work_items.imported_external_ids[]; it never rewrites unrelated state."
 
 pipeline_entry:
   - pipeline: full-pipeline
@@ -582,6 +734,6 @@ pipeline_entry:
 
 event_emissions:
   - event: file.written
-    on: each export file produced
-    payload: { path, type: "export" }
+    on: each export file produced or imported work-item/index file written
+    payload: { path, type: "export" | "import" }
 ```

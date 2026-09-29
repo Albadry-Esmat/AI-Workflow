@@ -1,6 +1,6 @@
 # How to Use — Developer & AI Agent Guide
 
-**Version:** 2.3.0 | **Last updated:** 2026-07-03
+**Version:** 2.3.1 | **Last updated:** 2026-09-29
 
 ---
 
@@ -57,7 +57,7 @@ cd /path/to/your-project
 opencode
 ```
 
-This copies `opencode.json`, `.opencode/` (all 121 skills + 24 agents), and your `.env` configuration into the target project. Review the target project’s `.env` separately and use short-lived, least-privilege credentials; do not copy personal tokens into a new project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
+This copies `opencode.json`, `.opencode/` (all 126 skills + 24 agents), and your `.env` configuration into the target project. Review the target project’s `.env` separately and use short-lived, least-privilege credentials; do not copy personal tokens into a new project by default. After that it is fully standalone — no dependency on the AI-Workflow folder. Use this when you want the workflow to live inside a specific repo.
 
 ---
 

@@ -39,7 +39,7 @@
     "pipeline_template": {
       "type": "string",
       "description": "Name of the pipeline template driving this session",
-      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request", "gap-to-skill", "api-first", "ai-agent-system", "cloud-migration", "compliance-first", "data-engineering", "iot-embedded", "microservices-platform", "ml-platform", "mobile-app", "saas-platform"]
+      "enum": ["full-pipeline", "requirements-only", "architecture-only", "quick-review", "pre-deploy", "consumer-website", "developer-portal", "admin-panel", "insights-pipeline", "insights-adaptation-pipeline", "defect-lifecycle", "change-request", "gap-to-skill", "api-first", "ai-agent-system", "cloud-migration", "compliance-first", "data-engineering", "data-ml-pipeline", "iot-embedded", "microservices", "microservices-platform", "ml-platform", "mobile-app", "saas-platform", "serverless-edge"]
     },
 
     "created_at": {
@@ -379,6 +379,12 @@
           "description": "Count per work item type for quick summary without iterating items[].",
           "additionalProperties": { "type": "integer", "minimum": 0 }
         },
+        "imported_external_ids": {
+          "type": "array",
+          "description": "Source-qualified external work-item IDs imported into the local lifecycle store; used for idempotent import deduplication.",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
         "last_updated": {
           "type": "string",
           "format": "date-time",
@@ -386,6 +392,18 @@
         }
       },
       "required": ["items", "sequences", "type_counts", "last_updated"]
+    },
+
+    "performance_metrics": {
+      "type": "object",
+      "description": "Latest numeric performance measurements made available to performance-guard.",
+      "additionalProperties": { "type": "number" }
+    },
+
+    "performance_regression_threshold": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Optional percentage threshold supplied to performance-guard; defaults to 20 when absent."
     },
 
     "behavioral_telemetry": {

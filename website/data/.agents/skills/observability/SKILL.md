@@ -1,16 +1,20 @@
 ---
 name: observability
-version: 1.1.0
+version: 2.0.0
 domain: system
-description: 'Use when adding metrics collection, monitoring, or observability to skills or the orchestrator pipeline. Triggers on: "add metrics", "monitor skills", "observability", "track execution", "how do I measure", "pipeline metrics", "execution monitoring". Do NOT use for application-level monitoring of deployed software — this skill monitors the skill pipeline itself.'
+description: 'Use when designing pipeline and application observability, generating Prometheus rules, OpenTelemetry configuration, Grafana dashboards, or preserving internal pipeline metrics. Triggers on: "add metrics", "monitor skills", "observability", "Prometheus", "OpenTelemetry", "Grafana", "track execution", "pipeline metrics", "execution monitoring".'
 author: ASE-OS
+lifecycle_state: active
 ---
 
 # Observability
 
-**Version:** 1.1.0 | **Last updated:** 2026-06-18
+**Version:** 2.0.0 | **Last updated:** 2026-09-29
 
-Standardized metrics collection, aggregation, threshold alerting, and health status reporting for the skill execution pipeline. Every skill emits a `metrics` object; this skill consumes those events, maintains a running pipeline aggregate, checks alert thresholds, and surfaces health alerts to the orchestrator.
+`observability` has two compatible responsibilities:
+
+1. It generates production observability artifacts from architecture and integration contracts: Prometheus alerting rules, an OpenTelemetry collector/SDK configuration, Grafana dashboard JSON, and a canonical metric catalog.
+2. It remains the stateful metrics sink for the skill pipeline. Existing orchestrator event collection, `pipeline_metrics` aggregation, health alerts, and canonical per-skill metrics are preserved below as **internal pipeline-metrics mode**.
 
 ---
 
@@ -18,29 +22,22 @@ Standardized metrics collection, aggregation, threshold alerting, and health sta
 
 ```yaml
 name: observability
-version: 1.1.0
-domain: system
+version: 2.0.0
 description: >
-  Use when adding metrics collection, monitoring, or observability to skills or
-  the orchestrator pipeline. Triggers on: "add metrics", "monitor skills",
-  "observability", "track execution", "how do I measure", "pipeline metrics",
-  "execution monitoring".
-  Do NOT use for application-level monitoring of deployed software.
+  Generate stack-aware observability artifacts and aggregate the existing
+  skill-pipeline metrics stream. No credentials or application payloads are
+  collected.
 author: ASE-OS
+lifecycle_state: active
 ```
 
 ---
 
 ## 2. Purpose
 
-`observability` acts as the metrics sink and aggregator for the skill pipeline. It is invoked by the **orchestrator** at four defined collection points during every pipeline run:
+The skill turns architecture integration points into portable, reviewable observability specifications. It does not provision infrastructure, contact a telemetry backend, or emit secrets. Generated artifacts are deterministic for the same normalized input and use labels and datasource references rather than environment-specific values.
 
-1. **Skill start** — records timestamp and input token count
-2. **Skill complete** — records duration, output tokens, items produced
-3. **Gate event** — records gate type, verdict, and wait duration
-4. **Pipeline end** — aggregates all per-skill metrics into a pipeline summary with health assessment
-
-The skill also defines the **canonical metrics schema** that every other skill MUST implement in its `metrics` output field. Compliance with this schema is enforced by `schema-validator` (SKL-009).
+The internal pipeline-metrics behavior is intentionally retained. The orchestrator may continue to call this skill at `skill.started`, `skill.completed`, `skill.failed`, gate, feedback, and pipeline-end collection points. In that mode, the skill reads and writes the `pipeline_metrics` aggregate through `state-manager`; it does not require application architecture data.
 
 ---
 
@@ -48,102 +45,173 @@ The skill also defines the **canonical metrics schema** that every other skill M
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `skill_name` | `string` | Yes | Name of the skill reporting metrics |
-| `execution_event` | `string` | Yes | Event type: `skill.started`, `skill.completed`, `skill.failed`, `gate.passed`, `gate.blocked`, `feedback.triggered`, `pipeline.ended` |
-| `metrics_data` | `object` | Yes | The metrics payload for this event (schema depends on `execution_event`) |
-| `session_id` | `string` | Yes | Session UUID for correlation across events |
-| `pipeline_phase` | `string` | No | Current pipeline phase (e.g., `phase-2-architecture`, `phase-7b-guards`) |
-| `aggregate_so_far` | `object` | No | Running aggregate from prior collection points (state-manager snapshot) |
+| `architecture` | `object` | Generation mode | Architecture output containing `modules[]` and optional `integration_points[]` |
+| `integration_points` | `array[object]` | Generation mode | API, queue, database, cache, or external-service contracts |
+| `tech_stack` | `object` | Generation mode | Runtime/framework/language and telemetry transport preferences |
+| `slo_targets` | `object` | No | Availability, error-rate, p95, and p99 targets; defaults are applied when omitted |
+| `mode` | `string` | No | `artifact_generation` (default) or `internal_pipeline_metrics` |
+| `dry_run` | `boolean` | No | When true, return all previews without writing state or files; default `false` |
+| `skill_name` | `string` | Pipeline mode | Existing internal metrics event producer |
+| `execution_event` | `string` | Pipeline mode | One of the seven existing pipeline events |
+| `metrics_data` | `object` | Pipeline mode | Event-specific metrics payload |
+| `session_id` | `string` | Pipeline mode | Active session UUID used for correlation |
+| `pipeline_phase` | `string` | No | Current pipeline phase |
+| `aggregate_so_far` | `object` | No | Previous `pipeline_metrics` state-manager snapshot |
 
-**Input Schema:**
+### Input Schema
 
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ObservabilityInput",
   "type": "object",
-  "required": ["skill_name", "execution_event", "metrics_data", "session_id"],
   "properties": {
+    "architecture": {
+      "type": "object",
+      "properties": {
+        "modules": { "type": "array", "items": { "type": "object" } },
+        "integration_points": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": true
+    },
+    "integration_points": { "type": "array", "items": { "$ref": "#/$defs/integration_point" } },
+    "tech_stack": {
+      "type": "object",
+      "properties": {
+        "language": { "type": "string" },
+        "framework": { "type": "string" },
+        "runtime": { "type": "string" },
+        "otel_transport": { "type": "string", "enum": ["otlp_grpc", "otlp_http"] }
+      },
+      "additionalProperties": true
+    },
+    "slo_targets": {
+      "type": "object",
+      "properties": {
+        "availability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "default": 0.999 },
+        "error_rate_threshold": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.01 },
+        "p95_latency_ms": { "type": "number", "exclusiveMinimum": 0, "default": 500 },
+        "p99_latency_ms": { "type": "number", "exclusiveMinimum": 0, "default": 1000 }
+      },
+      "additionalProperties": false
+    },
+    "dry_run": { "type": "boolean", "default": false },
+    "mode": { "type": "string", "enum": ["artifact_generation", "internal_pipeline_metrics"], "default": "artifact_generation" },
     "skill_name": { "type": "string", "minLength": 1 },
     "execution_event": {
       "type": "string",
-      "enum": ["skill.started","skill.completed","skill.failed",
-               "gate.passed","gate.blocked","feedback.triggered","pipeline.ended"]
+      "enum": ["skill.started", "skill.completed", "skill.failed", "gate.passed", "gate.blocked", "feedback.triggered", "pipeline.ended"]
     },
-    "metrics_data": {
-      "type": "object",
-      "description": "Event-specific payload — see Metrics Data Schemas below"
-    },
+    "metrics_data": { "type": "object" },
     "session_id": { "type": "string", "format": "uuid" },
     "pipeline_phase": { "type": "string" },
     "aggregate_so_far": { "type": "object" }
+  },
+  "oneOf": [
+    { "required": ["architecture", "integration_points", "tech_stack"] },
+    { "required": ["skill_name", "execution_event", "metrics_data", "session_id"] }
+  ],
+  "$defs": {
+    "integration_point": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["rest_api", "grpc", "graphql", "message_queue", "database", "cache", "external_service"] },
+        "module": { "type": "string" },
+        "protocol": { "type": "string" },
+        "service": { "type": "string" },
+        "operations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
   }
 }
 ```
 
-### Metrics Data Schemas (per event type)
+Defaults for `slo_targets` are availability `0.999`, error rate `0.01`, p95 `500ms`, and p99 `1000ms`. A pipeline-mode invocation is valid through the second `oneOf` branch and remains backward-compatible with the pre-2.0 event contract.
+
+### Internal Event Payload Schemas
+
+When `execution_event` is supplied, validate `metrics_data` against the matching schema before updating `pipeline_metrics`:
 
 ```json
 {
   "skill.started": {
+    "type": "object",
     "required": ["timestamp", "tokens_in"],
     "properties": {
       "timestamp": { "type": "string", "format": "date-time" },
-      "tokens_in":  { "type": "integer", "minimum": 0 }
-    }
+      "tokens_in": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": true
   },
   "skill.completed": {
+    "type": "object",
     "required": ["timestamp", "tokens_in", "tokens_out", "duration_ms", "items_produced", "version"],
     "properties": {
-      "timestamp":      { "type": "string", "format": "date-time" },
-      "tokens_in":      { "type": "integer", "minimum": 0 },
-      "tokens_out":     { "type": "integer", "minimum": 0 },
-      "duration_ms":    { "type": "integer", "minimum": 0 },
+      "timestamp": { "type": "string", "format": "date-time" },
+      "tokens_in": { "type": "integer", "minimum": 0 },
+      "tokens_out": { "type": "integer", "minimum": 0 },
+      "duration_ms": { "type": "integer", "minimum": 0 },
       "items_produced": { "type": "integer", "minimum": 0 },
-      "version":        { "type": "string" },
-      "retries":        { "type": "integer", "default": 0 },
+      "version": { "type": "string" },
+      "retries": { "type": "integer", "minimum": 0, "default": 0 },
       "validation_passed": { "type": "boolean" }
-    }
+    },
+    "additionalProperties": true
   },
   "skill.failed": {
+    "type": "object",
     "required": ["timestamp", "error_type", "retry_count"],
     "properties": {
-      "timestamp":   { "type": "string", "format": "date-time" },
-      "error_type":  { "type": "string" },
+      "timestamp": { "type": "string", "format": "date-time" },
+      "error_type": { "type": "string" },
       "retry_count": { "type": "integer", "minimum": 0 },
-      "tokens_in":   { "type": "integer" }
-    }
+      "tokens_in": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": true
   },
   "gate.passed": {
+    "type": "object",
     "required": ["gate_type", "wait_duration_s"],
     "properties": {
-      "gate_type":        { "type": "string" },
-      "wait_duration_s":  { "type": "integer" },
-      "auto_continued":   { "type": "boolean" }
-    }
+      "gate_type": { "type": "string" },
+      "wait_duration_s": { "type": "integer", "minimum": 0 },
+      "auto_continued": { "type": "boolean" }
+    },
+    "additionalProperties": true
   },
   "gate.blocked": {
+    "type": "object",
     "required": ["gate_type", "block_reason"],
     "properties": {
-      "gate_type":    { "type": "string" },
+      "gate_type": { "type": "string" },
       "block_reason": { "type": "string" },
-      "duration_s":   { "type": "integer" }
-    }
+      "duration_s": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": true
   },
   "feedback.triggered": {
+    "type": "object",
     "required": ["from_skill", "target_skill", "reason"],
     "properties": {
-      "from_skill":   { "type": "string" },
+      "from_skill": { "type": "string" },
       "target_skill": { "type": "string" },
-      "reason":       { "type": "string" },
-      "loop_number":  { "type": "integer" }
-    }
+      "reason": { "type": "string" },
+      "loop_number": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": true
   },
   "pipeline.ended": {
+    "type": "object",
     "required": ["final_status"],
     "properties": {
-      "final_status": { "type": "string", "enum": ["success","partial","failed","halted"] },
-      "total_skills":  { "type": "integer" }
-    }
+      "final_status": { "type": "string", "enum": ["success", "partial", "failed", "halted"] },
+      "total_skills": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": true
   }
 }
 ```
@@ -152,79 +220,114 @@ The skill also defines the **canonical metrics schema** that every other skill M
 
 ## 4. Required Context
 
-- `aggregate_so_far` from `state-manager` (read operation on key `pipeline_metrics`) must be loaded before each call. If absent, initialize a fresh aggregate.
-- `session_id` must match the active session in `state-manager.session_context.session_id`.
-- `execution_event` must be one of the 7 defined event types — unknown events are rejected.
+Generation mode requires:
+
+- `architecture.modules[]` and/or `architecture.integration_points[]` from `architecture-design`.
+- Explicit `integration_points[]` from the architecture or API/event/database contracts. Explicit input wins when both sources are present.
+- `tech_stack` with at least a language or framework. Unknown stacks use the portable OTLP baseline and emit a warning.
+- Optional SLO targets from the requirements or SLO/SLA design stage.
+
+Internal pipeline-metrics mode requires:
+
+- The active `session_context.session_id` from `state-manager`.
+- `aggregate_so_far` loaded from `state-manager` key `pipeline_metrics` before each event.
+- A valid existing event payload. The skill never reads session files or telemetry backends directly.
 
 ---
 
 ## 5. Execution Logic
 
+### Step 1 — Select mode and validate input
+
+1. If `execution_event` is present, select internal pipeline-metrics mode; otherwise select artifact-generation mode.
+2. Validate the selected branch against the input schema and event-specific schema.
+3. Normalize SLO defaults, stack aliases, surface IDs, and labels. Reject credentials, URLs containing credentials, code bodies, and path traversal in session identifiers.
+
+### Step 2 — Extract observable surfaces
+
+Read `integration_points[]` and the architecture's integration points. Deduplicate by explicit `id`, then by `(module, type, name)`. For each supported type emit:
+
+| Surface type | Standard signals |
+|--------------|------------------|
+| `rest_api`, `grpc`, `graphql`, `external_service` | request rate, error rate, latency histogram, availability |
+| `message_queue` | publish rate, consume rate, consumer lag, delivery failures |
+| `database` | query rate, query errors, query latency, connection-pool saturation |
+| `cache` | operation rate, errors, latency, hit ratio |
+
+Each surface has `{id, name, type, module, protocol, operations, labels}`. Unsupported or incomplete points are retained with `status: "unclassified"` and a warning; they are not silently dropped.
+
+### Step 3 — Generate metric definitions
+
+Generate one definition per signal, using stable names and a bounded label set. API metrics use `http_requests_total`, `http_request_duration_seconds`, `http_request_errors_total`, and `service_up`; queue, database, and cache names use the corresponding signal table above. Every definition contains:
+
+```json
+{
+  "name": "http_request_duration_seconds",
+  "type": "histogram",
+  "unit": "seconds",
+  "surface_id": "orders-api",
+  "labels": ["service", "environment", "route", "method", "status_code"],
+  "description": "Request duration for the observable surface"
+}
 ```
-Step 1 — Validate event and metrics_data
-  Verify execution_event is one of 7 known event types.
-  Validate metrics_data against the event-specific schema.
-  If validation fails: emit warning feedback, return partial metrics_report.
-  Output: validated_event, validated_metrics_data
 
-Step 2 — Emit structured log entry
-  Construct log entry:
-    { timestamp, session_id, event: execution_event, skill: skill_name,
-      pipeline_phase, duration_ms (if present), tokens_delta, status, details }
-  Log levels:
-    skill.started     → INFO
-    skill.completed   → INFO  (WARN if duration_ms > 2× baseline or retries > 0)
-    skill.failed      → ERROR
-    gate.passed       → INFO  (WARN if wait_duration_s > 1800)
-    gate.blocked      → WARN
-    feedback.triggered → WARN (ERROR if loop_number > 2)
-    pipeline.ended    → INFO  (ERROR if final_status == "failed")
-  Output: log_entry
+Reject duplicate metric names with incompatible types. Keep label values low-cardinality; route templates, not raw URLs, are required.
 
-Step 3 — Update running aggregate
-  Load aggregate_so_far or initialize:
-    {
-      total_tokens_in: 0, total_tokens_out: 0, total_duration_ms: 0,
-      skills_executed: 0, skills_failed: 0, validation_errors: 0,
-      feedback_loops: 0, gates_passed: 0, gates_blocked: 0, retries: 0,
-      compression_savings_tokens: 0, per_skill: []
-    }
-  Apply this event's data to the aggregate:
-    skill.completed   → increment skills_executed, tokens, duration; add per_skill entry
-    skill.failed      → increment skills_failed, retries
-    gate.passed       → increment gates_passed
-    gate.blocked      → increment gates_blocked
-    feedback.triggered → increment feedback_loops
-    pipeline.ended    → set final_status, compute summary ratios
-  Write updated aggregate to state-manager (key: pipeline_metrics).
-  Output: updated_aggregate
+### Step 4 — Generate Prometheus alerting rules YAML
 
-Step 4 — Check alert thresholds
-  Evaluate each metric against the alert threshold table:
-    Pipeline success rate:     < 95% over session → alert_level = "warning"
-    Single skill duration:     > 120,000ms (2 min) → alert_level = "warning"
-    Validation failure rate:   > 5% of skill runs → alert_level = "warning"
-    Feedback loop frequency:   > 2 loops in session → alert_level = "critical"
-    Token budget utilization:  > 80% of session budget → alert_level = "warning"
-    HITL gate block rate:      > 2 blocks in session → alert_level = "warning"
-    Skill retry count:         > 3 retries for one skill → alert_level = "critical"
-    Total session duration:    > 1,800,000ms (30 min) → alert_level = "warning"
-  Output: alerts (array of { metric, current_value, threshold, alert_level, message })
+Produce `prometheus_rules_yaml` as valid YAML with a stable `groups` root. Generate at least one alert for every API-like integration point (`rest_api`, `grpc`, `graphql`, and `external_service`), plus SLO alerts for error rate, p95 latency, and availability. Thresholds are derived from `slo_targets`; alert names are sanitized stable identifiers, never user input as executable YAML.
 
-Step 5 — Compute health_status
-  IF any alert has alert_level == "critical":  health_status = "critical"
-  ELSE IF any alert has alert_level == "warning": health_status = "degraded"
-  ELSE: health_status = "healthy"
-  Output: health_status
+The generated rules use the canonical labels `service` and `environment`, document the metric assumptions in annotations, and do not embed secrets or environment-specific hostnames.
 
-Step 6 — Assemble and return metrics_report
-  Compile:
-    aggregate metrics (Step 3 output)
-    health_status (Step 5)
-    alerts (Step 4)
-    log_entry (Step 2)
-  Output: complete metrics_report
+### Step 5 — Generate OpenTelemetry configuration
+
+Produce `otel_config` as a JSON object with `receivers`, `processors`, `exporters`, and `service.pipelines` for traces, metrics, and logs. Use OTLP with an endpoint placeholder such as `${OTEL_EXPORTER_OTLP_ENDPOINT}`; never replace it with a credential or hardcoded deployment URL. Add a `sdk_setup` object selected from:
+
+| Stack | SDK setup |
+|-------|-----------|
+| Node.js | `@opentelemetry/sdk-node` with OTLP exporter |
+| Python | `opentelemetry-sdk` with OTLP exporter |
+| Go | `go.opentelemetry.io/otel` with OTLP gRPC exporter |
+| Java | `opentelemetry-java` with auto-instrumentation agent |
+
+Unknown stacks receive the language-neutral collector configuration and an `info` feedback entry requesting a stack-specific review.
+
+### Step 6 — Generate Grafana dashboard JSON
+
+Produce valid `grafana_dashboard_json` with datasource `prometheus`, variables `$service` and `$environment`, and four panels in a 2×2 grid: `error_rate`, `p95_latency`, `request_rate`, and `availability`. Queries are annotated placeholders using the canonical metric names; the generator must not invent a user's label schema. Panel descriptions state which labels or recording rules must be adapted.
+
+### Step 7 — Preserve internal pipeline-metrics behavior
+
+For pipeline mode, execute the existing event flow without generating application artifacts:
+
+1. Validate `metrics_data` against the event schema below.
+2. Emit a structured `log_entry` with timestamp, session, event, skill, phase, status, and safe metadata.
+3. Load or initialize the aggregate and update `pipeline_metrics` after every event.
+4. Recompute alerts and `health_status` (`healthy`, `degraded`, or `critical`).
+5. Emit feedback for critical health or unavailable state-manager, but never halt the pipeline solely because observability is unavailable.
+6. Return `prometheus_rules_yaml: null`, `otel_config: null`, and
+   `grafana_dashboard_json: null` in this mode; the preserved
+   `metrics_report`, `health_status`, and `alerts` fields remain populated.
+
+The seven preserved event payloads are:
+
+```json
+{
+  "skill.started": { "required": ["timestamp", "tokens_in"] },
+  "skill.completed": { "required": ["timestamp", "tokens_in", "tokens_out", "duration_ms", "items_produced", "version"] },
+  "skill.failed": { "required": ["timestamp", "error_type", "retry_count"] },
+  "gate.passed": { "required": ["gate_type", "wait_duration_s"] },
+  "gate.blocked": { "required": ["gate_type", "block_reason"] },
+  "feedback.triggered": { "required": ["from_skill", "target_skill", "reason"] },
+  "pipeline.ended": { "required": ["final_status"] }
+}
 ```
+
+The aggregate retains `total_tokens_in`, `total_tokens_out`, `total_duration_ms`, `skills_executed`, `skills_failed`, `validation_errors`, `feedback_loops`, `gates_passed`, `gates_blocked`, `retries`, `compression_savings_tokens`, `final_status`, and `per_skill[]`. Existing thresholds remain: success rate below 95%, a skill over 120,000ms, validation failures over 5%, more than two feedback loops, token utilization over 80%, more than two blocked gates, more than three retries for one skill, or session duration over 1,800,000ms produce alerts.
+
+### Step 8 — Validate, persist, and assemble
+
+Validate YAML syntax conceptually, JSON shape, required panels, API alert coverage, metric uniqueness, and output schema. In artifact mode, write generated artifacts and aggregate state only when `dry_run` is false. In pipeline mode, `dry_run` suppresses the state-manager write but still returns the projected aggregate. Return previews in both modes.
 
 ---
 
@@ -232,280 +335,230 @@ Step 6 — Assemble and return metrics_report
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `metrics_report` | `object` | Aggregated pipeline metrics (tokens, durations, success rates, per-skill breakdown) |
-| `health_status` | `string` | `"healthy"` \| `"degraded"` \| `"critical"` |
-| `alerts` | `array[object]` | Threshold breach alerts with severity and remediation hint |
-| `log_entry` | `object` | Structured log entry for this specific event |
-| `metrics` | `object` | This skill's own execution metrics (REQUIRED standard field) |
-| `feedback` | `array[object]` | Feedback to orchestrator when critical health status or alerts detected |
+| `prometheus_rules_yaml` | `string` | Valid Prometheus rule YAML; one or more alerts per API integration point |
+| `otel_config` | `object` | JSON-serializable collector and SDK setup |
+| `grafana_dashboard_json` | `object` | JSON-serializable dashboard with four required SLI panels |
+| `observable_surfaces` | `array[object]` | Normalized surfaces discovered from architecture and integration points |
+| `metrics` | `object` | Metric catalog plus the canonical per-skill execution metrics fields |
+| `metrics_report` | `object` | Preserved pipeline aggregate in internal pipeline-metrics mode |
+| `health_status` | `string` | Pipeline mode status: `healthy`, `degraded`, or `critical` |
+| `alerts` | `array[object]` | Pipeline threshold alerts or generation warnings |
+| `feedback` | `array[object]` | `backpropagate`, `info`, or `warning` entries |
 
-**Output Schema:**
+### Output Schema
 
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ObservabilityOutput",
   "type": "object",
-  "required": ["metrics_report", "health_status", "alerts", "log_entry", "metrics", "feedback"],
+  "required": ["observable_surfaces", "metrics", "feedback"],
   "properties": {
-    "metrics_report": {
-      "type": "object",
-      "required": ["total_tokens_in","total_tokens_out","total_duration_ms","skills_executed",
-                   "skills_failed","validation_errors","feedback_loops","gates_passed",
-                   "gates_blocked","retries","per_skill"],
+    "prometheus_rules_yaml": { "type": ["string", "null"] },
+    "otel_config": {
+      "type": ["object", "null"],
+      "required": ["receivers", "processors", "exporters", "service", "sdk_setup"],
       "properties": {
-        "total_tokens_in":            { "type": "integer" },
-        "total_tokens_out":           { "type": "integer" },
-        "total_duration_ms":          { "type": "integer" },
-        "skills_executed":            { "type": "integer" },
-        "skills_failed":              { "type": "integer" },
-        "validation_errors":          { "type": "integer" },
-        "feedback_loops":             { "type": "integer" },
-        "gates_passed":               { "type": "integer" },
-        "gates_blocked":              { "type": "integer" },
-        "retries":                    { "type": "integer" },
-        "compression_savings_tokens": { "type": "integer" },
-        "final_status": {
-          "type": ["string","null"],
-          "enum": ["success","partial","failed","halted",null]
-        },
-        "per_skill": {
+        "receivers": { "type": "object" },
+        "processors": { "type": "object" },
+        "exporters": { "type": "object" },
+        "service": { "type": "object" },
+        "sdk_setup": { "type": "object" }
+      }
+    },
+    "grafana_dashboard_json": {
+      "type": ["object", "null"],
+      "required": ["title", "schemaVersion", "templating", "panels"],
+      "properties": {
+        "title": { "type": "string" },
+        "schemaVersion": { "type": "integer" },
+        "templating": { "type": "object" },
+        "panels": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["name","status","tokens_in","tokens_out","duration_ms","retries","validation_passed"],
-            "properties": {
-              "name":               { "type": "string" },
-              "status":             { "type": "string", "enum": ["ok","failed","skipped"] },
-              "tokens_in":          { "type": "integer" },
-              "tokens_out":         { "type": "integer" },
-              "duration_ms":        { "type": "integer" },
-              "retries":            { "type": "integer" },
-              "validation_passed":  { "type": "boolean" },
-              "pipeline_phase":     { "type": ["string","null"] }
-            }
-          }
+          "minItems": 4,
+          "items": { "type": "object" }
         }
       }
     },
-    "health_status": { "type": "string", "enum": ["healthy","degraded","critical"] },
-    "alerts": {
+    "observable_surfaces": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["metric","current_value","threshold","alert_level","message"],
+        "required": ["id", "name", "type", "status"],
         "properties": {
-          "metric":         { "type": "string" },
-          "current_value":  { "type": ["number","string"] },
-          "threshold":      { "type": ["number","string"] },
-          "alert_level":    { "type": "string", "enum": ["warning","critical"] },
-          "message":        { "type": "string" }
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "module": { "type": "string" },
+          "protocol": { "type": "string" },
+          "status": { "type": "string", "enum": ["classified", "unclassified"] },
+          "labels": { "type": "array", "items": { "type": "string" } }
         }
       }
     },
-    "log_entry": {
-      "type": "object",
-      "required": ["timestamp","session_id","event","skill","status"],
-      "properties": {
-        "timestamp":      { "type": "string", "format": "date-time" },
-        "session_id":     { "type": "string" },
-        "event":          { "type": "string" },
-        "skill":          { "type": "string" },
-        "pipeline_phase": { "type": ["string","null"] },
-        "duration_ms":    { "type": ["integer","null"] },
-        "tokens_delta":   { "type": ["integer","null"] },
-        "status":         { "type": "string", "enum": ["ok","error","halted","warning"] },
-        "details":        { "type": "object" }
-      }
-    },
-    "metrics":  { "$ref": "#/$defs/metrics" },
-    "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
-  },
-  "$defs": {
     "metrics": {
       "type": "object",
-      "required": ["tokens_in","tokens_out","duration_ms","items_produced","version"],
+      "required": ["definitions", "tokens_in", "tokens_out", "duration_ms", "items_produced", "version"],
       "properties": {
-        "tokens_in":      { "type": "integer" },
-        "tokens_out":     { "type": "integer" },
-        "duration_ms":    { "type": "integer" },
-        "items_produced": { "type": "integer" },
-        "version":        { "type": "string" }
+        "definitions": { "type": "array", "items": { "type": "object" } },
+        "tokens_in": { "type": "integer", "minimum": 0 },
+        "tokens_out": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "items_produced": { "type": "integer", "minimum": 0 },
+        "version": { "type": "string" }
       }
     },
-    "feedback_entry": {
-      "type": "object",
-      "required": ["type","from_skill","reason"],
-      "properties": {
-        "type":         { "type": "string", "enum": ["backpropagate","info","warning"] },
-        "from_skill":   { "type": "string" },
-        "target_skill": { "type": "string" },
-        "reason":       { "type": "string" },
-        "evidence":     { "type": "object" }
+    "metrics_report": { "type": ["object", "null"] },
+    "health_status": { "type": ["string", "null"], "enum": ["healthy", "degraded", "critical", null] },
+    "alerts": { "type": "array", "items": { "type": "object" } },
+    "feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "from_skill", "reason"],
+        "properties": {
+          "type": { "type": "string", "enum": ["backpropagate", "info", "warning"] },
+          "from_skill": { "type": "string" },
+          "target_skill": { "type": "string" },
+          "reason": { "type": "string" },
+          "evidence": { "type": "object" }
+        }
       }
     }
   }
 }
 ```
 
-### Canonical Per-Skill Metrics Schema
-
-Every skill's `metrics` output field MUST conform to this minimum schema:
-
-```json
-{
-  "tokens_in":      "<integer> — input token count for this invocation",
-  "tokens_out":     "<integer> — output token count for this invocation",
-  "duration_ms":    "<integer> — wall-clock execution time in milliseconds",
-  "items_produced": "<integer> — count of primary output items (requirements, tasks, files, etc.)",
-  "version":        "<string>  — semver of the skill that produced this output"
-}
-```
-
-Domain-specific metrics are **additional** fields beyond these five. Example extensions:
-
-| Skill | Extension Fields |
-|-------|-----------------|
-| `security-review` | `critical_count`, `high_count`, `medium_count`, `low_count` |
-| `clean-code-review` | `issue_count`, `complexity_score` |
-| `test-generator` | `tests_generated`, `coverage_estimate_pct` |
-| `implementation-completeness-auditor` | `readiness_score`, `gap_count` |
+`dry_run: true` returns the complete output, including all artifact previews, but performs no state-manager write and emits an `info` feedback entry identifying the preview.
 
 ---
 
 ## 7. Rules & Constraints
 
-- Every skill in the system MUST include a `metrics` object conforming to the canonical schema in its output.
-- This skill is **stateful** within a session — it maintains a running aggregate via `state-manager`.
-- `execution_event` must be one of 7 defined types. Unknown events are rejected with a warning.
-- `health_status = "critical"` triggers an info feedback entry to the orchestrator.
-- Metrics data is **never compressed** — full fidelity is required for threshold checking.
-- Aggregate is written to `state-manager` after every event — not batched.
-- Log entries older than the active session are not loaded. Historical analysis is out of scope.
-- `details` field in log entries is omitted for `INFO` level events (present only for `WARN` and `ERROR`).
+- Every API-like integration point must have at least one Prometheus alert.
+- The dashboard must contain `error_rate`, `p95_latency`, `request_rate`, and `availability` panels.
+- Metric names and labels are stable, bounded, and free of request-specific identifiers.
+- `metrics` always includes the canonical `tokens_in`, `tokens_out`, `duration_ms`, `items_produced`, and `version` fields, even when its `definitions` list is empty in pipeline mode.
+- Pipeline-mode aggregates are updated after every event, not batched. The `per_skill` detail is capped at 50 entries; older entries are rolled up.
+- Unknown events are rejected without mutating the aggregate. A generation warning never prevents a valid partial catalog from being returned.
+- Observability is read-only with respect to application code and infrastructure. It only writes its declared generated artifacts and the `pipeline_metrics` state key.
 
 ---
 
 ## 8. Security Considerations
 
-- Metrics payloads MUST NOT contain user data, credentials, or code content — only numeric and string metadata.
-- `session_id` must be a UUID — reject any session_id that contains path traversal patterns (`../`, `/etc/`, etc.).
-- Log entries are stored in-session only — they are NOT persisted to disk or external systems by this skill.
-- `details` field in WARN/ERROR logs must not reproduce full skill output — only error types and field names.
+- Never collect or emit credentials, tokens, user payloads, source code, PII, or raw URLs.
+- Use `${OTEL_EXPORTER_OTLP_ENDPOINT}` and similar environment references instead of hardcoded endpoints or secrets.
+- Reject session IDs containing `/`, `\\`, `..`, or other path traversal patterns.
+- Use route templates and bounded labels; never use user IDs, query strings, or unbounded exception text as metric labels.
+- Sanitize alert names and YAML strings before rendering. Do not evaluate templates as code.
+- Structured log details include field names and error types only, never full skill output.
 
 ---
 
 ## 9. Token Optimization
 
-- Metrics data is always compact JSON (no whitespace, no verbose field names).
-- Per-skill entries in `per_skill` are capped at 50 entries. Older entries are rolled up into `{ rolled_up_count: N, total_tokens: X }`.
-- `aggregate_so_far` loaded from state-manager is the running state — not recomputed from scratch each call.
-- Log entries omit `details` for INFO events — saving ~20–50 tokens per entry.
-- `metrics_report.per_skill` returns full detail only for the current event's skill; other skills are summarized.
+- Pass module and integration signatures, not full source files or payloads.
+- Deduplicate surfaces and metric definitions before rendering artifacts.
+- Keep Prometheus annotations and dashboard descriptions concise while preserving metric assumptions.
+- Keep pipeline `aggregate_so_far` as the source of truth instead of recomputing historical events.
+- Return full artifact content for dry runs; in persisted runs large dashboard content may be stored by reference while the schema and summary remain in the result.
 
 ---
 
 ## 10. Quality Checklist
 
-- [ ] `execution_event` is one of the 7 defined event types
-- [ ] `metrics_data` validated against event-specific schema
-- [ ] Running aggregate correctly updated in state-manager after every event
-- [ ] Alert thresholds checked against all 8 defined metrics
-- [ ] `health_status` correctly derived from alert severity
-- [ ] `log_entry.status` is `"ok"`, `"error"`, `"halted"`, or `"warning"` — no other values
-- [ ] `details` field present in log_entry ONLY for WARN/ERROR level
-- [ ] `feedback` contains info entry when `health_status == "critical"`
-- [ ] Canonical per-skill metrics schema documented and enforced by schema-validator
-- [ ] Output is valid JSON matching output schema
+- [ ] Frontmatter and output version are `2.0.0`.
+- [ ] Input schema accepts architecture, integration points, tech stack, SLO targets, and dry-run mode.
+- [ ] All supported surface types are classified or explicitly reported as unclassified.
+- [ ] Metric definitions are unique and use bounded labels.
+- [ ] Every API integration point has at least one alert.
+- [ ] Prometheus output has a `groups` root and is valid YAML.
+- [ ] OTel output contains traces, metrics, and logs pipelines with stack-aware SDK setup.
+- [ ] Grafana output is valid JSON with four required panels and two variables.
+- [ ] Internal seven-event pipeline metrics behavior and `pipeline_metrics` aggregate are preserved.
+- [ ] Dry runs produce previews without writes.
+- [ ] `metrics` conforms to the canonical per-skill metrics shape.
+- [ ] Feedback entries use the standard feedback schema.
 
 ---
 
 ## 11. Failure Scenarios
 
-| Condition | Fallback Behavior |
+| Condition | Fallback behavior |
 |-----------|-------------------|
-| `metrics_data` fails event-specific schema validation | Return partial `metrics_report` with warning in `alerts`; do not halt pipeline |
-| `state-manager` unavailable for aggregate read/write | Initialize fresh aggregate for this invocation; emit warning feedback to orchestrator |
-| `session_id` does not match active session | Reject event; return `health_status: "degraded"` and error feedback |
-| Unknown `execution_event` type | Reject with warning; return current aggregate unchanged |
-| `per_skill` array would exceed 50 entries | Roll up oldest 10 entries; emit info about rollup in feedback |
-| `health_status` = "critical" and orchestrator does not respond to feedback | Log at ERROR level; pipeline continues (observability never halts pipeline) |
+| Architecture or integration points missing in generation mode | Return a schema error and `backpropagate` feedback to `architecture-design`; do not write artifacts |
+| Unsupported integration type | Return the surface as `unclassified`, skip type-specific rules, and emit a warning |
+| Unknown tech stack | Use portable OTLP configuration and emit an informational stack-review feedback |
+| Invalid SLO target | Reject the invalid field, use the documented default only when the field is absent, and emit a warning |
+| Duplicate metric name with incompatible type | Return `validation_result` failure and do not persist artifacts |
+| State-manager unavailable in pipeline mode | Use a fresh in-memory aggregate, return `degraded`, and emit warning feedback; never halt the pipeline |
+| Invalid session or event payload | Reject the event and leave the existing aggregate unchanged |
+| Dashboard or YAML validation failure | Return errors and previews only; do not persist invalid artifacts |
 
 ---
 
 ## 12. Human-in-the-Loop Gates
 
-This skill does **not** trigger HITL gates directly. It is a passive metrics sink.
+This skill has no mandatory pause in internal pipeline-metrics mode. Artifact generation may surface review feedback but does not approve deployment or provision telemetry.
 
 | Gate | Trigger | Behavior |
 |------|---------|----------|
-| None (direct) | N/A | Observability never pauses the pipeline |
-| Indirect: critical health | `health_status: "critical"` | Emits feedback entry type `"warning"` to orchestrator; orchestrator decides whether to surface to user |
-
-The orchestrator MAY present `metrics_report` to the user at the HITL gates (architecture approval, completeness sign-off) as context, but this is orchestrator behavior — not a gate defined by this skill.
+| Stack review | Unknown or mixed runtime/framework | Emit `info` feedback; human may select a stack-specific SDK setup |
+| High-cardinality review | Proposed labels contain unbounded values | Emit `warning` feedback and require correction before production adoption |
+| Artifact validation | Invalid YAML/JSON or missing API alert | Block artifact persistence; the caller must repair the input |
+| Critical pipeline health | Existing aggregate has a critical alert | Emit warning feedback to the orchestrator; the orchestrator decides whether to show it at its normal HITL gate |
 
 ---
 
 ## 13. Skill Composition
 
-`observability` is invoked by the **orchestrator** at 4 defined collection points. It is not composed by individual skills — individual skills only need to produce a compliant `metrics` object in their output.
+Artifact-generation invocation:
 
 ```yaml
-# Orchestrator collection point invocations (conceptual)
-name: orchestrator-observability-hooks
-collection_points:
-  - event: skill.started
-    trigger: before every skill invocation
+composes:
+  - skill: observability
+    version: "^2.0.0"
     input_map:
-      skill_name:      "<active_skill_name>"
-      execution_event: "skill.started"
-      metrics_data:    { timestamp: "<now>", tokens_in: "<estimated_tokens_in>" }
-      session_id:      "session_context.session_id"
-      pipeline_phase:  "current_phase"
-
-  - event: skill.completed
-    trigger: after every successful skill invocation
-    input_map:
-      skill_name:      "<active_skill_name>"
-      execution_event: "skill.completed"
-      metrics_data:    "<skill_output.metrics>"
-      session_id:      "session_context.session_id"
-      pipeline_phase:  "current_phase"
-      aggregate_so_far: "state_manager.read(pipeline_metrics)"
-
-  - event: gate.passed / gate.blocked
-    trigger: after every HITL gate decision
-    input_map:
-      skill_name:      "<gate_owning_skill>"
-      execution_event: "gate.passed OR gate.blocked"
-      metrics_data:    { gate_type: "<gate_name>", wait_duration_s: "<elapsed>" }
-      session_id:      "session_context.session_id"
-
-  - event: pipeline.ended
-    trigger: on pipeline completion (success, failure, or halt)
-    input_map:
-      skill_name:      "orchestrator"
-      execution_event: "pipeline.ended"
-      metrics_data:    { final_status: "<status>", total_skills: "<count>" }
-      session_id:      "session_context.session_id"
-      aggregate_so_far: "state_manager.read(pipeline_metrics)"
+      architecture: "state.architecture"
+      integration_points: "state.architecture.integration_points"
+      tech_stack: "session.tech_stack"
+      slo_targets: "state.slo_targets"
+      dry_run: "request.dry_run"
+    output_map:
+      prometheus_rules_yaml: "state.prometheus_rules_yaml"
+      otel_config: "state.otel_config"
+      grafana_dashboard_json: "state.grafana_dashboard_json"
+      observable_surfaces: "state.observable_surfaces"
+      metrics: "state.observability_metrics"
+      feedback: "state.feedback"
 ```
 
-### Alert Threshold Reference
+Existing orchestrator collection points remain supported:
 
-| Metric | Warning Threshold | Critical Threshold |
-|--------|-------------------|-------------------|
-| Single skill duration | > 120,000ms | > 240,000ms |
-| Session token budget utilization | > 80% | > 95% |
-| Validation failure rate | > 5% of runs | > 20% of runs |
-| Feedback loop count | > 2 loops | > 3 loops |
-| HITL gate block count | > 2 blocks | > 4 blocks |
-| Skill retry count (single skill) | > 2 retries | > 3 retries |
-| Total session duration | > 30 min | > 60 min |
-| Skills failed / skills executed | > 10% | > 25% |
+```yaml
+pipeline_metrics_hooks:
+  aggregate_key: pipeline_metrics
+  events:
+    - skill.started
+    - skill.completed
+    - skill.failed
+    - gate.passed
+    - gate.blocked
+    - feedback.triggered
+    - pipeline.ended
+  input_map:
+    skill_name: "active_skill.name"
+    execution_event: "event.name"
+    metrics_data: "event.payload"
+    session_id: "session_context.session_id"
+    pipeline_phase: "current_phase"
+    aggregate_so_far: "state_manager.read(pipeline_metrics)"
+  output_map:
+    metrics_report: "state.pipeline_metrics"
+    health_status: "state.pipeline_health"
+    alerts: "state.pipeline_alerts"
+    feedback: "state.feedback"
+```
 
-### Changelog
-
-| Version | Date | Change |
-|---------|------|--------|
-| 1.1.0 | 2026-06-18 | Full 13-section rebuild from 108-line stub. Added input/output schemas, 7-event execution logic, 8-metric alert threshold table, health_status computation, state-manager integration, and orchestrator composition spec |
-| 1.0.0 | 2026-06-16 | Initial reference document (108 lines, pre-standardization) |
+The pipeline hook is passive and never replaces the orchestrator's gate decisions. `schema-validator` validates both branches; `state-manager` owns the aggregate; `orchestrator` owns invocation timing and any deployment decision.

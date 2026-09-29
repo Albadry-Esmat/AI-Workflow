@@ -1,6 +1,6 @@
 ---
 name: security-review
-version: 1.0.0
+version: 1.1.0
 domain: security
 description: 'Use when asked to review security, find vulnerabilities, perform threat modeling, or assess risks in code or architecture. Triggers on: "security review", "find vulnerabilities", "threat modeling", "is this secure", "security risks", "OWASP", "penetration test", "security audit".'
 author: system
@@ -18,6 +18,7 @@ Identify security vulnerabilities at the architecture and code level before they
 | `code_snippets` | `array[object]` | No | Code to analyze (file_path, language, code) |
 | `threat_model_context` | `string` | No | Existing threat model, compliance requirements (PCI, HIPAA, SOC2), or security policies |
 | `strictness` | `string` | No | `"quick"`, `"standard"`, `"deep"` (default: `"standard"`) |
+| `dependency_manifests` | `array[object]` | No | Dependency lockfiles/manifests to scan (ecosystem, file_path, content or scan result) |
 
 **Input Schema:**
 
@@ -40,7 +41,20 @@ Identify security vulnerabilities at the architecture and code level before they
       }
     },
     "threat_model_context": { "type": "string" },
-    "strictness": { "type": "string", "enum": ["quick", "standard", "deep"], "default": "standard" }
+    "strictness": { "type": "string", "enum": ["quick", "standard", "deep"], "default": "standard" },
+    "dependency_manifests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ecosystem": { "type": "string", "enum": ["npm", "yarn", "pnpm", "python", "go", "rust", "maven", "gradle"] },
+          "file_path": { "type": "string" },
+          "content": { "type": "string" },
+          "scan_result": { "type": "object" }
+        },
+        "required": ["ecosystem", "file_path"]
+      }
+    }
   },
   "required": ["architecture"]
 }
@@ -82,6 +96,20 @@ Step 5 — Analyze dependency and supply chain (if code provided)
   Flag outdated packages, insecure protocols, unverified sources.
   Output: dependency risk assessment
 
+Step 6a — Specify and normalize dependency vulnerability scans (TASK-0017)
+  Select the protocol by ecosystem and inspect the corresponding lockfile/manifest:
+    - npm/yarn/pnpm: `npm audit --json` or Snyk against package-lock.json, yarn.lock, or pnpm-lock.yaml.
+    - Python: `pip-audit` or Safety against requirements.txt or Pipfile.lock.
+    - Go: `govulncheck` against go.sum.
+    - Rust: `cargo audit` against Cargo.lock.
+    - Maven/Gradle: OWASP Dependency-Check against pom.xml or build.gradle.
+  The runtime executor performs the scanner invocation; this step only defines the protocol and
+  parses supplied scan results. Normalize each CVE into dependency_vulnerabilities[] with package,
+  ecosystem, affected/fixed versions, CVSS score, severity, and a concise description. Preserve
+  transitive dependency status when available; a CVSS score >= 9.0 remains critical even when
+  the package is transitive.
+  Output: dependency_vulnerabilities[]
+
 Step 6 — OWASP / CWE mapping
   Map each finding to OWASP Top 10 category and CWE identifier.
   Output: classified finding list
@@ -97,6 +125,7 @@ Step 7 — Prioritize and generate remediation
 | Field | Type | Description |
 |-------|------|-------------|
 | `vulnerabilities` | `array[object]` | Security findings (id, owasp, cwe, severity, location, description) |
+| `dependency_vulnerabilities` | `array[object]` | Normalized third-party CVEs: cve_id, package, ecosystem, affected_version, fixed_version, cvss_score, severity, description |
 | `threat_model` | `object` | STRIDE threat matrix per module |
 | `remediation` | `array[object]` | Remediation steps (finding_id, action, effort, priority) |
 | `risks` | `array[object]` | Business risks (description, likelihood, impact, severity) |
@@ -124,6 +153,23 @@ Step 7 — Prioritize and generate remediation
           "affected_module": { "type": "string" }
         },
         "required": ["id", "severity", "description"]
+      }
+    },
+    "dependency_vulnerabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cve_id": { "type": "string" },
+          "package": { "type": "string" },
+          "ecosystem": { "type": "string", "enum": ["npm", "yarn", "pnpm", "python", "go", "rust", "maven", "gradle"] },
+          "affected_version": { "type": "string" },
+          "fixed_version": { "type": ["string", "null"] },
+          "cvss_score": { "type": "number", "minimum": 0, "maximum": 10 },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+          "description": { "type": "string" }
+        },
+        "required": ["cve_id", "package", "affected_version", "fixed_version", "cvss_score", "severity"]
       }
     },
     "threat_model": {
@@ -201,7 +247,7 @@ Step 7 — Prioritize and generate remediation
       "items": { "$ref": "#/$defs/feedback_entry" }
     }
   },
-  "required": ["vulnerabilities", "threat_model", "remediation", "risks", "metrics", "feedback"],
+  "required": ["vulnerabilities", "dependency_vulnerabilities", "threat_model", "remediation", "risks", "metrics", "feedback"],
   "$defs": {
     "feedback_entry": {
       "type": "object",
@@ -224,6 +270,10 @@ Step 7 — Prioritize and generate remediation
 - Critical vulnerabilities MUST include a remediation step.
 - Do NOT scan for generic secrets (API keys, tokens) — that is a separate concern.
 - `threat_model` MUST cover every module from the architecture input.
+- `dependency_vulnerabilities` MUST always be emitted as an array; emit `[]` when no supported manifest or CVE is supplied.
+- CVEs with CVSS >= 7.0 MUST be copied into `vulnerabilities[]` as blocking high/critical findings; CVEs with CVSS 4.0–6.9 MUST be copied as warnings.
+- The `security-guard` consumer evaluates dependency CVEs using the same effective CVSS threshold as other vulnerabilities; CVSS >= the effective threshold blocks.
+- The scan specification does not execute scanners. Runtime execution owns commands and supplies parseable results for normalization.
 
 ## Security Considerations
 

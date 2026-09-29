@@ -1,6 +1,6 @@
 ---
 name: seo-optimizer
-version: 1.0.0
+version: 1.1.0
 domain: quality
 description: 'Use when generating SEO artifacts or enforcing web performance standards for any website or web application. Triggers on: "optimize for SEO", "generate sitemap", "add structured data", "set up Open Graph", "Core Web Vitals budget", "robots.txt", "meta tags", "SEO audit", "search engine optimization".'
 author: system
@@ -20,6 +20,8 @@ Generate the full set of SEO and web performance artifacts required for any publ
 | `structured_data_types` | `array[string]` | No | Explicit JSON-LD schema types to generate (e.g. `["WebSite", "Product", "BreadcrumbList"]`) |
 | `performance_budget` | `object` | No | Override CWV thresholds (LCP, FID/INP, CLS — defaults: LCP ≤ 2.5s, CLS ≤ 0.1, INP ≤ 200ms) |
 | `crawl_rules` | `array[object]` | No | Explicit allow/disallow rules for robots.txt (defaults: allow all, disallow /admin) |
+| `supported_locales` | `array[string]` | No | BCP 47 locale codes for localized pages |
+| `locale_url_map` | `object` | No | Optional mapping from locale code to its base URL; defaults to subdirectories |
 
 **Input Schema:**
 
@@ -89,6 +91,14 @@ Generate the full set of SEO and web performance artifacts required for any publ
           "rule": { "type": "string", "enum": ["allow", "disallow"] }
         }
       }
+    },
+    "supported_locales": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "locale_url_map": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "format": "uri" }
     }
   }
 }
@@ -116,6 +126,9 @@ Step 2 — Generate sitemap.xml
     <changefreq>: derived from layout_type (landing→monthly, listing→weekly, detail→daily)
     <priority>: derived from page type (home→1.0, landing→0.8, listing→0.7, detail→0.6)
   Exclude: noindex pages, error pages, auth pages.
+  When supported_locales.length > 1, add the `xmlns:xhtml` namespace and one
+  `<xhtml:link rel="alternate" hreflang="..." href="..." />` entry for every locale URL
+  to each localized `<url>` entry.
   Output: sitemap.xml spec (structure + entry count)
 
 Step 3 — Generate robots.txt
@@ -151,6 +164,17 @@ Step 6 — Generate JSON-LD structured data schemas
     Product / Article / FAQPage: derived from requirements when applicable
   Output: structured_data array — one schema template per route + type pair
 
+Step 6a — Generate hreflang tags (TASK-0023)
+  If supported_locales is absent or contains one locale, emit hreflang_tags: [] and
+  x_default_url: null. If it contains more than one locale, generate one self-referencing
+  `<link rel="alternate" hreflang="{locale}" href="{url}" />` tag per locale and one
+  `x-default` tag pointing to the primary locale (site_config.default_locale unless
+  primary_locale is supplied by the caller). Use locale_url_map when supplied; otherwise
+  use the default subdirectory strategy `{base_url}/{locale}{route}`.
+  Validate BCP 47 locale syntax, require a self-reference for every page, require x-default,
+  and flag asymmetric locale graphs. Add the same locale links to sitemap.xml entries.
+  Output: hreflang_tags[] and x_default_url
+
 Step 7 — Define Core Web Vitals budget
   Apply performance_budget overrides or use defaults:
     LCP ≤ 2500ms, CLS ≤ 0.1, INP ≤ 200ms, FCP ≤ 1800ms, TTFB ≤ 800ms
@@ -175,6 +199,8 @@ Step 8 — Validate coverage and produce compliance report
 | `meta_tag_specs` | `array[object]` | Per-route meta tag definitions (route, title, description, canonical, robots) |
 | `og_specs` | `array[object]` | Per-route Open Graph + Twitter Card specs (route, og_title, og_type, og_image_ref) |
 | `structured_data` | `array[object]` | JSON-LD schema templates per route (route, schema_type, template) |
+| `hreflang_tags` | `array[object]` | Alternate locale links with `{ locale, url, rel: "alternate" }`; empty for zero/one locale |
+| `x_default_url` | `string|null` | URL used by the `x-default` hreflang tag when multiple locales are configured |
 | `cwv_budget` | `object` | Core Web Vitals thresholds with implementation constraints (lcp, cls, inp, fcp, ttfb) |
 | `seo_compliance_report` | `object` | Coverage percentage, gap list, violations |
 | `metadata` | `object` | indexable_page_count, noindex_page_count, schema_count, version |
@@ -187,7 +213,7 @@ Step 8 — Validate coverage and produce compliance report
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["sitemap", "robots_txt", "meta_tag_specs", "og_specs", "structured_data", "cwv_budget", "seo_compliance_report", "metadata", "metrics", "feedback"],
+  "required": ["sitemap", "robots_txt", "meta_tag_specs", "og_specs", "structured_data", "hreflang_tags", "x_default_url", "cwv_budget", "seo_compliance_report", "metadata", "metrics", "feedback"],
   "properties": {
     "sitemap": {
       "type": "object",
@@ -249,6 +275,19 @@ Step 8 — Validate coverage and produce compliance report
         }
       }
     },
+    "hreflang_tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["locale", "url", "rel"],
+        "properties": {
+          "locale": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "rel": { "const": "alternate" }
+        }
+      }
+    },
+    "x_default_url": { "type": ["string", "null"] },
     "cwv_budget": {
       "type": "object",
       "required": ["lcp_ms", "cls", "inp_ms"],
@@ -317,6 +356,11 @@ Step 8 — Validate coverage and produce compliance report
 - Duplicate canonical URLs across two different routes are a `critical` violation.
 - CWV budget thresholds may be relaxed via `performance_budget` input but must not exceed Google's "poor" thresholds (LCP > 4s, CLS > 0.25, INP > 500ms) — if they do, a `critical` violation is raised.
 - `og:image` references must point to a placeholder token, not a hardcoded URL — the actual image path is resolved by `code-generator`.
+- When `supported_locales.length > 1`, `x-default` is mandatory and every locale page MUST contain a self-referencing alternate link.
+- `supported_locales` values MUST use BCP 47 format; warn with `hreflang_invalid_locale_code` for values such as `en_US`.
+- Missing x-default emits `hreflang_missing_x_default`; missing self-reference emits `hreflang_missing_self_reference`; one-way locale links emit `hreflang_asymmetric`.
+- `locale_url_map` selects subdomain or ccTLD strategies; when omitted, use the subdirectory strategy `{base_url}/{locale}/`.
+- `hreflang_tags` is always present and empty when `supported_locales` is absent or has one locale; `x_default_url` is null in that case.
 
 ## Security Considerations
 
@@ -339,6 +383,8 @@ Step 8 — Validate coverage and produce compliance report
 - [ ] `seo_compliance_report.coverage_percentage` is 100 or all gaps have remediation
 - [ ] CWV budget thresholds are within Google's "good" ranges
 - [ ] No duplicate canonical URLs
+- [ ] Multi-locale pages have self-referencing hreflang tags and x-default
+- [ ] Sitemap includes the xhtml namespace and per-locale links when hreflang is active
 
 ## Failure Scenarios
 

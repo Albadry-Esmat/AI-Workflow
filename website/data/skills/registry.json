@@ -1,5 +1,5 @@
 {
-  "version": "5.3.0",
+  "version": "5.3.1",
   "description": "Orchestrator skill registry \u2014 contains skills with full I/O contracts, feedback routes, and orchestration metadata required for pipeline routing. This is a curated subset of skills/index.yaml; not every skill needs a registry entry (only those the orchestrator needs to resolve explicitly). The complete skill catalog is in skills/index.yaml.",
   "parallel_groups": [
     {
@@ -25,7 +25,7 @@
   "skills": [
     {
       "name": "requirement-analyzer",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "status": "active",
       "domain": "requirements",
       "path": ".agents/skills/requirement-analyzer/SKILL.md",
@@ -284,7 +284,15 @@
       "produces_for": [
         "task-dag@^1.0.0"
       ],
-      "orchestration": "Optional after two isolated planning passes when pipeline_config.debate_plan is true."
+      "orchestration": "Optional after two isolated planning passes when pipeline_config.debate_plan is true.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "confidence-scorer",
@@ -308,7 +316,15 @@
         "finding-aggregator@^1.0.0",
         "validation-checklist-engine@^1.0.0"
       ],
-      "orchestration": "Deterministic phase after specialized review dispatch."
+      "orchestration": "Deterministic phase after specialized review dispatch.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "finding-aggregator",
@@ -337,7 +353,15 @@
         "validation-checklist-engine@^1.0.0",
         "contract-freezer@^1.0.0"
       ],
-      "orchestration": "Deterministic aggregation after parallel specialized reviews."
+      "orchestration": "Deterministic aggregation after parallel specialized reviews.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "validation-checklist-engine",
@@ -363,7 +387,15 @@
       "produces_for": [
         "contract-freezer@^1.0.0"
       ],
-      "orchestration": "Runs before contract freeze and can return control to planning through its bounded revision loop."
+      "orchestration": "Runs before contract freeze and can return control to planning through its bounded revision loop.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "contract-freezer",
@@ -391,7 +423,15 @@
       "produces_for": [
         "code-generator@^1.1.0"
       ],
-      "orchestration": "Runs only after an approving validation result and named GATE-003 approval."
+      "orchestration": "Runs only after an approving validation result and named GATE-003 approval.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "github-pr-review",
@@ -418,7 +458,15 @@
       "produces_for": [
         "defect-manager@^1.0.0"
       ],
-      "orchestration": "Invoked by github-reviewer on PR opened/synchronized or on demand. Publishing steps require HITL approval."
+      "orchestration": "Invoked by github-reviewer on PR opened/synchronized or on demand. Publishing steps require HITL approval.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     },
     {
       "name": "github-merge-gate",
@@ -442,7 +490,15 @@
         "github-pr-review@^1.1.0"
       ],
       "produces_for": [],
-      "orchestration": "Invoked by merge-gatekeeper on CI completion or on demand under standing delegation for unanimous-green merges."
+      "orchestration": "Invoked by merge-gatekeeper on CI completion or on demand under standing delegation for unanimous-green merges.",
+      "origin_metadata": {
+        "source": "migrated",
+        "created_by_session": null,
+        "approval_tier": "legacy",
+        "dedup_override": false,
+        "dedup_override_reason": null,
+        "created_at": "2026-09-27T17:05:18Z"
+      }
     }
   ]
 }

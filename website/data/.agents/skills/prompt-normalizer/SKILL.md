@@ -1,5 +1,6 @@
 ---
 name: prompt-normalizer
+version: 1.1.0
 description: 'Use when a raw user prompt is vague, missing routing keywords, or potentially ambiguous before pipeline entry. Triggers on: "what pipeline should this trigger", "normalize this prompt", "clarify user intent", "pre-process this request", "ambiguous request". Do NOT use when the prompt already contains unambiguous pipeline trigger keywords or is an internal system event.'
 ---
 

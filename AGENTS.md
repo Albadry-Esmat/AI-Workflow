@@ -31,15 +31,17 @@ Match the first row whose triggers overlap with the user's request, then pass th
 | "change request", "change management", "RFC", "propose a change" | `skills/pipelines/change-request.json` | `planner` |
 | "cloud migration", "migrate to cloud", "lift and shift", "cloud-native" | `skills/pipelines/cloud-migration.json` | `analyzer` |
 | "consumer website", "marketing site", "landing page", "public website" | `skills/pipelines/consumer-website.json` | `analyzer` |
+| "ML model", "machine learning", "feature store", "model training", "inference service" | `skills/pipelines/data-ml-pipeline.json` | `analyzer` |
 | "data pipeline", "ETL", "data engineering", "data warehouse", "data lake" | `skills/pipelines/data-engineering.json` | `analyzer` |
 | "defect", "bug lifecycle", "bug fix pipeline", "defect management" | `skills/pipelines/defect-lifecycle.json` | `reviewer` |
 | "developer portal", "dev portal", "API portal", "developer docs" | `skills/pipelines/developer-portal.json` | `analyzer` |
 | "gap to skill", "create skill from gap", "missing skill", "skill gap" | `skills/pipelines/gap-to-skill.json` | `planner` |
 | "insights", "adaptation", "continuous improvement", "feedback loop" | `skills/pipelines/insights-adaptation-pipeline.json` | `analyzer` |
 | "IoT", "embedded system", "firmware", "hardware integration" | `skills/pipelines/iot-embedded.json` | `analyzer` |
-| "microservices", "service mesh", "distributed system", "micro-services" | `skills/pipelines/microservices-platform.json` | `analyzer` |
+| "microservices", "service mesh", "distributed system", "micro-services", "per-service", "API gateway", "event-driven architecture", "DDD" | `skills/pipelines/microservices.json` | `analyzer` |
 | "ML platform", "machine learning", "model training", "ML pipeline", "MLOps" | `skills/pipelines/ml-platform.json` | `analyzer` |
 | "mobile app", "iOS app", "Android app", "React Native", "Flutter" | `skills/pipelines/mobile-app.json` | `analyzer` |
 | "SaaS platform", "multi-tenant", "SaaS", "B2B platform", "subscription" | `skills/pipelines/saas-platform.json` | `analyzer` |
+| "serverless", "edge function", "Cloudflare Workers", "Vercel Edge", "Lambda", "AWS Lambda", "Deno Deploy", "cold start" | `skills/pipelines/serverless-edge.json` | `analyzer` |
 
 **Fallback:** If no trigger matches, ask the user: "Which stage of the pipeline do you need — requirements, architecture, review, testing, deployment, or the full pipeline?"

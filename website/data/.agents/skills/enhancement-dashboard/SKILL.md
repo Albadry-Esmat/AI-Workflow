@@ -1,6 +1,6 @@
 ---
 name: enhancement-dashboard
-version: 1.1.0
+version: 1.1.1
 domain: system
 description: 'Use when rendering a human-readable performance dashboard from session insights. Triggers on: "show dashboard", "performance dashboard", "skill performance report", "session insights report", "what are the insights". Read-only — never modifies system state. Requires session-insights (SKL-048) to have produced a session_summary first.'
 author: ASE-OS
@@ -91,6 +91,10 @@ It produces two representations of the same data:
 - `session_summary` must be read from `state-manager.read(scope: "behavioral_telemetry").session_summary` before invocation.
 - If `session_summary` is absent or `session_insights` was skipped (opt-out), return a minimal dashboard indicating no telemetry available.
 - This skill reads no other state-manager keys.
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "session", auto_archive: true }` — dashboard inputs are transient session state; `expires_at` is null (resolved at session end) and entries auto-archive per the context-memory TTL policy table.
 
 ---
 

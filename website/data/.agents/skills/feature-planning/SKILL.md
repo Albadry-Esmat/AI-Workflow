@@ -1,6 +1,6 @@
 ---
 name: feature-planning
-version: 2.2.0
+version: 2.2.1
 domain: planning
 description: 'Use when asked to break down a feature or project into tasks, estimate complexity, map dependencies, define milestones, or build a delivery roadmap. Triggers on: "plan this feature", "break this down", "task breakdown", "roadmap", "milestones", "what are the steps", "sprint planning".'
 author: system
@@ -212,6 +212,10 @@ Step 7c — Feature folder materialization (always-on)
 | `feature_count` | `integer` | Count of feature folders created. 0 if all folders already existed. |
 | `metrics` | `object` | Execution metrics (tokens_in, tokens_out, duration_ms, items_produced, version) |
 | `feedback` | `array[object]` | Feedback loop entries for cross-skill communication |
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "project", auto_archive: false }` — `req_task_map` persists until implementation complete; `expires_at` is null (no expiry until implementation complete), no auto-archive, per the context-memory TTL policy table.
 
 **Output Schema:**
 

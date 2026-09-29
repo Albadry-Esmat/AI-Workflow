@@ -1,6 +1,6 @@
 # Skills Registry — All Skills Catalog
 
-**Version:** 5.6.0 | **Last updated:** 2026-07-09
+**Version:** 5.6.0 | **Last updated:** 2026-09-29
 
 The system uses a two-layer skill architecture. For the full lightweight index, see `skills/index.yaml`. For rich knowledge documentation per skill, see `skills/knowledge/`. This file is the human-readable catalog layer.
 
@@ -20,7 +20,7 @@ The system uses a two-layer skill architecture. For the full lightweight index, 
 |----------|-------|
 | Domain | `requirements` |
 | File | `.agents/skills/requirement-analyzer/SKILL.md` |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Purpose | Extract, normalize, and validate requirements from raw input |
 | Consumes from | None (entry point) |
 | Produces for | `architecture-design` |
@@ -85,7 +85,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 |----------|-------|
 | Domain | `architecture` |
 | File | `.agents/skills/architecture-design/SKILL.md` |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Purpose | Define modules, data flow, integration points, tech decisions |
 | Consumes from | `requirement-analyzer` |
 | Produces for | `feature-planning`, `security-review`, `documentation-generator` |
@@ -159,7 +159,7 @@ or produce biased interpretations. Not needed for simple, well-understood featur
 |----------|-------|
 | Domain | `security` |
 | File | `.agents/skills/security-review/SKILL.md` |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Purpose | Threat modeling, vulnerability detection, remediation |
 | Consumes from | `architecture-design`, `clean-code-review` |
 | Produces for | None |
@@ -576,6 +576,18 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 | Pipeline | `skills/pipelines/iot-embedded.json` |
 
 **Key output:** `domain_constraints` (system_type, required_modules, memory_constraints, safety_controls, protocol_constraints, ota_requirements, game_constraints)
+
+---
+
+## Specialized Pipeline Templates
+
+| Template | Domain | Purpose |
+|----------|--------|---------|
+| `data-ml-pipeline.json` | `data_ml` | Data/ML architecture, warehouse schema, model evaluation, data-quality and fairness gates, and feature-store deployment |
+| `microservices.json` | `microservices` | Service-boundary design, service-mesh constraints, per-service contracts and isolation, and distributed tracing |
+| `serverless-edge.json` | `serverless_edge` | Edge-runtime constraints, cold-start checks, bundle-size and environment-configuration guards, and provider deployment |
+
+The templates are stored under `skills/pipelines/` and are selected by the primary agent's intent-routing table.
 
 ---
 

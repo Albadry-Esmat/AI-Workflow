@@ -174,6 +174,11 @@ Step 0.5 — Retry check (FEATURE-005)
 
 Step 1 — Resolve pipeline from registry
   Look up each skill name in registry.json. Resolve file path, version, input/output schemas.
+  A pipeline step may be a reserved future capability only when its step config
+  has `placeholder: true` and a non-empty `reason`. Such a step is not invoked;
+  it produces a `placeholder_skipped` trace record and is eligible only when its
+  phase condition is true. Any unregistered step without this explicit marker
+  returns `{"error":"UNKNOWN_SKILL"}`.
   Validate that all dependencies (consumes_from) are satisfied.
 
   ─── ROUTING DEAD-END / GAP DETECTION (FEATURE-001) ────────────────────────

@@ -74,7 +74,9 @@ def main() -> int:
     required_fixtures = {"plan-local-only", "hash-exact-match", "hash-mismatch", "path-outside-staging", "path-symlink-blocked", "consent-required", "approved-fixture-executes-one", "output-not-captured", "recovery-preserves-staging"}
     check("fixtures cover required O5 scenarios", required_fixtures.issubset(fixture_ids))
 
-    with tempfile.TemporaryDirectory(prefix="aiw-o5-controls-") as raw:
+    # Keep the fixture under the repository root so macOS `/var` aliases do
+    # not make an otherwise regular staging path look like a symlink.
+    with tempfile.TemporaryDirectory(prefix="aiw-o5-controls-", dir=ROOT) as raw:
         temp = Path(raw)
         staging = temp / "staging"
         state_root = temp / "state"

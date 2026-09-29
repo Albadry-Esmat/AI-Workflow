@@ -481,7 +481,8 @@ def agent_use(adapter_id: str, as_json: bool) -> int:
         report = {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": adapter_id, "fallback": False}
         emit(report, as_json, "Agent selection failed")
         return 1
-    report = resolve_runtime(adapter_id, ROOT, dry_run=False)
+    target_root = Path(os.environ.get("AIW_O2_TARGET_ROOT", str(ROOT))).resolve()
+    report = resolve_runtime(adapter_id, target_root, dry_run=False)
     emit(report, as_json, "Agent runtime selected" if report.get("verdict") == "pass" else "Agent selection failed")
     return 0 if report.get("verdict") == "pass" else 1
 

@@ -1,6 +1,6 @@
 ---
 name: database-architect
-version: 1.1.0
+version: 1.2.0
 domain: database
 description: 'Use when designing, reviewing, or validating the data model for any feature or system. Triggers on: "design the database", "create the schema", "data model review", "ERD design", "migration strategy", "indexing strategy", "audit logging design", "soft-delete pattern".'
 author: system
@@ -19,6 +19,7 @@ Design and validate the data architecture layer for any feature or application. 
 | `database_constraints` | `object` | No | Database engine, version, existing schema if extension |
 | `existing_schema` | `array[object]` | No | Already-defined tables to prevent duplication or conflict |
 | `domain_constraints` | `object` | No | **NEW v1.1.0.** Domain constraints from `saas-enterprise-architect`. When `domain_constraints.tenancy_model` is present, multi-tenant schema strategy is applied in Step 0 before entity design. |
+| `dry_run` | `boolean` | No | If true, execute all design steps but write nothing to state and queue no migration; all design outputs (including `migration_plan` document) are still returned (default: `false`) |
 
 **Input Schema:**
 
@@ -56,7 +57,8 @@ Design and validate the data architecture layer for any feature or application. 
         "version":          { "type": "string" },
         "existing_schema":  { "type": "array" }
       }
-    }
+    },
+    "dry_run": { "type": "boolean", "default": false }
   }
 }
 ```
@@ -136,6 +138,12 @@ Step 5 — Define indexing strategy
 Step 6 — Define migration plan
   Classify all changes as additive, non-destructive, or destructive.
   For destructive changes: define expand/contract migration steps.
+  If dry_run === true: still produce the full migration_plan document (what would
+  change), but skip all migration queuing/execution and skip all writes to
+  state-manager. database-guard still validates the plan document (non-destructive
+  check) regardless of dry_run status.
+  If dry_run === false (default): behavior is identical to v1.1.0 — plan is produced
+  and normal migration queuing/state writes proceed.
   Output: migration plan with up/down scripts structure and approval gate requirements
 
 Step 7 — Security and PII annotation
@@ -297,6 +305,9 @@ Step 9 — Assemble database architecture document
 - ERD MUST be parseable Mermaid `erDiagram` syntax.
 - `migration_plan.destructive` entries MUST have `requires_approval: true`.
 - `violations` with `severity: critical` block pipeline advancement to implementation.
+- When `dry_run === true`: all output fields (entities, relationships, erd, indexes,
+  security_annotations, migration_plan) are populated normally, but no write occurs
+  to state-manager and no migration is queued or executed.
 
 ## Security Considerations
 
@@ -319,6 +330,7 @@ Step 9 — Assemble database architecture document
 - [ ] No violations with severity: critical
 - [ ] ERD renders without syntax errors
 - [ ] All destructive migration steps are flagged requires_approval: true
+- [ ] dry_run: true populates all outputs with no state writes and no queued migration
 
 ## Failure Scenarios
 

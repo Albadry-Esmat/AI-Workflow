@@ -1,29 +1,29 @@
 meta:
   version: 3.1.0
-  last_updated: '2026-09-26'
-  total_nodes: 121
-  total_edges: 373
+  last_updated: '2026-09-29'
+  total_nodes: 126
+  total_edges: 399
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
   name: requirement-analysis
   domain: requirements
   mastery_level: intermediate
-  version: 1.2.0
+  version: 1.3.0
   status: active
   layer: pipeline-entry
 - id: SKL-002
   name: architecture-design
   domain: architecture
   mastery_level: advanced
-  version: 1.3.0
+  version: 1.4.0
   status: active
   layer: pipeline-core
 - id: SKL-003
   name: feature-planning
   domain: planning
   mastery_level: intermediate
-  version: 2.2.0
+  version: 2.2.1
   status: active
   layer: pipeline-core
 - id: SKL-004
@@ -44,7 +44,7 @@ nodes:
   name: security-review
   domain: security
   mastery_level: advanced
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-quality
 - id: SKL-007
@@ -72,7 +72,7 @@ nodes:
   name: orchestration
   domain: system
   mastery_level: advanced
-  version: 2.5.0
+  version: 2.5.1
   status: active
   layer: meta
 - id: SKL-011
@@ -93,14 +93,14 @@ nodes:
   name: context-memory
   domain: system
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.1.0
   status: active
   layer: utility
 - id: SKL-014
   name: observability
   domain: system
   mastery_level: intermediate
-  version: 1.1.0
+  version: 2.0.0
   status: active
   layer: utility
 - id: SKL-015
@@ -149,7 +149,7 @@ nodes:
   name: state-manager
   domain: orchestration
   mastery_level: advanced
-  version: 1.1.0
+  version: 1.1.1
   status: active
   layer: infrastructure
 - id: SKL-022
@@ -170,7 +170,7 @@ nodes:
   name: change-impact-analyzer
   domain: architecture
   mastery_level: advanced
-  version: 1.1.0
+  version: 1.2.0
   status: active
   layer: pipeline-core
 - id: SKL-025
@@ -191,14 +191,14 @@ nodes:
   name: adr-generator
   domain: documentation
   mastery_level: intermediate
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-execution
 - id: SKL-028
   name: test-generator
   domain: testing
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.1.0
   status: active
   layer: pipeline-execution
 - id: SKL-029
@@ -219,14 +219,14 @@ nodes:
   name: frontend-ux-architect
   domain: design
   mastery_level: advanced
-  version: 2.0.0
+  version: 2.1.0
   status: active
   layer: pipeline-core
 - id: SKL-032
   name: database-architect
   domain: database
   mastery_level: advanced
-  version: 1.1.0
+  version: 1.2.0
   status: active
   layer: pipeline-core
 - id: SKL-033
@@ -247,14 +247,14 @@ nodes:
   name: performance-guard
   domain: governance
   mastery_level: intermediate
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-quality
 - id: SKL-036
   name: ui-ux-compliance-guard
   domain: governance
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.1.0
   status: active
   layer: pipeline-quality
 - id: SKL-037
@@ -268,14 +268,14 @@ nodes:
   name: design-system-generator
   domain: design
   mastery_level: intermediate
-  version: 2.0.0
+  version: 2.1.0
   status: active
   layer: pipeline-execution
 - id: SKL-039
   name: seo-optimizer
   domain: quality
   mastery_level: intermediate
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-quality
 - id: SKL-040
@@ -289,7 +289,7 @@ nodes:
   name: security-guard
   domain: governance
   mastery_level: advanced
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-quality
 - id: SKL-042
@@ -331,21 +331,21 @@ nodes:
   name: behavioral-telemetry-collector
   domain: system
   mastery_level: intermediate
-  version: 1.3.0
+  version: 1.3.1
   status: active
   layer: utility
 - id: SKL-048
   name: session-insights
   domain: system
   mastery_level: intermediate
-  version: 1.3.0
+  version: 1.3.1
   status: active
   layer: utility
 - id: SKL-049
   name: enhancement-dashboard
   domain: system
   mastery_level: beginner
-  version: 1.1.0
+  version: 1.1.1
   status: active
   layer: utility
 - id: SKL-050
@@ -387,21 +387,21 @@ nodes:
   name: defect-manager
   domain: lifecycle
   mastery_level: intermediate
-  version: 1.0.0
+  version: 1.0.1
   status: active
   layer: lifecycle
 - id: SKL-056
   name: change-request-manager
   domain: lifecycle
   mastery_level: intermediate
-  version: 1.0.0
+  version: 1.0.1
   status: active
   layer: lifecycle
 - id: SKL-057
   name: work-item-exporter
   domain: integration
   mastery_level: beginner
-  version: 2.1.0
+  version: 2.3.0
   status: active
   layer: integration
 - id: SKL-058
@@ -852,6 +852,41 @@ nodes:
   version: 1.0.0
   status: active
   layer: pipeline-core
+- id: SKL-059
+  name: api-contract-guard
+  domain: governance
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-060
+  name: bundle-size-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-061
+  name: environment-config-manager
+  domain: deployment
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-062
+  name: release-notes-generator
+  domain: delivery
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-064
+  name: i18n-compliance-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
 edges:
 - from: SKL-001
   to: SKL-002
@@ -2352,3 +2387,107 @@ edges:
   to: SKL-055
   type: dependency
   label: github-merge-gate holds on open blocking defect-manager issues
+- from: SKL-005
+  to: SKL-003
+  type: dependency
+  label: testing-strategy consumes feature-planning@^2.0.0 plan outputs for strategy scope
+- from: SKL-006
+  to: SKL-002
+  type: dependency
+  label: security-review consumes architecture-design@^1.3.0 integration points for threat surface
+- from: SKL-006
+  to: SKL-004
+  type: dependency
+  label: security-review consumes clean-code-review@^1.1.0 findings for security relevance
+- from: SKL-007
+  to: SKL-002
+  type: dependency
+  label: deployment-strategy consumes architecture-design@^1.3.0 modules for environment topology
+- from: SKL-007
+  to: SKL-005
+  type: dependency
+  label: deployment-strategy consumes testing-strategy@^2.0.0 quality gates for promotion rules
+- from: SKL-008
+  to: SKL-001
+  type: dependency
+  label: documentation-generator consumes requirement-analyzer@^1.2.0 requirements for doc scope
+- from: SKL-008
+  to: SKL-002
+  type: dependency
+  label: documentation-generator consumes architecture-design@^1.3.0 modules for API docs
+- from: SKL-008
+  to: SKL-004
+  type: dependency
+  label: documentation-generator consumes clean-code-review@^1.1.0 findings for quality notes
+- from: SKL-039
+  to: SKL-001
+  type: dependency
+  label: seo-optimizer consumes requirement-analyzer@^1.2.0 site goals for metadata scope
+- from: SKL-039
+  to: SKL-031
+  type: dependency
+  label: seo-optimizer consumes frontend-ux-architect@^2.0.0 routes for sitemap and hreflang
+- from: SKL-027
+  to: SKL-021
+  type: dependency
+  label: adr-generator consumes state-manager@^1.1.0 adr_index for supersedure checks
+- from: SKL-029
+  to: SKL-004
+  type: dependency
+  label: code-repair consumes clean-code-review@^1.1.0 findings as repair input
+- from: SKL-029
+  to: SKL-021
+  type: dependency
+  label: code-repair consumes state-manager@^1.1.0 snapshots for rollback safety
+- from: SKL-004
+  to: SKL-003
+  type: dependency
+  label: clean-code-review consumes feature-planning@^2.0.0 task scope for review bounds
+- from: SKL-047
+  to: SKL-014
+  type: dependency
+  label: behavioral-telemetry-collector consumes observability@^1.1.0 event schema for pipeline metrics
+- from: SKL-048
+  to: SKL-047
+  type: dependency
+  label: session-insights consumes behavioral-telemetry-collector@^1.0.0 events for analysis
+- from: SKL-049
+  to: SKL-048
+  type: dependency
+  label: enhancement-dashboard consumes session-insights@^1.0.0 session_summary for rendering
+- from: SKL-050
+  to: SKL-048
+  type: dependency
+  label: adaptive-proposal-generator consumes session-insights@^1.0.0 summaries for proposals
+- from: SKL-051
+  to: SKL-050
+  type: dependency
+  label: adaptation-applicator consumes adaptive-proposal-generator@^1.0.0 approved proposals
+- from: SKL-051
+  to: SKL-012
+  type: dependency
+  label: adaptation-applicator consumes skill-authoring@^1.0.0 scaffolds for skill changes
+- from: SKL-002
+  to: SKL-059
+  type: dependency
+  label: api-contract-guard consumes architecture-design API contracts
+- from: SKL-010
+  to: SKL-059
+  type: composition
+  label: orchestrator invokes api-contract-guard in the guard layer
+- from: SKL-026
+  to: SKL-060
+  type: dependency
+  label: bundle-size-guard consumes code-generator build artifacts
+- from: SKL-010
+  to: SKL-060
+  type: composition
+  label: orchestrator invokes bundle-size-guard in frontend and edge pipelines
+- from: SKL-007
+  to: SKL-061
+  type: dependency
+  label: environment-config-manager consumes deployment-strategy environment definitions
+- from: SKL-010
+  to: SKL-061
+  type: composition
+  label: orchestrator invokes environment-config-manager before deployment

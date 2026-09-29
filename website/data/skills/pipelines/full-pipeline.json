@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/pipeline-schema.json",
   "name": "full-pipeline",
-  "version": "4.0.0",
+  "version": "4.1.1",
   "description": "Full idea-to-production pipeline (v4.0.0 \u2014 TASK-0073..0080 expansion): cost estimate (HITL) \u2192 requirements \u2192 clarify [\u2192 optional spec-debate] [\u2192 optional pre-arch research] \u2192 architecture [\u2192 optional arch-debate] \u2192 UX/DB design \u2192 design system \u2225 dependency graph \u2192 planning [\u2192 optional dual-model plan-debate consensus] \u2192 phase-4b-research (conditional on uncertainty markers) \u2192 task DAG \u2192 impact analysis \u2192 phase-4c parallel 4-reviewer dispatch \u2192 phase-4d confidence scoring \u2192 phase-4e conditional debate \u2192 phase-4f finding aggregation \u2192 phase-4g change requests \u2192 contract freeze \u2192 phase-4h validation (revision loop, HITL@3) \u2192 code generation \u2192 guard layer \u2192 quality + testing \u2192 cross-artifact consistency \u2192 RTM \u2192 completeness audit \u2192 drift detection \u2192 defect management (conditional) \u2192 deployment \u2192 export + docs + post-run cost report. TASK-0078: reduced to 4 mandatory HITL gates (GATE-001..004). Set hitl_preset:'full' to restore all 18 legacy gates.",
   "mode": "hybrid",
   "phases": [
@@ -693,6 +693,12 @@
           "version": "^1.0.0",
           "max_retries": 1,
           "type": "validation_check"
+        },
+        {
+          "name": "api-contract-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
         }
       ]
     },
@@ -763,6 +769,11 @@
           "name": "deployment-strategy",
           "version": "^1.1.0",
           "max_retries": 2
+        },
+        {
+          "name": "environment-config-manager",
+          "version": "^1.0.0",
+          "max_retries": 1
         }
       ]
     },
@@ -792,6 +803,12 @@
           "name": "work-item-exporter",
           "version": "^2.0.0",
           "max_retries": 1
+        },
+        {
+          "name": "release-notes-generator",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "async": true
         }
       ]
     },
@@ -879,6 +896,24 @@
       "skip_condition": "pipeline_config.ci_mode === true",
       "skip_log_reason": "ci_mode_cost_gate_bypass",
       "note": "TASK-0078: Legacy gate IDs replaced: GATE-COST-ESTIMATE, GATE-0-COST. Set hitl_preset:'full' to restore original behavior."
+    },
+    {
+      "gate_id": "GATE-REQ-CONFLICT",
+      "after_phase": "phase-1-requirements",
+      "type": "human_approval",
+      "label": "Requirements conflict review — resolve stakeholder conflicts before architecture",
+      "condition": "project_spec.conflicts && project_spec.conflicts.length > 0",
+      "timeout": 3600,
+      "bypass_on_timeout": false,
+      "choices": ["APPROVE", "REJECT"],
+      "on_choice": {
+        "REJECT": {
+          "action": "abort_pipeline",
+          "reason": "Stakeholder conflicts were not resolved before architecture."
+        }
+      },
+      "artifacts_presented": ["project_spec.conflicts", "project_spec.open_questions"],
+      "note": "Only a recorded human decision may advance conflicting requirements. APPROVE means the reviewer accepts the documented resolution options and assumptions for architecture review."
     },
     {
       "gate_id": "GATE-002",
@@ -1049,7 +1084,8 @@
     "documentation-generator",
     "doc-maintainer",
     "adr-generator",
-    "work-item-exporter"
+    "work-item-exporter",
+    "release-notes-generator"
   ],
   "token_policy": {
     "auto_compress": true,

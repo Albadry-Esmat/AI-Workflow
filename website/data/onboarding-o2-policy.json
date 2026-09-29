@@ -8,7 +8,17 @@
   },
   "selection": {
     "catalog_path": "config/agent-runtime-catalog.json",
-    "auto_precedence": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"],
+    "auto_precedence": [
+      "opencode",
+      "claude-code",
+      "codex",
+      "copilot-cli",
+      "antigravity",
+      "cursor",
+      "gemini-cli",
+      "aider",
+      "generic-command"
+    ],
     "explicit_missing_fails": true,
     "silent_fallback": false
   },
@@ -45,7 +55,26 @@
     "Automate provider or runtime login",
     "Store raw runtime, provider, or GitHub secrets",
     "Copy .env or secrets into a target project",
-    "Launch a runtime through a provider-specific adapter",
     "Mutate target projects during setup, detection, selection, or demo"
-  ]
+  ],
+  "governed_launch": {
+    "allowed": [
+      "detect",
+      "select",
+      "validate",
+      "invoke an externally owned runtime",
+      "launch a verified IDE opener with the target path only (S2 opener-launch)"
+    ],
+    "forbidden": [
+      "install the runtime",
+      "authenticate the runtime",
+      "own its credentials",
+      "change its provider account",
+      "silently select another runtime",
+      "silently change its model",
+      "launch an unverified or absent IDE opener"
+    ],
+    "amended": "2026-09-29",
+    "amendment": "S2 IDE opener launch + MCP strict start gates (P1 Slice S2): opener-launch enters scope narrowly for catalog-verified openers only, with MCP freshness global and strict dependency gates per MCP-surface adapter; all S1 prohibitions remain, extended to unverified openers."
+  }
 }
