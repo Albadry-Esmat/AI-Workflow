@@ -439,6 +439,10 @@ jobs:
         if: success() || failure()
         run: node scripts/validate-pipeline-references.js
 
+      - name: "index.yaml ↔ SKILL.md version consistency"
+        if: success() || failure()
+        run: node scripts/validate-skill-metadata.js
+
       - name: Summary
         if: always()
         run: echo "=== Skill validation complete ==="
@@ -466,6 +470,7 @@ jobs:
           ROOT     = Path(".")
           DOCS_DIR = ROOT / "docs"
           broken   = []
+          external = []
 
           # Check docs/, root .md files, and examples/ (if it exists)
           examples_dir = ROOT / "examples"
@@ -481,7 +486,11 @@ jobs:
               content = md_file.read_text(errors="replace")
               for m in link_re.finditer(content):
                   raw_target = m.group(2).strip()
-                  if raw_target.startswith(("http://", "https://", "mailto:", "#")):
+                  if raw_target.startswith(("http://", "https://")):
+                      if raw_target not in external:
+                          external.append(raw_target)
+                      continue
+                  if raw_target.startswith(("mailto:", "#")):
                       continue
                   path_part = raw_target.split("#")[0]
                   if not path_part:
@@ -498,6 +507,24 @@ jobs:
               sys.exit(1)
           else:
               print(f"  PASS: All internal Markdown links resolve ({len(md_files)} files checked)")
+
+          # External links: warn-only (never fail — network flakiness must not
+          # block CI). TASK-0046: external breakage is advisory.
+          import urllib.request
+          warned = 0
+          for url in external:
+              try:
+                  req = urllib.request.Request(url, method="HEAD",
+                      headers={"User-Agent": "AIW-link-check/1.0"})
+                  with urllib.request.urlopen(req, timeout=10) as resp:
+                      if resp.status >= 400:
+                          print(f"  WARN: external link HTTP {resp.status}: {url}")
+                          warned += 1
+              except Exception as exc:
+                  print(f"  WARN: external link unreachable ({type(exc).__name__}): {url}")
+                  warned += 1
+          if warned == 0:
+              print(f"  PASS: All external links reachable ({len(external)} checked, warn-only)")
           PYEOF
 
   # ── Job 3: Website data sync check ─────────────────────────────────────────

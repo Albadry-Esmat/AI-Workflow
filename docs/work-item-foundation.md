@@ -124,6 +124,7 @@ jira_epic_link: null
 | `INVESTIGATION` | `Sub-task` (parent: BUG) |
 | `CLOSURE` | `Sub-task` (parent: BUG) |
 | `CR` | `Change Request` (custom type) or `Epic` |
+| `FEATURE` | `Epic` (member TASKs export as `Story`/`Task` linked via `jira_epic_link`; `customfield_10011`) |
 
 ---
 

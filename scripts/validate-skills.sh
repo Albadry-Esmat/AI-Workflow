@@ -271,8 +271,9 @@ if command -v node &>/dev/null; then
 
     for (const skill of registry.skills) {
       if (!skill.origin_metadata) {
-        // Pre-v5.1.0 skills are exempt — counted but not failed
-        warnings++;
+        // TASK-0048: backfill complete — missing origin_metadata now fails.
+        process.stderr.write('  FAIL: ' + skill.name + ' — origin_metadata missing (backfill via scripts/backfill-origin-metadata.js)\n');
+        errors++;
         continue;
       }
       const om = skill.origin_metadata;

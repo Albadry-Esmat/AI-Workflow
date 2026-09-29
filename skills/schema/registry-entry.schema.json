@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://ase-os/schemas/registry-entry.json",
   "title": "RegistryEntry",
-  "description": "Schema for a single skill entry in skills/registry.json. The origin_metadata field is required for all skills registered at v5.1.0 or later; pre-v5.1.0 entries that lack it are exempted with a WARN in validate-skills.sh.",
+  "description": "Schema for a single skill entry in skills/registry.json. The origin_metadata field is required for all entries since the TASK-0048 backfill; missing origin_metadata fails validate-skills.sh check 8.",
   "type": "object",
   "required": ["name", "version", "status", "domain", "path"],
   "additionalProperties": true,
@@ -37,7 +37,7 @@
     },
     "origin_metadata": {
       "type": "object",
-      "description": "Provenance and approval metadata. Required for all skills registered after v5.1.0 (FEATURE-003). Pre-v5.1.0 skills without this field receive a WARN in validate-skills.sh (not an error).",
+      "description": "Provenance and approval metadata. Required for all registry entries since the TASK-0048 backfill; missing origin_metadata fails validate-skills.sh check 8.",
       "required": ["source", "approval_tier", "created_at"],
       "additionalProperties": false,
       "properties": {
