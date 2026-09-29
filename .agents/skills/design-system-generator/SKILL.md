@@ -1,6 +1,6 @@
 ---
 name: design-system-generator
-version: 2.0.0
+version: 2.1.0
 domain: design
 description: 'Use when generating design system artifacts — token files, component scaffolds, Storybook config, and theme configuration — from a UX architecture spec. Triggers on: "generate the design system", "create token files", "scaffold the component library", "generate Storybook config", "produce theme config", "build the design foundation", "generate motion tokens", "multi-theme system".'
 author: system
@@ -22,6 +22,7 @@ Generate the concrete design system artifact layer from the token requirements a
 | `theme_modes` | `array[string]` | No | Theme variants to generate (default: `["light", "dark"]`) |
 | `existing_token_files` | `array[string]` | No | Paths to existing token files to merge rather than replace |
 | `storybook_version` | `string` | No | Target Storybook version (default: `"8"`) |
+| `dry_run` | `boolean` | No | If true, generate all artifacts in memory but write no files to disk; list planned writes in `file_manifest` with `would_write: true` and `files_written: 0` (default: `false`) |
 
 **Input Schema:**
 
@@ -79,7 +80,8 @@ Generate the concrete design system artifact layer from the token requirements a
       "default": ["light", "dark"]
     },
     "existing_token_files": { "type": "array", "items": { "type": "string" } },
-    "storybook_version":    { "type": "string" }
+    "storybook_version":    { "type": "string" },
+    "dry_run": { "type": "boolean", "default": false }
   }
 }
 ```
@@ -94,6 +96,15 @@ Generate the concrete design system artifact layer from the token requirements a
 ## Execution Logic
 
 ```
+Dry-run gate (applies to Steps 2–8):
+  If dry_run === true: execute Steps 2–8 fully in memory to produce identical
+  artifact content, but perform zero disk writes. All planned writes are listed in
+  file_manifest with would_write: true and metrics.files_written = 0.
+  Auto dry_run: if upstream token_requirements was produced with
+  metadata.dry_run_only: true (see frontend-ux-architect TASK-0003), this skill
+  automatically operates in dry_run mode even if the caller did not explicitly set it.
+  If dry_run === false (default): behavior is identical to v2.0.0 — files are written.
+
 Step 1 — Resolve token inventory
   Group token_requirements by tier: primitive → semantic → component.
   Add implicit required categories if not already present:
@@ -205,7 +216,10 @@ Step 9 — Assemble file manifest
   Validate: every token referenced in component stubs exists in the token files.
   Validate: every semantic token references a primitive (no orphan semantics).
   Flag any unresolved token references as violations.
-  Output: file_manifest with path, type, size_estimate, purpose per file
+  If dry_run === true (or auto dry_run is active): every file_manifest entry MUST
+  carry would_write: true, zero files are written to disk, and metrics.files_written = 0.
+  If dry_run === false (default): files are written normally and would_write is false.
+  Output: file_manifest with path, type, size_estimate, purpose, would_write per file
 ```
 
 ## Outputs
@@ -217,7 +231,7 @@ Step 9 — Assemble file manifest
 | `component_stubs` | `array[object]` | Scaffolded component file specs (path, component_name, props_count, stories_path) |
 | `storybook_config` | `object` | Storybook setup (main_config_path, preview_path, story_count, framework, theme_modes) |
 | `motion_tokens` | `object` | Summary of generated motion token set (duration_steps, easing_curves, spring_presets) |
-| `file_manifest` | `array[object]` | Full list of all generated files (path, type, purpose) |
+| `file_manifest` | `array[object]` | Full list of all generated files (path, type, purpose, `would_write`) — `would_write: true` and zero disk writes when `dry_run: true` |
 | `violations` | `array[object]` | Unresolved token references, naming conflicts, missing required tokens |
 | `metadata` | `object` | token_count, component_count, theme_count, file_count, version |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
@@ -292,11 +306,12 @@ Step 9 — Assemble file manifest
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["path", "type", "purpose"],
+        "required": ["path", "type", "purpose", "would_write"],
         "properties": {
-          "path":    { "type": "string" },
-          "type":    { "type": "string", "enum": ["token", "theme", "component", "story", "config", "font"] },
-          "purpose": { "type": "string" }
+          "path":        { "type": "string" },
+          "type":        { "type": "string", "enum": ["token", "theme", "component", "story", "config", "font"] },
+          "purpose":     { "type": "string" },
+          "would_write": { "type": "boolean", "description": "True when dry_run is true: file content was generated but not written to disk" }
         }
       }
     },
@@ -335,7 +350,8 @@ Step 9 — Assemble file manifest
         "tokens_out":     { "type": "integer" },
         "duration_ms":    { "type": "integer" },
         "items_produced": { "type": "integer" },
-        "version":        { "type": "string" }
+        "version":        { "type": "string" },
+        "files_written":  { "type": "integer", "description": "Files written to disk; 0 when dry_run is true" }
       }
     },
     "feedback_entry": {
@@ -364,6 +380,8 @@ Step 9 — Assemble file manifest
 - If `existing_token_files` are provided, new tokens MUST be merged (not overwritten); conflicts surface as `critical` violations.
 - Hardcoded hex values or pixel values in token files are a `critical` violation.
 - Glass tokens (`glass-bg`, `glass-blur`) MUST NOT appear in the accessibility theme — surface as auto-removed with info feedback.
+- When `dry_run === true` (or auto dry_run via upstream `metadata.dry_run_only: true`):
+  write zero files to disk; every `file_manifest` entry carries `would_write: true`.
 
 ## Security Considerations
 
@@ -390,6 +408,7 @@ Step 9 — Assemble file manifest
 - [ ] `violations` array empty or all items are `severity: minor`
 - [ ] No raw hex or pixel values in token files
 - [ ] Glass tokens absent from accessibility theme
+- [ ] dry_run: true writes zero files; file_manifest entries carry would_write: true and files_written = 0
 
 ## Failure Scenarios
 

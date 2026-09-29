@@ -34,6 +34,17 @@
       ]
     },
     {
+      "id": "phase-2d-localization",
+      "label": "Localization Architecture",
+      "skills": [
+        {
+          "name": "localization-architect",
+          "version": "^1.0.0",
+          "max_retries": 1
+        }
+      ]
+    },
+    {
       "id": "phase-2b-design",
       "label": "UI/UX + Database Design",
       "parallel": true,
@@ -157,6 +168,18 @@
         },
         {
           "name": "security-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "bundle-size-guard",
+          "version": "^1.0.0",
+          "max_retries": 1,
+          "type": "validation_check"
+        },
+        {
+          "name": "i18n-compliance-guard",
           "version": "^1.0.0",
           "max_retries": 1,
           "type": "validation_check"

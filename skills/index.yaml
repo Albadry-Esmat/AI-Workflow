@@ -695,7 +695,7 @@ skills:
   - tradeoffs
   - documentation
   - records
-  version: 1.0.0
+  version: 1.1.0
   depends_on:
   - SKL-002
   mastery_level: intermediate
@@ -812,7 +812,7 @@ skills:
   - motion
   - visual-excellence
   - creative-layouts
-  version: 2.0.0
+  version: 2.1.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -842,7 +842,7 @@ skills:
   - migrations
   - audit-logging
   - soft-delete
-  version: 1.1.0
+  version: 1.2.0
   depends_on:
   - SKL-001
   - SKL-002
@@ -1021,7 +1021,7 @@ skills:
   - motion-tokens
   - multi-theme
   - glass-effects
-  version: 2.0.0
+  version: 2.1.0
   depends_on:
   - SKL-031
   mastery_level: intermediate
@@ -3534,3 +3534,63 @@ skills:
   mastery_level: intermediate
   use_when: 'Deciding whether a pull request may merge, gating on CI completion, or auditing a merge decision.'
   do_not_use_when: 'Approving reviews, merging on red checks, bypassing branch policy, or closing human PRs.'
+- id: SKL-059
+  name: API Contract Guard
+  short_description: Validate implementation routes against architecture API contracts, blocking on missing routes, method mismatches, and schema drift.
+  reference_path: .agents/skills/api-contract-guard/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .agents/skills/api-contract-guard/SKILL.md
+  tags: [api, contract, guard, governance, block, microservices, saas]
+  version: 1.0.0
+  depends_on: [SKL-002]
+  mastery_level: advanced
+  use_when: 'Validating API implementations against architecture contracts in phase-7b guards, or checking microservices and SaaS service boundaries.'
+  do_not_use_when: 'Designing API contracts from scratch, or when no architecture contract exists to validate against.'
+- id: SKL-060
+  name: Bundle Size Guard
+  short_description: Enforce frontend and edge bundle-size budgets with near-budget warnings, blocking on over-budget bundles.
+  reference_path: .agents/skills/bundle-size-guard/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .agents/skills/bundle-size-guard/SKILL.md
+  tags: [bundle, performance, guard, governance, block, web, edge, budgets]
+  version: 1.0.0
+  depends_on: [SKL-003]
+  mastery_level: intermediate
+  use_when: 'Enforcing bundle budgets for consumer websites, developer portals, admin panels, or edge functions after build artifacts exist.'
+  do_not_use_when: 'Backend-only services with no shipped bundles, or before build artifacts are produced.'
+- id: SKL-061
+  name: Environment Config Manager
+  short_description: Validate environment variable declarations across target environments and generate overlays with deployment risk flags.
+  reference_path: .agents/skills/environment-config-manager/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .agents/skills/environment-config-manager/SKILL.md
+  tags: [env, config, deployment, secrets-safety, overlays, pre-deploy]
+  version: 1.0.0
+  depends_on: [SKL-003]
+  mastery_level: intermediate
+  use_when: 'Preparing environment overlays for pre-deploy phases, auditing undeclared variables, or flagging staging and production risks.'
+  do_not_use_when: 'Storing or outputting secret values — names and annotations only, never values.'
+- id: SKL-062
+  name: Release Notes Generator
+  short_description: Synthesize per-audience release notes from ADRs, work items, and changelog diffs with breaking-change migration pointers.
+  reference_path: .agents/skills/release-notes-generator/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .agents/skills/release-notes-generator/SKILL.md
+  tags: [release-notes, changelog, adr, documentation, audiences]
+  version: 1.0.0
+  depends_on: [SKL-003]
+  mastery_level: intermediate
+  use_when: 'Generating release notes at release time from closed work items and ADRs, per technical, stakeholder, or end-user audience.'
+  do_not_use_when: 'Fabricating notes with no closed items, or as a substitute for the changelog.'
+- id: SKL-064
+  name: i18n Compliance Guard
+  short_description: Enforce internationalization compliance (no hardcoded strings, key coverage, RTL, plurals) with pass/block verdicts.
+  reference_path: .agents/skills/i18n-compliance-guard/SKILL.md
+  reference_sections: ['## Purpose', '## Execution Logic', '## Outputs']
+  executable_skill: .agents/skills/i18n-compliance-guard/SKILL.md
+  tags: [i18n, l10n, guard, governance, block, rtl, plurals, coverage]
+  version: 1.0.0
+  depends_on: [SKL-105]
+  mastery_level: intermediate
+  use_when: 'Gating multi-locale releases on string externalization, translation coverage, RTL layouts, and plural rules.'
+  do_not_use_when: 'Single-locale applications, or when localization-architect (SKL-105) has not defined the locale spec.'

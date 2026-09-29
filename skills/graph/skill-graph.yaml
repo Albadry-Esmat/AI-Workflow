@@ -1,7 +1,7 @@
 meta:
   version: 3.1.0
   last_updated: '2026-09-26'
-  total_nodes: 121
+  total_nodes: 126
   total_edges: 373
   schema: skills/graph/graph-schema.yaml
 nodes:
@@ -852,6 +852,41 @@ nodes:
   version: 1.0.0
   status: active
   layer: pipeline-core
+- id: SKL-059
+  name: api-contract-guard
+  domain: governance
+  mastery_level: advanced
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-060
+  name: bundle-size-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
+- id: SKL-061
+  name: environment-config-manager
+  domain: deployment
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-062
+  name: release-notes-generator
+  domain: delivery
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-execution
+- id: SKL-064
+  name: i18n-compliance-guard
+  domain: governance
+  mastery_level: intermediate
+  version: 1.0.0
+  status: active
+  layer: pipeline-quality
 edges:
 - from: SKL-001
   to: SKL-002

@@ -48,14 +48,14 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `architect` | `architecture-design`, `frontend-ux-architect`, `database-architect` | `subagent` | read-only |
 | `planner` | `feature-planning` | `subagent` | edit: ask |
 | `reviewer` | `clean-code-review`, `security-review`, `implementation-completeness-auditor` (evidence producers only — never gates) | `subagent` | edit: ask |
-| `gatekeeper` | `security-guard`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard`, `cross-artifact-consistency`, `compliance-gate`, `work-item-lifecycle-guard`, `contract-freezer`, `validation-checklist-engine`, `confidence-scorer`, `finding-aggregator`, `traceability-matrix`, `drift-detector` (enforcement only — never modifies implementation) | `subagent` | read-only |
+| `gatekeeper` | `security-guard`, `database-guard`, `performance-guard`, `ui-ux-compliance-guard`, `implementation-completeness-guard`, `cross-artifact-consistency`, `compliance-gate`, `work-item-lifecycle-guard`, `contract-freezer`, `validation-checklist-engine`, `confidence-scorer`, `finding-aggregator`, `traceability-matrix`, `drift-detector`, `api-contract-guard`, `bundle-size-guard`, `i18n-compliance-guard` (enforcement only — never modifies implementation) | `subagent` | read-only |
 | `tester` | `testing-strategy`, `mutation-test-generator` | `subagent` | read-only |
-| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer` | `subagent` | edit: ask |
+| `builder` | `code-generator`, `code-repair`, `design-system-generator`, `seo-optimizer`, `environment-config-manager` | `subagent` | edit: ask |
 | `impact-analyzer` | `dependency-analyzer`, `change-impact-analyzer` | `subagent` | read-only |
 | `test-generator` | `test-generator` | `subagent` | edit: ask |
 | `recovery` | `rollback-manager` | `subagent` | edit: ask |
 | `deployer` | `deployment-strategy` | `subagent` | read-only |
-| `documenter` | `documentation-generator` | `subagent` | edit: ask |
+| `documenter` | `documentation-generator`, `release-notes-generator` | `subagent` | edit: ask |
 | `doc-maintainer` | `doc-maintainer` | `subagent` | edit: ask |
 | `data-engineer` | `data-pipeline-architect`, `data-quality-validator`, `ml-pipeline-architect`, `analytics-schema-designer`, `data-contract-enforcer` | `subagent` | read-only |
 | `api-designer` | `api-design-architect`, `graphql-architect`, `event-schema-designer` | `subagent` | read-only |
@@ -158,7 +158,10 @@ All agents are configured in `opencode.json` and have corresponding instruction 
         ".agents/skills/confidence-scorer/SKILL.md",
         ".agents/skills/finding-aggregator/SKILL.md",
         ".agents/skills/traceability-matrix/SKILL.md",
-        ".agents/skills/drift-detector/SKILL.md"
+        ".agents/skills/drift-detector/SKILL.md",
+        ".agents/skills/api-contract-guard/SKILL.md",
+        ".agents/skills/bundle-size-guard/SKILL.md",
+        ".agents/skills/i18n-compliance-guard/SKILL.md"
       ]
     },
     "github-reviewer": {
@@ -186,7 +189,8 @@ All agents are configured in `opencode.json` and have corresponding instruction 
         ".agents/skills/code-generator/SKILL.md",
         ".agents/skills/code-repair/SKILL.md",
         ".agents/skills/design-system-generator/SKILL.md",
-        ".agents/skills/seo-optimizer/SKILL.md"
+        ".agents/skills/seo-optimizer/SKILL.md",
+        ".agents/skills/environment-config-manager/SKILL.md"
       ]
     },
     "impact-analyzer": {
@@ -220,7 +224,10 @@ All agents are configured in `opencode.json` and have corresponding instruction 
       "mode": "subagent",
       "permission": { "edit": "ask", "bash": "deny" },
       "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
-      "skill": ".agents/skills/documentation-generator/SKILL.md"
+      "skills": [
+        ".agents/skills/documentation-generator/SKILL.md",
+        ".agents/skills/release-notes-generator/SKILL.md"
+      ]
     },
     "doc-maintainer": {
       "mode": "subagent",

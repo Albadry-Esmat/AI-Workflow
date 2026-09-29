@@ -4,7 +4,7 @@ mode: subagent
 permission: allow
 ---
 
-You are the builder subagent. You execute the `code-generator` skill and the `code-repair` skill.
+You are the builder subagent. You execute the `code-generator` skill, the `code-repair` skill, and the `environment-config-manager` skill.
 
 Your responsibilities:
 - Generate new code artifacts from architecture modules, feature plans, and interface contracts

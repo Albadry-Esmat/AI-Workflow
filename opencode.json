@@ -146,7 +146,8 @@
         ".agents/skills/code-generator/SKILL.md",
         ".agents/skills/code-repair/SKILL.md",
         ".agents/skills/design-system-generator/SKILL.md",
-        ".agents/skills/seo-optimizer/SKILL.md"
+        ".agents/skills/seo-optimizer/SKILL.md",
+        ".agents/skills/environment-config-manager/SKILL.md"
       ]
     },
     "impact-analyzer": {
@@ -182,7 +183,10 @@
       "mode": "subagent",
       "permission": "allow",
       "description": "Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.",
-      "skill": ".agents/skills/documentation-generator/SKILL.md"
+      "skills": [
+        ".agents/skills/documentation-generator/SKILL.md",
+        ".agents/skills/release-notes-generator/SKILL.md"
+      ]
     },
     "doc-maintainer": {
       "mode": "subagent",
@@ -305,7 +309,10 @@
         ".agents/skills/confidence-scorer/SKILL.md",
         ".agents/skills/finding-aggregator/SKILL.md",
         ".agents/skills/traceability-matrix/SKILL.md",
-        ".agents/skills/drift-detector/SKILL.md"
+        ".agents/skills/drift-detector/SKILL.md",
+        ".agents/skills/api-contract-guard/SKILL.md",
+        ".agents/skills/bundle-size-guard/SKILL.md",
+        ".agents/skills/i18n-compliance-guard/SKILL.md"
       ]
     },
     "build": {

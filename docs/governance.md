@@ -67,6 +67,9 @@ Guard skills are enforcement agents that run as `validation_check` gates. A `blo
 | Implementation Completeness Guard | `implementation-completeness-guard` (SKL-037) | Readiness score < threshold (default: 85), critical requirements marked missing | implementation-completeness-auditor (SKL-033) |
 | Security Guard | `security-guard` (SKL-041) | CVSS score ≥ effective threshold, OWASP Top-10 critical findings present, compliance-scope blocking conditions (PCI/HIPAA/SOC2) | security-review (SKL-006) |
 | Work Item Lifecycle Guard | `work-item-lifecycle-guard` (SKL-058) | Invalid lifecycle state transition for any work item type (block mode only; initial deployment: warning mode) | docs/work-item-foundation.md (lifecycle state machine) |
+| API Contract Guard | `api-contract-guard` (SKL-059) | Route missing from code_map, method mismatch, missing path params or schema fields, expired approval, missing contract evidence | architecture-design (SKL-002) |
+| Bundle Size Guard | `bundle-size-guard` (SKL-060) | Bundle or total payload over budget, edge function over 1024KB uncompressed, missing build evidence | build artifacts + performance budgets |
+| i18n Compliance Guard | `i18n-compliance-guard` (SKL-064) | Hardcoded strings, missing primary-locale keys, RTL or plural gaps, premium coverage < 70 | localization-architect (SKL-105) |
 
 **Previously existing guards (covered by existing skills):**
 

@@ -803,3 +803,94 @@ Enforces the work item lifecycle state machine from `docs/work-item-foundation.m
 **Governance layer:** Layer 2 (Guard Skills)
 
 **ADR:** [ADR-0001](adr/ADR-0001-work-lifecycle-persistence-model.md)
+
+---
+
+### SKL-059 — API Contract Guard
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-059 |
+| **Domain** | governance |
+| **Version** | 1.0.0 |
+| **Mastery** | advanced |
+| **Executable** | `.agents/skills/api-contract-guard/SKILL.md` |
+| **Assigned to** | `gatekeeper` agent |
+
+Validates implementation routes against architecture API contracts in phase-7b guards. Blocks on missing routes, method mismatches, missing path params or schema fields, expired approvals, and missing contract evidence. Optional query-param gaps warn only. Bypass only via registry decision id (`gd_…`) resolved through `scripts/resolve-override.js`.
+
+**Key outputs:** `verdict` (`pass`/`block`), `violations[]`, `warnings[]`
+
+**Governance layer:** Layer 2 (Guard Skills)
+
+---
+
+### SKL-060 — Bundle Size Guard
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-060 |
+| **Domain** | governance |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.agents/skills/bundle-size-guard/SKILL.md` |
+| **Assigned to** | `gatekeeper` agent |
+
+Enforces frontend and edge bundle-size budgets in phase-7b guards (consumer-website, developer-portal, admin-panel). Blocks on over-budget bundles, total overflow, edge functions over 1024KB uncompressed, and missing build evidence. Warns at ≥85% utilization and on large unused chunks.
+
+**Key outputs:** `verdict` (`pass`/`block`), `violations[]`, `warnings[]`, `budget_utilization_pct`
+
+**Governance layer:** Layer 2 (Guard Skills)
+
+---
+
+### SKL-061 — Environment Config Manager
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-061 |
+| **Domain** | deployment |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.agents/skills/environment-config-manager/SKILL.md` |
+| **Assigned to** | `builder` agent |
+
+Validates environment variable declarations across target environments and generates overlays with deployment risk flags. SECRET-typed vars render empty — names and annotations only, never values. Runs in pre-deploy phase-6-deploy and full-pipeline phase-9-deploy.
+
+**Key outputs:** `env_template`, `overlays[]`, `undeclared_vars[]`, `deployment_risks[]`
+
+---
+
+### SKL-062 — Release Notes Generator
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-062 |
+| **Domain** | delivery |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.agents/skills/release-notes-generator/SKILL.md` |
+| **Assigned to** | `documenter` agent |
+
+Synthesizes per-audience release notes from ADRs, work items, and changelog diffs in full-pipeline phase-10b-export (async). Breaking changes carry migration pointers flagged for owner review; empty releases emit Summary + Known Issues rather than fabricated notes.
+
+**Key outputs:** `release_notes_md`, `sections[]`, `breaking_changes[]`, `migration_required`
+
+---
+
+### SKL-064 — i18n Compliance Guard
+
+| Property | Value |
+|----------|-------|
+| **ID** | SKL-064 |
+| **Domain** | governance |
+| **Version** | 1.0.0 |
+| **Mastery** | intermediate |
+| **Executable** | `.agents/skills/i18n-compliance-guard/SKILL.md` |
+| **Assigned to** | `gatekeeper` agent |
+
+Enforces internationalization compliance in phase-7b guards (consumer-website, saas-platform). Blocks on hardcoded strings, missing primary-locale keys, RTL gaps, missing plurals, and premium coverage below 70. Consumes the `localization-architect` (SKL-105) locale spec.
+
+**Key outputs:** `verdict` (`pass`/`block`), `violations[]`, `warnings[]`, `i18n_coverage_pct`
+
+**Governance layer:** Layer 2 (Guard Skills)

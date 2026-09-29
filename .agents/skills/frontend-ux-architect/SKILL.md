@@ -1,6 +1,6 @@
 ---
 name: frontend-ux-architect
-version: 2.0.0
+version: 2.1.0
 domain: design
 description: 'Use when designing, reviewing, or validating the UI/UX architecture of any screen, component system, or interaction flow. Triggers on: "design the UI", "review the UX", "validate the interface", "define screen structure", "accessibility review", "design system compliance", "motion design spec", "creative layout".'
 author: system
@@ -21,6 +21,7 @@ Design and validate the UI/UX architecture layer for any feature or application.
 | `creativity_level` | `string` | No | `standard` (default), `premium`, or `world-class` — controls design ambition and reference set |
 | `motion_requirements` | `array[object]` | No | Motion categories required: micro-interaction, page-transition, scroll-experience, advanced-motion, 3d |
 | `domain_constraints` | `object` | No | Domain constraints from `mobile-platform-specialist`. When present, activates mobile-first layout constraints, platform-specific navigation patterns, and PWA capability checklist. |
+| `dry_run` | `boolean` | No | If true, populate all outputs normally and set `metadata.dry_run_only: true` so downstream skills skip file writes (default: `false`) |
 
 **Input Schema:**
 
@@ -81,7 +82,8 @@ Design and validate the UI/UX architecture layer for any feature or application.
           "context":  { "type": "string" }
         }
       }
-    }
+    },
+    "dry_run": { "type": "boolean", "default": false }
   }
 }
 ```
@@ -237,6 +239,10 @@ Step 11 — Apply platform-specific and PWA constraints (if domain_constraints p
 Step 12 — Assemble UX architecture document
   Combine all outputs into structured artifact.
   Include design_rationale for all non-standard decisions.
+  When dry_run === true: populate all output fields normally and set
+  metadata.dry_run_only = true so downstream consumers (design-system-generator,
+  code-generator) know not to trigger file-writing operations.
+  When dry_run === false (default): set metadata.dry_run_only = false.
   Output: complete UX architecture spec
 ```
 
@@ -254,7 +260,7 @@ Step 12 — Assemble UX architecture document
 | `visual_excellence_targets` | `object` | Typography, color, depth, spacing specifications (populated when creativity_level ≠ standard) |
 | `motion_spec` | `object` | Motion brief per requirement category (populated when motion_requirements provided) |
 | `creative_recommendations` | `array[object]` | Optional innovative patterns with reference product, rationale, and implementation complexity |
-| `metadata` | `object` | Requirement coverage, screen count, component count, creativity_level, version |
+| `metadata` | `object` | Requirement coverage, screen count, component count, creativity_level, version, `dry_run_only` flag |
 | `metrics` | `object` | tokens_in, tokens_out, duration_ms, items_produced, version |
 | `feedback` | `array[object]` | Backpropagate entries for requirement-analyzer or architecture-design if gaps found |
 
@@ -415,7 +421,8 @@ Step 12 — Assemble UX architecture document
         "requirement_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
         "screen_count":         { "type": "integer" },
         "component_count":      { "type": "integer" },
-        "creativity_level":     { "type": "string" }
+        "creativity_level":     { "type": "string" },
+        "dry_run_only":         { "type": "boolean", "default": false, "description": "True when invoked with dry_run: true; downstream skills must skip file writes" }
       }
     },
     "metrics":  { "$ref": "#/$defs/metrics" },
@@ -460,6 +467,9 @@ Step 12 — Assemble UX architecture document
 - `visual_excellence_targets` MUST be populated when `creativity_level` is `premium` or `world-class`.
 - `motion_spec` MUST be populated when `motion_requirements` array is non-empty.
 - All motion specs MUST include `reduced_motion_fallbacks` — this is not optional.
+- When dry_run: true, set metadata.dry_run_only = true. Downstream consumers
+  (`design-system-generator`, `code-generator`) MUST respect `dry_run_only: true`
+  and skip file writes / produce dry-run artifacts instead.
 
 ## Security Considerations
 
@@ -489,6 +499,7 @@ Step 12 — Assemble UX architecture document
 - [ ] `visual_excellence_targets` populated for premium/world-class
 - [ ] All motion specs include reduced_motion_fallbacks
 - [ ] `creative_recommendations` includes at minimum 2 entries for world-class level
+- [ ] dry_run contract: when dry_run is true, metadata.dry_run_only is true and all outputs are populated normally
 
 ## Failure Scenarios
 

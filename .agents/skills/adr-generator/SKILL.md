@@ -1,6 +1,6 @@
 ---
 name: adr-generator
-version: 1.0.0
+version: 1.1.0
 domain: documentation
 description: 'Use when creating Architecture Decision Records from architectural choices, tech stack selections, or design tradeoffs. Triggers on: "write an ADR", "document this decision", "create an architecture decision record", "record this tradeoff", "why did we choose this".'
 author: system
@@ -24,6 +24,7 @@ Produce well-structured, immutable Architecture Decision Records (ADRs) that cap
 | `supersedes` | `string` | No | ADR ID this record supersedes (if any) |
 | `related_skills` | `array[string]` | No | Skill IDs that produced or are affected by this decision |
 | `output_path` | `string` | No | Where to write the ADR (default: `docs/adr/`) |
+| `dry_run` | `boolean` | No | If true, execute all steps but write nothing to state; return full ADR in `adr_preview` and set `file_path` to `null` (default: `false`) |
 
 **Input Schema:**
 
@@ -63,7 +64,8 @@ Produce well-structured, immutable Architecture Decision Records (ADRs) that cap
     "status": { "type": "string", "enum": ["proposed", "accepted", "deprecated", "superseded"] },
     "supersedes": { "type": "string" },
     "related_skills": { "type": "array", "items": { "type": "string" } },
-    "output_path": { "type": "string" }
+    "output_path": { "type": "string" },
+    "dry_run": { "type": "boolean", "default": false }
   },
   "required": ["decision_title", "decision_context", "decision_made", "alternatives", "consequences"]
 }
@@ -123,18 +125,28 @@ Step 4 — Determine output path
   Output: file_path
 
 Step 5 — Handle supersession
-  If supersedes is set: update the referenced ADR's Status line to "Superseded by {adr_id}".
-  Write updated superseded ADR to state.
+  If dry_run === true: skip all state writes in this step (do not update the
+  referenced ADR in state). Still compute superseded_adr_update as a preview value.
+  If dry_run === false (default):
+    If supersedes is set: update the referenced ADR's Status line to "Superseded by {adr_id}".
+    Write updated superseded ADR to state.
   Output: superseded_adr_update
 
 Step 6 — Write ADR and update index
-  Write adr_document to file_path via state-manager.
-  Update adr_index: append { id: adr_id, title, status, path: file_path, date }.
-  Emit event: "file.written" with payload { path: file_path, type: "adr" }.
-  Output: written_adr
+  If dry_run === true: skip all writes — do NOT write adr_document to file_path
+  via state-manager and do NOT update adr_index; do NOT emit "file.written".
+  Set file_path to null for the output.
+  If dry_run === false (default):
+    Write adr_document to file_path via state-manager.
+    Update adr_index: append { id: adr_id, title, status, path: file_path, date }.
+    Emit event: "file.written" with payload { path: file_path, type: "adr" }.
+  Output: written_adr (null when dry_run === true)
 
 Step 7 — Assemble output
   Return adr_id, file_path, adr_document preview (first 500 chars), metrics, feedback.
+  When dry_run === true: file_path is null and adr_preview contains the full ADR
+  markdown text (not truncated). When dry_run === false: file_path is the written
+  path and adr_preview is the first 500 characters.
 ```
 
 ## Outputs
@@ -142,8 +154,8 @@ Step 7 — Assemble output
 | Field | Type | Description |
 |-------|------|-------------|
 | `adr_id` | `string` | Assigned ADR identifier (e.g. `ADR-0042`) |
-| `file_path` | `string` | Path where the ADR was written |
-| `adr_preview` | `string` | First 500 characters of the generated ADR |
+| `file_path` | `string \| null` | Path where the ADR was written; `null` when `dry_run: true` (nothing written) |
+| `adr_preview` | `string` | First 500 characters of the generated ADR (full ADR markdown text when `dry_run: true`) |
 | `superseded_adr` | `string` | ID of the ADR marked as superseded (if any) |
 | `metrics` | `object` | Execution metrics |
 | `feedback` | `array[object]` | Feedback entries |
@@ -156,8 +168,8 @@ Step 7 — Assemble output
   "type": "object",
   "properties": {
     "adr_id": { "type": "string", "pattern": "^ADR-[0-9]{4}$" },
-    "file_path": { "type": "string" },
-    "adr_preview": { "type": "string" },
+    "file_path": { "type": ["string", "null"], "description": "Written ADR path; null when dry_run is true" },
+    "adr_preview": { "type": "string", "description": "First 500 chars normally; full ADR markdown text when dry_run is true" },
     "superseded_adr": { "type": "string" },
     "metrics": { "$ref": "#/$defs/metrics" },
     "feedback": { "type": "array", "items": { "$ref": "#/$defs/feedback_entry" } }
@@ -197,6 +209,9 @@ Step 7 — Assemble output
 - ADR IDs are monotonically increasing — gaps are not allowed.
 - ADRs MUST NOT contain credentials, PII, internal IP addresses, or environment-specific values.
 - `adr_index` is the only authoritative source for ADR numbering — never infer IDs from file names.
+- When `dry_run === true`: execute all steps but write nothing to `state-manager`
+  (`adr_index` scope); return the fully-formed ADR content in `adr_preview` and set
+  `file_path` to `null`. No `file.written` event is emitted.
 
 ## Security Considerations
 
@@ -216,6 +231,7 @@ Step 7 — Assemble output
 - [ ] ADR ID assigned sequentially from adr_index
 - [ ] file_path follows the {adr_id}-{slug}.md convention
 - [ ] Superseded ADR updated if supersedes is set
+- [ ] dry_run: true does not write to state
 
 ## Failure Scenarios
 
