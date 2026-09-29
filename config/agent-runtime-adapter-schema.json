@@ -156,8 +156,8 @@
         },
         "launch_kind": {
           "type": "string",
-          "enum": ["cli-direct", "ide-guidance", "generic"],
-          "description": "S1 how aiw start uses this runtime. cli-direct: executed with CWD=target. ide-guidance: never executed; guidance plus best-effort documented opener. generic: user-provided command executed with CWD=target."
+          "enum": ["cli-direct", "ide-guidance", "opener-launch", "generic"],
+          "description": "S1 how aiw start uses this runtime. cli-direct: executed with CWD=target. ide-guidance: never executed; guidance plus best-effort documented opener. opener-launch (S2): IDE runtime executed via its verified opener with the target path and no model flags; falls back to guidance when the opener is absent. generic: user-provided command executed with CWD=target."
         },
         "project_markers": {
           "type": "array",

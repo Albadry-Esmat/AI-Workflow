@@ -179,6 +179,52 @@ done
 export PATH="$SAVED_PATH"
 unset AIW_EXEC_DRY_RUN AIW_O2_STATE_ROOT
 
+echo "=== S2-A IDE opener launch (verified opener, fail-closed otherwise) ==="
+MARKV="$FIX/targets/vscode"
+MARKW="$FIX/targets/windsurf"
+mkdir -p "$MARKV/.vscode" "$MARKW/.windsurf"
+# explicit vscode-copilot with code shim + markers → opener-launch
+reset_fixtures
+make_shim code
+out="$(run_o2 agent-resolve --target "$MARKV" --for vscode-copilot --dry-run --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.launch+'|'+(r.opener||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "opener-launch|code" ]]; then _ok "explicit vscode-copilot resolves opener-launch"; else _fail "explicit vscode gave '$got'"; fi
+# explicit windsurf-devin with shim + markers → guidance (opener unverified)
+reset_fixtures
+make_shim windsurf
+out="$(run_o2 agent-resolve --target "$MARKW" --for windsurf-devin --dry-run --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.launch+'|'+(r.opener||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "external-guidance|" ]]; then _ok "explicit windsurf stays guidance (unverified opener)"; else _fail "explicit windsurf gave '$got'"; fi
+# auto singleton .vscode with only code shim → opener-launch
+reset_fixtures
+make_shim code
+out="$(run_o2 agent-resolve --target "$MARKV" --for auto --dry-run --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log((r.adapter_id||'')+'|'+(r.launch||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "vscode-copilot|opener-launch" ]]; then _ok "auto singleton vscode resolves opener-launch"; else _fail "auto vscode gave '$got'"; fi
+# opener absent (shim removed) but markers present → explicit still guidance, never launch
+reset_fixtures
+out="$(run_o2 agent-resolve --target "$MARKV" --for vscode-copilot --dry-run --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.launch+'|'+(r.opener||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "external-guidance|" ]]; then _ok "opener absent falls back to guidance"; else _fail "absent opener gave '$got'"; fi
+# aiw start DRY-RUN opener argv + no model flags
+reset_fixtures
+make_shim code
+export AIW_EXEC_DRY_RUN=1
+export AIW_O2_STATE_ROOT="$FIX/state3"
+mkdir -p "$FIX/state3"
+export PATH="$FIX/bin:/usr/bin:/bin"
+out="$(bash aiw start "$MARKV" --for vscode-copilot 2>&1 || true)"
+argv="$(echo "$out" | grep "DRY-RUN argv" || true)"
+if [[ -z "$argv" ]]; then _fail "vscode-copilot: no DRY-RUN opener argv"; else _ok "vscode-copilot opener argv captured"; fi
+if echo "$argv" | grep -Eq '(^|[[:space:]])(-m|--model)([[:space:]]|=|$)'; then
+  _fail "vscode-copilot: model flag leaked into opener argv: $argv"
+else
+  _ok "vscode-copilot opener argv has no model flags"
+fi
+if echo "$argv" | grep -q "CMD=code "; then _ok "opener argv uses verified opener"; else _fail "opener argv missing CMD=code: $argv"; fi
+export PATH="$SAVED_PATH"
+unset AIW_EXEC_DRY_RUN AIW_O2_STATE_ROOT
+
 echo
 echo "Runtime selection: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]

@@ -305,6 +305,19 @@ def display_order() -> list[str]:
     return load_json(POLICY_PATH)["selection"]["auto_precedence"]
 
 
+def verified_opener(adapter: dict[str, Any]) -> str | None:
+    """S2 first verified opener executable found on PATH, else None.
+
+    Verified means the catalog documents the opener as tested; presence is
+    proven by PATH lookup (hermetic under test fixture PATHs). Unverified or
+    absent openers never launch — callers fall back to external guidance.
+    """
+    for opener in adapter.get("openers", []) or []:
+        if opener.get("verified") and shutil.which(opener.get("executable", "")):
+            return opener["executable"]
+    return None
+
+
 def resolve_runtime(for_id: str, target: Path, dry_run: bool) -> dict[str, Any]:
     """S1 deterministic runtime resolution (levels 1-6). Persists unless dry_run."""
     adapters = {a["id"]: a for a in catalog()}
@@ -335,8 +348,14 @@ def resolve_runtime(for_id: str, target: Path, dry_run: bool) -> dict[str, Any]:
         if for_id not in adapters:
             return {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": for_id, "fallback": False}
         adapter = adapters[for_id]
-        if adapter.get("launch_kind") == "ide-guidance":
+        if adapter.get("launch_kind") in ("ide-guidance", "opener-launch"):
             if for_id in marked or not marked:
+                opener = verified_opener(adapter) if adapter.get("launch_kind") == "opener-launch" else None
+                if opener:
+                    record = persist(for_id, "explicit-arg-opener")
+                    return {"verdict": "pass", **record, "launch": "opener-launch", "opener": opener,
+                            "fallback": False,
+                            "reason": "explicit IDE runtime selection; verified opener launch"}
                 record = persist(for_id, "explicit-arg-guidance")
                 return {"verdict": "pass", **record, "launch": "external-guidance",
                         "reason": "explicit IDE runtime selection; external launch required"}
@@ -366,15 +385,34 @@ def resolve_runtime(for_id: str, target: Path, dry_run: bool) -> dict[str, Any]:
         p_markers = set(adapters[persisted].get("project_markers", []) or [])
         if (not marked) or (persisted in marked) or (not p_markers):
             record = persist(persisted, "persisted")
-            return {"verdict": "pass", **record, "fallback": False}
+            out = {"verdict": "pass", **record, "fallback": False}
+            if adapters[persisted].get("launch_kind") in ("ide-guidance", "opener-launch"):
+                opener = (verified_opener(adapters[persisted])
+                          if adapters[persisted].get("launch_kind") == "opener-launch" else None)
+                out["launch"] = "opener-launch" if opener else "external-guidance"
+                if opener:
+                    out["opener"] = opener
+            return out
         stale_note = f"Persisted '{persisted}' does not match target markers; continuing resolution."
 
     # Levels 3-4 — project markers constrain auto candidates; singleton wins.
     if marked:
         marked_available = [m for m in marked if m in available]
         if len(marked_available) == 1:
-            record = persist(marked_available[0], "project-marker")
-            out = {"verdict": "pass", **record, "fallback": False}
+            chosen = marked_available[0]
+            if adapters[chosen].get("launch_kind") in ("ide-guidance", "opener-launch"):
+                opener = (verified_opener(adapters[chosen])
+                          if adapters[chosen].get("launch_kind") == "opener-launch" else None)
+                if opener:
+                    record = persist(chosen, "project-marker-opener")
+                    out = {"verdict": "pass", **record, "launch": "opener-launch",
+                           "opener": opener, "fallback": False}
+                else:
+                    record = persist(chosen, "project-marker-guidance")
+                    out = {"verdict": "pass", **record, "launch": "external-guidance", "fallback": False}
+            else:
+                record = persist(chosen, "project-marker")
+                out = {"verdict": "pass", **record, "fallback": False}
             if stale_note:
                 out["warning"] = stale_note
             return out
@@ -396,8 +434,13 @@ def resolve_runtime(for_id: str, target: Path, dry_run: bool) -> dict[str, Any]:
         if stale_note:
             out["warning"] = stale_note
         return out
-    ide_available = [m for m in marked if m in available and adapters[m].get("launch_kind") == "ide-guidance"] if marked else []
+    ide_available = [m for m in marked if m in available and adapters[m].get("launch_kind") in ("ide-guidance", "opener-launch")] if marked else []
     if len(ide_available) == 1:
+        opener = (verified_opener(adapters[ide_available[0]])
+                  if adapters[ide_available[0]].get("launch_kind") == "opener-launch" else None)
+        if opener:
+            record = persist(ide_available[0], "auto-opener")
+            return {"verdict": "pass", **record, "launch": "opener-launch", "opener": opener, "fallback": False}
         record = persist(ide_available[0], "auto-guidance")
         return {"verdict": "pass", **record, "launch": "external-guidance", "fallback": False}
     if ide_available:

@@ -300,8 +300,40 @@ cmd_start() {
     echo -e "${DIM}MCP projections for '$ADAPTER_ID' are S2 (no generated files to verify).${NC}"
   fi
 
-  # 3. Launch (CLI) or guide (IDE). No model flags, ever.
+  # 3. Launch (CLI / verified IDE opener) or guide (IDE). No model flags, ever.
   if [[ "$LAUNCH_KIND" == "ide-guidance" ]]; then
+    cmd_start_guidance "$ADAPTER_ID" "$TARGET_DIR"
+    return 0
+  fi
+  if [[ "$LAUNCH_KIND" == "opener-launch" ]]; then
+    local RESOLVE_LAUNCH RESOLVE_OPENER VERIFIED_OPENERS
+    RESOLVE_LAUNCH="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).launch||'')" <<<"$RESOLVE_JSON")"
+    RESOLVE_OPENER="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).opener||'')" <<<"$RESOLVE_JSON")"
+    VERIFIED_OPENERS="$(node -e "
+      const cat = JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8'));
+      const a = cat.adapters.find(x => x.id === '$ADAPTER_ID') || {};
+      console.log(((a.openers || []).filter(o => o.verified) || []).map(o => o.executable).join(' '));
+    ")"
+    # Fail-safe: resolve verdict AND catalog must agree on a verified, installed opener.
+    if [[ "$RESOLVE_LAUNCH" == "opener-launch" && -n "$RESOLVE_OPENER" ]]; then
+      local opener_ok=0
+      for candidate in $VERIFIED_OPENERS; do
+        if [[ "$candidate" == "$RESOLVE_OPENER" ]] && command -v "$RESOLVE_OPENER" &>/dev/null; then
+          opener_ok=1
+          break
+        fi
+      done
+      if [[ "$opener_ok" -eq 1 ]]; then
+        echo -e "${GREEN}Starting AI Workflow...${NC} ${DIM}(runtime: $ADAPTER_ID via opener: $RESOLVE_OPENER)${NC}"
+        echo -e "${DIM}Target project: $TARGET_DIR${NC}"
+        if [[ -n "${AIW_EXEC_DRY_RUN:-}" ]]; then
+          echo "DRY-RUN argv: [$ADAPTER_ID] CWD=$TARGET_DIR CMD=$RESOLVE_OPENER $TARGET_DIR"
+          return 0
+        fi
+        cd "$TARGET_DIR"
+        exec "$RESOLVE_OPENER" "$TARGET_DIR"
+      fi
+    fi
     cmd_start_guidance "$ADAPTER_ID" "$TARGET_DIR"
     return 0
   fi

@@ -1132,7 +1132,7 @@
         "secret_copy_allowed": false
       },
       "launch": {
-        "command": "external-launch-required",
+        "command": "opener-launch",
         "target_cwd": true,
         "neutral_start_supported": true,
         "explicit_agent_selection_supported": true
@@ -1177,7 +1177,7 @@
         "mcp_path": ".cursor/mcp.json (shared with Cursor CLI projection)",
         "skills_support": "native"
       },
-      "launch_kind": "ide-guidance",
+      "launch_kind": "opener-launch",
       "project_markers": [
         ".cursor/"
       ],
@@ -1248,7 +1248,7 @@
         "secret_copy_allowed": false
       },
       "launch": {
-        "command": "external-launch-required",
+        "command": "opener-launch",
         "target_cwd": true,
         "neutral_start_supported": true,
         "explicit_agent_selection_supported": true
@@ -1293,7 +1293,7 @@
         "mcp_path": ".vscode/mcp.json (S2 projection target)",
         "skills_support": "native"
       },
-      "launch_kind": "ide-guidance",
+      "launch_kind": "opener-launch",
       "project_markers": [
         ".vscode/",
         ".github/"
