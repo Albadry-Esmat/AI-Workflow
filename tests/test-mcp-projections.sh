@@ -172,6 +172,14 @@ fi
 restore_start
 if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _ok "projections clean after start-gate tests"; else _fail "start-gate tests left drift"; fi
 
+echo "=== S2-D sync-runtimes MCP phase default-on ==="
+cp .vscode/mcp.json "$FIX/vscode.phase.backup"
+rm .vscode/mcp.json
+if bash scripts/sync-runtimes.sh --check >/dev/null 2>&1; then _fail "missing vscode projection not detected by sync check"; else _ok "sync --check detects missing vscode projection"; fi
+if bash scripts/sync-runtimes.sh --skills-only --check >/dev/null 2>&1; then _ok "--skills-only skips MCP phase"; else _fail "--skills-only should skip MCP drift"; fi
+if bash scripts/sync-runtimes.sh >/dev/null 2>&1 && [[ -f .vscode/mcp.json ]]; then _ok "default sync regenerates vscode projection"; else _fail "default sync did not regenerate"; fi
+if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _ok "projections clean after default sync"; else _fail "drift after default sync"; fi
+
 echo
 echo "MCP projections: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]

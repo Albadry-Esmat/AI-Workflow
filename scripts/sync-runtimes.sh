@@ -10,6 +10,9 @@
 #     (index.yaml == .agents/skills count), no cross-root duplicate bodies.
 #
 # S1: skills phase (P0, unchanged) + MCP phase (scripts/sync-mcp.js engine).
+# S2: MCP phase is default-on covering all 4 projections (opencode.json,
+# .mcp.json, .cursor/mcp.json, .vscode/mcp.json); --skills-only is the
+# explicit opt-out preserving P0 behavior.
 # Explicitly OUT OF SCOPE: rules, custom agents, workflows, GEMINI.md,
 # packaging, marketplaces, runtime installation.
 #
