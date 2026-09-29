@@ -77,6 +77,10 @@
       "syntax": "aiw agent use <adapter-id|auto> [--json]",
       "status": "implemented-in-o2"
     },
+    "agent_forget": {
+      "syntax": "aiw agent forget [--json]",
+      "status": "implemented-in-o2"
+    },
     "demo": {
       "syntax": "aiw demo [--json]",
       "status": "implemented-in-o2"

@@ -225,6 +225,29 @@ if echo "$argv" | grep -q "CMD=code "; then _ok "opener argv uses verified opene
 export PATH="$SAVED_PATH"
 unset AIW_EXEC_DRY_RUN AIW_O2_STATE_ROOT
 
+echo "=== S2-F remember / forget selection ==="
+reset_fixtures
+make_shim claude
+export AIW_O2_STATE_ROOT="$FIX/state4"
+mkdir -p "$FIX/state4"
+export PATH="$FIX/bin:/usr/bin:/bin"
+out="$($O2 agent-use claude-code --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.verdict+'|'+(r.adapter_id||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "pass|claude-code" ]]; then _ok "agent use remembers selection"; else _fail "agent use gave '$got'"; fi
+out="$($O2 agent-forget --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.verdict+'|'+r.forgotten+'|'+(r.previous_adapter_id||''))" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "pass|true|claude-code" ]]; then _ok "agent forget clears remembered selection"; else _fail "agent forget gave '$got'"; fi
+out="$($O2 agent-forget --json 2>/dev/null)"
+got="$(node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8'));console.log(r.verdict+'|'+r.forgotten)" <<<"$out" 2>/dev/null)"
+if [[ "$got" == "pass|false" ]]; then _ok "second forget reports nothing remembered"; else _fail "second forget gave '$got'"; fi
+if node -e "const s=JSON.parse(require('fs').readFileSync('$FIX/state4/state.json','utf8'));if('runtime_selection' in s)process.exit(1)"; then
+  _ok "state file has no runtime_selection after forget"
+else
+  _fail "runtime_selection still in state after forget"
+fi
+export PATH="$SAVED_PATH"
+unset AIW_O2_STATE_ROOT
+
 echo
 echo "Runtime selection: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]

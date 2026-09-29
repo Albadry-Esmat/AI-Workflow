@@ -486,6 +486,23 @@ def agent_use(adapter_id: str, as_json: bool) -> int:
     return 0 if report.get("verdict") == "pass" else 1
 
 
+def agent_forget(as_json: bool) -> int:
+    """S2 forget a remembered runtime selection (never touches anything else)."""
+    state = load_state()
+    previous = (state or {}).get("runtime_selection", {}).get("adapter_id")
+    if state is not None and "runtime_selection" in state:
+        del state["runtime_selection"]
+        mark_step(state, "runtime-select", "skipped", "selection forgotten; use aiw agent use")
+        append_evidence("runtime-forgotten", {"previous_adapter_id": previous,
+                                              "external_writes": 0, "secrets_seen": False})
+        save_state(state)
+    result = {"verdict": "pass", "forgotten": previous is not None, "previous_adapter_id": previous,
+              "selection": None, "fallback": False,
+              "guidance": "Run: aiw agent use <runtime> to remember a selection."}
+    emit(result, as_json, "Agent selection forgotten" if previous else "No remembered selection")
+    return 0
+
+
 def agent_marker_scan(target: str, as_json: bool) -> int:
     target_path = Path(target).expanduser()
     if not target_path.is_dir():
@@ -612,6 +629,8 @@ def main() -> int:
     use_parser = sub.add_parser("agent-use")
     use_parser.add_argument("adapter")
     use_parser.add_argument("--json", action="store_true")
+    forget_parser = sub.add_parser("agent-forget")
+    forget_parser.add_argument("--json", action="store_true")
     resolve_parser = sub.add_parser("agent-resolve")
     resolve_parser.add_argument("--target", default=".")
     resolve_parser.add_argument("--for", dest="for_id", default="auto")
@@ -634,6 +653,7 @@ def main() -> int:
         if args.command == "agent-list": return agent_list(args.json)
         if args.command == "agent-detect": return agent_detect(args.json)
         if args.command == "agent-use": return agent_use(args.adapter, args.json)
+        if args.command == "agent-forget": return agent_forget(args.json)
         if args.command == "agent-resolve": return agent_resolve(args.target, args.for_id, args.dry_run, args.json)
         if args.command == "agent-marker-scan": return agent_marker_scan(args.target, args.json)
         if args.command == "demo": return demo(args.json)

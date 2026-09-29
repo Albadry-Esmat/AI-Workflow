@@ -114,6 +114,7 @@ show_help() {
   echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
   echo -e "    ${CYAN}agent detect${NC}                  Detect installed adapters with safe version probes"
   echo -e "    ${CYAN}agent use${NC} ${DIM}<id|auto>${NC}             Select a runtime without silent fallback"
+  echo -e "    ${CYAN}agent forget${NC}                 Forget the remembered runtime selection"
   echo -e "    ${CYAN}agent resolve${NC} ${DIM}[--target dir] [--for id|auto] [--dry-run]${NC}  Resolve runtime precedence for a target"
   echo -e "    ${CYAN}auth status${NC}                   Show delegated, redacted runtime auth status"
   echo -e "    ${CYAN}recover${NC}                      Recover or reset O2-owned onboarding state"
@@ -485,9 +486,10 @@ cmd_agent() {
     list) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-list "$@" ;;
     detect) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-detect "$@" ;;
     use) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-use "$@" ;;
+    forget) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-forget "$@" ;;
     resolve) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-resolve "$@" ;;
     marker-scan) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan "$@" ;;
-    *) echo "Usage: aiw agent [list|detect|use <id|auto>|resolve|marker-scan]"; return 2 ;;
+    *) echo "Usage: aiw agent [list|detect|use <id|auto>|forget|resolve|marker-scan]"; return 2 ;;
   esac
 }
 

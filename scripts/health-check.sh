@@ -250,6 +250,20 @@ if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
     fi
     R_WARN="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).warning||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
     [[ -n "$R_WARN" ]] && _warn "selection note: $R_WARN"
+    # S2-F IDE opener status (warn-only): opener-launch adapters need their
+    # verified opener on PATH or start falls back to guidance.
+    if [[ -n "$R_ADAPTER" && "$R_ADAPTER" != "undefined" && "$R_ADAPTER" != "" ]]; then
+      R_KIND="$(node -e "console.log(((JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8')).adapters.find(x => x.id === '$R_ADAPTER') || {}).launch_kind)||'')" 2>/dev/null)"
+      if [[ "$R_KIND" == "opener-launch" ]]; then
+        R_LAUNCH="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).launch||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+        R_OPENER="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).opener||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+        if [[ "$R_LAUNCH" == "opener-launch" && -n "$R_OPENER" ]]; then
+          _ok "IDE opener ready: $R_OPENER for $R_ADAPTER"
+        else
+          _warn "IDE opener for $R_ADAPTER not on PATH — start prints guidance; install the opener or run: aiw agent use <runtime>"
+        fi
+      fi
+    fi
   else
     _warn "runtime resolution unavailable (python3 required) — run: aiw agent detect"
   fi
