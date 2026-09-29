@@ -572,6 +572,31 @@ init_install_tree() {
   done < <(find "$src_dir" -mindepth 1 \( -type f -o -type l \) 2>/dev/null | sort)
 }
 
+init_explain_mcp_conflict() {
+  # $1 source (AIW repo), $2 dest (target) — S2-C merge-assist: explain an MCP
+  # projection conflict per server (added/missing/differing IDs only, never
+  # values), then the caller still fails closed. Never merges automatically.
+  local src="$1" dst="$2" rel="$3"
+  node -e "
+    const fs = require('fs');
+    const [src, dst, rel] = process.argv.slice(1);
+    let a, b;
+    try { a = JSON.parse(fs.readFileSync(src, 'utf8')); b = JSON.parse(fs.readFileSync(dst, 'utf8')); }
+    catch { console.log('    ' + rel + ': unreadable as JSON — manual review required'); process.exit(0); }
+    const pick = (o) => (o && typeof o === 'object') ? (o.mcpServers || o.servers || o.mcp || {}) : {};
+    const A = pick(a), B = pick(b);
+    const ka = new Set(Object.keys(A)), kb = new Set(Object.keys(B));
+    const added = [...ka].filter(k => !kb.has(k)).sort();
+    const missing = [...kb].filter(k => !ka.has(k)).sort();
+    const differing = [...ka].filter(k => kb.has(k) && JSON.stringify(A[k]) !== JSON.stringify(B[k])).sort();
+    console.log('    ' + rel + ':');
+    if (added.length) console.log('      AIW adds servers: ' + added.join(', '));
+    if (missing.length) console.log('      target-only servers (kept): ' + missing.join(', '));
+    if (differing.length) console.log('      differing servers (kept target version): ' + differing.join(', '));
+    if (!added.length && !missing.length && !differing.length) console.log('      same server set, formatting differs');
+  " "$src" "$dst" "$rel"
+}
+
 cmd_init() {
   # S1 runtime-neutral init. Installs the portable core + selected runtime
   # projections. Default is fail-closed on any pre-existing install-set path;
@@ -586,9 +611,10 @@ cmd_init() {
       -h|--help)
         echo "Usage: aiw init <path> [--for runtime|auto|all] [--merge]"
         echo "  Installs the portable core (.agents/skills/, AGENTS.md, skills/,"
-        echo "  config/mcp-manifest.json) plus S1 runtime projections for --for."
+        echo "  config/mcp-manifest.json) plus runtime projections for --for."
         echo "  Default refuses to touch existing paths; --merge adds missing,"
-        echo "  keeps identical, and fails on differing entries. Never copies secrets."
+        echo "  keeps identical, and fails on differing entries (MCP conflicts"
+        echo "  print a per-server explanation first). Never copies secrets."
         return 0 ;;
       *) TARGET="$1"; shift ;;
     esac
@@ -621,7 +647,7 @@ cmd_init() {
   [[ -z "${WANT// }" ]] && WANT="auto"
   local RUNTIMES=""
   if [[ "$WANT" == *"all"* ]]; then
-    RUNTIMES="opencode claude-code cursor copilot-cli codex gemini-cli"
+    RUNTIMES="opencode claude-code cursor copilot-cli codex gemini-cli cursor-ide vscode-copilot"
   elif [[ "$WANT" == *"auto"* ]]; then
     RUNTIMES="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan --target "$TARGET" 2>/dev/null || echo "")"
     if [[ -z "${RUNTIMES// }" ]]; then
@@ -663,8 +689,10 @@ cmd_init() {
       claude-code) PLAN_FILES+=(".mcp.json:.mcp.json") ;;
       cursor) PLAN_FILES+=(".cursor/mcp.json:.cursor/mcp.json") ;;
       copilot-cli) PLAN_FILES+=(".mcp.json:.mcp.json") ;;
-      codex|gemini-cli) echo -e "  ${DIM}Note: $r has no S1 file projections (catalog declares S2 target); core only.${NC}" ;;
-      cursor-ide|vscode-copilot|windsurf-devin) echo -e "  ${DIM}Note: $r is IDE guidance-only; core only.${NC}" ;;
+      codex|gemini-cli) echo -e "  ${DIM}Note: $r has no file projections yet (catalog declares S2 target); core only.${NC}" ;;
+      cursor-ide) PLAN_FILES+=(".cursor/mcp.json:.cursor/mcp.json") ;;
+      vscode-copilot) PLAN_FILES+=(".vscode/mcp.json:.vscode/mcp.json") ;;
+      windsurf-devin) echo -e "  ${DIM}Note: $r has no project-scoped MCP projection (user-global only, AIW never writes outside the repo); core only.${NC}" ;;
       *) echo -e "  ${DIM}Note: $r (generic) installs portable core only.${NC}" ;;
     esac
   done
@@ -735,6 +763,22 @@ cmd_init() {
   if [[ "${#INIT_CONFLICTS[@]}" -gt 0 ]]; then
     echo -e "${RED}Error:${NC} conflicting entries (kept user-owned files untouched):"
     printf "    %s\n" "${INIT_CONFLICTS[@]}"
+    # S2-C merge-assist: explain MCP projection conflicts per server (never values).
+    local conflicted rel entry entry_src
+    for conflicted in "${INIT_CONFLICTS[@]}"; do
+      rel="${conflicted#$TARGET/}"
+      case "$rel" in
+        .mcp.json|.cursor/mcp.json|.vscode/mcp.json|opencode.json)
+          entry_src=""
+          for entry in "${PLAN_FILES[@]}"; do
+            [[ "${entry#*:}" == "$rel" ]] && entry_src="${entry%%:*}"
+          done
+          if [[ -n "$entry_src" && -f "$ROOT/$entry_src" && -f "$TARGET/$rel" ]]; then
+            init_explain_mcp_conflict "$ROOT/$entry_src" "$TARGET/$rel" "$rel"
+          fi
+          ;;
+      esac
+    done
     echo "  Resolve manually, then re-run with --merge."
     exit 1
   fi

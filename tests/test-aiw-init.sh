@@ -80,6 +80,21 @@ fi
 echo "=== unknown --for rejected ==="
 if ./aiw init "$FIX/t4" --for definitely-not-a-runtime >/dev/null 2>&1; then _fail "unknown runtime accepted"; else _ok "unknown runtime rejected"; fi
 
+echo "=== S2-C IDE projections + MCP merge-assist ==="
+mkdir -p "$FIX/t5" "$FIX/t6"
+./aiw init "$FIX/t5" --for cursor-ide >/dev/null 2>&1
+if [[ -f "$FIX/t5/.cursor/mcp.json" && -f "$FIX/t5/AGENTS.md" ]]; then _ok "cursor-ide installs shared cursor projection"; else _fail "cursor-ide install incomplete"; fi
+./aiw init "$FIX/t6" --for vscode-copilot >/dev/null 2>&1
+if node -e "const v=require('$FIX/t6/.vscode/mcp.json');if(!v.servers||!v.servers.github)process.exit(1)"; then _ok "vscode-copilot installs vscode projection"; else _fail "vscode-copilot install incomplete"; fi
+echo '{"mcpServers":{"user-srv":{"command":"x"},"github":{"command":"y"}}}' > "$FIX/t5/.cursor/mcp.json"
+./aiw init "$FIX/t5" --for cursor-ide --merge > "$FIX/merge-assist.log" 2>&1
+if grep -q "target-only servers (kept): user-srv" "$FIX/merge-assist.log" && grep -q "differing servers (kept target version): github" "$FIX/merge-assist.log"; then
+  _ok "merge-assist explains MCP conflict per server"
+else
+  _fail "merge-assist explanation missing (see $FIX/merge-assist.log)"
+fi
+if grep -q '"user-srv"' "$FIX/t5/.cursor/mcp.json"; then _ok "conflicting MCP target kept"; else _fail "conflicting MCP target modified"; fi
+
 echo
 echo "aiw init: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]
