@@ -14,7 +14,7 @@ import json
 import sys
 from pathlib import Path
 
-TRACKED = [Path("opencode.json"), Path("skills/registry.json"), Path(".mcp.json"), Path(".cursor/mcp.json")]
+TRACKED = [Path("opencode.json"), Path("skills/registry.json"), Path(".mcp.json"), Path(".cursor/mcp.json"), Path(".vscode/mcp.json")]
 
 
 def canonical(text: str) -> str:

@@ -14,7 +14,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "brave-search": {
       "description": "Web search for agents that need current documentation or references",
@@ -29,7 +29,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "memory": {
       "description": "Persistent cross-session memory for agents",
@@ -44,7 +44,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "context7": {
       "description": "Up-to-date library documentation inside agent context windows",
@@ -59,7 +59,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "playwright": {
       "description": "Browser automation for verification and testing agents",
@@ -74,7 +74,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "slack": {
       "description": "Team notifications (disabled by default; enable explicitly per project)",
@@ -89,7 +89,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     },
     "vercel": {
       "description": "Deployment operations for deployer agents (disabled by default)",
@@ -104,7 +104,7 @@
       "cwd": null,
       "timeout_ms": 5000,
       "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli"]
+      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
     }
   }
 }

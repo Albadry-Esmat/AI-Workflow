@@ -4,7 +4,8 @@
 // Authority: config/mcp-manifest.json (sole source). Projections:
 //   - opencode.json@mcp            (legacy authority migrated to generated)
 //   - .mcp.json                    (Claude Code + Copilot CLI shared project scope, Q2)
-//   - .cursor/mcp.json             (Cursor project scope)
+//   - .cursor/mcp.json             (Cursor CLI + Cursor IDE shared project scope)
+//   - .vscode/mcp.json             (VS Code + Copilot project scope, S2)
 // Secret refs are NEVER resolved: ${VAR} is translated per-target
 // ({env:VAR} / ${VAR} / ${env:VAR}) but values are never read.
 //
@@ -23,6 +24,7 @@ const MANIFEST = process.env.AIW_MCP_MANIFEST || path.join(ROOT, "config/mcp-man
 const OPENCODE = path.join(ROOT, "opencode.json");
 const CLAUDE = path.join(ROOT, ".mcp.json");
 const CURSOR = path.join(ROOT, ".cursor/mcp.json");
+const VSCODE = path.join(ROOT, ".vscode/mcp.json");
 
 const REF_RE = /^\$\{([A-Za-z_][A-Za-z0-9_]*)\}$/;
 
@@ -133,6 +135,33 @@ function projectCursor(servers) {
   return { mcpServers: block };
 }
 
+function projectVSCode(servers) {
+  // VS Code workspace shape: { servers: { id: stdio|http } } for enabled
+  // servers only. Env refs translate ${VAR} -> ${env:VAR} (VS Code variable
+  // substitution; refs-only, values never read). Remote servers keep url +
+  // headers verbatim (refs-only).
+  const block = {};
+  for (const [id, s] of enabledServers(servers)) {
+    if (s.transport === "stdio") {
+      const [command, ...rest] = [...s.command, ...(s.args || [])];
+      const entry = { command, args: rest };
+      if (Object.keys(s.env_refs || {}).length > 0) {
+        entry.env = {};
+        for (const [name, ref] of Object.entries(s.env_refs)) {
+          entry.env[name] = `\${env:${ref.slice(2, -1)}}`;
+        }
+      }
+      block[id] = entry;
+    } else {
+      const entry = { url: s.url };
+      if (s.transport === "http") entry.type = "http";
+      if (Object.keys(s.headers || {}).length > 0) entry.headers = { ...s.headers };
+      block[id] = entry;
+    }
+  }
+  return { servers: block };
+}
+
 // --- Driver ----------------------------------------------------------------
 
 function writeIfChanged(filePath, content, changes) {
@@ -168,9 +197,10 @@ function main() {
   const r1 = writeIfChanged(OPENCODE, canonical(opencode), changes);
   const r2 = writeIfChanged(CLAUDE, canonical(projectClaude(servers)), changes);
   const r3 = writeIfChanged(CURSOR, canonical(projectCursor(servers)), changes);
+  const r4 = writeIfChanged(VSCODE, canonical(projectVSCode(servers)), changes);
 
   if (mode === "check") {
-    if (!process.exitCode) console.log("  PASS: MCP projections in sync (opencode.json, .mcp.json, .cursor/mcp.json)");
+    if (!process.exitCode) console.log("  PASS: MCP projections in sync (opencode.json, .mcp.json, .cursor/mcp.json, .vscode/mcp.json)");
     return;
   }
   if (!process.exitCode) {

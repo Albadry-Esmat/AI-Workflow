@@ -266,7 +266,7 @@ else
   _warn "config/mcp-manifest.json missing — MCP projections unavailable"
 fi
 if node "$ROOT/scripts/sync-mcp.js" --check >/dev/null 2>&1; then
-  _ok "MCP projections fresh (opencode.json, .mcp.json, .cursor/mcp.json)"
+  _ok "MCP projections fresh (opencode.json, .mcp.json, .cursor/mcp.json, .vscode/mcp.json)"
 else
   _warn "MCP projections stale — run: aiw sync-runtimes"
 fi

@@ -83,8 +83,16 @@ else
   _fail "opencode disabled entries wrong"
 fi
 
+echo "=== S2-B .vscode/mcp.json projection ==="
+if node -e 'const v = require("./.vscode/mcp.json"); if (!v.servers || typeof v.servers !== "object") process.exit(1); if (v.servers.slack || v.servers.vercel) process.exit(1); if (!v.servers.github || !v.servers.memory) process.exit(1); const env = v.servers.github.env || {}; const re = new RegExp("^\\$\\{env:[A-Za-z_][A-Za-z0-9_]*\\}$"); if (!Object.values(env).every((s) => re.test(s))) process.exit(1);'; then _ok ".vscode projection shape valid (servers, enabled-only, env refs)"; else _fail ".vscode projection shape wrong"; fi
+cp .vscode/mcp.json "$FIX/vscode.backup"
+echo " " >> .vscode/mcp.json
+if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _fail "edited .vscode projection not detected"; else _ok "edited .vscode projection detected"; fi
+cp "$FIX/vscode.backup" .vscode/mcp.json
+if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _ok ".vscode restored to clean"; else _fail ".vscode restore failed"; fi
+
 echo "=== no secret values emitted ==="
-if grep -rEq 'ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]+|sk-(live|ant)-[A-Za-z0-9]+|xox[bpas]-[A-Za-z0-9-]+' .mcp.json .cursor/mcp.json; then
+if grep -rEq 'ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]+|sk-(live|ant)-[A-Za-z0-9]+|xox[bpas]-[A-Za-z0-9-]+' .mcp.json .cursor/mcp.json .vscode/mcp.json; then
   _fail "token-like value in generated projections"
 else
   _ok "no secret values in projections"
@@ -136,6 +144,33 @@ if AIW_MCP_MANIFEST="$REQMAN" node scripts/check-mcp-deps.js --adapter claude-co
 else
   _ok "unsupported required transport fails"
 fi
+
+echo "=== S2-B start gates (stale blocks, IDE strict runs) ==="
+FIXBIN="$FIX/startbin"
+mkdir -p "$FIXBIN"
+for essential in node bash sh; do
+  command -v "$essential" >/dev/null 2>&1 && ln -sf "$(command -v "$essential")" "$FIXBIN/$essential"
+done
+printf '#!/bin/sh\necho "claude fake 9.9.9"\n' > "$FIXBIN/claude"; chmod +x "$FIXBIN/claude"
+printf '#!/bin/sh\necho "cursor fake 9.9.9"\n' > "$FIXBIN/cursor"; chmod +x "$FIXBIN/cursor"
+cp .mcp.json "$FIX/mcp.start.backup"
+restore_start() { cp "$FIX/mcp.start.backup" .mcp.json; }
+# stale projection blocks start even in dry-run
+echo " " >> .mcp.json
+if AIW_EXEC_DRY_RUN=1 AIW_O2_STATE_ROOT="$FIX/startstate" PATH="$FIXBIN:/usr/bin:/bin" bash aiw start "$ROOT" --for claude-code >/dev/null 2>&1; then
+  _fail "stale projection did not block start"
+else
+  _ok "stale projection blocks start"
+fi
+restore_start
+# cursor-ide strict gate runs and dry-run argv captured
+if out="$(AIW_EXEC_DRY_RUN=1 AIW_O2_STATE_ROOT="$FIX/startstate" PATH="$FIXBIN:/usr/bin:/bin" bash aiw start "$ROOT" --for cursor-ide 2>&1)"; then
+  if echo "$out" | grep -q "DRY-RUN argv: \[cursor-ide\]"; then _ok "cursor-ide strict gate passes, opener argv captured"; else _fail "cursor-ide argv missing: $out"; fi
+else
+  _fail "cursor-ide start failed on clean tree"
+fi
+restore_start
+if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _ok "projections clean after start-gate tests"; else _fail "start-gate tests left drift"; fi
 
 echo
 echo "MCP projections: $PASS passed, $FAIL failed"

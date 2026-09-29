@@ -283,22 +283,27 @@ cmd_start() {
     console.log(a.launch_kind || 'cli-direct');
   ")"
 
-  # 2. MCP freshness + required dependencies (Q4 stronger fail-closed).
-  if [[ "$ADAPTER_ID" == "opencode" || "$ADAPTER_ID" == "claude-code" || "$ADAPTER_ID" == "copilot-cli" || "$ADAPTER_ID" == "cursor" ]]; then
-    if ! node "$ROOT/scripts/sync-mcp.js" --check >/dev/null 2>&1; then
-      echo -e "${RED}Error:${NC} MCP projections are stale for the selected runtime."
-      echo "  Remediation: aiw sync-runtimes   (refusing to launch on known-differing config)"
-      exit 1
-    fi
-    MCP_DEPS_OUT="$(node "$ROOT/scripts/check-mcp-deps.js" --adapter "$ADAPTER_ID" --strict 2>&1)" || {
-      echo "$MCP_DEPS_OUT"
-      echo -e "${RED}Error:${NC} required MCP dependencies unusable — start blocked."
-      exit 1
-    }
-    [[ -n "$MCP_DEPS_OUT" ]] && echo "$MCP_DEPS_OUT"
-  else
-    echo -e "${DIM}MCP projections for '$ADAPTER_ID' are S2 (no generated files to verify).${NC}"
+  # 2. MCP freshness (global, all adapters) + required dependencies per
+  # MCP-surface adapter (S2-B strict: opencode, claude-code, copilot-cli,
+  # cursor, cursor-ide, vscode-copilot). Q4 fail-closed start.
+  if ! node "$ROOT/scripts/sync-mcp.js" --check >/dev/null 2>&1; then
+    echo -e "${RED}Error:${NC} MCP projections are stale for the selected runtime."
+    echo "  Remediation: aiw sync-runtimes   (refusing to launch on known-differing config)"
+    exit 1
   fi
+  case "$ADAPTER_ID" in
+    opencode|claude-code|copilot-cli|cursor|cursor-ide|vscode-copilot)
+      MCP_DEPS_OUT="$(node "$ROOT/scripts/check-mcp-deps.js" --adapter "$ADAPTER_ID" --strict 2>&1)" || {
+        echo "$MCP_DEPS_OUT"
+        echo -e "${RED}Error:${NC} required MCP dependencies unusable — start blocked."
+        exit 1
+      }
+      [[ -n "$MCP_DEPS_OUT" ]] && echo "$MCP_DEPS_OUT"
+      ;;
+    *)
+      echo -e "${DIM}No MCP surface declared for '$ADAPTER_ID' — continuing without MCP gates.${NC}"
+      ;;
+  esac
 
   # 3. Launch (CLI / verified IDE opener) or guide (IDE). No model flags, ever.
   if [[ "$LAUNCH_KIND" == "ide-guidance" ]]; then

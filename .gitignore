@@ -8,8 +8,9 @@ node_modules/
 .env
 .env.*
 
-# Editor
-.vscode/
+# Editor (S2-B: .vscode/mcp.json is a generated MCP projection and IS tracked)
+.vscode/*
+!.vscode/mcp.json
 .idea/
 
 # Build artefacts
