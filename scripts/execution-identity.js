@@ -121,9 +121,24 @@ function createLauncherIdentity({ agent, executionId, source }) {
   };
 }
 
+function trustedLauncherCallsite(source) {
+  const stack = String(new Error().stack || '');
+  const entrypoint = source === 'launcher:aiw-run'
+    ? /scripts[\\/]aiw-run\.js(?:[:\\)]|$)/
+    : source === 'launcher:orchestrate-workers'
+      ? /scripts[\\/]orchestrate-workers\.js(?:[:\\)]|$)/
+      : null;
+  const fixture = process.env.AIW_TEST_FIXTURE === '1'
+    && /scripts[\\/]test-launcher-fixture\.js(?:[:\\)]|$)/.test(stack);
+  if (!entrypoint || (!entrypoint.test(stack) && !fixture)) {
+    throw new Error('execution-identity: launcher dispatch identity may only be issued by a trusted launcher entrypoint');
+  }
+}
+
 // Attribution identities remain constructible for review/test fixtures.  Only
 // the dispatch entrypoints receive the producer-evidence capability marker.
 function createLauncherDispatchIdentity(params) {
+  trustedLauncherCallsite(params && params.source);
   const value = createLauncherIdentity(params);
   LAUNCHER_ISSUED.add(value);
   return value;
@@ -152,6 +167,7 @@ function createWorkerIdentity({ agent, parentExecutionId, workerIndex, source })
 }
 
 function createWorkerDispatchIdentity(params) {
+  trustedLauncherCallsite(params && params.source);
   const value = createWorkerIdentity(params);
   LAUNCHER_ISSUED.add(value);
   return value;

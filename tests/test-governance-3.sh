@@ -34,7 +34,7 @@ node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const re=require('$ROOT/scripts/review-evidence');
 const id=require('$ROOT/scripts/execution-identity');
- pe.record({agentIdentity:id.createLauncherDispatchIdentity({agent:'builder',executionId:'$TREL3-producer',source:'launcher:aiw-run'}),subjectHash:'$HEAD_SHA',outcome:'completed',sourceRef:'$TREL3-producer'});
+ pe.record({agentIdentity:require('$ROOT/scripts/test-launcher-fixture').launcher({agent:'builder',executionId:'$TREL3-producer',source:'launcher:aiw-run'}),subjectHash:'$HEAD_SHA',outcome:'completed',sourceRef:'$TREL3-producer'});
 re.record({reviewerIdentity:id.createLauncherIdentity({agent:'reviewer',executionId:'$TREL3-review',source:'test-fixture-phased'}),subjectHash:'$HEAD_SHA',executionId:'$TREL3-review',outcome:'approve',reason:'gov3 fixture review'});
 " > /dev/null || { bad "release fixture evidence"; }
 REL3_DID=$(node -e "

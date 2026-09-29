@@ -160,7 +160,7 @@ node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const re=require('$ROOT/scripts/review-evidence');
 const id=require('$ROOT/scripts/execution-identity');
- pe.record({agentIdentity:id.createLauncherDispatchIdentity({agent:'builder',executionId:'$TCLI-producer',source:'launcher:aiw-run'}),subjectHash:'$HEAD_SHA',outcome:'completed',sourceRef:'$TCLI-producer'});
+ pe.record({agentIdentity:require('$ROOT/scripts/test-launcher-fixture').launcher({agent:'builder',executionId:'$TCLI-producer',source:'launcher:aiw-run'}),subjectHash:'$HEAD_SHA',outcome:'completed',sourceRef:'$TCLI-producer'});
 re.record({reviewerIdentity:id.createLauncherIdentity({agent:'reviewer',executionId:'$TCLI-review',source:'test-fixture-phased'}),subjectHash:'$HEAD_SHA',executionId:'$TCLI-review',outcome:'approve',reason:'gate-auth fixture review'});
 " > /dev/null || { bad "release fixture evidence"; }
 D_CLI=$(mint release release approve repo_head "$HEAD_SHA" human alice true "$TCLI")

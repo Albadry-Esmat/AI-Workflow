@@ -45,28 +45,31 @@ cleanup_subject() { # remove fixture lines for a subject file
 node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const id=require('$ROOT/scripts/execution-identity');
-const b=id.createLauncherDispatchIdentity({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
+const fx=require('$ROOT/scripts/test-launcher-fixture');
+const b=fx.launcher({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
 const r=pe.record({agentIdentity:b,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'e-b'});
 if(!r.recorded)process.exit(1);
-const w=id.createWorkerDispatchIdentity({agent:'builder',parentExecutionId:'p',workerIndex:2,source:'launcher:orchestrate-workers'});
+const w=fx.worker({agent:'builder',parentExecutionId:'p',workerIndex:2,source:'launcher:orchestrate-workers'});
 pe.record({agentIdentity:w,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'p-w2'});
 const set=pe.loadForSubject('$SYN_A');
 if(set.producers.length!==1||set.producers[0].id!=='builder')process.exit(1);
 if(set.entries.length!==2)process.exit(1);
 // analyzer role is not a producer role → skipped, never widens the set
-const a=id.createLauncherDispatchIdentity({agent:'analyzer',executionId:'e-a',source:'launcher:aiw-run'});
+const a=fx.launcher({agent:'analyzer',executionId:'e-a',source:'launcher:aiw-run'});
 const s=pe.record({agentIdentity:a,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'e-a'});
 if(s.recorded)process.exit(1);
 " && ok "producer set (multi-entry, role-filtered, deterministic)" || bad "producer evidence"
 node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const id=require('$ROOT/scripts/execution-identity');
-const b=id.createLauncherDispatchIdentity({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
+const fx=require('$ROOT/scripts/test-launcher-fixture');
+const b=fx.launcher({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
 try{pe.record({agentIdentity:b,subjectHash:'not-hex!!',outcome:'completed'});process.exit(1);}catch(e){if(!/hex/.test(e.message))process.exit(1);}
 try{pe.record({agentIdentity:{agent:'builder'},subjectHash:'$SYN_A',outcome:'completed'});process.exit(1);}catch(e){if(!/execution-identity/.test(e.message))process.exit(1);}
 const forged={...id.createLauncherIdentity({agent:'builder',executionId:'forged',source:'launcher:aiw-run'})};
 try{pe.record({agentIdentity:forged,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'forged'});process.exit(1);}catch(e){if(!/launcher-owned/.test(e.message))process.exit(1);}
-const unknown=id.createLauncherDispatchIdentity({agent:'unknown-agent',executionId:'unknown',source:'launcher:aiw-run'});
+try{id.createLauncherDispatchIdentity({agent:'builder',executionId:'unauthorized',source:'launcher:aiw-run'});process.exit(1);}catch(e){if(!/trusted launcher entrypoint/.test(e.message))process.exit(1);}
+const unknown=fx.launcher({agent:'unknown-agent',executionId:'unknown',source:'launcher:aiw-run'});
 try{pe.record({agentIdentity:unknown,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'unknown'});process.exit(1);}catch(e){if(!/unknown role/.test(e.message))process.exit(1);}
 " && ok "malformed/unattributed producer rejected" || bad "producer fail-closed"
 cleanup_subject "$SYN_A"
@@ -76,7 +79,7 @@ cleanup_subject "$SYN_A"
 # them so a failed assertion cannot leave authority residue behind.
 node -e "
 const fs=require('fs');const pe=require('$ROOT/scripts/producer-evidence');const id=require('$ROOT/scripts/execution-identity');
-const subject='$SYN_B';const p=pe.producersPath(subject);const b=id.createLauncherDispatchIdentity({agent:'builder',executionId:'store-base',source:'launcher:aiw-run'});
+const subject='$SYN_B';const p=pe.producersPath(subject);const fx=require('$ROOT/scripts/test-launcher-fixture');const b=fx.launcher({agent:'builder',executionId:'store-base',source:'launcher:aiw-run'});
 const base=pe.record({agentIdentity:b,subjectHash:subject,outcome:'completed',sourceRef:'store-base'}).entry;
 const save=fs.readFileSync(p,'utf8');
 let malformed=false;
@@ -90,7 +93,7 @@ const head=pe.repoHeadSha();const hp=pe.producersPath(head);const backup=hp+'.wr
 if(fs.existsSync(backup))fs.rmSync(backup,{recursive:true,force:true});
 if(fs.existsSync(hp))fs.renameSync(hp,backup);
 fs.mkdirSync(hp,{recursive:true});let writeFailed=false;
-try{pe.recordDispatch({agentIdentity:id.createLauncherDispatchIdentity({agent:'builder',executionId:'write-failure',source:'launcher:aiw-run'}),result:{denied:false},sourceRef:'write-failure'});}catch(e){writeFailed=true;}
+try{pe.recordDispatch({agentIdentity:fx.launcher({agent:'builder',executionId:'write-failure',source:'launcher:aiw-run'}),result:{denied:false},sourceRef:'write-failure'});}catch(e){writeFailed=true;}
 fs.rmSync(hp,{recursive:true,force:true});if(fs.existsSync(backup))fs.renameSync(backup,hp);
 if(!malformed||!unknown||!ambiguous||!writeFailed)process.exit(1);
 fs.rmSync(p,{force:true});
@@ -203,7 +206,7 @@ mkdec() { # mkdec <exec> → decision id in isolated registry
   node -e "const gd=require('$ROOT/scripts/gate-decisions');console.log(gd.record({gate_id:'release',gate_class:'release',decision:'approve',subject_kind:'repo_head',subject_hash:'$RHEAD',principal:{type:'human',id:'alice',authenticated:true,source:'test-fixture'},scope:{},reason:'release wiring fixture',execution_id:'$1',policy_version:'1.0.0'}).decision_id);"
 }
 mkprod() { # mkprod <agent> <exec>
-  node -e "const pe=require('$ROOT/scripts/producer-evidence');const id=require('$ROOT/scripts/execution-identity');pe.record({agentIdentity:id.createLauncherDispatchIdentity({agent:'$1',executionId:'$2',source:'launcher:aiw-run'}),subjectHash:'$RHEAD',outcome:'completed',sourceRef:'$2'});" > /dev/null
+  node -e "const pe=require('$ROOT/scripts/producer-evidence');const fx=require('$ROOT/scripts/test-launcher-fixture');pe.record({agentIdentity:fx.launcher({agent:'$1',executionId:'$2',source:'launcher:aiw-run'}),subjectHash:'$RHEAD',outcome:'completed',sourceRef:'$2'});" > /dev/null
 }
 mkrev() { # mkrev <agent> <exec>
   node -e "const re=require('$ROOT/scripts/review-evidence');const id=require('$ROOT/scripts/execution-identity');re.record({reviewerIdentity:id.createLauncherIdentity({agent:'$1',executionId:'$2',source:'test-fixture-phased'}),subjectHash:'$RHEAD',executionId:'$2',outcome:'approve',reason:'wiring fixture review'});" > /dev/null
