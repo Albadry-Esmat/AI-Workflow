@@ -162,7 +162,8 @@
       "mode": "subagent",
       "permission": "allow",
       "description": "Generates unit, integration, and edge-case test suites from code artifacts and testing strategies. Invoked after code-generator output is validated.",
-      "skill": ".agents/skills/test-generator/SKILL.md"
+      "skill": ".agents/skills/test-generator/SKILL.md",
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "recovery": {
       "mode": "subagent",
@@ -174,7 +175,8 @@
       "mode": "subagent",
       "permission": "allow",
       "description": "Deployment strategy \u2014 environment model, promotion rules, rollback criteria, feature flags. Invoked after testing strategy is defined.",
-      "skill": ".agents/skills/deployment-strategy/SKILL.md"
+      "skill": ".agents/skills/deployment-strategy/SKILL.md",
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "documenter": {
       "mode": "subagent",
@@ -186,7 +188,8 @@
       "mode": "subagent",
       "permission": "allow",
       "description": "Autonomous documentation maintenance engine \u2014 detects system changes and keeps /docs in sync. Triggered after every system change.",
-      "skill": ".agents/skills/doc-maintainer/SKILL.md"
+      "skill": ".agents/skills/doc-maintainer/SKILL.md",
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "data-engineer": {
       "mode": "subagent",
@@ -281,7 +284,8 @@
       "mode": "subagent",
       "permission": "allow",
       "description": "Issue lifecycle ownership \u2014 dedupe, create, link, label, update, close, reopen. Reviewer determines resolution.",
-      "skills": []
+      "skills": [],
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "gatekeeper": {
       "mode": "subagent",

@@ -327,6 +327,12 @@ agents:
 An explicit override that is unavailable blocks execution — it never falls back
 silently. Omitting `model` (or `null`) means inherit.
 
+Pinned lightweight tier (Phase 4, E-0052): `test-generator`, `deployer`,
+`doc-maintainer`, and `issue-manager` require `github-copilot/claude-haiku-4.5`
+(structural/validation workloads with downstream verification). Reasoning-critical
+agents (`architect`, `reviewer`, `planner`, `gatekeeper`, `security-specialist`)
+always inherit — never pinned to a lightweight tier.
+
 **Full reference** → [`docs/models.md`](models.md) — precedence, inheritance vs
 explicit semantics, provider neutrality, and governance rules for safety-critical agents.
 

@@ -23,11 +23,11 @@ must exist before auto-compression (TASK-0053) and durable job budgets (Phase 7)
 
 | ID | Title | SP | Status |
 |----|-------|----|--------|
-| TASK-0050 | Fix `work-item-exporter` pin in `full-pipeline.json` (`^1.0.0` → `^2.0.0`) | 1 | pending |
-| TASK-0049 | Add `token_policy` block to all 21 pipeline templates | 3 | pending |
-| TASK-0052 | Model tier right-sizing — assign `claude-haiku-4.5` to eligible agents | 3 | pending |
-| TASK-0053 | Orchestrator `compress_after_handoff` — compress completed skill state after downstream consumption | 5 | pending |
-| TASK-0051 | Orchestrator output-field pruning — pass only required input fields to each skill | 8 | pending |
+| TASK-0050 | Fix `work-item-exporter` pin in `full-pipeline.json` (`^1.0.0` → `^2.0.0`) | 1 | complete |
+| TASK-0049 | Add `token_policy` block to all 21 pipeline templates | 3 | complete |
+| TASK-0052 | Model tier right-sizing — assign `claude-haiku-4.5` to eligible agents | 3 | complete |
+| TASK-0053 | Orchestrator `compress_after_handoff` — compress completed skill state after downstream consumption | 5 | complete |
+| TASK-0051 | Orchestrator output-field pruning — pass only required input fields to each skill | 8 | complete |
 
 ---
 

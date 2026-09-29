@@ -1,6 +1,7 @@
 ---
 description: Deployment strategy — environment model, promotion rules, rollback criteria, feature flags, and IaC scaffold. Invoked after testing strategy is defined.
 mode: subagent
+model: github-copilot/claude-haiku-4.5
 permission: allow
 ---
 
