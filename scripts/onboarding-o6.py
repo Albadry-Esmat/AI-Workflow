@@ -149,10 +149,29 @@ def verify_ed25519(public_key_pem: str, payload: bytes, signature_b64: str) -> t
         payload_path.write_bytes(payload)
         signature_path.write_bytes(signature)
         openssl = shutil.which("openssl")
-        if not openssl:
-            return False, "openssl verifier is unavailable"
-        result = subprocess.run([openssl, "pkeyutl", "-verify", "-rawin", "-pubin", "-inkey", str(public_key), "-in", str(payload_path), "-sigfile", str(signature_path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
-        return result.returncode == 0, "signature verified" if result.returncode == 0 else "signature verification failed"
+        if openssl:
+            result = subprocess.run([openssl, "pkeyutl", "-verify", "-rawin", "-pubin", "-inkey", str(public_key), "-in", str(payload_path), "-sigfile", str(signature_path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            if result.returncode == 0:
+                return True, "signature verified"
+
+        # macOS ships LibreSSL versions that do not support Ed25519 or the
+        # OpenSSL `-rawin` flag. Node's built-in crypto verifier provides the
+        # same detached-signature check without adding a dependency. Any
+        # unavailable or unsuccessful fallback remains fail-closed.
+        node = shutil.which("node")
+        if node:
+            verifier = (
+                "const fs=require('fs'),crypto=require('crypto');"
+                "const data=fs.readFileSync(process.argv[1]);"
+                "const key=fs.readFileSync(process.argv[2],'utf8');"
+                "const sig=fs.readFileSync(process.argv[3]);"
+                "process.exit(crypto.verify(null,data,key,sig)?0:1);"
+            )
+            result = subprocess.run([node, "-e", verifier, str(payload_path), str(public_key), str(signature_path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            if result.returncode == 0:
+                return True, "signature verified"
+
+        return False, "signature verification failed"
 
 
 def state_template(mode: str, record: dict[str, Any] | None) -> dict[str, Any]:

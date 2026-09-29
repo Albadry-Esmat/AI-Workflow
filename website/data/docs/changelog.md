@@ -21,6 +21,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Added Jira import-direction support, website catalog synchronization, CI build
   checks, fail-closed placeholder resolution, conflict approval gating, and state
   fields for imported IDs and performance measurements.
+- Added a fail-closed Node.js Ed25519 verification fallback for macOS LibreSSL,
+  keeping O6 attestation verification offline and dependency-free.
 
 ### P1 Slice S2 — IDE opener launch and MCP strict start gates (UNRELEASED WORK)
 
