@@ -26,11 +26,11 @@ on cached skill invocations in feedback loops; –50 to –80% rework tokens aft
 
 | ID | Title | SP | Status |
 |----|-------|----|--------|
-| TASK-0054 | Parallelize `dependency-analyzer` + `design-system-generator` | 2 | pending |
-| TASK-0055 | Orchestrator lazy SKILL.md section loading | 5 | pending |
-| TASK-0058 | Async skill completion tracking (`async_task_registry` in orchestrator state) | 5 | pending |
-| TASK-0056 | Add `resume_from_phase` capability to orchestrator + pipeline templates | 8 | pending |
-| TASK-0057 | Skill invocation memoization — within-session cache by `(skill, input_hash)` | 8 | pending |
+| TASK-0054 | Parallelize `dependency-analyzer` + `design-system-generator` | 2 | complete |
+| TASK-0055 | Orchestrator lazy SKILL.md section loading | 5 | complete |
+| TASK-0058 | Async skill completion tracking (`async_task_registry` in orchestrator state) | 5 | complete |
+| TASK-0056 | Add `resume_from_phase` capability to orchestrator + pipeline templates | 8 | complete |
+| TASK-0057 | Skill invocation memoization — within-session cache by `(skill, input_hash)` | 8 | complete |
 
 ---
 
