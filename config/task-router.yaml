@@ -27,4 +27,12 @@ routes:
     model_requirement: "tasks.release-review"
     tier_hint: "frontier"
     description: "Release gate: disputed evals + security + completeness"
+  # Subordinate producer route only. Natural-language primary routing remains
+  # unchanged; release-review consumes evidence from this explicit dispatch.
+  release-producer:
+    pipeline: "pre-deploy"
+    agent: "builder"
+    model_requirement: "tasks.release-producer"
+    tier_hint: "balanced"
+    description: "Release producer: builder dispatch with launcher-owned evidence"
 default_route: "feature-delivery"

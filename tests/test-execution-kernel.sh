@@ -35,6 +35,21 @@ node -e "const g=require('$ROOT/scripts/policy-gateway'); const r=g.check({tool:
 #    null task model = inherit runtime/session model via precedence)
 node -e "const r=require('$ROOT/scripts/task-router'); const q=r.route('quick-fix'); if(q.model_id!==null||q.model_requirement!=='tasks.quick-fix'||q.tier_hint!=='cheap')process.exit(1)" && ok "router quick-fix->inherit" || bad "router"
 node -e "const r=require('$ROOT/scripts/task-router'); const q=r.route('release-review'); if(q.model_id!==null||q.model_requirement!=='tasks.release-review')process.exit(1)" && ok "router release-review->inherit" || bad "router2"
+node -e "const r=require('$ROOT/scripts/task-router'); const q=r.route('release-producer'); if(q.pipeline!=='pre-deploy'||q.agent!=='builder'||q.model_id!==null||q.model_requirement!=='tasks.release-producer')process.exit(1)" && ok "router release-producer->builder/pre-deploy" || bad "router release-producer"
+# 4b. The subordinate builder route records only successful dispatches; policy
+# denied turns do not create producer evidence.
+TPROD="test-fixture-phased-release-producer-$RANDOM"
+AIW_AVAILABLE_MODELS="openai/gpt-5.6,openai/gpt-5.4" AIW_RUNTIME_MODEL="openai/gpt-5.6" \
+node "$ROOT/scripts/aiw-run.js" --template release-producer --thread "$TPROD" --path docs/a.md "prepare release" > /tmp/release-producer-out.json \
+&& node -e "const fs=require('fs'); const h=require('child_process').execFileSync('git',['-C','$ROOT','rev-parse','HEAD'],{encoding:'utf8'}).trim(); const p='$ROOT/.opencode/state/producers/'+h+'.jsonl'; const rows=fs.readFileSync(p,'utf8').split('\\n').filter(Boolean).map(JSON.parse).filter((x)=>x.source_ref==='$TPROD'); if(rows.length!==1||rows[0].producer.id!=='builder'||rows[0].producer_role!=='developer'||rows[0].outcome!=='completed')process.exit(1)" \
+&& ok "successful builder dispatch records completed producer evidence" || bad "successful producer dispatch"
+TDENY="test-fixture-phased-release-denied-$RANDOM"
+AIW_AVAILABLE_MODELS="openai/gpt-5.6,openai/gpt-5.4" AIW_RUNTIME_MODEL="openai/gpt-5.6" \
+node "$ROOT/scripts/aiw-run.js" --template release-producer --thread "$TDENY" --tool write --path docs/a.md "denied release write" > /tmp/release-producer-denied.json \
+&& node -e "const fs=require('fs'); const h=require('child_process').execFileSync('git',['-C','$ROOT','rev-parse','HEAD'],{encoding:'utf8'}).trim(); const p='$ROOT/.opencode/state/producers/'+h+'.jsonl'; const rows=fs.existsSync(p)?fs.readFileSync(p,'utf8').split('\\n').filter(Boolean).map(JSON.parse).filter((x)=>x.source_ref==='$TDENY'):[]; const out=require('/tmp/release-producer-denied.json'); if(!out.result.denied||rows.length!==0)process.exit(1)" \
+&& ok "denied builder dispatch creates no producer evidence" || bad "denied producer dispatch"
+node -e "const rr=require('$ROOT/scripts/release-review'); const pe=require('$ROOT/scripts/producer-evidence'); const id=require('$ROOT/scripts/execution-identity'); const h='ab'.repeat(32); pe.record({agentIdentity:id.createLauncherIdentity({agent:'builder',executionId:'test-fixture-phased-release-failed',source:'test-fixture-phased'}),subjectHash:h,outcome:'failed',sourceRef:'test-fixture-phased-release-failed'}); const s=rr.filterProducerEvidence(pe.loadForSubject(h).entries); if(s.completed.length!==0||s.incomplete.length!==1||s.incomplete[0].outcome!=='failed')process.exit(1); require('fs').rmSync(pe.producersPath(h),{force:true})" \
+&& ok "failed builder dispatch is retained and cannot satisfy producer prerequisite" || bad "failed producer dispatch"
 # 5. checkpointer resume + idempotent task
 node -e "
 const c=require('$ROOT/scripts/checkpointer'); const t='test-thread-'+Date.now();

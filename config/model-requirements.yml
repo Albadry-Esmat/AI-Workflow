@@ -224,3 +224,10 @@ tasks:
     tier_hint: frontier
     fallbacks: []
     on_unavailable: fail_closed
+  release-producer:
+    model: null
+    provider: null
+    capabilities: [release-production, producer-evidence]
+    tier_hint: balanced
+    fallbacks: []
+    on_unavailable: fail_closed

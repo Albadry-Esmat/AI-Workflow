@@ -279,7 +279,7 @@ policy; the runtime is authoritative for availability.
 
 ## Current assignments
 
-All 24 agents and 3 tasks **inherit** the runtime/session model (no explicit
+All 24 agents and 4 tasks **inherit** the runtime/session model (no explicit
 pins, no global override). `config/model-requirements.yml` is authoritative;
 `capabilities` and `tier_hint` below remain as descriptive signals for future
 explicit policy, not execution requirements.
@@ -287,7 +287,7 @@ explicit policy, not execution requirements.
 | Agent/Task | Policy | Signal |
 |------------|--------|--------|
 | `primary` and all subagents | inherit | `tier_hint` balanced/cheap per role |
-| `quick-fix`, `feature-delivery`, `release-review` | inherit | `tier_hint` cheap/balanced/frontier |
+| `quick-fix`, `feature-delivery`, `release-review`, `release-producer` | inherit | `tier_hint` cheap/balanced/frontier/balanced |
 | `global_agent_model` | none (`null`) | runtime/session model is the default |
 
 Cost/quality tuning (e.g. lightweight models for rote agents, premium models

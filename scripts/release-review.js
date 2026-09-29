@@ -22,6 +22,7 @@ const path = require('node:path');
 const router = require('./task-router');
 const checkpointer = require('./checkpointer');
 const store = require('./store');
+const producerEvidence = require('./producer-evidence');
 
 const ROOT = path.resolve(__dirname, '..');
 const POLICY_VERSION = '1.1.0';
@@ -40,6 +41,18 @@ function sha256File(p) {
   } catch {
     return null;
   }
+}
+
+// Only completed producer-role executions can satisfy the release
+// prerequisite. A failed (or malformed) producer record is not silently
+// filtered away: it blocks the subject so a partial dispatch cannot advance.
+function filterProducerEvidence(entries) {
+  const producerEntries = (Array.isArray(entries) ? entries : [])
+    .filter((entry) => entry && producerEvidence.PRODUCER_ROLES.has(entry.producer_role));
+  return {
+    completed: producerEntries.filter((entry) => entry.outcome === 'completed'),
+    incomplete: producerEntries.filter((entry) => entry.outcome !== 'completed'),
+  };
 }
 
 function main() {
@@ -96,10 +109,15 @@ function main() {
   // not burn the single-use decision). Producers from launcher-generated
   // evidence only — no CLI producer claims exist or are accepted.
   const freshness = require('./evidence-freshness');
-  const producerEvidence = require('./producer-evidence');
   const reviewEvidence = require('./review-evidence');
   const produced = producerEvidence.loadForSubject(head);
-  const developerProducers = (produced.entries || []).filter((e) => producerEvidence.PRODUCER_ROLES.has(e.producer_role));
+  const producerSelection = filterProducerEvidence(produced.entries || []);
+  if (producerSelection.incomplete.length > 0) {
+    const outcome = producerSelection.incomplete[0].outcome || 'missing';
+    console.error(`release blocked: producer evidence includes a non-completed execution (SOD_PRODUCER_EXECUTION_INCOMPLETE; outcome=${outcome}). Failing closed.`);
+    process.exit(1);
+  }
+  const developerProducers = producerSelection.completed;
   if (developerProducers.length === 0) {
     console.error(`release blocked: no producer evidence for HEAD ${head.slice(0, 12)} (SOD_PRODUCER_EVIDENCE_MISSING). Producing executions record it automatically; unattributable subjects cannot advance. Failing closed.`);
     process.exit(1);
@@ -184,4 +202,4 @@ function main() {
   console.log(JSON.stringify({ thread, ...attestation }, null, 2));
 }
 if (require.main === module) main();
-module.exports = { repoHeadSha, sha256File, POLICY_VERSION };
+module.exports = { repoHeadSha, sha256File, filterProducerEvidence, POLICY_VERSION };

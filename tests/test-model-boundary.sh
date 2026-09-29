@@ -69,12 +69,14 @@ node -e "
 const router=require('$ROOT/scripts/task-router');
 const yaml=require('js-yaml'); const fs=require('fs');
 const manifest=yaml.load(fs.readFileSync('$ROOT/config/model-requirements.yml','utf8'));
-for(const t of ['quick-fix','feature-delivery','release-review']){
+for(const t of ['quick-fix','feature-delivery','release-review','release-producer']){
   const r=router.route(t);
   if(!r.model_requirement||r.model_requirement!==('tasks.'+t))process.exit(1);
   if(r.model_id!==null&&r.model_id!==manifest.tasks[t].model)process.exit(1);
   if(manifest.tasks[t].model!==null)process.exit(1);
 }
+const rp=router.route('release-producer');
+if(rp.pipeline!=='pre-deploy'||rp.agent!=='builder')process.exit(1);
 const rr=require('$ROOT/scripts/resolve-model');
 const rec=rr.resolveTask('quick-fix',['openai/gpt-5.6'],'test',{sessionModel:'openai/gpt-5.6',sessionSource:'test'});
 if(rec.selection_source!=='runtime'||rec.selected_model_id!=='openai/gpt-5.6')process.exit(1);
