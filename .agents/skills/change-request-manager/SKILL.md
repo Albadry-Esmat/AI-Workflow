@@ -1,6 +1,6 @@
 ---
 name: change-request-manager
-version: 1.0.0
+version: 1.0.1
 domain: lifecycle
 description: 'Use when a change request is raised, a requirement changes, or the project scope is modified. Triggers on: "change request", "modify this requirement", "scope change", "CR", "change the spec", "new requirement added", "requirement updated". Do NOT use for bug reports — use defect-manager instead.'
 author: system
@@ -61,6 +61,10 @@ Receive a change request — a new requirement, a modified existing requirement,
 - `task_graph` scope from state-manager: existing TASK-NNNN items for delta computation.
 - `work_items.sequences.CR` from state-manager: to assign next CR sequence number.
 - Foundation schema from `docs/work-item-foundation.md`: governs CR lifecycle states and ID patterns.
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "project", auto_archive: false }` — change request records persist until work is complete; `expires_at` is null (no expiry until work complete), no auto-archive, per the context-memory TTL policy table.
 
 ## Execution Logic
 

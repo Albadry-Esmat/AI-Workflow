@@ -1,6 +1,6 @@
 ---
 name: context-memory
-version: 2.0.0
+version: 2.1.0
 domain: system
 description: 'Use when managing session state, persisting context between turns, or preventing state bleed across executions in multi-turn skill orchestration. Triggers on: "remember this", "persist context", "restore session", "state management", "multi-turn", "cross-session memory", "archival memory", "project memory".'
 author: system
@@ -278,6 +278,14 @@ triggered only by the orchestrator under known pipeline conditions.
   maps to Tier 1 write — identical to v1.0.0 behavior. All existing callers work without modification.
 - **Orchestrator is sole writer:** Only the orchestrator invokes context-memory write/clear
   operations. Skills MUST NOT write directly to any memory tier.
+- **Context TTL policy:** Session- and project-scoped state carries
+  `context_ttl: { expires_at, policy, auto_archive }`. Producing skills declare
+  their policy; `state-manager` honors `expires_at` on read (expired → null).
+
+  | Policy | Scope | `expires_at` | `auto_archive` | Used by |
+  |--------|-------|--------------|----------------|---------|
+  | `session` | Transient session state | `null` (resolved at session end) | `true` | behavioral-telemetry-collector, session-insights, enhancement-dashboard |
+  | `project` | Persists until work complete | `null` (no expiry until project/CR/implementation complete) | `false` | defect-manager, change-request-manager, feature-planning (`req_task_map`) |
 
 ## Security Considerations
 

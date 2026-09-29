@@ -1,6 +1,6 @@
 ---
 name: state-manager
-version: 1.1.0
+version: 1.1.1
 domain: system
 description: 'Use when reading, writing, diffing, or restoring the ASE-OS system state. Triggers on: "read system state", "update state", "write state diff", "restore state", "system state snapshot", "state consistency".'
 author: system
@@ -165,6 +165,7 @@ Step 5 — Assemble output
 - The `diff_log` is append-only — entries cannot be deleted or modified.
 - `snapshot` operations do not modify state — they only serialize it.
 - **ADR canonical source:** `scope: "adr_index"` is the single source of truth for Architecture Decision Records. `decision_log.adrs` is deprecated — do not write new ADRs there. Migrate existing reads to `scope: "adr_index"`.
+- **Context TTL:** Respect `context_ttl.expires_at` on read — return null for expired context. See the TTL policy table in `context-memory` (`session` = transient, `project` = persists until work complete).
 
 ## Security Considerations
 

@@ -1,6 +1,6 @@
 ---
 name: session-insights
-version: 1.3.0
+version: 1.3.1
 domain: system
 description: 'Use when generating per-skill performance insights from collected behavioral telemetry. Triggers on: "session insights", "skill performance report", "analyze telemetry", "pipeline performance", "HITL rejection ratio", "latency p95". Requires behavioral-telemetry-collector (SKL-047) to have run first. Read-only — does not modify behavioral_telemetry.events.'
 author: ASE-OS
@@ -97,6 +97,10 @@ This skill is **read-only on the events array**. It only writes to `behavioral_t
 - `telemetry_events` must be loaded via `state-manager.read(scope: "behavioral_telemetry")` before invocation. If `behavioral_telemetry` is absent or `opt_out: true`, return empty summary with `skipped: true`.
 - All events must have `session_id` matching the active session — mismatched events are filtered out before analysis (not an error).
 - If `telemetry_events` is empty, return a summary with all zero counts. Do not halt.
+
+### Context TTL
+
+`context_ttl: { expires_at: null, policy: "session", auto_archive: true }` — session summary is transient session state; `expires_at` is null (resolved at session end) and entries auto-archive per the context-memory TTL policy table.
 
 ---
 
