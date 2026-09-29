@@ -94,10 +94,10 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 |---------|-------------|
 | `./aiw setup` | **Start here** — install deps, create `.env`, add `aiw` to PATH |
 | `aiw health` | Check tools, `.env`, and configuration — prints PASS/WARN/FAIL |
-| `aiw start [path] [--for runtime\|auto]` | Resolve a runtime (OpenCode, Claude, Codex, Cursor, Copilot, Gemini, …) and launch it — never passes model flags |
-| `aiw init <path> [--for ...] [--merge]` | Install the portable core + runtime projections (non-destructive; `--merge` adds/keeps, never overwrites) |
-| `aiw agent list\|detect\|use\|resolve` | List, probe, select, and resolve runtimes without silent fallback |
-| `aiw sync-runtimes [--check] [--skills-only]` | Regenerate runtime adapters + MCP projections from canonical sources |
+| `aiw start [path] [--for runtime\|auto]` | Resolve a runtime (OpenCode, Claude, Codex, Cursor, Copilot, Gemini, Cursor IDE, VS Code, …) and launch it — CLI direct, IDE via verified opener — never passes model flags |
+| `aiw init <path> [--for ...] [--merge]` | Install the portable core + runtime projections incl. IDE (non-destructive; `--merge` adds/keeps, explains MCP conflicts, never overwrites) |
+| `aiw agent list\|detect\|use\|forget\|resolve` | List, probe, select, forget, and resolve runtimes without silent fallback |
+| `aiw sync-runtimes [--check] [--skills-only]` | Regenerate runtime adapters + MCP projections (opencode, .mcp.json, .cursor, .vscode) from canonical sources |
 
 ### Validation
 

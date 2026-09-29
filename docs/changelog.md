@@ -9,6 +9,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P1 Slice S2 — IDE opener launch and MCP strict start gates (UNRELEASED WORK)
+
+- `aiw start` launches IDE runtimes with catalog-verified openers
+  (`cursor-ide` via `cursor`, `vscode-copilot` via `code`; new
+  `opener-launch` kind): resolve emits `launch: opener-launch` + opener only
+  when the verified opener is on PATH, otherwise fail-closed guidance
+  (windsurf stays guidance-only: opener unverified). Foreground launch with
+  target path only; no model flags ever (argv-tested, 28/28 runtime suite).
+- MCP strict enforcement for every MCP-surface adapter: global projection
+  freshness gate for all adapters plus `--strict` dependency gates for
+  `opencode`, `claude-code`, `cursor`, `copilot-cli`, `cursor-ide`,
+  `vscode-copilot`; new `.vscode/mcp.json` projection (VS Code `servers`
+  shape, `${env:VAR}` refs-only) with manifest compatibility extended;
+  stale projections block start even in dry-run (tested).
+- `aiw init` covers IDE runtimes (`cursor-ide` → shared `.cursor/mcp.json`,
+  `vscode-copilot` → `.vscode/mcp.json`, `--for all` extended) and explains
+  MCP conflicts per server (adds/target-only/differing, values never shown)
+  while still failing closed with the target untouched.
+- `sync-runtimes` MCP phase default-on pinned by tests (`--skills-only`
+  opt-out preserved); O2 contract `governed-launch-s2` + policy amendment
+  (unverified-opener launch forbidden); `aiw doctor` reports `ide_openers`;
+  `aiw agent forget` clears the remembered selection; health reports IDE
+  opener readiness (warn-only).
+- Governance preserved: no installs/logins/secret ownership/silent switches
+  or model overrides; windsurf user-global MCP untouched (AIW never writes
+  outside the repo).
+
 ### P1 Slice S1 — runtime-neutral execution and canonical MCP (UNRELEASED WORK)
 
 - `aiw start` no longer requires OpenCode: catalog-driven resolution
