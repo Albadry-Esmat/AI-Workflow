@@ -68,7 +68,7 @@ try{pe.record({agentIdentity:b,subjectHash:'not-hex!!',outcome:'completed'});pro
 try{pe.record({agentIdentity:{agent:'builder'},subjectHash:'$SYN_A',outcome:'completed'});process.exit(1);}catch(e){if(!/execution-identity/.test(e.message))process.exit(1);}
 const forged={...id.createLauncherIdentity({agent:'builder',executionId:'forged',source:'launcher:aiw-run'})};
 try{pe.record({agentIdentity:forged,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'forged'});process.exit(1);}catch(e){if(!/launcher-owned/.test(e.message))process.exit(1);}
-try{id.createLauncherDispatchIdentity({agent:'builder',executionId:'unauthorized',source:'launcher:aiw-run'});process.exit(1);}catch(e){if(!/trusted launcher entrypoint/.test(e.message))process.exit(1);}
+try{id.createLauncherDispatchIdentity({agent:'builder',executionId:'unauthorized',source:'launcher:aiw-run'});process.exit(1);}catch(e){if(!/module capability/.test(e.message))process.exit(1);}
 const unknown=fx.launcher({agent:'unknown-agent',executionId:'unknown',source:'launcher:aiw-run'});
 try{pe.record({agentIdentity:unknown,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'unknown'});process.exit(1);}catch(e){if(!/unknown role/.test(e.message))process.exit(1);}
 " && ok "malformed/unattributed producer rejected" || bad "producer fail-closed"

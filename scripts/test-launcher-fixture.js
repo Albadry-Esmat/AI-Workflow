@@ -8,9 +8,9 @@ const identity = require('./execution-identity');
 
 module.exports = {
   launcher(params) {
-    return identity.createLauncherDispatchIdentity(params);
+    return identity.createLauncherDispatchIdentity({ ...params, issuer: module });
   },
   worker(params) {
-    return identity.createWorkerDispatchIdentity(params);
+    return identity.createWorkerDispatchIdentity({ ...params, issuer: module });
   },
 };

@@ -77,7 +77,7 @@ function main() {
     console.error(`execution identity failed: template '${args.template}' routes to no agent; refusing unattributable execution.`);
     process.exit(1);
   }
-  const agent_identity = identity.createLauncherDispatchIdentity({ agent: r.agent, executionId: args.thread, source: 'launcher:aiw-run' });
+  const agent_identity = identity.createLauncherDispatchIdentity({ agent: r.agent, executionId: args.thread, source: 'launcher:aiw-run', issuer: module });
   adapter.start(args.thread, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity });
   const ctx = retrieve(args.request.split(' ').slice(0, 5).join(' '), args.retrieval);
   checkpointer.appendCheckpoint(args.thread, { kind: 'retrieval', method: ctx.method, strategy: args.retrieval });

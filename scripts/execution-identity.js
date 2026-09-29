@@ -28,6 +28,7 @@
 // gate-decisions registry may record authenticated humans (later phase).
 
 const IDENTITY_VERSION = 1;
+const path = require('node:path');
 
 const PRINCIPAL_TYPES = new Set(['human', 'agent', 'system']);
 
@@ -121,25 +122,26 @@ function createLauncherIdentity({ agent, executionId, source }) {
   };
 }
 
-function trustedLauncherCallsite(source) {
-  const stack = String(new Error().stack || '');
-  const entrypoint = source === 'launcher:aiw-run'
-    ? /scripts[\\/]aiw-run\.js(?:[:\\)]|$)/
+function trustedLauncherIssuer(issuer, source) {
+  const expectedFile = source === 'launcher:aiw-run'
+    ? 'aiw-run.js'
     : source === 'launcher:orchestrate-workers'
-      ? /scripts[\\/]orchestrate-workers\.js(?:[:\\)]|$)/
+      ? 'orchestrate-workers.js'
       : null;
-  const fixture = process.env.AIW_TEST_FIXTURE === '1'
-    && /scripts[\\/]test-launcher-fixture\.js(?:[:\\)]|$)/.test(stack);
-  if (!entrypoint || (!entrypoint.test(stack) && !fixture)) {
-    throw new Error('execution-identity: launcher dispatch identity may only be issued by a trusted launcher entrypoint');
+  const isFixture = process.env.AIW_TEST_FIXTURE === '1' && source?.startsWith('launcher:');
+  const expectedPath = isFixture ? path.join(__dirname, 'test-launcher-fixture.js') : expectedFile && path.join(__dirname, expectedFile);
+  const expectedModule = expectedPath && require.cache[expectedPath];
+  if (!expectedModule || issuer !== expectedModule) {
+    throw new Error('execution-identity: launcher dispatch identity requires the trusted launcher module capability');
   }
 }
 
 // Attribution identities remain constructible for review/test fixtures.  Only
 // the dispatch entrypoints receive the producer-evidence capability marker.
 function createLauncherDispatchIdentity(params) {
-  trustedLauncherCallsite(params && params.source);
-  const value = createLauncherIdentity(params);
+  trustedLauncherIssuer(params && params.issuer, params && params.source);
+  const { issuer, ...identityParams } = params || {};
+  const value = createLauncherIdentity(identityParams);
   LAUNCHER_ISSUED.add(value);
   return value;
 }
@@ -167,8 +169,9 @@ function createWorkerIdentity({ agent, parentExecutionId, workerIndex, source })
 }
 
 function createWorkerDispatchIdentity(params) {
-  trustedLauncherCallsite(params && params.source);
-  const value = createWorkerIdentity(params);
+  trustedLauncherIssuer(params && params.issuer, params && params.source);
+  const { issuer, ...identityParams } = params || {};
+  const value = createWorkerIdentity(identityParams);
   LAUNCHER_ISSUED.add(value);
   return value;
 }
