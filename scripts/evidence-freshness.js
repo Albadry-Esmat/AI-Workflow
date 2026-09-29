@@ -24,8 +24,6 @@
 //   | EVIDENCE_SUBJECT_MISMATCH | EVIDENCE_EXECUTION_MISMATCH | EVIDENCE_STALE
 //   | EVIDENCE_EXPIRED | EVIDENCE_NOT_APPROVING
 
-const identity = require('./execution-identity');
-
 function ok(kind) {
   return { fresh: true, code: 'EVIDENCE_OK', kind, detail: 'evidence is current for the governed subject' };
 }
@@ -47,11 +45,16 @@ function check(kind, record, { subjectHash, executionId = null } = {}) {
   if (!record || typeof record !== 'object') return stale(kind, 'EVIDENCE_MISSING', `no ${kind} evidence presented`);
 
   if (kind === 'producer') {
-    const cls = identity.describeIdentity({ identity_version: 1, agent: (record.producer || {}).id || '', principal: record.producer, role: record.producer_role || null, execution_id: record.execution_id || '', parent_execution_id: record.parent_execution_id || null, worker: record.worker || null, source: record.source || '' });
-    if (!record.producer || typeof record.producer.id !== 'string') return stale(kind, 'EVIDENCE_UNATTRIBUTED', 'producer entry lacks a canonical principal');
-    if (cls !== 'canonical') return stale(kind, 'EVIDENCE_MALFORMED', `producer identity is ${cls}`);
     if (String(record.subject_hash || '').toLowerCase() !== subject) return stale(kind, 'EVIDENCE_SUBJECT_MISMATCH', 'producer evidence refers to a different subject');
+    const producerEvidence = require('./producer-evidence');
+    try {
+      producerEvidence.validateEntry(record, { subjectHash: subject });
+    } catch (err) {
+      const code = err.code === 'PRODUCER_PRINCIPAL_INVALID' ? 'EVIDENCE_UNATTRIBUTED' : 'EVIDENCE_MALFORMED';
+      return stale(kind, code, err.message);
+    }
     if (executionId && record.execution_id !== executionId) return stale(kind, 'EVIDENCE_EXECUTION_MISMATCH', 'producer evidence belongs to a different execution');
+    if (record.outcome !== 'completed') return stale(kind, 'EVIDENCE_STALE', 'producer execution did not complete');
     return ok(kind);
   }
 

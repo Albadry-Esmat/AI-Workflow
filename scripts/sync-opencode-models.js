@@ -201,7 +201,10 @@ function write() {
   if (JSON.stringify(cfg._model_projection || null) !== JSON.stringify(PROJECTION_MARKER)) updated++;
   // Byte-preserving serialization: the checked-in file uses \uXXXX escapes for
   // non-ASCII; plain JSON.stringify would emit literal UTF-8 and noisy diffs.
-  const text = JSON.stringify(next, null, 2).replace(/[^\x00-\x7F]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`) + '\n';
+  // Preserve the repository's no-trailing-newline projection convention. A
+  // newline-only rewrite changes the MCP projection hash and makes a valid
+  // runtime launch fail its freshness gate.
+  const text = JSON.stringify(next, null, 2).replace(/[^\x00-\x7F]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
   fs.writeFileSync(OPENCODE_PATH, text);
   return updated;
 }

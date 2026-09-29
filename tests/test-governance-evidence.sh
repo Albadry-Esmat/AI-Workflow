@@ -45,27 +45,57 @@ cleanup_subject() { # remove fixture lines for a subject file
 node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const id=require('$ROOT/scripts/execution-identity');
-const b=id.createLauncherIdentity({agent:'builder',executionId:'e-b',source:'test-fixture-phased'});
+const b=id.createLauncherIdentity({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
 const r=pe.record({agentIdentity:b,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'e-b'});
 if(!r.recorded)process.exit(1);
-const w=id.createWorkerIdentity({agent:'builder',parentExecutionId:'p',workerIndex:2,source:'test-fixture-phased'});
+const w=id.createWorkerIdentity({agent:'builder',parentExecutionId:'p',workerIndex:2,source:'launcher:orchestrate-workers'});
 pe.record({agentIdentity:w,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'p-w2'});
 const set=pe.loadForSubject('$SYN_A');
 if(set.producers.length!==1||set.producers[0].id!=='builder')process.exit(1);
 if(set.entries.length!==2)process.exit(1);
 // analyzer role is not a producer role → skipped, never widens the set
-const a=id.createLauncherIdentity({agent:'analyzer',executionId:'e-a',source:'test-fixture-phased'});
+const a=id.createLauncherIdentity({agent:'analyzer',executionId:'e-a',source:'launcher:aiw-run'});
 const s=pe.record({agentIdentity:a,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'e-a'});
 if(s.recorded)process.exit(1);
 " && ok "producer set (multi-entry, role-filtered, deterministic)" || bad "producer evidence"
 node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const id=require('$ROOT/scripts/execution-identity');
-const b=id.createLauncherIdentity({agent:'builder',executionId:'e-b',source:'t'});
+const b=id.createLauncherIdentity({agent:'builder',executionId:'e-b',source:'launcher:aiw-run'});
 try{pe.record({agentIdentity:b,subjectHash:'not-hex!!',outcome:'completed'});process.exit(1);}catch(e){if(!/hex/.test(e.message))process.exit(1);}
 try{pe.record({agentIdentity:{agent:'builder'},subjectHash:'$SYN_A',outcome:'completed'});process.exit(1);}catch(e){if(!/execution-identity/.test(e.message))process.exit(1);}
+const forged=id.createLauncherIdentity({agent:'builder',executionId:'forged',source:'cli-claim'});
+try{pe.record({agentIdentity:forged,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'forged'});process.exit(1);}catch(e){if(!/launcher-owned/.test(e.message))process.exit(1);}
+const unknown=id.createLauncherIdentity({agent:'unknown-agent',executionId:'unknown',source:'launcher:aiw-run'});
+try{pe.record({agentIdentity:unknown,subjectHash:'$SYN_A',outcome:'completed',sourceRef:'unknown'});process.exit(1);}catch(e){if(!/unknown role/.test(e.message))process.exit(1);}
 " && ok "malformed/unattributed producer rejected" || bad "producer fail-closed"
 cleanup_subject "$SYN_A"
+
+# Malformed, unknown-role, ambiguous-store, and producer-write failures all
+# fail closed. These fixtures are removed in the same process that creates
+# them so a failed assertion cannot leave authority residue behind.
+node -e "
+const fs=require('fs');const pe=require('$ROOT/scripts/producer-evidence');const id=require('$ROOT/scripts/execution-identity');
+const subject='$SYN_B';const p=pe.producersPath(subject);const b=id.createLauncherIdentity({agent:'builder',executionId:'store-base',source:'launcher:aiw-run'});
+const base=pe.record({agentIdentity:b,subjectHash:subject,outcome:'completed',sourceRef:'store-base'}).entry;
+const save=fs.readFileSync(p,'utf8');
+let malformed=false;
+try{fs.writeFileSync(p,JSON.stringify({...base,event:'forged_event'})+'\\n');pe.loadForSubject(subject);}catch(e){malformed=true;}
+let unknown=false;
+try{fs.writeFileSync(p,JSON.stringify({...base,producer_role:'reviewer',producer_agent:'reviewer',producer:{...base.producer,id:'reviewer'},execution_id:'unknown-role',source_ref:'unknown-role'})+'\\n');pe.loadForSubject(subject);}catch(e){unknown=true;}
+let ambiguous=false;
+try{fs.writeFileSync(p,JSON.stringify(base)+'\\n'+JSON.stringify(base)+'\\n');pe.loadForSubject(subject);}catch(e){ambiguous=true;}
+fs.writeFileSync(p,save);
+const head=pe.repoHeadSha();const hp=pe.producersPath(head);const backup=hp+'.write-failure-backup';
+if(fs.existsSync(backup))fs.rmSync(backup,{recursive:true,force:true});
+if(fs.existsSync(hp))fs.renameSync(hp,backup);
+fs.mkdirSync(hp,{recursive:true});let writeFailed=false;
+try{pe.recordDispatch({agentIdentity:id.createLauncherIdentity({agent:'builder',executionId:'write-failure',source:'launcher:aiw-run'}),result:{denied:false},sourceRef:'write-failure'});}catch(e){writeFailed=true;}
+fs.rmSync(hp,{recursive:true,force:true});if(fs.existsSync(backup))fs.renameSync(backup,hp);
+if(!malformed||!unknown||!ambiguous||!writeFailed)process.exit(1);
+fs.rmSync(p,{force:true});
+" && ok "malformed/unknown/ambiguous records and producer write failures block" || bad "producer store/write fail-closed"
+cleanup_subject "$SYN_B"
 
 # ── Review freshness ──────────────────────────────────────────────────
 node -e "
@@ -153,7 +183,7 @@ const saved=fs.existsSync(p)?fs.readFileSync(p,'utf8'):null;
 fs.appendFileSync(p,JSON.stringify({producer:{type:'agent',id:'x'},subject_hash:'$SYN_B'})+'\n');
 const pe=require('$ROOT/scripts/producer-evidence');
 let failed=false;
-try{pe.loadForSubject('$SYN_A');}catch(e){failed=/contamination/.test(e.message);}
+try{pe.loadForSubject('$SYN_A');}catch(e){failed=/contamination|malformed|stored entry/.test(e.message);}
 if(saved===null){fs.rmSync(p,{force:true});}else{fs.writeFileSync(p,saved);}
 if(!failed)process.exit(1);
 " && ok "tampered producer store detected" || bad "store integrity"
@@ -173,7 +203,7 @@ mkdec() { # mkdec <exec> → decision id in isolated registry
   node -e "const gd=require('$ROOT/scripts/gate-decisions');console.log(gd.record({gate_id:'release',gate_class:'release',decision:'approve',subject_kind:'repo_head',subject_hash:'$RHEAD',principal:{type:'human',id:'alice',authenticated:true,source:'test-fixture'},scope:{},reason:'release wiring fixture',execution_id:'$1',policy_version:'1.0.0'}).decision_id);"
 }
 mkprod() { # mkprod <agent> <exec>
-  node -e "const pe=require('$ROOT/scripts/producer-evidence');const id=require('$ROOT/scripts/execution-identity');pe.record({agentIdentity:id.createLauncherIdentity({agent:'$1',executionId:'$2',source:'test-fixture-phased'}),subjectHash:'$RHEAD',outcome:'completed',sourceRef:'$2'});" > /dev/null
+  node -e "const pe=require('$ROOT/scripts/producer-evidence');const id=require('$ROOT/scripts/execution-identity');pe.record({agentIdentity:id.createLauncherIdentity({agent:'$1',executionId:'$2',source:'launcher:aiw-run'}),subjectHash:'$RHEAD',outcome:'completed',sourceRef:'$2'});" > /dev/null
 }
 mkrev() { # mkrev <agent> <exec>
   node -e "const re=require('$ROOT/scripts/review-evidence');const id=require('$ROOT/scripts/execution-identity');re.record({reviewerIdentity:id.createLauncherIdentity({agent:'$1',executionId:'$2',source:'test-fixture-phased'}),subjectHash:'$RHEAD',executionId:'$2',outcome:'approve',reason:'wiring fixture review'});" > /dev/null
@@ -184,6 +214,20 @@ mv "$ROOT/.opencode/state/producers/$RHEAD.jsonl" "$ROOT/.opencode/state/produce
 D1=$(mkdec "rel-w1"); mkrev reviewer rel-w1r
 if node "$ROOT/scripts/release-review.js" --yes --decision-id "$D1" --thread rel-w1 --bench-out /tmp/relw-bench.json > /dev/null 2>&1; then bad "missing producers attested"; else ok "missing producer evidence blocks"; fi
 mv "$ROOT/.opencode/state/producers/$RHEAD.jsonl.kept" "$ROOT/.opencode/state/producers/$RHEAD.jsonl" 2>/dev/null || true
+# malformed producer evidence blocks before the single-use decision is
+# consumed. Restore the pre-test store immediately afterwards.
+cp "$ROOT/.opencode/state/producers/$RHEAD.jsonl" "$ROOT/.opencode/state/producers/$RHEAD.jsonl.valid"
+node -e "require('fs').writeFileSync('$ROOT/.opencode/state/producers/$RHEAD.jsonl','{malformed-producer-record\\n')"
+D_BAD=$(mkdec "rel-malformed")
+mkrev reviewer rel-malformed-review
+if node "$ROOT/scripts/release-review.js" --yes --decision-id "$D_BAD" --thread rel-malformed --bench-out /tmp/relw-malformed-bench.json > /dev/null 2>&1; then
+  bad "malformed producer evidence attested"
+elif [ -f "${AIW_GATE_REGISTRY%.jsonl}.consumptions.jsonl" ] && grep -q "\"decision_id\":\"$D_BAD\"" "${AIW_GATE_REGISTRY%.jsonl}.consumptions.jsonl"; then
+  bad "malformed producer evidence consumed gate decision"
+else
+  ok "malformed producer evidence blocks before gate consumption"
+fi
+mv "$ROOT/.opencode/state/producers/$RHEAD.jsonl.valid" "$ROOT/.opencode/state/producers/$RHEAD.jsonl"
 # producer==reviewer → block (helper level; the review store correctly refuses
 # non-reviewer roles, so this combination cannot be file-stored — proven here)
 node -e "const g=require('$ROOT/scripts/require-gate-decision');const id=require('$ROOT/scripts/execution-identity');

@@ -45,6 +45,11 @@ function parseArgs(argv) {
   out.request = rest.join(' ');
   return out;
 }
+
+function writeProducerEvidence(producers, agentIdentity, result, sourceRef) {
+  return producers.recordDispatch({ agentIdentity, result, sourceRef });
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.request) usage();
@@ -76,20 +81,27 @@ function main() {
   adapter.start(args.thread, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity });
   const ctx = retrieve(args.request.split(' ').slice(0, 5).join(' '), args.retrieval);
   checkpointer.appendCheckpoint(args.thread, { kind: 'retrieval', method: ctx.method, strategy: args.retrieval });
-  const res = adapter.send(args.thread, { prompt: args.request, model_id, tier_hint: r.tier_hint, agent_identity, tool: args.tool, targetPath: args.path, approval: args.approval, model_resolution });
+  let res = adapter.send(args.thread, { prompt: args.request, model_id, tier_hint: r.tier_hint, agent_identity, tool: args.tool, targetPath: args.path, approval: args.approval, model_resolution });
   // Phase D: producer evidence for completed producer-role dispatches —
   // launcher-owned identity + derived HEAD subject (denied turns produced
   // nothing and are skipped; recording never alters dispatch outcome).
+  let evidenceError = null;
   if (!res.denied) {
     try {
-      const producers = require('./producer-evidence');
-      const head = producers.repoHeadSha();
-      if (head) producers.record({ agentIdentity: agent_identity, subjectHash: head, outcome: res.failed ? 'failed' : 'completed', sourceRef: args.thread });
+      writeProducerEvidence(require('./producer-evidence'), agent_identity, res, args.thread);
     } catch (err) {
-      console.error(`producer evidence warning: ${err.message}`);
+      evidenceError = err;
+      console.error(`producer evidence write failed: ${err.message}`);
     }
   }
+  if (evidenceError) {
+    // Do not emit a successful producer result when the authoritative evidence
+    // write failed. The dispatch is considered failed and the process is
+    // non-zero so callers cannot advance on an unverifiable execution.
+    res = { ...res, failed: true, reason: `producer-evidence-write-failed: ${evidenceError.message}` };
+  }
   console.log(JSON.stringify({ template: r, adapter: args.adapter, thread: args.thread, retrieval: ctx, result: res, evidence: adapter.evidence(args.thread) }, null, 2));
+  if (evidenceError || res.failed) process.exitCode = 1;
 }
 if (require.main === module) main();
-module.exports = { retrieve };
+module.exports = { retrieve, writeProducerEvidence };

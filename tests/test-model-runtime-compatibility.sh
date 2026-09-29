@@ -10,10 +10,11 @@ PASS=0; FAIL=0
 ok() { echo "  PASS: $1"; PASS=$((PASS+1)); }
 bad() { echo "  FAIL: $1"; FAIL=$((FAIL+1)); }
 
-# Fixtures: no Copilot anywhere (regression for the reported startup mismatch
-# "Agent primary's configured model github-copilot/claude-sonnet-4.6 is not valid").
+# Fixtures: the disconnected-copilot case remains explicit below; the normal
+# catalog includes the four current manifest pins so the compatibility report
+# tests the actual policy rather than an obsolete all-inherit assumption.
 LIVE_NO_COPILOT="opencode/muse-spark-1.3-contributor-free,openai/gpt-5.4,lmstudio-llm/qwen/qwen3.6-35b-a3b"
-FX_OPENAI="openai/gpt-5.6,openai/gpt-5.4"
+FX_OPENAI="openai/gpt-5.6,openai/gpt-5.4,github-copilot/claude-haiku-4.5"
 SESSION_OPENAI="openai/gpt-5.6"
 NOSESSION="env -u AIW_RUNTIME_MODEL -u OPENCODE_MODEL"
 
@@ -23,13 +24,14 @@ if AIW_AVAILABLE_MODELS="$FX_OPENAI" AIW_RUNTIME_MODEL="$SESSION_OPENAI" node "$
 const rep=require('/tmp/mrc-pass.json');
 if(rep.summary.verdict!=='pass')process.exit(1);
 for(const r of rep.records){
-  if(r.selection_source!=='runtime')process.exit(1);
-  if(r.explicit_override!==false)process.exit(1);
-  if(r.selected_model!=='$SESSION_OPENAI')process.exit(1);
+  const pinned=['test-generator','deployer','doc-maintainer','issue-manager'].includes(r.agent);
+  if(pinned){
+    if(r.selection_source!=='agent_override'||r.explicit_override!==true||r.selected_model!=='github-copilot/claude-haiku-4.5')process.exit(1);
+  } else if(r.selection_source!=='runtime'||r.explicit_override!==false||r.selected_model!=='$SESSION_OPENAI')process.exit(1);
   if(r.runtime_model!=='$SESSION_OPENAI')process.exit(1);
 }
-if(rep.records.length!==27)process.exit(1);
-" && ok "inheritance: session model resolves all 27 (source runtime)" || bad "inheritance resolution records"
+if(rep.records.length!==28)process.exit(1);
+" && ok "inheritance: session model resolves all 28 (source runtime)" || bad "inheritance resolution records"
 else
   bad "inheritance available"; cat /tmp/mrc-pass.txt
 fi
@@ -38,7 +40,10 @@ fi
 if AIW_AVAILABLE_MODELS="$FX_OPENAI" AIW_RUNTIME_MODEL="openai/gpt-5.4" node "$ROOT/scripts/check-model-runtime-compatibility.js" --out /tmp/mrc-switch.json > /dev/null 2>&1; then
   node -e "
 const rep=require('/tmp/mrc-switch.json');
-if(!rep.records.every((r)=>r.selected_model==='openai/gpt-5.4'&&r.selection_source==='runtime'))process.exit(1);
+for(const r of rep.records){
+  const pinned=['test-generator','deployer','doc-maintainer','issue-manager'].includes(r.agent);
+  if(pinned ? (r.selected_model!=='github-copilot/claude-haiku-4.5'||r.selection_source!=='agent_override') : (r.selected_model!=='openai/gpt-5.4'||r.selection_source!=='runtime'))process.exit(1);
+}
 " && ok "session switch changes inherited resolution" || bad "session switch"
 else
   bad "session switch gate must pass"
@@ -49,14 +54,16 @@ node -e "
 const yaml=require('js-yaml');const fs=require('fs');
 const m=yaml.load(fs.readFileSync('$ROOT/config/model-requirements.yml','utf8'));
 if(m.global_agent_model!==null)process.exit(1);
+const pinned={'test-generator':'github-copilot/claude-haiku-4.5',deployer:'github-copilot/claude-haiku-4.5','doc-maintainer':'github-copilot/claude-haiku-4.5','issue-manager':'github-copilot/claude-haiku-4.5'};
 for(const s of ['agents','tasks'])for(const n of Object.keys(m[s])){
-  if(m[s][n].model!==null&&m[s][n].model!==undefined){console.error('pinned '+s+'.'+n);process.exit(1);}
+  const expected=s==='agents'&&pinned[n]?pinned[n]:null;
+  if((m[s][n].model||null)!==expected){console.error('unexpected model policy '+s+'.'+n);process.exit(1);}
   if((m[s][n].fallbacks||[]).length!==0)process.exit(1);
 }
-if(Object.keys(m.agents).length!==24||Object.keys(m.tasks).length!==3)process.exit(1);
-" && ok "provider-neutral manifest (0 pins, global null)" || bad "manifest neutrality"
+if(Object.keys(m.agents).length!==24||Object.keys(m.tasks).length!==4)process.exit(1);
+" && ok "manifest policy (24 agents, 4 tasks, expected explicit pins)" || bad "manifest policy"
 # ...and an lmstudio session resolves without any repo edit.
-if AIW_AVAILABLE_MODELS="lmstudio-llm/qwen/qwen3.6-35b-a3b,openai/gpt-5.4" AIW_RUNTIME_MODEL="lmstudio-llm/qwen/qwen3.6-35b-a3b" node "$ROOT/scripts/check-model-runtime-compatibility.js" --out /tmp/mrc-lmstudio.json > /dev/null 2>&1; then
+if AIW_AVAILABLE_MODELS="lmstudio-llm/qwen/qwen3.6-35b-a3b,openai/gpt-5.4,github-copilot/claude-haiku-4.5" AIW_RUNTIME_MODEL="lmstudio-llm/qwen/qwen3.6-35b-a3b" node "$ROOT/scripts/check-model-runtime-compatibility.js" --out /tmp/mrc-lmstudio.json > /dev/null 2>&1; then
   ok "lmstudio session resolves with no repo change"
 else
   bad "lmstudio session resolution"
@@ -146,7 +153,10 @@ else
     node -e "
 const rep=require('/tmp/mrc-nosession.json');
 if(rep.summary.verdict!=='block')process.exit(1);
-if(!rep.records.every((x)=>x.resolution==='UNAVAILABLE'&&x.selected_model===null&&x.selection_source==='runtime'&&x.explicit_override===false))process.exit(1);
+for(const x of rep.records){
+ const pinned=['test-generator','deployer','doc-maintainer','issue-manager'].includes(x.agent);
+ if(pinned ? (x.resolution!=='UNAVAILABLE'||x.selected_model!==null||x.selection_source!=='agent_override'||x.explicit_override!==true) : (x.resolution!=='UNAVAILABLE'||x.selected_model!==null||x.selection_source!=='runtime'||x.explicit_override!==false))process.exit(1);
+}
 " && ok "no session → fail closed (nothing selected, nothing guessed)" || bad "no-session records"
   else
     bad "missing actionable no-session error"; cat /tmp/mrc-nosession.txt
@@ -193,20 +203,30 @@ if node "$ROOT/scripts/sync-opencode-models.js" --check > /tmp/mrc-drift.txt 2>&
   node -e "
 const cfg=require('$ROOT/opencode.json');
 if('model' in cfg){console.error('top-level model must be absent (global null)');process.exit(1);}
-for(const [n,e] of Object.entries(cfg.agent)){if('model' in e){console.error('pinned '+n);process.exit(1);}}
 const fs=require('fs');const path=require('path');
+const expected={'test-generator':'github-copilot/claude-haiku-4.5',deployer:'github-copilot/claude-haiku-4.5','doc-maintainer':'github-copilot/claude-haiku-4.5','issue-manager':'github-copilot/claude-haiku-4.5'};
+for(const [name,entry] of Object.entries(cfg.agent)){
+ const want=expected[name]||null;
+ if(want ? entry.model!==want : ('model' in entry)){console.error('projection mismatch '+name);process.exit(1);}
+}
 const dir=path.join('$ROOT','.opencode','agent');
 for(const f of fs.readdirSync(dir)){
   if(!f.endsWith('.md'))continue;
   const text=fs.readFileSync(path.join(dir,f),'utf8');
   const fm=text.split('\n');
   if(fm[0].trim()!=='---')continue;
-  for(let i=1;i<fm.length;i++){
-    if(fm[i].trim()==='---')break;
-    if(/^\s*model:/.test(fm[i])){console.error('frontmatter pin in '+f);process.exit(1);}
-  }
+   let foundModel=false;
+   for(let i=1;i<fm.length;i++){
+     if(fm[i].trim()==='---')break;
+     if(/^\s*model:/.test(fm[i])){
+       const name=path.basename(f,'.md');
+       if(!expected[name]||fm[i].trim()!==('model: '+expected[name])){console.error('frontmatter projection mismatch in '+f);process.exit(1);}
+       foundModel=true;
+     }
+   }
+   if(expected[path.basename(f,'.md')]&&!foundModel){console.error('missing frontmatter pin in '+f);process.exit(1);}
 }
-" && ok "projection: inherited agents carry no hardcoded model (opencode.json + agent-md)" || bad "projection fields"
+" && ok "projection: manifest pins and inherited agents match opencode.json + agent-md" || bad "projection fields"
 else
   bad "projection drift"; cat /tmp/mrc-drift.txt
 fi
@@ -221,7 +241,8 @@ const must=['requirement_key','requested_agent_override','global_override','runt
 for(const rec of rep.records){
   for(const k of must){ if(!(k in rec)){console.error('missing '+k);process.exit(1);} }
   if(!rec.requirement_key.match(/^(agents|tasks)\./))process.exit(1);
-  if(rec.provider!=='openai')process.exit(1);
+  const expectedProvider=rec.selected_model ? rec.selected_model.split('/')[0] : (rec.requested_agent_override||rec.runtime_model).split('/')[0];
+  if(rec.provider!==expectedProvider)process.exit(1);
   if(rec.head_sha!=='unknown'&&!/^[0-9a-f]{4,40}/.test(rec.head_sha))process.exit(1);
   if(isNaN(Date.parse(rec.timestamp)))process.exit(1);
 }
@@ -231,12 +252,14 @@ if(rep.runtime_model!='$SESSION_OPENAI'||rep.global_agent_model!==null)process.e
 
 # 19. GitHub Copilot regression: Copilot disconnected, OpenAI session → all inherit.
 if AIW_AVAILABLE_MODELS="$LIVE_NO_COPILOT" AIW_RUNTIME_MODEL="openai/gpt-5.4" node "$ROOT/scripts/check-model-runtime-compatibility.js" --out /tmp/mrc-copilot.json > /tmp/mrc-copilot.txt 2>&1; then
+  bad "copilot-disconnected must BLOCK pinned agents"
+else
   node -e "
 const rep=require('/tmp/mrc-copilot.json');
-if(!rep.records.every((r)=>r.selected_model==='openai/gpt-5.4'&&r.selection_source==='runtime'))process.exit(1);
-" && ok "copilot disconnected → inherited OpenAI resolves (startup mismatch gone)" || bad "copilot regression records"
-else
-  bad "copilot-disconnected must PASS"; cat /tmp/mrc-copilot.txt
+const pinned=['test-generator','deployer','doc-maintainer','issue-manager'];
+if(rep.summary.unavailable!==4)process.exit(1);
+for(const r of rep.records){if(pinned.includes(r.agent)){if(r.resolution!=='UNAVAILABLE')process.exit(1);}else if(r.selected_model!=='openai/gpt-5.4'||r.selection_source!=='runtime')process.exit(1);}
+" && ok "copilot disconnected → pinned agents block while inherited agents resolve" || bad "copilot regression records"
 fi
 
 # 20. Session discovery: env precedence + invalid fail-closed + never guess.

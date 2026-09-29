@@ -6,6 +6,7 @@
 const opencode = require('./runtime-adapter');
 const checkpointer = require('./checkpointer');
 const store = require('./store');
+const { writeProducerEvidence } = require('./aiw-run');
 
 function parseArgs(argv) {
   const o = { parent: 'parent-' + Date.now(), template: 'quick-fix', tasks: [] };
@@ -43,26 +44,34 @@ function main() {
   }
   const parent_identity = identity.createOrchestratorIdentity({ executionId: args.parent, source: 'launcher:orchestrate-workers' });
   opencode.start(args.parent, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity: parent_identity });
+  const evidenceFailures = [];
   const results = args.tasks.map((t, i) => {
     const worker_identity = identity.createWorkerIdentity({ agent: r.agent, parentExecutionId: args.parent, workerIndex: i, source: 'launcher:orchestrate-workers' });
     const worker = worker_identity.execution_id;
     opencode.start(worker, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity: worker_identity });
     const res = opencode.send(worker, { prompt: t, model_id, tier_hint: r.tier_hint, agent_identity: worker_identity, tool: 'read', targetPath: 'docs/', model_resolution });
-    store.put(args.parent, `worker-${i}`, { task: t, result: res, worker_identity });
     // Phase D: worker producer evidence (subject = HEAD at completion).
+    let workerResult = res;
     if (!res.denied) {
       try {
-        const producers = require('./producer-evidence');
-        const head = producers.repoHeadSha();
-        if (head) producers.record({ agentIdentity: worker_identity, subjectHash: head, outcome: 'completed', sourceRef: worker });
+        writeProducerEvidence(require('./producer-evidence'), worker_identity, res, worker);
       } catch (err) {
-        console.error(`producer evidence warning: ${err.message}`);
+        evidenceFailures.push({ worker, error: err });
+        workerResult = { ...res, failed: true, reason: `producer-evidence-write-failed: ${err.message}` };
+        console.error(`producer evidence write failed for ${worker}: ${err.message}`);
       }
     }
-    return { worker, task: t, denied: res.denied };
+    store.put(args.parent, `worker-${i}`, { task: t, result: workerResult, worker_identity });
+    return { worker, task: t, denied: workerResult.denied, failed: Boolean(workerResult.failed), evidence_error: workerResult.reason || null };
   });
   checkpointer.appendCheckpoint(args.parent, { kind: 'fanout', workers: results.length, template: args.template });
   const denied = results.filter((x) => x.denied).length;
+  if (evidenceFailures.length > 0 || results.some((x) => x.failed)) {
+    console.error('orchestrate-workers failed: producer evidence or worker execution did not complete successfully. Failing closed.');
+    console.log(JSON.stringify({ parent: args.parent, template: args.template, workers: results.length, denied, failed: results.filter((x) => x.failed).length, results }, null, 2));
+    process.exitCode = 1;
+    return;
+  }
   console.log(JSON.stringify({ parent: args.parent, template: args.template, workers: results.length, denied, synthesis: `fanned out ${results.length}, ${denied} denied by policy` }, null, 2));
 }
 if (require.main === module) main();

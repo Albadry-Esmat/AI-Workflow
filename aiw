@@ -645,13 +645,17 @@ cmd_init() {
 
   # Resolve --for set (default: auto).
   local WANT
-  WANT="$(echo "$FOR_LIST" | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')"
+  # Keep the empty default safe under `set -o pipefail`: grep-based filtering
+  # returns status 1 for an empty --for list and aborts before auto resolution.
+  WANT="$(printf '%s' "$FOR_LIST" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
   [[ -z "${WANT// }" ]] && WANT="auto"
   local RUNTIMES=""
   if [[ "$WANT" == *"all"* ]]; then
     RUNTIMES="opencode claude-code cursor copilot-cli codex gemini-cli cursor-ide vscode-copilot"
   elif [[ "$WANT" == *"auto"* ]]; then
-    RUNTIMES="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan --target "$TARGET" 2>/dev/null || echo "")"
+    # The marker scanner is a structured interface; request JSON explicitly
+    # instead of feeding its human-readable status text into catalog lookup.
+    RUNTIMES="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan --target "$TARGET" --json 2>/dev/null | node -e "const r=JSON.parse(require('fs').readFileSync(0,'utf8')); console.log((r.markers||[]).join(' '));" || echo "")"
     if [[ -z "${RUNTIMES// }" ]]; then
       echo -e "  ${DIM}No incumbent runtime markers in target — installing portable core only.${NC}"
       echo -e "  ${DIM}Add a runtime later: aiw init $TARGET --for <runtime> --merge${NC}"

@@ -47,8 +47,10 @@ function sha256File(p) {
 // prerequisite. A failed (or malformed) producer record is not silently
 // filtered away: it blocks the subject so a partial dispatch cannot advance.
 function filterProducerEvidence(entries) {
-  const producerEntries = (Array.isArray(entries) ? entries : [])
-    .filter((entry) => entry && producerEvidence.PRODUCER_ROLES.has(entry.producer_role));
+  if (!Array.isArray(entries)) throw new Error('producer evidence entries must be an array');
+  // Validate every record before selecting completed evidence. In particular,
+  // an unknown role or malformed record must not disappear through filtering.
+  const producerEntries = entries.map((entry) => producerEvidence.validateEntry(entry));
   return {
     completed: producerEntries.filter((entry) => entry.outcome === 'completed'),
     incomplete: producerEntries.filter((entry) => entry.outcome !== 'completed'),
@@ -110,8 +112,15 @@ function main() {
   // evidence only — no CLI producer claims exist or are accepted.
   const freshness = require('./evidence-freshness');
   const reviewEvidence = require('./review-evidence');
-  const produced = producerEvidence.loadForSubject(head);
-  const producerSelection = filterProducerEvidence(produced.entries || []);
+  let produced;
+  let producerSelection;
+  try {
+    produced = producerEvidence.loadForSubject(head);
+    producerSelection = filterProducerEvidence(produced.entries);
+  } catch (err) {
+    console.error(`release blocked: producer evidence is malformed or unverifiable (${err.message}). Failing closed.`);
+    process.exit(1);
+  }
   if (producerSelection.incomplete.length > 0) {
     const outcome = producerSelection.incomplete[0].outcome || 'missing';
     console.error(`release blocked: producer evidence includes a non-completed execution (SOD_PRODUCER_EXECUTION_INCOMPLETE; outcome=${outcome}). Failing closed.`);

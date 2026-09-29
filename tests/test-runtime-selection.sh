@@ -26,7 +26,7 @@ FIX="$(mktemp -d /tmp/aiw-rt-XXXX)"
 trap 'rm -rf "$FIX"' EXIT
 mkdir -p "$FIX/bin" "$FIX/state" "$FIX/targets"
 # Essentials available inside fixture PATHs (aiw needs node+bash; probes stay isolated).
-for essential in node bash sh; do
+for essential in node bash sh python3; do
   command -v "$essential" >/dev/null 2>&1 && ln -sf "$(command -v "$essential")" "$FIX/bin/$essential"
 done
 

@@ -163,7 +163,7 @@ const re=require('$ROOT/scripts/review-evidence');
 const fe=require('$ROOT/scripts/evidence-freshness');
 const fi=require('$ROOT/scripts/finding-evidence');
 // Developer A produces S
-const devA=id.createLauncherIdentity({agent:'builder',executionId:'e2e-dev',source:'e2e'});
+const devA=id.createLauncherIdentity({agent:'builder',executionId:'e2e-dev',source:'launcher:aiw-run'});
 pe.record({agentIdentity:devA,subjectHash:S,outcome:'completed',sourceRef:'e2e-dev'});
 // deterministic tests pass on S
 const bench={repo_head_sha:S,passed:8,failed:0};

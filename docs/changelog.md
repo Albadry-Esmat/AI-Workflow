@@ -12,6 +12,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ### Wave 3d — specialized pipeline wiring
 
 - Added the subordinate `release-producer` route (`pre-deploy` → `builder`) and its inherited, fail-closed model requirement without changing natural-language primary routing. Release review now rejects non-completed producer evidence, including failed dispatches, before gate consumption; deterministic routing and evidence regressions cover successful, denied, and failed dispatch outcomes.
+- Hardened producer evidence to accept only launcher-owned provenance, validate complete records, reject malformed/ambiguous or unknown-role entries, and fail dispatches when evidence writes fail; release-review now blocks malformed producer stores before gate consumption.
 
 - Reconciled lifecycle records for TASK-0024, TASK-0025, TASK-0026, and TASK-0047 with their implemented and validated deliverables.
 - Recorded the normalized `phase-2b-data-schema` label used by the final data/ML pipeline template.
