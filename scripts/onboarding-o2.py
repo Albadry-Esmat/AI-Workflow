@@ -247,6 +247,24 @@ def mcp_doctor() -> dict[str, Any]:
     return info
 
 
+def opener_doctor() -> list[dict[str, Any]]:
+    """S2 IDE opener status: for opener-launch adapters, opener presence on PATH.
+
+    Names only; never executes the opener. Absent openers mean guidance
+    fallback at start time (fail-safe, never an error here).
+    """
+    items = []
+    for adapter in catalog():
+        if adapter.get("launch_kind") != "opener-launch":
+            continue
+        for opener in adapter.get("openers", []) or []:
+            if not opener.get("verified"):
+                continue
+            items.append({"adapter_id": adapter["id"], "opener": opener.get("executable"),
+                          "verified": True, "present": bool(shutil.which(opener.get("executable", "")))})
+    return items
+
+
 def doctor(as_json: bool) -> int:
     detection = detect_all()
     toolchain = toolchain_check()
@@ -260,6 +278,7 @@ def doctor(as_json: bool) -> int:
         "toolchain": toolchain,
         "runtime_detection": detection,
         "runtime_resolution": {k: v for k, v in resolution.items() if k != "detections"},
+        "ide_openers": opener_doctor(),
         "mcp": mcp,
         "state": {"present": state is not None, "status": "available" if state else "not-started", "path": str(STATE_PATH.relative_to(ROOT))},
         "authentication": {"status": "delegated", "raw_secret_values": 0},

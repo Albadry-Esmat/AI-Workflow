@@ -99,7 +99,7 @@
     },
     "start": {
       "syntax": "aiw start [path] [--for runtime|auto]",
-      "status": "governed-launch-s1"
+      "status": "governed-launch-s2"
     }
   },
   "sequences": {

@@ -62,7 +62,8 @@
       "detect",
       "select",
       "validate",
-      "invoke an externally owned runtime"
+      "invoke an externally owned runtime",
+      "launch a verified IDE opener with the target path only (S2 opener-launch)"
     ],
     "forbidden": [
       "install the runtime",
@@ -70,9 +71,10 @@
       "own its credentials",
       "change its provider account",
       "silently select another runtime",
-      "silently change its model"
+      "silently change its model",
+      "launch an unverified or absent IDE opener"
     ],
-    "amended": "2026-09-27",
-    "amendment": "S1 runtime-neutral execution (P1 Slice S1): governed launch enters scope narrowly; all prohibitions above remain."
+    "amended": "2026-09-29",
+    "amendment": "S2 IDE opener launch + MCP strict start gates (P1 Slice S2): opener-launch enters scope narrowly for catalog-verified openers only, with MCP freshness global and strict dependency gates per MCP-surface adapter; all S1 prohibitions remain, extended to unverified openers."
   }
 }

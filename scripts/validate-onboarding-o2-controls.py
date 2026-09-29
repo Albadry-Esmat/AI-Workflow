@@ -62,8 +62,11 @@ def main() -> int:
     check("demo is deterministic zero-write", policy["demo"]["external_writes"] == 0 and policy["demo"]["no_secret"])
     check("recovery is owned-path-only", policy["recovery"]["rollback_only_owned_paths"] and policy["recovery"]["target_projects_untouched"])
     check("contract has all O2 commands", {"setup", "doctor", "agent_list", "agent_detect", "agent_use", "demo", "auth_status", "recover"}.issubset(contract["commands"]))
-    check("contract keeps login deferred; start is governed S1 launch", contract["commands"]["auth_login"]["status"] == "deferred-runtime-owned" and contract["commands"]["start"]["status"] == "governed-launch-s1")
-    check("catalog has the S1 adapter matrix (9 CLI + 3 IDE guidance)", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command", "cursor-ide", "vscode-copilot", "windsurf-devin"})
+    check("contract keeps login deferred; start is governed S2 launch", contract["commands"]["auth_login"]["status"] == "deferred-runtime-owned" and contract["commands"]["start"]["status"] == "governed-launch-s2")
+    check("catalog has the S2 adapter matrix (9 CLI/generic + 2 opener-launch + 1 IDE guidance)", {a["id"] for a in catalog["adapters"]} == {"opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command", "cursor-ide", "vscode-copilot", "windsurf-devin"})
+    check("opener-launch adapters declare verified openers", all(
+        any(o.get("verified") for o in a.get("openers", []) or [])
+        for a in catalog["adapters"] if a.get("launch_kind") == "opener-launch"))
     check("fixtures cover required O2 scenarios", {f["id"] for f in fixtures["fixtures"]} >= {"setup-resume-after-failure", "explicit-missing-fails", "auto-deterministic", "no-runtime-demo", "auth-delegated", "recover-owned-state"})
 
     with tempfile.TemporaryDirectory(prefix="aiw-o2-controls-") as raw:

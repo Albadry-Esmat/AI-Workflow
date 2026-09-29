@@ -87,7 +87,7 @@
         "amended": {"type": "string", "format": "date"},
         "amendment": {"type": "string", "minLength": 1}
       },
-      "description": "S1 narrowly permits governed runtime launch (detect/select/validate/invoke externally owned runtimes) while retaining all prohibitions."
+      "description": "S1 narrowly permits governed runtime launch (detect/select/validate/invoke externally owned runtimes) while retaining all prohibitions. S2 extends allowed launch to catalog-verified IDE openers with target path only."
     }
   }
 }
