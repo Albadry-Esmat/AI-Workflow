@@ -46,7 +46,7 @@ function main() {
   opencode.start(args.parent, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity: parent_identity });
   const evidenceFailures = [];
   const results = args.tasks.map((t, i) => {
-    const worker_identity = identity.createWorkerIdentity({ agent: r.agent, parentExecutionId: args.parent, workerIndex: i, source: 'launcher:orchestrate-workers' });
+      const worker_identity = identity.createWorkerDispatchIdentity({ agent: r.agent, parentExecutionId: args.parent, workerIndex: i, source: 'launcher:orchestrate-workers' });
     const worker = worker_identity.execution_id;
     opencode.start(worker, { model_id, tier_hint: r.tier_hint, pipeline: r.pipeline, model_resolution, agent_identity: worker_identity });
     const res = opencode.send(worker, { prompt: t, model_id, tier_hint: r.tier_hint, agent_identity: worker_identity, tool: 'read', targetPath: 'docs/', model_resolution });

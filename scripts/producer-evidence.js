@@ -215,6 +215,9 @@ function producersPath(subjectHash) {
 // malformed input (fail-closed); never invents attribution.
 function record({ agentIdentity, subjectHash, outcome, sourceRef }) {
   const valid = identity.validateAgentIdentity(agentIdentity, 'producer.agentIdentity');
+  if (!identity.isLauncherIssued(agentIdentity)) {
+    throw evidenceError('producer identity was not issued by a trusted launcher dispatch (launcher-owned provenance required)', 'PRODUCER_PROVENANCE_INVALID');
+  }
   assertLauncherIdentity(valid);
   const subject = normalizeSubjectHash(subjectHash);
   if (!['completed', 'failed'].includes(outcome)) {

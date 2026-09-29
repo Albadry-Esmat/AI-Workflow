@@ -54,6 +54,12 @@ const ROLE_BY_AGENT = {
 const REVIEWER_ROLES = new Set(['reviewer']);
 const GATEKEEPER_ROLES = new Set(['gatekeeper']);
 
+// Runtime-only capability marker.  It is deliberately not part of the
+// serialized identity envelope: producer evidence must receive the original
+// object issued by a launcher, not a caller-created object that merely copies
+// launcher-looking fields.
+const LAUNCHER_ISSUED = new WeakSet();
+
 const ENVELOPE_KEYS = new Set([
   'identity_version', 'agent', 'principal', 'role',
   'execution_id', 'parent_execution_id', 'worker', 'source',
@@ -115,6 +121,14 @@ function createLauncherIdentity({ agent, executionId, source }) {
   };
 }
 
+// Attribution identities remain constructible for review/test fixtures.  Only
+// the dispatch entrypoints receive the producer-evidence capability marker.
+function createLauncherDispatchIdentity(params) {
+  const value = createLauncherIdentity(params);
+  LAUNCHER_ISSUED.add(value);
+  return value;
+}
+
 // Worker identity: same agent/role as the parent route, distinguished by a
 // stable execution-scoped worker thread id, with explicit parent lineage.
 function createWorkerIdentity({ agent, parentExecutionId, workerIndex, source }) {
@@ -135,6 +149,16 @@ function createWorkerIdentity({ agent, parentExecutionId, workerIndex, source })
     worker: { index: workerIndex, id: workerId },
     source,
   };
+}
+
+function createWorkerDispatchIdentity(params) {
+  const value = createWorkerIdentity(params);
+  LAUNCHER_ISSUED.add(value);
+  return value;
+}
+
+function isLauncherIssued(value) {
+  return Boolean(value && typeof value === 'object' && LAUNCHER_ISSUED.has(value));
 }
 
 // Orchestrator identity: the fan-out coordinator itself (distinct role from
@@ -226,8 +250,11 @@ module.exports = {
   createPrincipal,
   validatePrincipal,
   createLauncherIdentity,
+  createLauncherDispatchIdentity,
   createWorkerIdentity,
+  createWorkerDispatchIdentity,
   createOrchestratorIdentity,
+  isLauncherIssued,
   validateAgentIdentity,
   describeIdentity,
 };

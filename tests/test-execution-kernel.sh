@@ -48,7 +48,7 @@ AIW_AVAILABLE_MODELS="openai/gpt-5.6,openai/gpt-5.4" AIW_RUNTIME_MODEL="openai/g
 node "$ROOT/scripts/aiw-run.js" --template release-producer --thread "$TDENY" --tool write --path docs/a.md "denied release write" > /tmp/release-producer-denied.json \
 && node -e "const fs=require('fs'); const h=require('child_process').execFileSync('git',['-C','$ROOT','rev-parse','HEAD'],{encoding:'utf8'}).trim(); const p='$ROOT/.opencode/state/producers/'+h+'.jsonl'; const rows=fs.existsSync(p)?fs.readFileSync(p,'utf8').split('\\n').filter(Boolean).map(JSON.parse).filter((x)=>x.source_ref==='$TDENY'):[]; const out=require('/tmp/release-producer-denied.json'); if(!out.result.denied||rows.length!==0)process.exit(1)" \
 && ok "denied builder dispatch creates no producer evidence" || bad "denied producer dispatch"
-node -e "const rr=require('$ROOT/scripts/release-review'); const pe=require('$ROOT/scripts/producer-evidence'); const id=require('$ROOT/scripts/execution-identity'); const h='ab'.repeat(32); pe.record({agentIdentity:id.createLauncherIdentity({agent:'builder',executionId:'test-fixture-phased-release-failed',source:'launcher:aiw-run'}),subjectHash:h,outcome:'failed',sourceRef:'test-fixture-phased-release-failed'}); const s=rr.filterProducerEvidence(pe.loadForSubject(h).entries); if(s.completed.length!==0||s.incomplete.length!==1||s.incomplete[0].outcome!=='failed')process.exit(1); require('fs').rmSync(pe.producersPath(h),{force:true})" \
+node -e "const rr=require('$ROOT/scripts/release-review'); const pe=require('$ROOT/scripts/producer-evidence'); const id=require('$ROOT/scripts/execution-identity'); const h='ab'.repeat(32); pe.record({agentIdentity:id.createLauncherDispatchIdentity({agent:'builder',executionId:'test-fixture-phased-release-failed',source:'launcher:aiw-run'}),subjectHash:h,outcome:'failed',sourceRef:'test-fixture-phased-release-failed'}); const s=rr.filterProducerEvidence(pe.loadForSubject(h).entries); if(s.completed.length!==0||s.incomplete.length!==1||s.incomplete[0].outcome!=='failed')process.exit(1); require('fs').rmSync(pe.producersPath(h),{force:true})" \
 && ok "failed builder dispatch is retained and cannot satisfy producer prerequisite" || bad "failed producer dispatch"
 # 5. checkpointer resume + idempotent task
 node -e "
@@ -109,7 +109,7 @@ node -e "
 const pe=require('$ROOT/scripts/producer-evidence');
 const re=require('$ROOT/scripts/review-evidence');
 const id=require('$ROOT/scripts/execution-identity');
-pe.record({agentIdentity:id.createLauncherIdentity({agent:'builder',executionId:'$TREL-producer',source:'launcher:aiw-run'}),subjectHash:'$FIXHEAD',outcome:'completed',sourceRef:'$TREL-producer'});
+ pe.record({agentIdentity:id.createLauncherDispatchIdentity({agent:'builder',executionId:'$TREL-producer',source:'launcher:aiw-run'}),subjectHash:'$FIXHEAD',outcome:'completed',sourceRef:'$TREL-producer'});
 re.record({reviewerIdentity:id.createLauncherIdentity({agent:'reviewer',executionId:'$TREL-review',source:'test-fixture-phased'}),subjectHash:'$FIXHEAD',executionId:'$TREL-review',outcome:'approve',reason:'kernel fixture review'});
 " > /dev/null || { bad "release fixture evidence"; }
 REL_DID=$(node -e "
