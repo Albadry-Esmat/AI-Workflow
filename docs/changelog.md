@@ -11,6 +11,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ### Wave 3d — specialized pipeline wiring
 
+- Reconciled lifecycle records for TASK-0024, TASK-0025, TASK-0026, and TASK-0047 with their implemented and validated deliverables.
+- Recorded the normalized `phase-2b-data-schema` label used by the final data/ML pipeline template.
 - Added routing, schema, workflow, and registry documentation for the `data-ml-pipeline`, `microservices`, and `serverless-edge` templates.
 - Synchronized the requested skill versions across the index and graph, and wired the existing API contract, bundle-size, and environment-configuration guard nodes in the graph.
 - Updated new-template version pins where they were stale against current skill frontmatter.
