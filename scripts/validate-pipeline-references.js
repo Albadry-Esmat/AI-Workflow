@@ -14,6 +14,18 @@ const sourceSkills = new Set(
 const references = [];
 const errors = [];
 
+// Pipeline-scoped role specs: skills/pipelines/<name>.md files with frontmatter
+// `name:` are dispatch roles (e.g. phase-4c reviewer roles, phase-4g change-request
+// handler), not portable skill directories. A reference is valid if it resolves
+// to either namespace. See work-items/TASK-0049-validate-pipeline-references-debt.md.
+const pipelineRoles = new Set();
+for (const filename of fs.readdirSync(pipelineRoot).filter((file) => file.endsWith(".md")).sort()) {
+  const text = fs.readFileSync(path.join(pipelineRoot, filename), "utf8");
+  const match = text.match(/^---\s*\n([\s\S]*?)\n---/);
+  const nameMatch = match && match[1].match(/^name:\s*(.+?)\s*$/m);
+  if (nameMatch) pipelineRoles.add(nameMatch[1]);
+}
+
 function addSkillReference(pipeline, phase, skill) {
   if (!skill || typeof skill.name !== "string") {
     errors.push(`${pipeline}:${phase} has a skill entry without a string name`);
@@ -21,7 +33,9 @@ function addSkillReference(pipeline, phase, skill) {
   }
   const name = skill.name.split("@")[0];
   references.push({ pipeline, phase, name });
-  if (!sourceSkills.has(name)) errors.push(`${pipeline}:${phase} references unknown skill: ${skill.name}`);
+  if (!sourceSkills.has(name) && !pipelineRoles.has(name)) {
+    errors.push(`${pipeline}:${phase} references unknown skill: ${skill.name}`);
+  }
 }
 
 for (const filename of fs.readdirSync(pipelineRoot).filter((file) => file.endsWith(".json")).sort()) {
@@ -51,6 +65,6 @@ for (const filename of fs.readdirSync(pipelineRoot).filter((file) => file.endsWi
 
 const uniqueReferences = new Set(references.map((reference) => reference.name));
 console.log(`Pipeline reference validation: ${errors.length === 0 ? "PASS" : "FAIL"}`);
-console.log(`  pipelines=${fs.readdirSync(pipelineRoot).filter((file) => file.endsWith(".json")).length} references=${references.length} uniqueSkills=${uniqueReferences.size} sourceSkills=${sourceSkills.size}`);
+console.log(`  pipelines=${fs.readdirSync(pipelineRoot).filter((file) => file.endsWith(".json")).length} references=${references.length} uniqueSkills=${uniqueReferences.size} sourceSkills=${sourceSkills.size} pipelineRoles=${pipelineRoles.size}`);
 for (const error of errors) console.log(`  FAIL: ${error}`);
 if (errors.length > 0) process.exit(1);

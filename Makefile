@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-runtime-parity validate-contracts validate-model-requirements test-model-boundary test-runtime-selection test-mcp-projections test-aiw-init validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
+.PHONY: help setup health validate validate-runtime-parity validate-contracts validate-pipeline-references validate-model-requirements test-model-boundary test-runtime-selection test-mcp-projections test-aiw-init validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -56,6 +56,7 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@bash tests/test-mcp-projections.sh
 	@bash tests/test-aiw-init.sh
 	@$(MAKE) validate-contracts
+	@$(MAKE) validate-pipeline-references
 	@$(MAKE) validate-model-requirements
 	@$(MAKE) validate-pipeline-gates
 	@$(MAKE) test-model-boundary
@@ -81,6 +82,9 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
 	@$(PYTHON) scripts/validate-execution-contracts.py
+
+validate-pipeline-references: ## Validate pipeline skill references resolve to skills or pipeline role specs
+	@node scripts/validate-pipeline-references.js
 
 validate-model-requirements: ## Validate single model authority, router references, and runtime boundary
 	@$(PYTHON) scripts/validate-model-requirements.py

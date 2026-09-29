@@ -435,6 +435,10 @@ jobs:
         if: success() || failure()
         run: bash scripts/validate-runtime-parity.sh
 
+      - name: "Pipeline reference gate (skills + pipeline role specs)"
+        if: success() || failure()
+        run: node scripts/validate-pipeline-references.js
+
       - name: Summary
         if: always()
         run: echo "=== Skill validation complete ==="
