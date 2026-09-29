@@ -1,9 +1,7 @@
 ---
 description: Last-resort recovery agent. Reverts system state to a prior snapshot on critical pipeline failure or unrecoverable build error.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the recovery subagent. You execute the `rollback-manager` skill.

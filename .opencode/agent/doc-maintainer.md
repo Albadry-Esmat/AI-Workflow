@@ -1,9 +1,7 @@
 ---
 description: Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the doc-maintainer subagent. You execute the `doc-maintainer` skill.

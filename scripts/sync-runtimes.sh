@@ -9,12 +9,14 @@
 #   - Validates: Case-B invariant (no .opencode/skills bodies), parity
 #     (index.yaml == .agents/skills count), no cross-root duplicate bodies.
 #
-# Explicitly OUT OF SCOPE (P1/P2): MCP projections, rules, custom agents,
-# workflows, GEMINI.md, packaging, marketplaces, runtime installation.
+# S1: skills phase (P0, unchanged) + MCP phase (scripts/sync-mcp.js engine).
+# Explicitly OUT OF SCOPE: rules, custom agents, workflows, GEMINI.md,
+# packaging, marketplaces, runtime installation.
 #
 # Usage:
-#   bash scripts/sync-runtimes.sh            # generate/update adapters
-#   bash scripts/sync-runtimes.sh --check    # drift gate (CI): exit 1 on diff
+#   bash scripts/sync-runtimes.sh                 # sync skills + MCP projections
+#   bash scripts/sync-runtimes.sh --skills-only   # skills phase only (P0 behavior)
+#   bash scripts/sync-runtimes.sh --check         # drift gate for both phases (CI)
 #
 # Deterministic: sorted skill names, relative symlinks, LF. No network, no secrets.
 # Portable: no mapfile/arrays (macOS bash 3.2 compatible).
@@ -24,9 +26,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 CHECK_MODE="false"
-if [[ "${1:-}" == "--check" ]]; then
-  CHECK_MODE="true"
-fi
+SKILLS_ONLY="false"
+for arg in "$@"; do
+  case "$arg" in
+    --check) CHECK_MODE="true" ;;
+    --skills-only) SKILLS_ONLY="true" ;;
+  esac
+done
 
 CANON=".agents/skills"
 CLAUDE=".claude/skills"
@@ -158,6 +164,20 @@ rm -f /tmp/aiw_proxies_$$.txt
 
 rm -f "$SKILLS_LIST_FILE"
 trap - EXIT
+
+# ── MCP phase (S1; skipped with --skills-only) ───────────────────────────────
+if [[ "$SKILLS_ONLY" != "true" ]]; then
+  echo "--- MCP projections (config/mcp-manifest.json) ---"
+  if [[ "$CHECK_MODE" == "true" ]]; then
+    if ! node "$ROOT/scripts/sync-mcp.js" --check; then
+      fail "MCP projection drift (run 'bash scripts/sync-runtimes.sh' to regenerate)"
+    fi
+  else
+    if ! node "$ROOT/scripts/sync-mcp.js" --write; then
+      fail "MCP projection generation failed"
+    fi
+  fi
+fi
 
 if [[ "$CHECK_MODE" == "true" ]]; then
   if [[ "$ERRORS" -gt 0 ]]; then

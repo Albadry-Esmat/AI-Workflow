@@ -154,6 +154,54 @@
           },
           "description": "P0 verified skill/instruction/MCP paths per official runtime docs. skills_support=native means the runtime discovers .agents/skills/ directly; adapter-required (Claude Code) means a generated link farm is maintained; generic means unverified."
         },
+        "launch_kind": {
+          "type": "string",
+          "enum": ["cli-direct", "ide-guidance", "generic"],
+          "description": "S1 how aiw start uses this runtime. cli-direct: executed with CWD=target. ide-guidance: never executed; guidance plus best-effort documented opener. generic: user-provided command executed with CWD=target."
+        },
+        "project_markers": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "description": "S1 repository markers mapping a target directory to this runtime (selection layer only, never installation)."
+        },
+        "openers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["executable", "verified"],
+            "properties": {
+              "executable": {"type": "string", "minLength": 1},
+              "verified": {"type": "boolean"}
+            }
+          },
+          "description": "S1 best-effort GUI project openers for ide-guidance runtimes. Attempted only after a successful probe; absence degrades to guidance, never failure. verified=false means unconfirmed — never attempted."
+        },
+        "mcp_projection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "remote_url_field", "env_syntax", "project_scoped"],
+          "properties": {
+            "path": {"type": ["string", "null"], "description": "S1 generated projection path, or null when S1 generates nothing for this runtime."},
+            "future_path": {"type": ["string", "null"], "description": "Declared S2 target; informational only."},
+            "remote_url_field": {"type": ["string", "null"], "description": "Remote endpoint field name (url vs serverUrl vs httpUrl)."},
+            "env_syntax": {"type": ["string", "null"], "description": "Secret-reference syntax, e.g. ${VAR}, {env:VAR}, ${env:NAME}."},
+            "project_scoped": {"type": ["boolean", "null"], "description": "Whether the runtime reads project-level MCP config."},
+            "shared_with": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Adapter IDs sharing the same generated file (Q2)."},
+            "note": {"type": "string", "description": "Compatibility or scope notes."}
+          },
+          "description": "S1 declarative MCP projection descriptor. AIW never writes outside the repository."
+        },
+        "adapter_paths": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "agents": {"type": ["string", "null"]},
+            "rules": {"type": ["string", "null"]},
+            "hooks": {"type": ["string", "null"]}
+          },
+          "description": "S1 informational runtime-specific paths (agents/rules/hooks). Generation of these is S2 or later; null means n/a."
+        },
         "capabilities": {
           "type": "object",
           "additionalProperties": false,

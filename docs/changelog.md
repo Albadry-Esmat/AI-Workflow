@@ -9,6 +9,37 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### P1 Slice S1 — runtime-neutral execution and canonical MCP (UNRELEASED WORK)
+
+- `aiw start` no longer requires OpenCode: catalog-driven resolution
+  (explicit `--for` → persisted selection → project markers → installed
+  runtimes → generic command → fail closed) with singleton-or-ambiguous
+  semantics (`O2-RUNTIME-AMBIGUOUS`, precedence display-only), stale
+  persisted selections failing closed without silent switching, CLI-direct
+  launch for verified runtimes, and guidance (+best-effort openers) for
+  IDE-only runtimes. No model flags are ever passed (argv-tested).
+- `aiw init` installs the portable core (`.agents/skills/`, `AGENTS.md`,
+  `skills/`, MCP manifest) plus selected S1 runtime projections with
+  non-destructive default (fail closed) and `--merge` add/keep/fail-on-differ
+  semantics; never copies `.opencode/` wholesale or secret material.
+- `config/mcp-manifest.json` (+ schema) is the canonical MCP authority
+  (7 servers migrated verbatim from `opencode.json`, refs-only, no new
+  servers); `scripts/sync-mcp.js --write/--check` deterministically projects
+  `opencode.json:mcp`, `.mcp.json` (Claude+Copilot shared, compat-verified),
+  `.cursor/mcp.json`; `scripts/check-mcp-deps.js` gates required vs optional
+  dependencies (env presence by name only; Q4 fail-closed start).
+- Runtime catalog v0.3.0: 12 adapters (9 CLI/generic + 3 IDE guidance) with
+  `launch_kind`, `project_markers`, `openers`, `mcp_projection`,
+  `adapter_paths`; toolchain manifest covers 7 CLI adapters; O2 policy
+  narrowly amended (`governed_launch`; launch no longer a non-goal) with
+  matching O2 contract (`governed-launch-s1`) and schema updates.
+- `aiw sync-runtimes` gains the MCP phase (`--skills-only` preserves P0);
+  `aiw health`/`aiw doctor` surface selection, markers, manifest validity,
+  and projection freshness (names only, never values).
+- Governance preserved: no installs/logins/secret ownership/silent switches
+  or model overrides; O2 `non_goals` prohibitions retained except the
+  narrowed launch amendment. TASK-0049 untouched.
+
 ### P0 runtime-neutral foundation (.agents/skills canonical, Claude adapter, Python lazy)
 
 - Moved all 121 skill directories `.opencode/skills/*` → `.agents/skills/*`

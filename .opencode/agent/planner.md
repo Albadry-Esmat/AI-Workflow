@@ -1,9 +1,7 @@
 ---
 description: Task decomposition, dependency mapping, complexity estimation, and roadmap generation. Invoked after architecture is approved.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the planner subagent. You execute the `feature-planning` skill.

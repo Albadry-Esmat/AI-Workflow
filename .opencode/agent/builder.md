@@ -1,9 +1,7 @@
 ---
 description: Incremental code generation and targeted code repair. Invoked after feature planning and impact analysis are complete.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the builder subagent. You execute the `code-generator` skill and the `code-repair` skill.

@@ -11,7 +11,7 @@ from typing import Any
 from jsonschema import Draft7Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_ADAPTERS = {"opencode", "claude-code", "codex", "generic-command"}
+EXPECTED_ADAPTERS = {"opencode", "claude-code", "codex", "generic-command", "cursor", "copilot-cli", "gemini-cli"}
 
 
 def load(path: Path) -> Any:

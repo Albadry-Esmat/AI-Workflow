@@ -410,6 +410,31 @@ jobs:
         if: success() || failure()
         run: bash tests/test-opencode-discovery.sh
 
+      # ── S1 runtime-neutral gates ──────────────────────────────────────────
+      - name: "S1 — MCP manifest + projections (sync-mcp --check)"
+        if: success() || failure()
+        run: node scripts/sync-mcp.js --check
+
+      - name: "S1 — MCP dependency gate (warn mode)"
+        if: success() || failure()
+        run: node scripts/check-mcp-deps.js --adapter claude-code --warn
+
+      - name: "S1 — Runtime selection fixtures"
+        if: success() || failure()
+        run: bash tests/test-runtime-selection.sh
+
+      - name: "S1 — MCP projection fixtures"
+        if: success() || failure()
+        run: bash tests/test-mcp-projections.sh
+
+      - name: "S1 — aiw init fixtures"
+        if: success() || failure()
+        run: bash tests/test-aiw-init.sh
+
+      - name: "S1 — Runtime parity gates"
+        if: success() || failure()
+        run: bash scripts/validate-runtime-parity.sh
+
       - name: Summary
         if: always()
         run: echo "=== Skill validation complete ==="

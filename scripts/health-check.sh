@@ -233,6 +233,57 @@ for dir in "${REQUIRED_DIRS[@]}"; do
   fi
 done
 
+# ── 11. Runtime selection (S1; warn-only — never fatal) ───────────────────────
+header "Runtime selection"
+
+if [[ -n "$PYTHON_BIN" ]] && [[ -x "$PYTHON_BIN" ]]; then
+  RESOLVE_JSON="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-resolve --target "$ROOT" --for auto --dry-run --json 2>/dev/null)" || RESOLVE_JSON=""
+  if [[ -n "$RESOLVE_JSON" ]]; then
+    R_VERDICT="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).verdict||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+    R_ADAPTER="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).adapter_id||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+    R_MODE="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).selection_mode||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+    if [[ "$R_VERDICT" == "pass" ]]; then
+      _ok "runtime resolved: $R_ADAPTER ($R_MODE)"
+    else
+      R_CODE="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).error_code||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+      _warn "runtime not resolved ($R_CODE) — run: aiw agent detect, then aiw agent use <runtime>"
+    fi
+    R_WARN="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).warning||'')" <<<"$RESOLVE_JSON" 2>/dev/null)"
+    [[ -n "$R_WARN" ]] && _warn "selection note: $R_WARN"
+  else
+    _warn "runtime resolution unavailable (python3 required) — run: aiw agent detect"
+  fi
+else
+  _warn "runtime resolution unavailable (python3 required for selection)"
+fi
+
+# ── 12. MCP manifest + projections (S1; warn-only in health) ──────────────────
+header "MCP configuration"
+
+if [[ -f "$ROOT/config/mcp-manifest.json" ]]; then
+  _ok "config/mcp-manifest.json present (canonical MCP authority)"
+else
+  _warn "config/mcp-manifest.json missing — MCP projections unavailable"
+fi
+if node "$ROOT/scripts/sync-mcp.js" --check >/dev/null 2>&1; then
+  _ok "MCP projections fresh (opencode.json, .mcp.json, .cursor/mcp.json)"
+else
+  _warn "MCP projections stale — run: aiw sync-runtimes"
+fi
+# Env-reference presence only (names, never values).
+if [[ -n "${R_ADAPTER:-}" && "$R_ADAPTER" != "undefined" && "$R_ADAPTER" != "" ]]; then
+  MCP_DEPS="$(node "$ROOT/scripts/check-mcp-deps.js" --adapter "$R_ADAPTER" --warn 2>&1)" || true
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    case "$line" in
+      *"WARN"*) _warn "mcp ($R_ADAPTER): ${line#*WARN*: }" ;;
+      *) : ;;
+    esac
+  done <<< "$MCP_DEPS"
+else
+  _warn "MCP dependency check skipped (no runtime resolved)"
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo
 echo -e "${BOLD}════════════════════════════════════════${NC}"

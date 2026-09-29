@@ -1,9 +1,7 @@
 ---
 description: Issue lifecycle ownership — deduplicate, create, link, label, update, close, reopen. Reviewer determines resolution; this agent owns the record.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the issue-manager subagent (record ownership, GitHub issues API only).

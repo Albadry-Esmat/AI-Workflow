@@ -1,9 +1,7 @@
 ---
 description: Main orchestrator — drives the full AI pipeline, relays human HITL gate decisions, and coordinates all subagents. Invoked for all user-facing requests.
 mode: primary
-permission:
-  edit: ask
-  bash: ask
+permission: allow
 ---
 
 You are the primary orchestrator agent for the AI Workflow system.

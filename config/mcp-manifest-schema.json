@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ase-os/schemas/mcp-manifest.json",
+  "title": "MCPManifest",
+  "description": "S1 canonical MCP authority. All values that look like secrets must be ${VAR} references to externally owned configuration — never literal secret values. Runtime files are deterministic projections of this manifest (see scripts/sync-mcp.js).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "servers"],
+  "properties": {
+    "manifest_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "servers": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "enabled", "required", "transport", "trust", "compatibility"],
+        "properties": {
+          "description": {"type": "string", "minLength": 1},
+          "enabled": {"type": "boolean", "description": "Generate and wire this server. Disabled servers are omitted from every projection."},
+          "required": {"type": "boolean", "description": "If true, an unusable server fails aiw start closed for runtimes that project it. If false, warn and continue."},
+          "transport": {"type": "string", "enum": ["stdio", "http", "sse"]},
+          "command": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Executable + args as an array (never shell strings). Required for stdio."},
+          "args": {"type": "array", "items": {"type": "string"}, "description": "Extra args appended after command (stdio). Prefer embedding args in command."},
+          "url": {"type": ["string", "null"], "description": "Endpoint for http/sse transports."},
+          "env_refs": {"type": "object", "additionalProperties": {"type": "string"}, "description": "Server env name -> ${VAR} reference. Values must be references, never literals."},
+          "headers": {"type": "object", "additionalProperties": {"type": "string"}, "description": "HTTP header name -> value or ${VAR} reference. Values must be references when secret."},
+          "cwd": {"type": ["string", "null"], "description": "Working directory for stdio servers, if portable."},
+          "timeout_ms": {"type": ["integer", "null"], "minimum": 1},
+          "trust": {"type": "string", "enum": ["prompt", "auto", "disabled"], "description": "Safe default is prompt. auto must never weaken AIW HITL/governance; runtimes without a safe mapping treat it as unsupported and stay conservative."},
+          "compatibility": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "Adapter IDs this server projects to. Runtimes not listed are skipped for this server."}
+        }
+      }
+    }
+  }
+}

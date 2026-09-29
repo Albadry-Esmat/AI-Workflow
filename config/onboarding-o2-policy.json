@@ -8,7 +8,17 @@
   },
   "selection": {
     "catalog_path": "config/agent-runtime-catalog.json",
-    "auto_precedence": ["opencode", "claude-code", "codex", "copilot-cli", "antigravity", "cursor", "gemini-cli", "aider", "generic-command"],
+    "auto_precedence": [
+      "opencode",
+      "claude-code",
+      "codex",
+      "copilot-cli",
+      "antigravity",
+      "cursor",
+      "gemini-cli",
+      "aider",
+      "generic-command"
+    ],
     "explicit_missing_fails": true,
     "silent_fallback": false
   },
@@ -45,7 +55,24 @@
     "Automate provider or runtime login",
     "Store raw runtime, provider, or GitHub secrets",
     "Copy .env or secrets into a target project",
-    "Launch a runtime through a provider-specific adapter",
     "Mutate target projects during setup, detection, selection, or demo"
-  ]
+  ],
+  "governed_launch": {
+    "allowed": [
+      "detect",
+      "select",
+      "validate",
+      "invoke an externally owned runtime"
+    ],
+    "forbidden": [
+      "install the runtime",
+      "authenticate the runtime",
+      "own its credentials",
+      "change its provider account",
+      "silently select another runtime",
+      "silently change its model"
+    ],
+    "amended": "2026-09-27",
+    "amendment": "S1 runtime-neutral execution (P1 Slice S1): governed launch enters scope narrowly; all prohibitions above remain."
+  }
 }

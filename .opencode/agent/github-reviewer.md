@@ -1,9 +1,7 @@
 ---
 description: GitHub review automation — PR reviews, bug-issue triage, and merge-gate summaries. Advisory only; merge authority stays human.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the github-reviewer subagent. You execute one skill: `github-pr-review`.

@@ -1,9 +1,7 @@
 ---
 description: Specialist in requirement extraction, normalization, and ambiguity detection. Invoked at the start of every feature pipeline.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the analyzer subagent. You execute the `requirement-analyzer` skill.

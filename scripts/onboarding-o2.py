@@ -148,7 +148,13 @@ def version_from_output(output: str) -> str | None:
 def safe_executable(adapter: dict[str, Any]) -> str | None:
     executable = adapter["detection"]["executable"]
     if executable == "user-defined":
-        executable = os.environ.get("AIW_AGENT_COMMAND", "").strip()
+        # Operator-provided command line: probe its first token only. The full
+        # string is rejected if it contains shell metacharacters; aiw start
+        # word-splits it identically at launch.
+        full = os.environ.get("AIW_AGENT_COMMAND", "").strip()
+        if not full or any(char in full for char in ";&|<>$`\n"):
+            return None
+        executable = full.split()[0]
     if not executable or any(char in executable for char in ";&|<>$`\n"):
         return None
     return shutil.which(executable) or (executable if Path(executable).is_file() else None)
@@ -212,16 +218,49 @@ def toolchain_check() -> dict[str, Any]:
         return result
 
 
+def mcp_doctor() -> dict[str, Any]:
+    """S1 MCP diagnostics: manifest validity (names only) + projection freshness."""
+    manifest_path = CONFIG / "mcp-manifest.json"
+    schema_path = CONFIG / "mcp-manifest-schema.json"
+    info: dict[str, Any] = {"manifest_present": manifest_path.is_file(), "manifest_valid": False,
+                            "projections_fresh": False, "servers": [], "raw_secret_values": 0}
+    if not info["manifest_present"]:
+        return info
+    try:
+        import jsonschema  # type: ignore
+
+        manifest = load_json(manifest_path)
+        jsonschema.validate(manifest, load_json(schema_path))
+        info["manifest_valid"] = True
+        info["servers"] = sorted(manifest.get("servers", {}).keys())
+    except Exception as exc:
+        info["manifest_error"] = type(exc).__name__
+        return info
+    try:
+        completed = subprocess.run(["node", str(ROOT / "scripts/sync-mcp.js"), "--check"],
+                                   cwd=ROOT, capture_output=True, text=True, check=False)
+        info["projections_fresh"] = completed.returncode == 0
+        if completed.returncode != 0:
+            info["projections_output"] = (completed.stdout + completed.stderr)[-500:]
+    except (OSError, subprocess.SubprocessError):
+        info["projections_error"] = "node unavailable"
+    return info
+
+
 def doctor(as_json: bool) -> int:
     detection = detect_all()
     toolchain = toolchain_check()
     state = load_state()
+    mcp = mcp_doctor()
+    resolution = resolve_runtime("auto", ROOT, dry_run=True)
     report = {
         "schema_version": "1.0.0",
         "command": "aiw doctor",
         "timestamp": now(),
         "toolchain": toolchain,
         "runtime_detection": detection,
+        "runtime_resolution": {k: v for k, v in resolution.items() if k != "detections"},
+        "mcp": mcp,
         "state": {"present": state is not None, "status": "available" if state else "not-started", "path": str(STATE_PATH.relative_to(ROOT))},
         "authentication": {"status": "delegated", "raw_secret_values": 0},
         "required_failures": len(toolchain.get("failures", [])),
@@ -245,38 +284,168 @@ def agent_detect(as_json: bool) -> int:
     return 0
 
 
-def agent_use(adapter_id: str, as_json: bool) -> int:
+def scan_markers(target: Path) -> list[str]:
+    """S1 adapter IDs whose project_markers exist in target (selection input only)."""
+    found: list[str] = []
+    try:
+        entries = {entry.name for entry in target.iterdir()}
+    except OSError:
+        return found
+    for adapter in catalog():
+        for marker in adapter.get("project_markers", []) or []:
+            if marker.rstrip("/") in entries:
+                found.append(adapter["id"])
+                break
+    order = [a["id"] for a in catalog()]
+    return sorted(found, key=order.index)
+
+
+def display_order() -> list[str]:
+    """Catalog precedence orders candidate display only; it never picks a runtime."""
+    return load_json(POLICY_PATH)["selection"]["auto_precedence"]
+
+
+def resolve_runtime(for_id: str, target: Path, dry_run: bool) -> dict[str, Any]:
+    """S1 deterministic runtime resolution (levels 1-6). Persists unless dry_run."""
     adapters = {a["id"]: a for a in catalog()}
-    if adapter_id != "auto" and adapter_id not in adapters:
+    detection = detect_all()
+    by_id = {item["adapter_id"]: item for item in detection["results"]}
+    available = {aid for aid, item in by_id.items() if item.get("available")}
+    marked = scan_markers(target)
+
+    def persist(chosen: str, mode: str) -> dict[str, Any]:
+        record = {"adapter_id": chosen, "selection_mode": mode, "availability": "detected",
+                  "version": by_id[chosen].get("version"), "selected_at": now(), "evidence_recorded": True}
+        if not dry_run:
+            state = load_state() or initial_state("apply")
+            state["runtime_selection"] = record
+            mark_step(state, "runtime-select", "passed", f"selected {chosen} ({mode})")
+            append_evidence("runtime-selected", {"adapter_id": chosen, "selection_mode": mode,
+                                                 "version": record["version"], "external_writes": 0, "secrets_seen": False})
+        return record
+
+    def ambiguous(candidates: list[str], level: str) -> dict[str, Any]:
+        ordered = [c for c in display_order() if c in candidates]
+        return {"verdict": "fail", "error_code": "O2-RUNTIME-AMBIGUOUS", "level": level,
+                "candidates": ordered, "fallback": False,
+                "guidance": "Multiple runtimes are equally valid. Run: aiw agent use <runtime> — " + ", ".join(ordered)}
+
+    # Level 1 — explicit CLI argument.
+    if for_id != "auto":
+        if for_id not in adapters:
+            return {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": for_id, "fallback": False}
+        adapter = adapters[for_id]
+        if adapter.get("launch_kind") == "ide-guidance":
+            if for_id in marked or not marked:
+                record = persist(for_id, "explicit-arg-guidance")
+                return {"verdict": "pass", **record, "launch": "external-guidance",
+                        "reason": "explicit IDE runtime selection; external launch required"}
+            return {"verdict": "fail", "error_code": "O2-ADAPTER-MISSING", "adapter_id": for_id,
+                    "selection_mode": "explicit", "fallback": False,
+                    "guidance": f"Target has no {for_id} project markers ({', '.join(marked) or 'none found'})"}
+        if for_id not in available:
+            return {"verdict": "fail", "error_code": "O2-ADAPTER-MISSING", "adapter_id": for_id,
+                    "selection_mode": "explicit", "fallback": False, "detection": by_id.get(for_id),
+                    "guidance": f"Install {adapter['display_name']} or run: aiw agent detect"}
+        record = persist(for_id, "explicit-arg")
+        return {"verdict": "pass", **record, "fallback": False}
+
+    # Level 2 — explicitly persisted selection (stale fails closed, never switches).
+    state = load_state()
+    persisted = (state or {}).get("runtime_selection", {}).get("adapter_id")
+    stale_note = None
+    if persisted:
+        if persisted not in adapters:
+            return {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": persisted,
+                    "fallback": False, "guidance": "Persisted selection is unknown; run: aiw agent use auto"}
+        if persisted not in available:
+            return {"verdict": "fail", "error_code": "O2-RUNTIME-STALE", "adapter_id": persisted,
+                    "selection_mode": "persisted", "fallback": False,
+                    "warning": f"Persisted runtime '{persisted}' is no longer available; no silent switch performed.",
+                    "guidance": "Run: aiw agent use auto — or: aiw agent use <runtime>"}
+        p_markers = set(adapters[persisted].get("project_markers", []) or [])
+        if (not marked) or (persisted in marked) or (not p_markers):
+            record = persist(persisted, "persisted")
+            return {"verdict": "pass", **record, "fallback": False}
+        stale_note = f"Persisted '{persisted}' does not match target markers; continuing resolution."
+
+    # Levels 3-4 — project markers constrain auto candidates; singleton wins.
+    if marked:
+        marked_available = [m for m in marked if m in available]
+        if len(marked_available) == 1:
+            record = persist(marked_available[0], "project-marker")
+            out = {"verdict": "pass", **record, "fallback": False}
+            if stale_note:
+                out["warning"] = stale_note
+            return out
+        if marked_available:
+            out = ambiguous(marked_available, "project-marker")
+            if stale_note:
+                out["warning"] = stale_note
+            return out
+    cli_available = [aid for aid in available if adapters.get(aid, {}).get("launch_kind") == "cli-direct"]
+    pool = [m for m in marked if m in set(cli_available)] if marked else cli_available
+    if len(pool) == 1:
+        record = persist(pool[0], "auto")
+        out = {"verdict": "pass", **record, "fallback": False}
+        if stale_note:
+            out["warning"] = stale_note
+        return out
+    if pool:
+        out = ambiguous(pool, "auto-detect")
+        if stale_note:
+            out["warning"] = stale_note
+        return out
+    ide_available = [m for m in marked if m in available and adapters[m].get("launch_kind") == "ide-guidance"] if marked else []
+    if len(ide_available) == 1:
+        record = persist(ide_available[0], "auto-guidance")
+        return {"verdict": "pass", **record, "launch": "external-guidance", "fallback": False}
+    if ide_available:
+        return ambiguous(ide_available, "auto-guidance")
+
+    # Level 5 — configured generic command.
+    if "generic-command" in available:
+        record = persist("generic-command", "generic-configured")
+        return {"verdict": "pass", **record, "fallback": False}
+
+    # Level 6 — fail closed with guidance.
+    return {"verdict": "fail", "error_code": "O2-NO-RUNTIME", "selection_mode": "auto",
+            "fallback": False, "detections": detection["results"],
+            "guidance": "No supported runtime detected. Install one manually, set AIW_AGENT_COMMAND, or run: aiw demo"}
+
+
+def agent_use(adapter_id: str, as_json: bool) -> int:
+    if adapter_id != "auto" and adapter_id not in {a["id"] for a in catalog()}:
         report = {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": adapter_id, "fallback": False}
         emit(report, as_json, "Agent selection failed")
         return 1
-    detection = detect_all()
-    by_id = {item["adapter_id"]: item for item in detection["results"]}
-    if adapter_id == "auto":
-        precedence = load_json(POLICY_PATH)["selection"]["auto_precedence"]
-        selected = next((item for item in precedence if by_id.get(item, {}).get("available")), None)
-        if selected is None:
-            report = {"verdict": "fail", "error_code": "O2-NO-ADAPTER", "selection_mode": "auto", "fallback": False, "detections": detection["results"]}
-            emit(report, as_json, "No agent runtime selected")
-            return 1
-        chosen = selected
-        selection_mode = "auto"
-    else:
-        chosen = adapter_id
-        selection_mode = "explicit"
-        if not by_id.get(chosen, {}).get("available"):
-            report = {"verdict": "fail", "error_code": "O2-ADAPTER-MISSING", "adapter_id": chosen, "selection_mode": "explicit", "fallback": False, "detection": by_id.get(chosen)}
-            emit(report, as_json, "Agent selection failed")
-            return 1
-    selected_result = by_id[chosen]
-    state = load_state() or initial_state("apply")
-    state["runtime_selection"] = {"adapter_id": chosen, "selection_mode": selection_mode, "availability": "detected", "version": selected_result.get("version"), "selected_at": now(), "evidence_recorded": True}
-    mark_step(state, "runtime-select", "passed", f"selected {chosen}")
-    append_evidence("runtime-selected", {"adapter_id": chosen, "selection_mode": selection_mode, "version": selected_result.get("version"), "external_writes": 0, "secrets_seen": False})
-    report = {"verdict": "pass", "adapter_id": chosen, "selection_mode": selection_mode, "version": selected_result.get("version"), "reason": "deterministic catalog precedence" if selection_mode == "auto" else "explicit selection", "fallback": False}
-    emit(report, as_json, "Agent runtime selected")
+    report = resolve_runtime(adapter_id, ROOT, dry_run=False)
+    emit(report, as_json, "Agent runtime selected" if report.get("verdict") == "pass" else "Agent selection failed")
+    return 0 if report.get("verdict") == "pass" else 1
+
+
+def agent_marker_scan(target: str, as_json: bool) -> int:
+    target_path = Path(target).expanduser()
+    if not target_path.is_dir():
+        emit({"markers": [], "error_code": "O2-TARGET-MISSING", "target": target}, as_json, "Marker scan failed")
+        return 1
+    emit({"markers": scan_markers(target_path.resolve()), "target": str(target_path)}, as_json, "Project markers")
     return 0
+
+
+def agent_resolve(target: str, for_id: str, dry_run: bool, as_json: bool) -> int:
+    target_path = Path(target).expanduser()
+    if not target_path.is_dir():
+        report = {"verdict": "fail", "error_code": "O2-TARGET-MISSING", "target": target, "fallback": False}
+        emit(report, as_json, "Runtime resolution failed")
+        return 1
+    if for_id != "auto" and for_id not in {a["id"] for a in catalog()}:
+        report = {"verdict": "fail", "error_code": "O2-ADAPTER-UNKNOWN", "adapter_id": for_id, "fallback": False}
+        emit(report, as_json, "Runtime resolution failed")
+        return 1
+    report = resolve_runtime(for_id, target_path.resolve(), dry_run=dry_run)
+    emit(report, as_json, "Runtime resolved" if report.get("verdict") == "pass" else "Runtime resolution failed")
+    return 0 if report.get("verdict") == "pass" else 1
 
 
 def demo(as_json: bool) -> int:
@@ -379,8 +548,16 @@ def main() -> int:
     detect_parser = sub.add_parser("agent-detect")
     detect_parser.add_argument("--json", action="store_true")
     use_parser = sub.add_parser("agent-use")
-    use_parser.add_argument("adapter", choices=["auto", "opencode", "claude-code", "codex", "generic-command"])
+    use_parser.add_argument("adapter")
     use_parser.add_argument("--json", action="store_true")
+    resolve_parser = sub.add_parser("agent-resolve")
+    resolve_parser.add_argument("--target", default=".")
+    resolve_parser.add_argument("--for", dest="for_id", default="auto")
+    resolve_parser.add_argument("--dry-run", action="store_true")
+    resolve_parser.add_argument("--json", action="store_true")
+    markers_parser = sub.add_parser("agent-marker-scan")
+    markers_parser.add_argument("--target", default=".")
+    markers_parser.add_argument("--json", action="store_true")
     demo_parser = sub.add_parser("demo")
     demo_parser.add_argument("--json", action="store_true")
     auth_parser = sub.add_parser("auth-status")
@@ -395,6 +572,8 @@ def main() -> int:
         if args.command == "agent-list": return agent_list(args.json)
         if args.command == "agent-detect": return agent_detect(args.json)
         if args.command == "agent-use": return agent_use(args.adapter, args.json)
+        if args.command == "agent-resolve": return agent_resolve(args.target, args.for_id, args.dry_run, args.json)
+        if args.command == "agent-marker-scan": return agent_marker_scan(args.target, args.json)
         if args.command == "demo": return demo(args.json)
         if args.command == "auth-status": return auth_status(args.json)
         if args.command == "recover": return recover(args.reset_state, args.json)

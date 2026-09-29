@@ -94,9 +94,10 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 |---------|-------------|
 | `./aiw setup` | **Start here** — install deps, create `.env`, add `aiw` to PATH |
 | `aiw health` | Check tools, `.env`, and configuration — prints PASS/WARN/FAIL |
-| `aiw start` | Launch the AI Workflow on **this** repo |
-| `aiw start <path>` | Launch on **any project** on your machine |
-| `aiw init <path>` | Copy the full workflow into another project (makes it standalone) |
+| `aiw start [path] [--for runtime\|auto]` | Resolve a runtime (OpenCode, Claude, Codex, Cursor, Copilot, Gemini, …) and launch it — never passes model flags |
+| `aiw init <path> [--for ...] [--merge]` | Install the portable core + runtime projections (non-destructive; `--merge` adds/keeps, never overwrites) |
+| `aiw agent list\|detect\|use\|resolve` | List, probe, select, and resolve runtimes without silent fallback |
+| `aiw sync-runtimes [--check] [--skills-only]` | Regenerate runtime adapters + MCP projections from canonical sources |
 
 ### Validation
 

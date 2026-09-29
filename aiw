@@ -76,9 +76,8 @@ show_help() {
   echo -e "    ${CYAN}health${NC}                       Check tools, .env, and configuration"
   echo -e "    ${CYAN}doctor${NC}                      Structured O2 diagnostics and runtime status"
   echo -e "    ${CYAN}demo${NC}                        Run the no-secret, zero-write demo"
-  echo -e "    ${CYAN}start${NC}                        Launch AI Workflow on this repo"
-  echo -e "    ${CYAN}start${NC} ${DIM}<path>${NC}               Launch AI Workflow on any project on your machine"
-  echo -e "    ${CYAN}init${NC}  ${DIM}<path>${NC}               Copy workflow into another project (makes it standalone)"
+  echo -e "    ${CYAN}start${NC} ${DIM}[path] [--for runtime|auto]${NC}  Resolve a runtime and launch it (never passes model flags)"
+  echo -e "    ${CYAN}init${NC}  ${DIM}<path> [--for ...] [--merge]${NC}  Install portable core + runtime projections (non-destructive)"
   echo ""
   echo -e "  ${BOLD}VALIDATION${NC}"
   echo -e "    ${CYAN}validate${NC}           Run the full skill validation suite"
@@ -115,6 +114,7 @@ show_help() {
   echo -e "    ${CYAN}agent list${NC}                    List source-owned runtime adapters"
   echo -e "    ${CYAN}agent detect${NC}                  Detect installed adapters with safe version probes"
   echo -e "    ${CYAN}agent use${NC} ${DIM}<id|auto>${NC}             Select a runtime without silent fallback"
+  echo -e "    ${CYAN}agent resolve${NC} ${DIM}[--target dir] [--for id|auto] [--dry-run]${NC}  Resolve runtime precedence for a target"
   echo -e "    ${CYAN}auth status${NC}                   Show delegated, redacted runtime auth status"
   echo -e "    ${CYAN}recover${NC}                      Recover or reset O2-owned onboarding state"
   echo -e "    ${CYAN}skill create${NC}                 Create a draft skill scaffold without registration"
@@ -226,47 +226,159 @@ cmd_health() {
 }
 
 cmd_start() {
-  if ! command -v opencode &>/dev/null; then
-    echo -e "${RED}Error:${NC} opencode is not installed."
-    echo "  Install it from: https://opencode.ai"
-    exit 1
-  fi
+  # S1 runtime-neutral dispatcher. Never requires opencode unless selected.
+  # Model invariant: no model flags are ever passed (runtime inheritance).
+  # Test hook: AIW_EXEC_DRY_RUN=1 prints argv instead of executing.
+  local FOR="auto"
+  local TARGET=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --for) FOR="${2:-auto}"; shift 2 ;;
+      --for=*) FOR="${1#--for=}"; shift ;;
+      -h|--help)
+        echo "Usage: aiw start [path] [--for runtime|auto]"
+        echo "  Resolves a runtime (explicit --for, persisted selection, project markers,"
+        echo "  installed runtimes, generic command) and launches it on the target."
+        echo "  No model override is ever passed; the runtime uses its own selection."
+        return 0 ;;
+      *) TARGET="$1"; shift ;;
+    esac
+  done
 
-  # Optional: path to a target project
-  local TARGET="${1:-}"
+  local TARGET_DIR="$ROOT"
+  local TARGET_GIVEN=0
   if [[ -n "$TARGET" ]]; then
-    # Resolve to absolute path
-    TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
-      echo -e "${RED}Error:${NC} directory not found: $1"
+    TARGET_DIR="$(cd "$TARGET" 2>/dev/null && pwd)" || {
+      echo -e "${RED}Error:${NC} directory not found: $TARGET"
       exit 1
     }
-    echo -e "${GREEN}Starting AI Workflow...${NC}"
-    echo -e "${DIM}Target project: $TARGET${NC}"
-    echo -e "${DIM}Agents + skills from: $ROOT${NC}"
-    echo -e "${DIM}Type a request to begin. Example: \"review code in src/\"${NC}"
-    echo ""
-    # Must run from ROOT so opencode.json and .opencode/ are found,
-    # but pass the target project path so opencode's file tools use it.
-    cd "$ROOT"
-    opencode "$TARGET"
-  else
-    echo ""
-    echo -e "  ${BOLD}AI Workflow${NC} — ready."
-    echo ""
-    echo -e "  ${CYAN}Working on this repo?${NC}"
-    echo -e "  Just start typing — the agents will read and edit files here."
-    echo ""
-    echo -e "  ${CYAN}Working on a different project?${NC}"
-    echo -e "  ${BOLD}aiw start /path/to/your-project${NC}   ← agents work on that project's files"
-    echo -e "  ${BOLD}aiw init  /path/to/your-project${NC}   ← install workflow into that project permanently"
-    echo ""
-    echo -e "  ${DIM}Examples:${NC}"
-    echo -e "  ${DIM}  aiw start ~/Projects/my-app${NC}"
-    echo -e "  ${DIM}  aiw start .  (current directory, same as no argument)${NC}"
-    echo ""
-    cd "$ROOT"
-    opencode
+    TARGET_GIVEN=1
   fi
+
+  # 1. Resolve runtime (fail closed; never falls back silently).
+  # Dry-run: aiw start never persists selection (persistence belongs to
+  # aiw agent use; per-target auto results must not overwrite the AIW default).
+  local RESOLVE_JSON
+  RESOLVE_JSON="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-resolve --target "$TARGET_DIR" --for "$FOR" --dry-run --json 2>/dev/null)" || true
+  if [[ -z "$RESOLVE_JSON" ]]; then
+    echo -e "${RED}Error:${NC} runtime resolution produced no output (python3 required for selection)."
+    exit 1
+  fi
+  local VERDICT ADAPTER_ID LAUNCH_KIND
+  VERDICT="$(node -e "console.log((JSON.parse(require('fs').readFileSync(0,'utf8')).verdict)||'')" <<<"$RESOLVE_JSON")"
+  if [[ "$VERDICT" != "pass" ]]; then
+    node -e "
+      const r = JSON.parse(require('fs').readFileSync(0,'utf8'));
+      console.log('Runtime resolution failed [' + (r.error_code||'unknown') + ']');
+      if (r.warning) console.log('  Warning: ' + r.warning);
+      if (r.candidates) console.log('  Choices: ' + r.candidates.join(', '));
+      if (r.guidance) console.log('  ' + r.guidance);
+    " <<<"$RESOLVE_JSON"
+    exit 1
+  fi
+  ADAPTER_ID="$(node -e "console.log(JSON.parse(require('fs').readFileSync(0,'utf8')).adapter_id)" <<<"$RESOLVE_JSON")"
+  LAUNCH_KIND="$(node -e "
+    const cat = JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8'));
+    const a = cat.adapters.find(x => x.id === '$ADAPTER_ID') || {};
+    console.log(a.launch_kind || 'cli-direct');
+  ")"
+
+  # 2. MCP freshness + required dependencies (Q4 stronger fail-closed).
+  if [[ "$ADAPTER_ID" == "opencode" || "$ADAPTER_ID" == "claude-code" || "$ADAPTER_ID" == "copilot-cli" || "$ADAPTER_ID" == "cursor" ]]; then
+    if ! node "$ROOT/scripts/sync-mcp.js" --check >/dev/null 2>&1; then
+      echo -e "${RED}Error:${NC} MCP projections are stale for the selected runtime."
+      echo "  Remediation: aiw sync-runtimes   (refusing to launch on known-differing config)"
+      exit 1
+    fi
+    MCP_DEPS_OUT="$(node "$ROOT/scripts/check-mcp-deps.js" --adapter "$ADAPTER_ID" --strict 2>&1)" || {
+      echo "$MCP_DEPS_OUT"
+      echo -e "${RED}Error:${NC} required MCP dependencies unusable — start blocked."
+      exit 1
+    }
+    [[ -n "$MCP_DEPS_OUT" ]] && echo "$MCP_DEPS_OUT"
+  else
+    echo -e "${DIM}MCP projections for '$ADAPTER_ID' are S2 (no generated files to verify).${NC}"
+  fi
+
+  # 3. Launch (CLI) or guide (IDE). No model flags, ever.
+  if [[ "$LAUNCH_KIND" == "ide-guidance" ]]; then
+    cmd_start_guidance "$ADAPTER_ID" "$TARGET_DIR"
+    return 0
+  fi
+
+  local LAUNCH_CMD
+  LAUNCH_CMD="$(node -e "
+    const cat = JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8'));
+    console.log((cat.adapters.find(x => x.id === '$ADAPTER_ID') || {}).launch.command || '');
+  ")"
+  if [[ -z "$LAUNCH_CMD" || "$LAUNCH_CMD" == "external-launch-required" ]]; then
+    cmd_start_guidance "$ADAPTER_ID" "$TARGET_DIR"
+    return 0
+  fi
+
+  echo -e "${GREEN}Starting AI Workflow...${NC} ${DIM}(runtime: $ADAPTER_ID)${NC}"
+  echo -e "${DIM}Target project: $TARGET_DIR${NC}"
+  if [[ -n "${AIW_EXEC_DRY_RUN:-}" ]]; then
+    echo "DRY-RUN argv: [$ADAPTER_ID] CWD=$TARGET_DIR CMD=$LAUNCH_CMD"
+    return 0
+  fi
+  if [[ "$ADAPTER_ID" == "opencode" ]]; then
+    # Preserve legacy behavior: run from ROOT, pass target positionally.
+    cd "$ROOT"
+    if [[ "$TARGET_GIVEN" -eq 1 ]]; then
+      exec opencode "$TARGET_DIR"
+    else
+      exec opencode
+    fi
+  elif [[ "$ADAPTER_ID" == "generic-command" ]]; then
+    if [[ -z "${AIW_AGENT_COMMAND:-}" ]]; then
+      echo -e "${RED}Error:${NC} AIW_AGENT_COMMAND is not set for generic-command."
+      exit 1
+    fi
+    cd "$TARGET_DIR"
+    # shellcheck disable=SC2086
+    exec $AIW_AGENT_COMMAND
+  else
+    cd "$TARGET_DIR"
+    case "$ADAPTER_ID" in
+      claude-code) exec claude ;;
+      codex) exec codex ;;
+      cursor) exec agent ;;
+      copilot-cli) exec copilot ;;
+      gemini-cli) exec gemini ;;
+      aider) exec aider ;;
+      antigravity) exec agy ;;
+      *) echo -e "${RED}Error:${NC} no verified launch command for '$ADAPTER_ID'."; exit 1 ;;
+    esac
+  fi
+}
+
+cmd_start_guidance() {
+  # $1 adapter_id, $2 target dir — IDE-only runtimes: guidance, best-effort opener.
+  local ADAPTER_ID="$1" TARGET_DIR="$2"
+  local DISPLAY OPENER
+  DISPLAY="$(node -e "console.log((JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8')).adapters.find(x => x.id === '$ADAPTER_ID') || {}).display_name || '$ADAPTER_ID')")"
+  OPENER="$(node -e "
+    const cat = JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8'));
+    const a = cat.adapters.find(x => x.id === '$ADAPTER_ID') || {};
+    const ok = (a.openers || []).filter(o => o.verified).map(o => o.executable);
+    console.log(ok.join(' '));
+  ")"
+  echo ""
+  echo -e "  ${BOLD}AI Workflow${NC} — configured for ${CYAN}$DISPLAY${NC} (IDE runtime)."
+  echo ""
+  echo -e "  Portable core installed at: ${CYAN}$TARGET_DIR${NC}"
+  echo -e "  Skills: ${CYAN}$TARGET_DIR/.agents/skills/${NC}  •  Instructions: ${CYAN}$TARGET_DIR/AGENTS.md${NC}"
+  echo ""
+  for candidate in $OPENER; do
+    if command -v "$candidate" &>/dev/null; then
+      echo -e "  Opening project with ${CYAN}$candidate${NC} ..."
+      "$candidate" "$TARGET_DIR" &
+      return 0
+    fi
+  done
+  echo -e "  ${DIM}External launch required: open $TARGET_DIR in $DISPLAY yourself.${NC}"
+  echo ""
 }
 
 cmd_validate() {
@@ -336,7 +448,9 @@ cmd_agent() {
     list) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-list "$@" ;;
     detect) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-detect "$@" ;;
     use) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-use "$@" ;;
-    *) echo "Usage: aiw agent [list|detect|use <id|auto>]"; return 2 ;;
+    resolve) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-resolve "$@" ;;
+    marker-scan) "$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan "$@" ;;
+    *) echo "Usage: aiw agent [list|detect|use <id|auto>|resolve|marker-scan]"; return 2 ;;
   esac
 }
 
@@ -379,16 +493,77 @@ cmd_doctor_legacy() {
   echo ""
 }
 
+# S1 portable install set helpers (Q5 non-destructive merge semantics).
+INIT_ADDED=0
+INIT_KEPT=0
+INIT_CONFLICTS=()
+init_install_file() {
+  # $1 source (must exist), $2 dest — missing:add, identical:keep, different:conflict.
+  local src="$1" dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  if [[ ! -e "$dst" ]]; then
+    cp "$src" "$dst"
+    INIT_ADDED=$((INIT_ADDED+1))
+  elif cmp -s "$src" "$dst"; then
+    INIT_KEPT=$((INIT_KEPT+1))
+  else
+    INIT_CONFLICTS+=("$dst")
+  fi
+}
+
+init_install_tree() {
+  # $1 source dir, $2 dest dir — per-file add/keep/conflict (never deletes).
+  local src_dir="$1" dst_dir="$2" f rel
+  while IFS= read -r f; do
+    rel="${f#$src_dir/}"
+    if [[ -L "$f" ]]; then
+      local link_target dest_link
+      link_target="$(readlink "$f")"
+      dest_link="$dst_dir/$rel"
+      mkdir -p "$(dirname "$dest_link")"
+      if [[ ! -e "$dest_link" && ! -L "$dest_link" ]]; then
+        ln -s "$link_target" "$dest_link"
+        INIT_ADDED=$((INIT_ADDED+1))
+      elif [[ -L "$dest_link" && "$(readlink "$dest_link")" == "$link_target" ]]; then
+        INIT_KEPT=$((INIT_KEPT+1))
+      else
+        INIT_CONFLICTS+=("$dest_link")
+      fi
+    elif [[ -f "$f" ]]; then
+      init_install_file "$f" "$dst_dir/$rel"
+    fi
+  done < <(find "$src_dir" -mindepth 1 \( -type f -o -type l \) 2>/dev/null | sort)
+}
+
 cmd_init() {
-  local TARGET="${1:-}"
+  # S1 runtime-neutral init. Installs the portable core + selected runtime
+  # projections. Default is fail-closed on any pre-existing install-set path;
+  # --merge adds missing entries, keeps identical ones, and still fails on
+  # differing ones. Never overwrites, never copies secrets.
+  local TARGET="" FOR_LIST="" MERGE="0"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --for) FOR_LIST="$FOR_LIST $2"; shift 2 ;;
+      --for=*) FOR_LIST="$FOR_LIST ${1#--for=}"; shift ;;
+      --merge) MERGE="1"; shift ;;
+      -h|--help)
+        echo "Usage: aiw init <path> [--for runtime|auto|all] [--merge]"
+        echo "  Installs the portable core (.agents/skills/, AGENTS.md, skills/,"
+        echo "  config/mcp-manifest.json) plus S1 runtime projections for --for."
+        echo "  Default refuses to touch existing paths; --merge adds missing,"
+        echo "  keeps identical, and fails on differing entries. Never copies secrets."
+        return 0 ;;
+      *) TARGET="$1"; shift ;;
+    esac
+  done
   if [[ -z "$TARGET" ]]; then
     echo -e "${RED}Error:${NC} specify a target project directory."
-    echo "  Usage: aiw init /path/to/your-project"
+    echo "  Usage: aiw init /path/to/your-project [--for runtime|auto|all] [--merge]"
     exit 1
   fi
 
   TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
-    echo -e "${RED}Error:${NC} directory not found: $1"
+    echo -e "${RED}Error:${NC} directory not found: $TARGET"
     exit 1
   }
 
@@ -403,25 +578,133 @@ cmd_init() {
     exit 1
   fi
 
-  # Guard: warn if opencode.json already exists
-  if [[ -f "$TARGET/opencode.json" ]]; then
-    echo -e "${YELLOW}Warning:${NC} $TARGET/opencode.json already exists."
-    read -r -p "  Overwrite? [y/N] " REPLY
-    echo
-    [[ "$REPLY" =~ ^[Yy]$ ]] || { echo "  Aborted."; exit 0; }
+  # Resolve --for set (default: auto).
+  local WANT
+  WANT="$(echo "$FOR_LIST" | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')"
+  [[ -z "${WANT// }" ]] && WANT="auto"
+  local RUNTIMES=""
+  if [[ "$WANT" == *"all"* ]]; then
+    RUNTIMES="opencode claude-code cursor copilot-cli codex gemini-cli"
+  elif [[ "$WANT" == *"auto"* ]]; then
+    RUNTIMES="$("$PYTHON_BIN" "$ROOT/scripts/onboarding-o2.py" agent-marker-scan --target "$TARGET" 2>/dev/null || echo "")"
+    if [[ -z "${RUNTIMES// }" ]]; then
+      echo -e "  ${DIM}No incumbent runtime markers in target — installing portable core only.${NC}"
+      echo -e "  ${DIM}Add a runtime later: aiw init $TARGET --for <runtime> --merge${NC}"
+    fi
+  else
+    RUNTIMES="$WANT"
+  fi
+  # Validate requested IDs against the catalog (unknown IDs fail closed here,
+  # so a typo can never silently install the wrong runtime set).
+  local UNKNOWN
+  UNKNOWN="$(node -e "
+    const cat = JSON.parse(require('fs').readFileSync('$ROOT/config/agent-runtime-catalog.json','utf8'));
+    const ids = new Set(cat.adapters.map(a => a.id));
+    console.log('$RUNTIMES'.split(' ').filter(Boolean).filter(id => !ids.has(id)).join(' '));
+  ")"
+  if [[ -n "${UNKNOWN// }" ]]; then
+    echo -e "${RED}Error:${NC} unknown runtime(s) in --for: $UNKNOWN"
+    exit 1
+  fi
+  echo -e "  Runtimes: ${CYAN}${RUNTIMES:-portable core only}${NC}"
+
+  # Build install set: portable core always; runtime files per selection.
+  INIT_ADDED=0
+  INIT_KEPT=0
+  INIT_CONFLICTS=()
+  local PLAN_FILES=()
+  local PLAN_TREES=()
+  # Portable core (always).
+  PLAN_TREES+=(".agents/skills:.agents/skills" "skills:skills")
+  PLAN_FILES+=("AGENTS.md:AGENTS.md" "config/mcp-manifest.json:config/mcp-manifest.json" "config/mcp-manifest-schema.json:config/mcp-manifest-schema.json")
+  local r
+  for r in $RUNTIMES; do
+    case "$r" in
+      opencode)
+        PLAN_FILES+=("opencode.json:opencode.json" ".opencode/package.json:.opencode/package.json" ".opencode/package-lock.json:.opencode/package-lock.json")
+        PLAN_TREES+=(".opencode/agent:.opencode/agent" ".opencode/plugins:.opencode/plugins") ;;
+      claude-code) PLAN_FILES+=(".mcp.json:.mcp.json") ;;
+      cursor) PLAN_FILES+=(".cursor/mcp.json:.cursor/mcp.json") ;;
+      copilot-cli) PLAN_FILES+=(".mcp.json:.mcp.json") ;;
+      codex|gemini-cli) echo -e "  ${DIM}Note: $r has no S1 file projections (catalog declares S2 target); core only.${NC}" ;;
+      cursor-ide|vscode-copilot|windsurf-devin) echo -e "  ${DIM}Note: $r is IDE guidance-only; core only.${NC}" ;;
+      *) echo -e "  ${DIM}Note: $r (generic) installs portable core only.${NC}" ;;
+    esac
+  done
+  # Dedupe plan entries (claude+copilot share .mcp.json).
+  PLAN_FILES=($(printf "%s\n" "${PLAN_FILES[@]}" | sort -u))
+  PLAN_TREES=($(printf "%s\n" "${PLAN_TREES[@]}" | sort -u))
+
+  # Default (no --merge): fail closed if ANY install-set path already exists.
+  if [[ "$MERGE" != "1" ]]; then
+    local EXISTING=()
+    local entry src rel
+    for entry in "${PLAN_FILES[@]}"; do
+      rel="${entry#*:}"
+      [[ -e "$TARGET/$rel" || -L "$TARGET/$rel" ]] && EXISTING+=("$rel")
+    done
+    for entry in "${PLAN_TREES[@]}"; do
+      rel="${entry#*:}"
+      [[ -e "$TARGET/$rel" || -L "$TARGET/$rel" ]] && EXISTING+=("$rel/")
+    done
+    if [[ "${#EXISTING[@]}" -gt 0 ]]; then
+      echo -e "${RED}Error:${NC} refusing to touch existing paths (non-destructive default):"
+      printf "    %s\n" "${EXISTING[@]}"
+      echo "  Re-run with --merge to add missing entries (differing entries still fail),"
+      echo "  or remove the paths above first."
+      exit 1
+    fi
   fi
 
-  # Copy the three required pieces
-  echo "  Copying opencode.json..."
-  cp "$ROOT/opencode.json" "$TARGET/opencode.json"
+  # Install per-entry add/keep/conflict (Q5).
+  local entry src rel
+  for entry in "${PLAN_FILES[@]}"; do
+    src="${entry%%:*}"
+    rel="${entry#*:}"
+    if [[ ! -e "$ROOT/$src" && ! -L "$ROOT/$src" ]]; then
+      echo -e "${YELLOW}Warning:${NC} source missing in AIW repo, skipping: $src"
+      continue
+    fi
+    init_install_file "$ROOT/$src" "$TARGET/$rel"
+  done
+  for entry in "${PLAN_TREES[@]}"; do
+    src="${entry%%:*}"
+    rel="${entry#*:}"
+    if [[ -L "$ROOT/$src" ]]; then
+      init_install_file "$ROOT/$src" "$TARGET/$rel"
+    else
+      init_install_tree "$ROOT/$src" "$TARGET/$rel"
+    fi
+  done
+  # Claude links are regenerated, never copied as physical dirs: recreate the
+  # farm in the target so links resolve inside the target project.
+  if [[ "$RUNTIMES" == *"claude-code"* ]]; then
+    local skill link_target
+    while IFS= read -r skill; do
+      skill="$(basename "$skill")"
+      link_target="../../.agents/skills/$skill"
+      if [[ ! -e "$TARGET/.claude/skills/$skill" && ! -L "$TARGET/.claude/skills/$skill" ]]; then
+        mkdir -p "$TARGET/.claude/skills"
+        ln -s "$link_target" "$TARGET/.claude/skills/$skill"
+        INIT_ADDED=$((INIT_ADDED+1))
+      elif [[ -L "$TARGET/.claude/skills/$skill" && "$(readlink "$TARGET/.claude/skills/$skill")" == "$link_target" ]]; then
+        INIT_KEPT=$((INIT_KEPT+1))
+      else
+        INIT_CONFLICTS+=(".claude/skills/$skill")
+      fi
+    done < <(find "$ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)
+  fi
 
-  echo "  Copying .opencode/ (agents + skills)..."
-  rsync -a --exclude='node_modules' --exclude='state' --exclude='registry-cache' \
-    "$ROOT/.opencode/" "$TARGET/.opencode/" 2>/dev/null || \
-    cp -R "$ROOT/.opencode" "$TARGET/.opencode"
+  if [[ "${#INIT_CONFLICTS[@]}" -gt 0 ]]; then
+    echo -e "${RED}Error:${NC} conflicting entries (kept user-owned files untouched):"
+    printf "    %s\n" "${INIT_CONFLICTS[@]}"
+    echo "  Resolve manually, then re-run with --merge."
+    exit 1
+  fi
+  echo "  Installed: $INIT_ADDED added, $INIT_KEPT unchanged."
 
-  # Install plugin deps in the target
-  if [[ -f "$TARGET/.opencode/package.json" ]]; then
+  # Install plugin deps in the target (opencode only).
+  if [[ "$RUNTIMES" == *"opencode"* && -f "$TARGET/.opencode/package.json" ]]; then
     echo "  Installing .opencode/ plugin dependencies..."
     npm install --prefix "$TARGET/.opencode" --silent
   fi
@@ -447,12 +730,11 @@ cmd_init() {
   echo -e "  ${GREEN}Done!${NC} AI Workflow is ready in:"
   echo -e "  ${CYAN}$TARGET${NC}"
   echo ""
-  echo "  To use it:"
-  echo "    cd $TARGET"
-  echo "    opencode"
+  echo "  Installed: portable core (.agents/skills/, AGENTS.md, skills/, MCP manifest)"
+  echo "  Runtimes: ${RUNTIMES:-none (core only)}"
   echo ""
-  echo "  Or from anywhere:"
-  echo "    aiw start $TARGET"
+  echo "  To use it:"
+  echo "    aiw start $TARGET --for auto"
   echo ""
 }
 

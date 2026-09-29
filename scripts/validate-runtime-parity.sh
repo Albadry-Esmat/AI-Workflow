@@ -11,7 +11,8 @@
 #   4. Generated adapter drift: sync-runtimes.sh --check clean.
 #   5. Claude adapter integrity: 121 links, all resolve to canonical bodies.
 #   6. OpenCode discovery compatibility: tests/test-opencode-discovery.sh.
-#   7. Runtime catalog schema: agent-runtime-catalog.json validates (node ajv or python).
+# 7. Runtime catalog schema: agent-runtime-catalog.json validates (node ajv or python).
+# 7b. MCP manifest schema: config/mcp-manifest.json validates (S1 authority).
 #   8. Secret safety: no token-like values in generated/adapter files.
 #
 # Deterministic, no network. Exit 0 all pass, non-zero on any fail.
@@ -139,6 +140,26 @@ else
   else
     _fail "agent-runtime-catalog.json missing interoperability fields"
   fi
+fi
+
+# 7b. MCP manifest authority (S1): schema-valid, refs-only, projections fresh.
+if python3 -c 'import jsonschema' 2>/dev/null; then
+  if python3 -c "
+import json, jsonschema
+jsonschema.validate(json.load(open('config/mcp-manifest.json')), json.load(open('config/mcp-manifest-schema.json')))
+print('manifest validates')
+" 2>/dev/null; then
+    _ok "mcp-manifest.json validates against schema"
+  else
+    _fail "mcp-manifest.json schema validation failed"
+  fi
+else
+  _fail "python jsonschema unavailable for MCP manifest validation"
+fi
+if node scripts/sync-mcp.js --check >/dev/null 2>&1; then
+  _ok "MCP projections fresh (sync-mcp --check)"
+else
+  _fail "MCP projection drift (run: aiw sync-runtimes)"
 fi
 
 # 8. Secret safety on generated/adapter surface

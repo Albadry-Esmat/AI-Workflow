@@ -9,7 +9,7 @@
 #   aiw start       ← launch the AI workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-.PHONY: help setup health validate validate-runtime-parity validate-contracts validate-model-requirements test-model-boundary validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
+.PHONY: help setup health validate validate-runtime-parity validate-contracts validate-model-requirements test-model-boundary test-runtime-selection test-mcp-projections test-aiw-init validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
 WEBSITE_ROOT ?= ../ASE-OS-Website
@@ -52,6 +52,9 @@ health: ## Check tools, .env, and configuration — prints PASS/WARN/FAIL per it
 validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operational validation suites
 	@bash scripts/validate-skills.sh
 	@bash scripts/validate-runtime-parity.sh
+	@bash tests/test-runtime-selection.sh
+	@bash tests/test-mcp-projections.sh
+	@bash tests/test-aiw-init.sh
 	@$(MAKE) validate-contracts
 	@$(MAKE) validate-model-requirements
 	@$(MAKE) validate-pipeline-gates
@@ -105,6 +108,15 @@ validate-governance-flags: ## Validate ci_mode skips and weakening-input policy
 
 test-model-boundary: ## Run model + runtime-boundary regression suite (fail_closed, no provisioning)
 	@bash tests/test-model-boundary.sh
+
+test-runtime-selection: ## Run S1 runtime selection fixtures (singleton-or-ambiguous, markers, stale, argv)
+	@bash tests/test-runtime-selection.sh
+
+test-mcp-projections: ## Run S1 MCP manifest + projection fixtures (determinism, drift, secrets)
+	@bash tests/test-mcp-projections.sh
+
+test-aiw-init: ## Run S1 aiw init fixtures (non-destructive install, merge, secrets)
+	@bash tests/test-aiw-init.sh
 
 validate-batch6: ## Validate Batch 6 budget, retry, and capability-policy controls
 	@$(PYTHON) scripts/validate-batch6-controls.py

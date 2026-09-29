@@ -1,9 +1,7 @@
 ---
 description: Automated test suite generation from code artifacts and specifications. Invoked after code generation is validated.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the test-generator subagent. You execute the `test-generator` skill.

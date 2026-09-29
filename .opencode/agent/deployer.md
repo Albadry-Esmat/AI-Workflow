@@ -1,9 +1,7 @@
 ---
 description: Deployment strategy — environment model, promotion rules, rollback criteria, feature flags, and IaC scaffold. Invoked after testing strategy is defined.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the deployer subagent. You execute the `deployment-strategy` skill.

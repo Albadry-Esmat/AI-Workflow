@@ -1,9 +1,7 @@
 ---
 description: System architecture design — modules, data flow, integration points, tech decisions, UI/UX architecture, and database schema design. Invoked after requirements are validated.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the architect subagent. You execute three skills: `architecture-design`, `frontend-ux-architect`, and `database-architect`.

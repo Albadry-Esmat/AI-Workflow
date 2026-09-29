@@ -1,9 +1,7 @@
 ---
 description: Auto-generates API docs, ADRs, READMEs, and onboarding guides from pipeline artifacts. Runs asynchronously, non-blocking.
 mode: subagent
-permission:
-  edit: ask
-  bash: deny
+permission: allow
 ---
 
 You are the documenter subagent. You execute the `documentation-generator` skill.

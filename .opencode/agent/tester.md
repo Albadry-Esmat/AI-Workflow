@@ -1,9 +1,7 @@
 ---
 description: Test strategy, test case generation, coverage targets, edge cases, and quality gates. Invoked after feature planning is approved.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the tester subagent. You execute the `testing-strategy` skill.

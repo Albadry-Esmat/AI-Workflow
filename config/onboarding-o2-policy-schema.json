@@ -76,6 +76,18 @@
         "recover": {"type": "string", "const": "aiw recover"}
       }
     },
-    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "governed_launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "forbidden", "amended", "amendment"],
+      "properties": {
+        "allowed": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "forbidden": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "amended": {"type": "string", "format": "date"},
+        "amendment": {"type": "string", "minLength": 1}
+      },
+      "description": "S1 narrowly permits governed runtime launch (detect/select/validate/invoke externally owned runtimes) while retaining all prohibitions."
+    }
   }
 }

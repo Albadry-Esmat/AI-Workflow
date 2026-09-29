@@ -80,6 +80,9 @@ artifacts/npm-audit-*.json
 
 
 # ─── Ephemeral test/execution state (never commit) ─────────────────────────────
+# S1: O2 runtime-selection state is project-local operator state (may hold a
+# chosen default runtime); never committed. Recover via `aiw recover`.
+.aiw/
 .opencode/state/test-*/
 .opencode/state/test-*
 .opencode/state/test-rel*/

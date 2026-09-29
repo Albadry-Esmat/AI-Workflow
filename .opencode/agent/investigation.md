@@ -1,9 +1,7 @@
 ---
 description: Evidence gathering for NEEDS_INVESTIGATION findings — one bounded round, then resolve or escalate.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the investigation subagent (read-only). You own exactly one evidence round per

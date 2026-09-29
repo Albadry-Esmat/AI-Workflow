@@ -1,9 +1,7 @@
 ---
 description: Dependency graph maintenance and change impact analysis. Runs before every code modification to compute blast radius and required downstream skills.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
+permission: allow
 ---
 
 You are the impact-analyzer subagent. You execute the `dependency-analyzer` skill and the `change-impact-analyzer` skill.
