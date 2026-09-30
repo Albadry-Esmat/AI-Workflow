@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiw-governance-execution-evidence/1",
+  "title": "Minimal Governance Execution Evidence",
+  "type": "object",
+  "required": ["schema", "role", "execution_id", "session_id", "base_sha", "head_sha", "diff_sha256", "scope_sha256", "capabilities", "credentials", "model", "outcome", "recorded_at"],
+  "properties": {
+    "schema": { "const": "aiw-governance-execution-evidence/1" },
+    "role": { "enum": ["producer", "reviewer", "gatekeeper"] },
+    "execution_id": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "parent_execution_id": { "type": ["string", "null"] },
+    "base_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "head_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "diff_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "scope_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "capabilities": {
+      "type": "object",
+      "required": ["source_write", "read_only", "merge", "reviewer_evidence", "gatekeeper", "witness_signing"],
+      "properties": {
+        "source_write": { "type": "boolean" },
+        "source_write_scope_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "read_only": { "type": "boolean" },
+        "merge": { "const": false },
+        "reviewer_evidence": { "type": "boolean" },
+        "gatekeeper": { "const": false },
+        "witness_signing": { "const": false }
+      },
+      "additionalProperties": false
+    },
+    "credentials": {
+      "type": "object",
+      "required": ["merge", "source_signing", "witness_signing"],
+      "properties": {
+        "merge": { "const": false },
+        "source_signing": { "const": false },
+        "witness_signing": { "const": false }
+      },
+      "additionalProperties": false
+    },
+    "outcome": { "enum": ["pass", "fail", "needs-work", "recorded"] },
+    "reviewer_execution_id": { "type": "string" },
+    "model": {
+      "type": "object",
+      "required": ["requested", "resolved", "available", "attested"],
+      "properties": {
+        "requested": { "type": "string" },
+        "resolved": { "type": "string" },
+        "available": { "type": "boolean" },
+        "attested": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "gatekeeper_identity": { "type": "object" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "record_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "additionalProperties": false
+}
