@@ -1,0 +1,87 @@
+name: Source Governance Bootstrap Witness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/source-governance-witness.yml
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  checks: read
+  id-token: write
+
+concurrency:
+  group: source-governance-witness-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  witness-a0-w0:
+    name: Witness A0 and exact W0 merge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout witnessed main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "20"
+
+      - name: Verify A0, one-shot W0 authorization, checks, paths, and binary diff
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/verify-source-governance-witness.js
+
+      - name: Reserve one-shot W0 witness attempt
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/verify-source-governance-witness.js --mark-witnessing
+
+      - name: Sign and verify canonical bootstrap evidence (production Rekor v1)
+        uses: sigstore/gh-action-sigstore-python@790bc6befb9d733738f18d8f895854b453640ec9 # v3.5.0
+        with:
+          inputs: ${{ runner.temp }}/aiw-source-governance-witness.json
+          verify: true
+          verify-cert-identity: https://github.com/Albadry-Esmat/AI-Workflow/.github/workflows/source-governance-witness.yml@refs/heads/main
+          verify-oidc-issuer: https://token.actions.githubusercontent.com
+          rekor-version: "1"
+          staging: false
+          upload-signing-artifacts: false
+          release-signing-artifacts: false
+
+      - name: Capture the exact Sigstore TUF trust material used by the client
+        run: node scripts/verify-source-governance-witness.js --capture-trust-root
+
+      - name: Sign and verify retained TUF root/metadata evidence (production Rekor v1)
+        uses: sigstore/gh-action-sigstore-python@790bc6befb9d733738f18d8f895854b453640ec9 # v3.5.0
+        with:
+          inputs: ${{ runner.temp }}/aiw-sigstore-tuf-evidence.json
+          verify: true
+          verify-cert-identity: https://github.com/Albadry-Esmat/AI-Workflow/.github/workflows/source-governance-witness.yml@refs/heads/main
+          verify-oidc-issuer: https://token.actions.githubusercontent.com
+          rekor-version: "1"
+          staging: false
+          upload-signing-artifacts: true
+          release-signing-artifacts: false
+
+      - name: Retain the A0/W0 payload and its verified Sigstore bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: a0-w0-primary-witness
+          path: |
+            ${{ runner.temp }}/aiw-source-governance-witness.json
+            ${{ runner.temp }}/aiw-source-governance-witness.json.sigstore.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record append-only A0 active / W0 consumed lifecycle
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/verify-source-governance-witness.js --record-consumed
