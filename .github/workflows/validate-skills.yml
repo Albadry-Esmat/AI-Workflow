@@ -2,6 +2,8 @@ name: Validate Skills
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "skills/**"
       - ".agents/skills/**"

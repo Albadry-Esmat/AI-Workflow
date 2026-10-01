@@ -90,6 +90,9 @@ const markBranch=witnessSource.indexOf("if (mode === '--mark-witnessing')");
 assert.ok(markBranch >= 0 && markBranch < witnessSource.indexOf('const tufPath',markBranch),'reservation branch must not read post-signing artifacts');
 assert.match(workflow,/actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/);
 assert.equal((workflow.match(/sigstore\/gh-action-sigstore-python@790bc6befb9d733738f18d8f895854b453640ec9/g)||[]).length,2);
+const validateSkills=fs.readFileSync(path.join(root,'.github/workflows/validate-skills.yml'),'utf8');
+const yamlCheck=require('child_process').spawnSync('python3',['-c','import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); x=d.get("on",d.get(True)); assert x["push"]["branches"]==["main"]; assert x["push"]["paths"]==x["pull_request"]["paths"]',path.join(root,'.github/workflows/validate-skills.yml')],{encoding:'utf8'});
+assert.equal(yamlCheck.status,0,yamlCheck.stderr||yamlCheck.stdout);
 for (const source of [workflow,website]) {
   assert.ok(!source.includes('WEBSITE_DEPLOY_TOKEN'));
   assert.ok(!source.includes('Albadry-Esmat/ASE-OS-Website'));
