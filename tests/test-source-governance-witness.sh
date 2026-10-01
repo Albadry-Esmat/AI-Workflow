@@ -73,9 +73,10 @@ const targetsMeta = {signed:{version:7,targets:{'trusted_root.json':{length:root
 fs.writeFileSync(path.join(metadataDir,'targets.json'),JSON.stringify(targetsMeta));
 const witnessPath=path.join(tufHome,'primary.json'); fs.writeFileSync(witnessPath,'{}\n'); fs.writeFileSync(witnessPath+'.sigstore.json','{"bundle":true}\n');
 const tufOutput=path.join(tufHome,'tuf-evidence.json');
-const tufCapture=witness.captureTufEvidence({home:tufHome,witnessPath,outputPath:tufOutput});
+const tufCapture=witness.captureTufEvidence({home:tufHome,witnessPath,outputPath:tufOutput,workflowContext:{workflow_ref:'Albadry-Esmat/AI-Workflow/.github/workflows/source-governance-witness.yml@refs/heads/main',workflow_sha:'8'.repeat(40),run_id:'42'}});
 const tufEvidence=JSON.parse(fs.readFileSync(tufOutput,'utf8'));
 assert.equal(tufEvidence.trusted_root.sha256,tufCapture.trusted_root_sha256);
+assert.equal(tufEvidence.client_verification.result,'passed');
 assert.equal(tufEvidence.metadata.find(x=>x.name==='targets.json').version,7);
 assert.equal(tufEvidence.signed_witness_bundle.sha256,digest(fs.readFileSync(witnessPath+'.sigstore.json').toString()));
 const chunks=witness.tufEvidenceChunkRecords(fs.readFileSync(tufOutput),'W0-fixture',40);

@@ -190,7 +190,7 @@ function tufEvidenceChunkRecords(bytes, authorizationId, chunkSize = 32000, mate
   }));
 }
 
-function captureTufEvidence({ home = os.homedir(), xdgCache = process.env.XDG_CACHE_HOME, xdgData = process.env.XDG_DATA_HOME, witnessPath, outputPath }) {
+function captureTufEvidence({ home = os.homedir(), xdgCache = process.env.XDG_CACHE_HOME, xdgData = process.env.XDG_DATA_HOME, witnessPath, outputPath, workflowContext }) {
   const tufUrl = 'https://tuf-repo-cdn.sigstore.dev';
   const encodedUrl = encodeURIComponent(tufUrl);
   const cacheRoot = xdgCache || path.join(home, '.cache');
@@ -220,6 +220,7 @@ function captureTufEvidence({ home = os.homedir(), xdgCache = process.env.XDG_CA
   const evidence = {
     schema: 'aiw-sigstore-tuf-evidence/1',
     action: { repository: 'sigstore/gh-action-sigstore-python', commit: '790bc6befb9d733738f18d8f895854b453640ec9', sigstore_python: '4.5.0', rekor_protocol: 'v1', staging: false },
+    client_verification: { implementation: 'pinned sigstore-python 4.5.0 verify:true action step', result: 'passed', workflow_ref: workflowContext.workflow_ref, workflow_sha: workflowContext.workflow_sha, run_id: workflowContext.run_id },
     tuf_url: tufUrl,
     trusted_root: target,
     metadata,
@@ -338,9 +339,12 @@ if (require.main === module) {
   const token = process.env.GITHUB_TOKEN;
   if (args.length === 1 && args[0] === '--capture-trust-root') {
     try {
+      const trustedRef = 'Albadry-Esmat/AI-Workflow/.github/workflows/source-governance-witness.yml@refs/heads/main';
+      if (process.env.GITHUB_ACTIONS !== 'true' || process.env.GITHUB_WORKFLOW_REF !== trustedRef || process.env.GITHUB_REF !== 'refs/heads/main' || !process.env.GITHUB_RUN_ID || !/^[a-f0-9]{40}$/.test(process.env.GITHUB_WORKFLOW_SHA || '')) fail('TUF capture requires the exact trusted main workflow context');
       const result = captureTufEvidence({
         witnessPath: `${process.env.RUNNER_TEMP}/aiw-source-governance-witness.json`,
         outputPath: `${process.env.RUNNER_TEMP}/aiw-sigstore-tuf-evidence.json`,
+        workflowContext: { workflow_ref: process.env.GITHUB_WORKFLOW_REF, workflow_sha: process.env.GITHUB_WORKFLOW_SHA, run_id: process.env.GITHUB_RUN_ID },
       });
       process.stdout.write(JSON.stringify(result) + '\n');
     } catch (error) {
@@ -376,7 +380,7 @@ if (require.main === module) {
       const tufBytes = fs.readFileSync(tufPath);
       const tufBundleBytes = fs.readFileSync(tufPath + '.sigstore.json');
       const tufEvidence = JSON.parse(tufBytes.toString('utf8'));
-      if (tufEvidence.schema !== 'aiw-sigstore-tuf-evidence/1' || tufEvidence.action.rekor_protocol !== 'v1' || tufEvidence.action.staging !== false || tufEvidence.signed_witness_bundle.sha256 !== sha(fs.readFileSync(path + '.sigstore.json'))) fail('Sigstore TUF evidence/profile/bundle binding invalid');
+      if (tufEvidence.schema !== 'aiw-sigstore-tuf-evidence/1' || tufEvidence.action.rekor_protocol !== 'v1' || tufEvidence.action.staging !== false || !tufEvidence.client_verification || tufEvidence.client_verification.result !== 'passed' || tufEvidence.signed_witness_bundle.sha256 !== sha(fs.readFileSync(path + '.sigstore.json'))) fail('Sigstore TUF evidence/profile/bundle binding invalid');
       const tufAfterPath = `${process.env.RUNNER_TEMP}/aiw-sigstore-tuf-after.json`;
       captureTufEvidence({ witnessPath: path, outputPath: tufAfterPath });
       const tufAfter = JSON.parse(fs.readFileSync(tufAfterPath, 'utf8'));
