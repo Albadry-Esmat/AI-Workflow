@@ -49,6 +49,10 @@ function parseW0Authorization(comment, issueNumber) {
   let auth;
   try { auth = JSON.parse(comment.slice(start + AUTH_START.length, end).trim()); } catch { fail('W0 authorization JSON invalid'); }
   if (auth.schema !== 'aiw-w0-authorization/1' || auth.issue_number !== issueNumber || auth.state !== 'active' || auth.consumed !== false) fail('W0 authorization is not active/unconsumed');
+  const authDigest = auth.canonical_payload_sha256;
+  const authPayload = { ...auth };
+  delete authPayload.canonical_payload_sha256;
+  if (!/^[a-f0-9]{64}$/.test(authDigest || '') || sha(canonicalize(authPayload)) !== authDigest) fail('W0 authorization canonical digest mismatch');
   if (!/^[a-f0-9]{64}$/.test(auth.nonce || '') || !/^[a-f0-9]{64}$/.test(auth.diff_sha256 || '')) fail('W0 authorization digest/nonce invalid');
   if (auth.nonce === auth.parent_a0_nonce) fail('W0 nonce must differ from parent A0 nonce');
   if (!Array.isArray(auth.allowed_paths) || auth.allowed_paths.join('\n') !== [...auth.allowed_paths].sort().join('\n')) fail('W0 path allowlist not canonical');
@@ -56,7 +60,7 @@ function parseW0Authorization(comment, issueNumber) {
   if (auth.verifier.id !== 'AIW-SOLO-W0-BOOTSTRAP-VERIFIER' || auth.verifier.version !== '1.0.1' || auth.acquirer.id !== 'AIW-SOLO-W0-EVIDENCE-ACQUIRER' || auth.acquirer.version !== '1.0.0') fail('W0 verifier/acquirer identity mismatch');
   const expiry = Date.parse(auth.expires_at);
   if (!Number.isFinite(expiry) || expiry <= Date.now()) fail('W0 authorization expired/invalid');
-  for (const key of ['parent_a0_id', 'parent_a0_sha256', 'pr_number', 'base_sha', 'head_sha', 'diff_sha256', 'b0_before_sha256', 'b0_after_sha256', 'witness_profile_sha256', 'verifier', 'acquirer', 'required_checks']) {
+  for (const key of ['canonical_payload_sha256', 'parent_a0_id', 'parent_a0_sha256', 'pr_number', 'base_sha', 'head_sha', 'diff_sha256', 'b0_before_sha256', 'b0_after_sha256', 'witness_profile_sha256', 'verifier', 'acquirer', 'required_checks']) {
     if (auth[key] === undefined || auth[key] === null) fail(`W0 authorization missing ${key}`);
   }
   return auth;
@@ -68,6 +72,10 @@ function parseVerifierPass(comment, authorization) {
   if (start < 0 || end <= start) fail('W0 verifier PASS receipt missing');
   let receipt;
   try { receipt = JSON.parse(comment.slice(start + PASS_START.length, end).trim()); } catch { fail('W0 verifier PASS receipt malformed'); }
+  const receiptDigest = receipt.canonical_payload_sha256;
+  const receiptPayload = { ...receipt };
+  delete receiptPayload.canonical_payload_sha256;
+  if (!/^[a-f0-9]{64}$/.test(receiptDigest || '') || sha(canonicalize(receiptPayload)) !== receiptDigest) fail('W0 verifier receipt canonical digest mismatch');
   const expected = {
     verdict: 'PASS', repository: FULL_REPO, pr_number: authorization.pr_number,
     base_sha: authorization.base_sha, head_sha: authorization.head_sha,
@@ -259,6 +267,7 @@ function createWitnessEnvelope({ a0, a0Digest, authorization, pr, files, checks,
     required_checks: required.map((item) => ({ context: item.context, app_id: item.app_id, head_sha: authorization.head_sha, conclusion: 'success' })),
     verifier: authorization.verifier,
     acquirer: authorization.acquirer,
+    external_verifier_receipt: verifierReceipt,
     b0_before_sha256: authorization.b0_before_sha256,
     b0_after_sha256: authorization.b0_after_sha256,
     witness_profile_sha256: authorization.witness_profile_sha256,

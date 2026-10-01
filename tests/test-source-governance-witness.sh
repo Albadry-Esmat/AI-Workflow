@@ -32,6 +32,7 @@ assert.throws(() => witness.checkApiPath('/repos/Albadry-Esmat/AI-Workflow/issue
 assert.throws(() => witness.checkApiPath('/repos/Albadry-Esmat/AI-Workflow/pulls/8/merge','POST'), /write endpoint outside/);
 assert.doesNotThrow(() => witness.checkApiPath('/repos/Albadry-Esmat/AI-Workflow/commits/' + 'a'.repeat(40)));
 const auth = {schema:'aiw-w0-authorization/1',authorization_id:'W0-fixture',nonce:'c'.repeat(64),parent_a0_nonce:'9'.repeat(64),state:'active',consumed:false,issue_number:47,pr_number:8,repository:'Albadry-Esmat/AI-Workflow',base_sha:'b'.repeat(40),head_sha:'d'.repeat(40),diff_sha256:'e'.repeat(64),allowed_paths:['one','two'],expires_at:'2099-01-01T00:00:00Z',parent_a0_id:'A0-fixture',parent_a0_sha256:'f'.repeat(64),b0_before_sha256:'1'.repeat(64),b0_after_sha256:'2'.repeat(64),witness_profile_sha256:'a'.repeat(64),verifier:{id:'AIW-SOLO-W0-BOOTSTRAP-VERIFIER',version:'1.0.1'},acquirer:{id:'AIW-SOLO-W0-EVIDENCE-ACQUIRER',version:'1.0.0'},required_checks:[]};
+auth.canonical_payload_sha256=digest(canonicalize(auth));
 const authComment = '<!-- AIW-W0-AUTHORIZATION/1 -->\n' + JSON.stringify(auth) + '\n<!-- /AIW-W0-AUTHORIZATION/1 -->';
 assert.equal(witness.parseW0Authorization(authComment,47).authorization_id,'W0-fixture');
 const lifecycleRecord = {w0_authorization_id:'W0-fixture',w0_state:'witnessing',witness_workflow_run_id:'r1'};
@@ -39,6 +40,7 @@ const lifecycleComment = {user:{login:'github-actions[bot]'},body:'<!-- AIW-A0-W
 assert.equal(witness.parseLifecycleComments([lifecycleComment])[0].w0_state,'witnessing');
 assert.throws(()=>witness.assertW0NotAttempted([lifecycleRecord],'W0-fixture'),/replay is blocked/);
 const receipt = {verdict:'PASS',repository:auth.repository,pr_number:auth.pr_number,base_sha:auth.base_sha,head_sha:auth.head_sha,diff_sha256:auth.diff_sha256,w0_authorization_id:auth.authorization_id,b0_before_sha256:auth.b0_before_sha256,b0_after_sha256:auth.b0_after_sha256,witness_profile_sha256:auth.witness_profile_sha256,verifier:auth.verifier,acquirer:auth.acquirer,allowed_paths:auth.allowed_paths,evidence_manifest_sha256:'3'.repeat(64),required_checks:[]};
+receipt.canonical_payload_sha256=digest(canonicalize(receipt));
 assert.equal(witness.parseVerifierPass('<!-- AIW-W0-VERIFIER-PASS/1 -->\n'+JSON.stringify(receipt)+'\n<!-- /AIW-W0-VERIFIER-PASS/1 -->',auth).verdict,'PASS');
 const verifier = {...auth.verifier,sha256:'4'.repeat(64)};
 const acquirer = {...auth.acquirer,sha256:'5'.repeat(64)};
