@@ -35,6 +35,11 @@ const auth = {schema:'aiw-w0-authorization/1',authorization_id:'W0-fixture',nonc
 auth.canonical_payload_sha256=digest(canonicalize(auth));
 const authComment = '<!-- AIW-W0-AUTHORIZATION/1 -->\n' + JSON.stringify(auth) + '\n<!-- /AIW-W0-AUTHORIZATION/1 -->';
 assert.equal(witness.parseW0Authorization(authComment,47).authorization_id,'W0-fixture');
+const expiredAuth={...auth,authorization_id:'W0-expired',expires_at:'2000-01-01T00:00:00Z'};
+expiredAuth.canonical_payload_sha256=digest(canonicalize(Object.fromEntries(Object.entries(expiredAuth).filter(([k])=>k!=='canonical_payload_sha256'))));
+const expiredComment={user:{login:'Albadry-Esmat'},body:'<!-- AIW-W0-AUTHORIZATION/1 -->\n'+JSON.stringify(expiredAuth)+'\n<!-- /AIW-W0-AUTHORIZATION/1 -->'};
+const activeComment={user:{login:'Albadry-Esmat'},body:authComment};
+assert.equal(witness.findW0Authorization([expiredComment,activeComment],47,'W0-fixture').authorization_id,'W0-fixture');
 const lifecycleRecord = {w0_authorization_id:'W0-fixture',w0_state:'witnessing',witness_workflow_run_id:'r1'};
 const lifecycleComment = {user:{login:'github-actions[bot]'},body:'<!-- AIW-A0-W0-LIFECYCLE/1 -->\n'+JSON.stringify(lifecycleRecord)+'\n<!-- /AIW-A0-W0-LIFECYCLE/1 -->'};
 assert.equal(witness.parseLifecycleComments([lifecycleComment])[0].w0_state,'witnessing');

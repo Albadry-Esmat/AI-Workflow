@@ -66,6 +66,20 @@ function parseW0Authorization(comment, issueNumber) {
   return auth;
 }
 
+function findW0Authorization(comments, issueNumber, authorizationId) {
+  const selected = [];
+  for (const comment of comments) {
+    if (!comment.user || comment.user.login !== OWNER || !comment.body || !comment.body.includes(AUTH_START) || !comment.body.includes(AUTH_END)) continue;
+    const start = comment.body.indexOf(AUTH_START) + AUTH_START.length;
+    const end = comment.body.indexOf(AUTH_END);
+    let candidate;
+    try { candidate = JSON.parse(comment.body.slice(start, end).trim()); } catch { fail('W0 authorization JSON invalid'); }
+    if (candidate.authorization_id === authorizationId) selected.push(parseW0Authorization(comment.body, issueNumber));
+  }
+  if (selected.length !== 1) fail('expected exactly one active W0 authorization record');
+  return selected[0];
+}
+
 function parseVerifierPass(comment, authorization) {
   const start = comment.indexOf(PASS_START);
   const end = comment.indexOf(PASS_END);
@@ -291,11 +305,7 @@ async function main() {
   if (issue.user.login !== OWNER || issue.state !== 'open') fail('A0 Issue author/state invalid');
   const a0 = parseA0Body(issue.body || '');
   const comments = await pages(`/repos/${FULL_REPO}/issues/${ref.issueNumber}/comments`, token);
-  const matches = comments.filter((comment) => comment.user && comment.user.login === OWNER && comment.body && comment.body.includes(AUTH_START) && comment.body.includes(AUTH_END))
-    .map((comment) => parseW0Authorization(comment.body, ref.issueNumber))
-    .filter((auth) => auth.authorization_id === ref.authorizationId);
-  if (matches.length !== 1) fail('W0 authorization comment missing or duplicated');
-  const authorization = matches[0];
+  const authorization = findW0Authorization(comments, ref.issueNumber, ref.authorizationId);
   if (authorization.issue_number !== ref.issueNumber || authorization.pr_number !== pr.number || authorization.authorization_id !== ref.authorizationId) fail('W0 authorization PR/Issue binding failed');
   const passReceipts = comments.filter((comment) => comment.user && comment.user.login === OWNER && comment.body && comment.body.includes(PASS_START) && comment.body.includes(PASS_END));
   const receiptMatches = passReceipts.map((comment) => parseVerifierPass(comment.body, authorization)).filter((receipt) => receipt.w0_authorization_id === authorization.authorization_id);
@@ -321,7 +331,7 @@ async function main() {
   fs.writeFileSync(process.env.RUNNER_TEMP + '/aiw-source-governance-witness.json', canonicalize(envelope) + '\n', { mode: 0o600, flag: 'wx' });
 }
 
-module.exports = { parseCanonicalEnvelope, parseA0Body, parseW0Authorization, parseVerifierPass, parseLifecycleComments, assertW0NotAttempted, parseIssueReference, checkApiPath, createWitnessEnvelope, appendLifecycleComment, captureTufEvidence, tufEvidenceChunkRecords };
+module.exports = { parseCanonicalEnvelope, parseA0Body, parseW0Authorization, findW0Authorization, parseVerifierPass, parseLifecycleComments, assertW0NotAttempted, parseIssueReference, checkApiPath, createWitnessEnvelope, appendLifecycleComment, captureTufEvidence, tufEvidenceChunkRecords };
 
 if (require.main === module) {
   const args = process.argv.slice(2);
