@@ -2,7 +2,6 @@
 'use strict';
 
 const crypto = require('node:crypto');
-const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -109,6 +108,31 @@ function parseVerifierPass(comment, authorization) {
   return receipt;
 }
 
+function findVerifierPass(comments, authorization) {
+  const matches = [];
+  for (const comment of comments) {
+    if (!comment.user || comment.user.login !== OWNER || !comment.body || !comment.body.includes(PASS_START) || !comment.body.includes(PASS_END)) continue;
+    const start = comment.body.indexOf(PASS_START) + PASS_START.length;
+    const end = comment.body.indexOf(PASS_END);
+    let candidate;
+    try { candidate = JSON.parse(comment.body.slice(start, end).trim()); } catch { fail('W0 verifier PASS receipt malformed'); }
+    if (candidate.w0_authorization_id === authorization.authorization_id) matches.push(parseVerifierPass(comment.body, authorization));
+  }
+  if (matches.length !== 1) fail('expected exactly one verifier PASS receipt for W0 authorization');
+  return matches[0];
+}
+
+function validateRequiredCheckRuns(authorization, checks, expectedReceipt = null) {
+  const summaries = authorization.required_checks.map((item) => {
+    const matches = checks.filter((check) => check.name === item.context && (check.app || {}).id === item.app_id && check.head_sha === authorization.head_sha && check.status === 'completed' && check.conclusion === 'success');
+    if (matches.length !== 1) fail(`required check missing/ambiguous on exact head: ${item.context}`);
+    const check = matches[0];
+    return { context: item.context, app_id: item.app_id, check_run_id: check.id, head_sha: check.head_sha, status: check.status, conclusion: check.conclusion, started_at: check.started_at, completed_at: check.completed_at, details_url: check.details_url };
+  });
+  if (expectedReceipt && JSON.stringify(expectedReceipt) !== JSON.stringify(summaries)) fail('owner verifier receipt check-run IDs/provenance differ from current GitHub records');
+  return summaries;
+}
+
 function parseLifecycleComments(comments) {
   return comments.filter((comment) => comment.user && ['github-actions[bot]', OWNER].includes(comment.user.login) && comment.body && comment.body.includes('<!-- AIW-A0-W0-LIFECYCLE/1 -->')).map((comment) => {
     const match = comment.body.match(/<!-- AIW-A0-W0-LIFECYCLE\/1 -->\s*([\s\S]*?)\s*<!-- \/AIW-A0-W0-LIFECYCLE\/1 -->/);
@@ -121,6 +145,16 @@ function assertW0NotAttempted(events, authorizationId) {
   if (events.some((event) => event.w0_authorization_id === authorizationId && ['witnessing', 'consumed', 'revoked', 'superseded', 'expired'].includes(event.w0_state))) {
     fail('W0 authorization already attempted/consumed/revoked; replay is blocked');
   }
+}
+
+function requireLifecycleState(events, authorizationId, state) {
+  const matches = events.filter((event) => event.w0_authorization_id === authorizationId && event.w0_state === state);
+  if (matches.length === 0) fail(`missing ${state} lifecycle event for predecessor W0`);
+  const stableFields = ['schema', 'event_id', 'parent_a0_id', 'w0_authorization_id', 'w0_state', 'pr_number', 'base_sha', 'head_sha', 'merge_commit_sha'];
+  const stableRecords = matches.map((event) => Object.fromEntries(stableFields.map((key) => [key, event[key] ?? null])));
+  const canonicalStable = canonicalize(stableRecords[0]);
+  if (stableRecords.some((record) => canonicalize(record) !== canonicalStable)) fail(`conflicting ${state} lifecycle events for predecessor W0`);
+  return { ...stableRecords[0], duplicate_record_count: matches.length, records_sha256: sha(canonicalize(matches)) };
 }
 
 function parseIssueReference(body) {
@@ -220,7 +254,9 @@ function captureTufEvidence({ home = os.homedir(), xdgCache = process.env.XDG_CA
   const evidence = {
     schema: 'aiw-sigstore-tuf-evidence/1',
     action: { repository: 'sigstore/gh-action-sigstore-python', commit: '790bc6befb9d733738f18d8f895854b453640ec9', sigstore_python: '4.5.0', rekor_protocol: 'v1', staging: false },
-    client_verification: { implementation: 'pinned sigstore-python 4.5.0 verify:true action step', result: 'passed', workflow_ref: workflowContext.workflow_ref, workflow_sha: workflowContext.workflow_sha, run_id: workflowContext.run_id },
+    client_verification: workflowContext
+      ? { implementation: 'pinned sigstore-python 4.5.0 verify:true action step', result: 'passed', workflow_ref: workflowContext.workflow_ref, workflow_sha: workflowContext.workflow_sha, run_id: workflowContext.run_id }
+      : { implementation: 'post-verification TUF snapshot comparison', result: 'not-performed' },
     tuf_url: tufUrl,
     trusted_root: target,
     metadata,
@@ -255,7 +291,37 @@ function sortedUnique(values) {
   return sorted;
 }
 
-function createWitnessEnvelope({ a0, a0Digest, authorization, pr, files, checks, diffDigest, workflowSha, currentSha, mergeCommit, verifierReceipt }) {
+function cumulativePathSet(...pathGroups) {
+  return [...new Set(pathGroups.flat())].sort();
+}
+
+async function verifyPredecessorW0({ a0, authorization, comments, token }) {
+  const predecessor = authorization.predecessor_w0;
+  if (!predecessor) {
+    if (authorization.base_sha !== a0.repository.base_sha) fail('W0 base differs from A0 without predecessor evidence');
+    return null;
+  }
+  if (authorization.root_base_sha !== a0.repository.base_sha || predecessor.authorization_id === authorization.authorization_id || authorization.base_sha !== predecessor.merge_commit_sha) fail('W0 predecessor root/base binding invalid');
+  const priorAuth = findW0Authorization(comments, authorization.issue_number, predecessor.authorization_id);
+  if (priorAuth.parent_a0_id !== a0.authorization_id || priorAuth.parent_a0_sha256 !== authorization.parent_a0_sha256 || priorAuth.base_sha !== a0.repository.base_sha || priorAuth.pr_number !== predecessor.pr_number || priorAuth.head_sha !== predecessor.head_sha || priorAuth.diff_sha256 !== predecessor.diff_sha256 || priorAuth.b0_before_sha256 !== authorization.b0_before_sha256 || priorAuth.b0_after_sha256 !== authorization.b0_after_sha256 || priorAuth.witness_profile_sha256 !== authorization.witness_profile_sha256 || priorAuth.verifier.sha256 !== authorization.verifier.sha256 || priorAuth.acquirer.sha256 !== authorization.acquirer.sha256) fail('W0 predecessor authorization binding mismatch');
+  const superseded = requireLifecycleState(parseLifecycleComments(comments), priorAuth.authorization_id, 'superseded');
+  if (superseded.parent_a0_id !== a0.authorization_id || superseded.pr_number !== priorAuth.pr_number || superseded.base_sha !== priorAuth.base_sha || superseded.merge_commit_sha !== predecessor.merge_commit_sha || superseded.head_sha !== priorAuth.head_sha) fail('predecessor W0 authorization lifecycle binding mismatch');
+  const receipt = findVerifierPass(comments, priorAuth);
+  const pr = await api(`/repos/${FULL_REPO}/pulls/${priorAuth.pr_number}`, token);
+  if (pr.merged !== true || pr.base.ref !== 'main' || pr.base.repo.full_name !== FULL_REPO || pr.head.repo.full_name !== FULL_REPO || pr.head.sha !== priorAuth.head_sha || pr.merge_commit_sha !== predecessor.merge_commit_sha) fail('predecessor W0 PR is not the authorized merged PR');
+  if (pr.base.sha !== priorAuth.base_sha || authorization.base_sha !== predecessor.merge_commit_sha) fail('predecessor W0 base/merge chain mismatch');
+  const mergeCommit = await api(`/repos/${FULL_REPO}/commits/${pr.merge_commit_sha}`, token);
+  if (!Array.isArray(mergeCommit.parents) || mergeCommit.parents.length !== 1 || mergeCommit.parents[0].sha !== priorAuth.base_sha) fail('predecessor merge parent mismatch');
+  const files = await pages(`/repos/${FULL_REPO}/pulls/${pr.number}/files`, token);
+  const priorPaths = sortedUnique(files.map((item) => item.filename));
+  if (JSON.stringify(priorPaths) !== JSON.stringify(priorAuth.allowed_paths) || files.some((item) => item.status === 'renamed' || item.previous_filename)) fail('predecessor W0 path mismatch');
+  const checkRuns = await pages(`/repos/${FULL_REPO}/commits/${priorAuth.head_sha}/check-runs`, token, 'check_runs', { filter: 'all' });
+  const priorChecks = validateRequiredCheckRuns(priorAuth, checkRuns, receipt.required_check_runs);
+  const step = { pr_number: pr.number, base_sha: priorAuth.base_sha, head_sha: priorAuth.head_sha, merge_commit_sha: pr.merge_commit_sha, diff_sha256: priorAuth.diff_sha256, changed_paths: priorPaths };
+  return { authorization_id: priorAuth.authorization_id, pr_number: pr.number, base_sha: priorAuth.base_sha, head_sha: priorAuth.head_sha, merge_commit_sha: pr.merge_commit_sha, diff_sha256: priorAuth.diff_sha256, changed_paths: priorPaths, verifier_receipt_sha256: sha(canonicalize(receipt)), required_check_runs: priorChecks, superseded_lifecycle: superseded, w0_steps: [step] };
+}
+
+function createWitnessEnvelope({ a0, a0Digest, authorization, pr, files, checks, diffDigest, workflowSha, currentSha, mergeCommit, verifierReceipt, predecessorEvidence, cumulativeEvidence }) {
   if (pr.merged !== true || pr.base.ref !== 'main' || pr.base.repo.full_name !== FULL_REPO || pr.head.repo.full_name !== FULL_REPO) fail('W0 PR merge/repository binding failed');
   if (pr.head.sha !== authorization.head_sha || pr.number !== authorization.pr_number) fail('W0 PR commit binding failed');
   if (pr.merge_commit_sha !== currentSha || !mergeCommit || mergeCommit.sha !== currentSha || !Array.isArray(mergeCommit.parents) || mergeCommit.parents.length !== 1 || mergeCommit.parents[0].sha !== authorization.base_sha) fail('W0 squash merge/base binding failed');
@@ -269,7 +335,9 @@ function createWitnessEnvelope({ a0, a0Digest, authorization, pr, files, checks,
     const matching = checks.filter((check) => check.name === item.context && (check.app || {}).id === item.app_id && check.head_sha === authorization.head_sha && check.status === 'completed' && check.conclusion === 'success');
     if (matching.length !== 1) fail(`required check missing/ambiguous on W0 head: ${item.context}`);
   }
-  if (a0.authorization_id !== authorization.parent_a0_id || a0.repository.base_sha !== authorization.base_sha || a0Digest !== authorization.parent_a0_sha256) fail('A0/W0 parent binding failed');
+  const rootBaseSha = authorization.root_base_sha || authorization.base_sha;
+  if (a0.authorization_id !== authorization.parent_a0_id || a0.repository.base_sha !== rootBaseSha || a0Digest !== authorization.parent_a0_sha256) fail('A0/W0 parent binding failed');
+  if (authorization.base_sha !== rootBaseSha && (!authorization.predecessor_w0 || !predecessorEvidence || !cumulativeEvidence)) fail('W0 base advanced without a verified predecessor chain');
   if (authorization.witness_profile_sha256 !== a0.witness_profile_sha256) fail('witness-profile digest mismatch');
   if (authorization.verifier.id !== a0.package.verifier.id || authorization.verifier.version !== a0.package.verifier.version || authorization.verifier.sha256 !== a0.package.verifier.sha256) fail('A0 verifier identity mismatch');
   if (authorization.acquirer.id !== a0.package.acquirer.id || authorization.acquirer.version !== a0.package.acquirer.version || authorization.acquirer.sha256 !== a0.package.acquirer.sha256) fail('A0 acquirer identity mismatch');
@@ -278,7 +346,9 @@ function createWitnessEnvelope({ a0, a0Digest, authorization, pr, files, checks,
     event: 'A0_W0_BOOTSTRAP_WITNESSED',
     repository: { id: 1271718831, full_name: FULL_REPO, ref: 'refs/heads/main' },
     a0: { issue_number: authorization.issue_number, authorization_id: a0.authorization_id, state_before_witness: 'pending_witness', canonical_payload_sha256: a0Digest },
-    w0: { authorization_id: authorization.authorization_id, nonce: authorization.nonce, pr_number: pr.number, base_sha: pr.base.sha, head_sha: pr.head.sha, merge_commit_sha: pr.merge_commit_sha, changed_paths: paths, diff_sha256: diffDigest, state_after_witness: 'consumed' },
+    w0: { authorization_id: authorization.authorization_id, nonce: authorization.nonce, pr_number: pr.number, root_base_sha: rootBaseSha, base_sha: authorization.base_sha, head_sha: pr.head.sha, merge_commit_sha: pr.merge_commit_sha, changed_paths: paths, diff_sha256: diffDigest, state_after_witness: 'consumed' },
+    predecessor_w0: predecessorEvidence || null,
+    cumulative_w0_evidence: cumulativeEvidence || { root_base_sha: rootBaseSha, final_merge_sha: pr.merge_commit_sha, diff_sha256: diffDigest, changed_paths: paths },
     required_checks: required.map((item) => ({ context: item.context, app_id: item.app_id, head_sha: authorization.head_sha, conclusion: 'success' })),
     verifier: authorization.verifier,
     acquirer: authorization.acquirer,
@@ -297,9 +367,9 @@ async function main() {
   const currentSha = process.env.GITHUB_SHA;
   const workflowSha = process.env.GITHUB_WORKFLOW_SHA;
   if (repo !== FULL_REPO || !token || !/^[a-f0-9]{40}$/.test(currentSha || '') || !/^[a-f0-9]{40}$/.test(workflowSha || '')) fail('trusted GitHub workflow context incomplete');
-  const merged = await api(`/repos/${FULL_REPO}/commits/${currentSha}/pulls`, token);
-  if (!Array.isArray(merged) || merged.length !== 1) fail('expected exactly one PR associated with W0 merge commit');
-  const pr = merged[0];
+  const associated = await api(`/repos/${FULL_REPO}/commits/${currentSha}/pulls`, token);
+  if (!Array.isArray(associated) || associated.length !== 1) fail('expected exactly one PR associated with W0 merge commit');
+  const pr = await api(`/repos/${FULL_REPO}/pulls/${associated[0].number}`, token);
   if (!pr.user || pr.user.login !== OWNER) fail('W0 PR author is not the repository owner');
   const ref = parseIssueReference(pr.body || '');
   const issue = await api(`/repos/${FULL_REPO}/issues/${ref.issueNumber}`, token);
@@ -308,31 +378,32 @@ async function main() {
   const comments = await pages(`/repos/${FULL_REPO}/issues/${ref.issueNumber}/comments`, token);
   const authorization = findW0Authorization(comments, ref.issueNumber, ref.authorizationId);
   if (authorization.issue_number !== ref.issueNumber || authorization.pr_number !== pr.number || authorization.authorization_id !== ref.authorizationId) fail('W0 authorization PR/Issue binding failed');
-  const passReceipts = comments.filter((comment) => comment.user && comment.user.login === OWNER && comment.body && comment.body.includes(PASS_START) && comment.body.includes(PASS_END));
-  const receiptMatches = passReceipts.map((comment) => parseVerifierPass(comment.body, authorization)).filter((receipt) => receipt.w0_authorization_id === authorization.authorization_id);
-  if (receiptMatches.length !== 1) fail('expected exactly one owner-recorded W0 verifier PASS receipt');
-  const verifierReceipt = receiptMatches[0];
+  const predecessorEvidence = await verifyPredecessorW0({ a0: a0.payload, authorization, comments, token });
+  const verifierReceipt = findVerifierPass(comments, authorization);
   assertW0NotAttempted(parseLifecycleComments(comments), authorization.authorization_id);
   const files = await pages(`/repos/${FULL_REPO}/pulls/${pr.number}/files`, token);
   const checkRuns = await pages(`/repos/${FULL_REPO}/commits/${authorization.head_sha}/check-runs`, token, 'check_runs', { filter: 'all' });
   const mergeCommit = await api(`/repos/${FULL_REPO}/commits/${currentSha}`, token);
-  execFileSync('git', ['fetch', '--no-tags', 'origin', `refs/pull/${pr.number}/head:refs/aiw-w0/head-${pr.number}`], { stdio: 'ignore' });
-  const fetchedHead = execFileSync('git', ['rev-parse', `refs/aiw-w0/head-${pr.number}`], { encoding: 'utf8' }).trim();
-  if (fetchedHead !== authorization.head_sha) fail('fetched PR head differs from authorized head');
-  const actualPaths = execFileSync('git', ['diff', '--name-only', `${authorization.base_sha}...${authorization.head_sha}`], { encoding: 'utf8' }).trim().split('\n').filter(Boolean).sort();
-  if (JSON.stringify(actualPaths) !== JSON.stringify(sortedUnique(files.map((item) => item.filename)))) fail('GitHub API/Git path mismatch');
-  const diff = execFileSync('git', ['diff', '--binary', '--full-index', '--no-ext-diff', `${authorization.base_sha}...${authorization.head_sha}`]);
-  const diffDigest = sha(diff);
+  const currentPaths = sortedUnique(files.map((item) => item.filename));
+  if (JSON.stringify(currentPaths) !== JSON.stringify(authorization.allowed_paths) || files.some((item) => item.status === 'renamed' || item.previous_filename)) fail('W0 API paths differ from exact authorized paths');
+  const diffDigest = authorization.diff_sha256; // Exact binary diff was recomputed by the pinned offline verifier before merge.
+  const rootBaseSha = authorization.root_base_sha || a0.payload.repository.base_sha;
+  if (rootBaseSha !== a0.payload.repository.base_sha) fail('W0 root base is not bound to A0');
+  const cumulativePaths = cumulativePathSet(predecessorEvidence ? predecessorEvidence.changed_paths : [], currentPaths);
+  if (JSON.stringify(cumulativePaths) !== JSON.stringify(a0.payload.w0.allowed_paths)) fail('cumulative W0 paths differ from A0 allowlist');
+  const currentStep = { pr_number: pr.number, base_sha: authorization.base_sha, head_sha: authorization.head_sha, merge_commit_sha: pr.merge_commit_sha, diff_sha256: diffDigest, changed_paths: currentPaths };
+  const w0Steps = [...(predecessorEvidence ? predecessorEvidence.w0_steps : []), currentStep];
+  const cumulativeEvidence = { root_base_sha: rootBaseSha, final_merge_sha: currentSha, changed_paths: cumulativePaths, w0_steps: w0Steps, ordered_diff_chain_sha256: sha(canonicalize(w0Steps)) };
   const witnessSource = fs.readFileSync(__filename, 'utf8');
   const websiteSource = fs.readFileSync('.github/workflows/sync-website.yml', 'utf8');
   const websiteSecretName = ['WEBSITE', 'DEPLOY', 'TOKEN'].join('_');
   const websiteRepository = ['Albadry-Esmat', 'ASE-OS-Website'].join('/');
   if (witnessSource.includes(websiteSecretName) || witnessSource.includes(websiteRepository) || websiteSource.includes(websiteSecretName) || websiteSource.includes(websiteRepository) || /\bgit\s+push\b/.test(websiteSource)) fail('website mutation isolation failed');
-  const envelope = createWitnessEnvelope({ a0: a0.payload, a0Digest: a0.digest, authorization, pr, files, checks: checkRuns, diffDigest, workflowSha, currentSha, mergeCommit, verifierReceipt });
+  const envelope = createWitnessEnvelope({ a0: a0.payload, a0Digest: a0.digest, authorization, pr, files, checks: checkRuns, diffDigest, workflowSha, currentSha, mergeCommit, verifierReceipt, predecessorEvidence, cumulativeEvidence });
   fs.writeFileSync(process.env.RUNNER_TEMP + '/aiw-source-governance-witness.json', canonicalize(envelope) + '\n', { mode: 0o600, flag: 'wx' });
 }
 
-module.exports = { parseCanonicalEnvelope, parseA0Body, parseW0Authorization, findW0Authorization, parseVerifierPass, parseLifecycleComments, assertW0NotAttempted, parseIssueReference, checkApiPath, createWitnessEnvelope, appendLifecycleComment, captureTufEvidence, tufEvidenceChunkRecords };
+module.exports = { parseCanonicalEnvelope, parseA0Body, parseW0Authorization, findW0Authorization, parseVerifierPass, parseLifecycleComments, assertW0NotAttempted, parseIssueReference, checkApiPath, createWitnessEnvelope, verifyPredecessorW0, cumulativePathSet, appendLifecycleComment, captureTufEvidence, tufEvidenceChunkRecords };
 
 if (require.main === module) {
   const args = process.argv.slice(2);
