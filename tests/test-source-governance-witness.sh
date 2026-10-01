@@ -44,6 +44,7 @@ const lifecycleRecord = {w0_authorization_id:'W0-fixture',w0_state:'witnessing',
 const lifecycleComment = {user:{login:'github-actions[bot]'},body:'<!-- AIW-A0-W0-LIFECYCLE/1 -->\n'+JSON.stringify(lifecycleRecord)+'\n<!-- /AIW-A0-W0-LIFECYCLE/1 -->'};
 assert.equal(witness.parseLifecycleComments([lifecycleComment])[0].w0_state,'witnessing');
 assert.throws(()=>witness.assertW0NotAttempted([lifecycleRecord],'W0-fixture'),/replay is blocked/);
+assert.throws(()=>witness.assertW0NotAttempted([{w0_authorization_id:'W0-fixture',w0_state:'revoked'}],'W0-fixture'),/replay is blocked/);
 const receipt = {verdict:'PASS',repository:auth.repository,pr_number:auth.pr_number,base_sha:auth.base_sha,head_sha:auth.head_sha,diff_sha256:auth.diff_sha256,w0_authorization_id:auth.authorization_id,b0_before_sha256:auth.b0_before_sha256,b0_after_sha256:auth.b0_after_sha256,witness_profile_sha256:auth.witness_profile_sha256,verifier:auth.verifier,acquirer:auth.acquirer,allowed_paths:auth.allowed_paths,evidence_manifest_sha256:'3'.repeat(64),required_checks:[]};
 receipt.canonical_payload_sha256=digest(canonicalize(receipt));
 assert.equal(witness.parseVerifierPass('<!-- AIW-W0-VERIFIER-PASS/1 -->\n'+JSON.stringify(receipt)+'\n<!-- /AIW-W0-VERIFIER-PASS/1 -->',auth).verdict,'PASS');

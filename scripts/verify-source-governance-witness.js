@@ -118,8 +118,8 @@ function parseLifecycleComments(comments) {
 }
 
 function assertW0NotAttempted(events, authorizationId) {
-  if (events.some((event) => event.w0_authorization_id === authorizationId && ['witnessing', 'consumed'].includes(event.w0_state))) {
-    fail('W0 authorization already attempted/consumed; replay is blocked');
+  if (events.some((event) => event.w0_authorization_id === authorizationId && ['witnessing', 'consumed', 'revoked', 'superseded', 'expired'].includes(event.w0_state))) {
+    fail('W0 authorization already attempted/consumed/revoked; replay is blocked');
   }
 }
 
