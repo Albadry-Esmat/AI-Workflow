@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aiw-source-governance-bootstrap/1",
+  "title": "Source Governance Bootstrap A0/W0 Record",
+  "type": "object",
+  "required": ["schema", "authorization_id", "nonce", "state", "issued_at", "expires_at", "repository", "governance", "scope", "package", "witness_profile"],
+  "properties": {
+    "schema": { "const": "aiw-source-governance-a0/1" },
+    "authorization_id": { "type": "string", "minLength": 16 },
+    "nonce": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "state": { "enum": ["pending_witness", "active", "superseded", "expired", "revoked"] },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "repository": {
+      "type": "object",
+      "required": ["id", "full_name", "default_branch", "base_sha"],
+      "properties": {
+        "id": { "const": 1271718831 },
+        "full_name": { "const": "Albadry-Esmat/AI-Workflow" },
+        "default_branch": { "const": "main" },
+        "base_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+      },
+      "additionalProperties": true
+    },
+    "governance": {
+      "type": "object",
+      "required": ["governance_mode", "repository_owner_github_login", "independent_human_review"],
+      "properties": {
+        "governance_mode": { "const": "solo-owner-autonomous" },
+        "repository_owner_github_login": { "const": "Albadry-Esmat" },
+        "independent_human_review": { "const": false },
+        "ai_review_is_human_review": { "const": false }
+      },
+      "additionalProperties": true
+    },
+    "scope": { "type": "object" },
+    "package": { "type": "object" },
+    "witness_profile": { "type": "object" }
+  },
+  "additionalProperties": true
+}
