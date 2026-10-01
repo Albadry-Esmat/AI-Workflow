@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/source-governance-witness.yml
+      - scripts/verify-source-governance-witness.js
 
 permissions:
   contents: read

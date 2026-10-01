@@ -60,6 +60,15 @@ const good = witness.createWitnessEnvelope({a0:a0Full,a0Digest:auth.parent_a0_sh
 assert.equal(good.event,'A0_W0_BOOTSTRAP_WITNESSED');
 assert.equal(good.w0.state_after_witness,'consumed');
 assert.throws(()=>witness.createWitnessEnvelope({a0:a0Full,a0Digest:auth.parent_a0_sha256,authorization:auth,pr,files:[{filename:'one'},{filename:'two'}],checks,diffDigest:'8'.repeat(64),workflowSha:'7'.repeat(40),currentSha:pr.merge_commit_sha,mergeCommit:{sha:pr.merge_commit_sha,parents:[{sha:auth.base_sha}]},verifierReceipt:{verdict:'PASS'}}),/diff digest mismatch/);
+const chainedAuth={...auth,root_base_sha:auth.base_sha,base_sha:'9'.repeat(40),predecessor_w0:{authorization_id:'W0-prior',merge_commit_sha:'9'.repeat(40)}};
+const chainedPr={...pr,base:{ref:'main',sha:chainedAuth.base_sha,repo:{full_name:auth.repository}},merge_commit_sha:'6'.repeat(40)};
+const predecessorEvidence={authorization_id:'W0-prior',merge_commit_sha:chainedAuth.base_sha,pr_number:7};
+const cumulativeEvidence={root_base_sha:chainedAuth.root_base_sha,final_merge_sha:chainedPr.merge_commit_sha,diff_sha256:'a'.repeat(64),changed_paths:['one','two']};
+const chained=witness.createWitnessEnvelope({a0:a0Full,a0Digest:chainedAuth.parent_a0_sha256,authorization:chainedAuth,pr:chainedPr,files:[{filename:'one'},{filename:'two'}],checks,diffDigest:chainedAuth.diff_sha256,workflowSha:'7'.repeat(40),currentSha:chainedPr.merge_commit_sha,mergeCommit:{sha:chainedPr.merge_commit_sha,parents:[{sha:chainedAuth.base_sha}]},verifierReceipt:{verdict:'PASS'},predecessorEvidence,cumulativeEvidence});
+assert.equal(chained.a0.canonical_payload_sha256,auth.parent_a0_sha256);
+assert.equal(chained.predecessor_w0.authorization_id,'W0-prior');
+assert.deepEqual(chained.cumulative_w0_evidence.changed_paths,['one','two']);
+assert.deepEqual(witness.cumulativePathSet(['one','two'],['one','three']),['one','three','two']);
 const tufHome = fs.mkdtempSync(path.join(os.tmpdir(),'aiw-tuf-fixture-'));
 const tufUrl = 'https://tuf-repo-cdn.sigstore.dev';
 const encoded = encodeURIComponent(tufUrl);
@@ -79,6 +88,9 @@ assert.equal(tufEvidence.trusted_root.sha256,tufCapture.trusted_root_sha256);
 assert.equal(tufEvidence.client_verification.result,'passed');
 assert.equal(tufEvidence.metadata.find(x=>x.name==='targets.json').version,7);
 assert.equal(tufEvidence.signed_witness_bundle.sha256,digest(fs.readFileSync(witnessPath+'.sigstore.json').toString()));
+const postVerifyTufOutput=path.join(tufHome,'post-verify-tuf.json');
+witness.captureTufEvidence({home:tufHome,witnessPath,outputPath:postVerifyTufOutput});
+assert.equal(JSON.parse(fs.readFileSync(postVerifyTufOutput,'utf8')).client_verification.result,'not-performed');
 const chunks=witness.tufEvidenceChunkRecords(fs.readFileSync(tufOutput),'W0-fixture',40);
 assert.equal(Buffer.concat(chunks.map(x=>Buffer.from(x.content_base64,'base64'))).toString(),fs.readFileSync(tufOutput,'utf8'));
 assert.ok(chunks.every(x=>x.tuf_evidence_sha256===digest(fs.readFileSync(tufOutput))));
@@ -102,10 +114,49 @@ assert.equal((workflow.match(/sigstore\/gh-action-sigstore-python@790bc6befb9d73
 const validateSkills=fs.readFileSync(path.join(root,'.github/workflows/validate-skills.yml'),'utf8');
 const yamlCheck=require('child_process').spawnSync('python3',['-c','import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); x=d.get("on",d.get(True)); assert x["push"]["branches"]==["main"]; assert x["push"]["paths"]==x["pull_request"]["paths"]',path.join(root,'.github/workflows/validate-skills.yml')],{encoding:'utf8'});
 assert.equal(yamlCheck.status,0,yamlCheck.stderr||yamlCheck.stdout);
+const witnessYamlCheck=require('child_process').spawnSync('python3',['-c','import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); x=d.get("on",d.get(True)); assert ".github/workflows/source-governance-witness.yml" in x["push"]["paths"]; assert "scripts/verify-source-governance-witness.js" in x["push"]["paths"]',path.join(root,'.github/workflows/source-governance-witness.yml')],{encoding:'utf8'});
+assert.equal(witnessYamlCheck.status,0,witnessYamlCheck.stderr||witnessYamlCheck.stdout);
 for (const source of [workflow,website]) {
   assert.ok(!source.includes('WEBSITE_DEPLOY_TOKEN'));
   assert.ok(!source.includes('Albadry-Esmat/ASE-OS-Website'));
   assert.ok(!/\bgit\s+push\b/.test(source));
 }
 console.log('PASS: canonicalization, A0 binding, endpoint allowlist, Sigstore profile, and website isolation');
+
+async function predecessorChainFixture() {
+  const base='b'.repeat(40), oldHead='d'.repeat(40), merge='9'.repeat(40), newHead='a'.repeat(40);
+  const profile='a'.repeat(64), before='1'.repeat(64), after='2'.repeat(64), oldDiff='e'.repeat(64), newDiff='f'.repeat(64);
+  const prior={schema:'aiw-w0-authorization/1',authorization_id:'W0-prior',nonce:'c'.repeat(64),parent_a0_nonce:'9'.repeat(64),state:'active',consumed:false,issue_number:47,parent_a0_id:'A0-fixture',parent_a0_sha256:'f'.repeat(64),repository:'Albadry-Esmat/AI-Workflow',pr_number:7,base_sha:base,head_sha:oldHead,diff_sha256:oldDiff,allowed_paths:['one','two'],expires_at:'2099-01-01T00:00:00Z',b0_before_sha256:before,b0_after_sha256:after,witness_profile_sha256:profile,verifier:{id:'AIW-SOLO-W0-BOOTSTRAP-VERIFIER',version:'1.0.1',sha256:'4'.repeat(64)},acquirer:{id:'AIW-SOLO-W0-EVIDENCE-ACQUIRER',version:'1.0.0',sha256:'5'.repeat(64),schema:'aiw-w0-evidence/1'},required_checks:[]};
+  prior.canonical_payload_sha256=digest(canonicalize(prior));
+  const cur={...prior,authorization_id:'W0-current',nonce:'6'.repeat(64),pr_number:8,base_sha:merge,head_sha:newHead,diff_sha256:newDiff,allowed_paths:['three'],root_base_sha:base,predecessor_w0:{authorization_id:prior.authorization_id,pr_number:7,head_sha:oldHead,diff_sha256:oldDiff,merge_commit_sha:merge}};
+  cur.canonical_payload_sha256=digest(canonicalize(cur));
+  const priorReceipt={verdict:'PASS',repository:prior.repository,pr_number:7,base_sha:base,head_sha:oldHead,diff_sha256:oldDiff,w0_authorization_id:prior.authorization_id,b0_before_sha256:before,b0_after_sha256:after,witness_profile_sha256:profile,verifier:prior.verifier,acquirer:prior.acquirer,allowed_paths:prior.allowed_paths,evidence_manifest_sha256:'7'.repeat(64),required_checks:[],required_check_runs:[]};
+  priorReceipt.canonical_payload_sha256=digest(canonicalize(priorReceipt));
+  const issueComments=[
+    {user:{login:'Albadry-Esmat'},body:'<!-- AIW-W0-AUTHORIZATION/1 -->\n'+JSON.stringify(prior)+'\n<!-- /AIW-W0-AUTHORIZATION/1 -->'},
+    {user:{login:'Albadry-Esmat'},body:'<!-- AIW-W0-VERIFIER-PASS/1 -->\n'+JSON.stringify(priorReceipt)+'\n<!-- /AIW-W0-VERIFIER-PASS/1 -->'},
+    {user:{login:'Albadry-Esmat'},body:'<!-- AIW-A0-W0-LIFECYCLE/1 -->\n'+JSON.stringify({schema:'aiw-source-governance-lifecycle/1',event_id:'w0-superseded-W0-prior',parent_a0_id:'A0-fixture',w0_authorization_id:prior.authorization_id,w0_state:'superseded',pr_number:7,base_sha:base,head_sha:oldHead,merge_commit_sha:merge,reason:'failed witness run',recorded_at:'2026-10-01T09:00:00Z'})+'\n<!-- /AIW-A0-W0-LIFECYCLE/1 -->'},
+    {user:{login:'Albadry-Esmat'},body:'<!-- AIW-A0-W0-LIFECYCLE/1 -->\n'+JSON.stringify({schema:'aiw-source-governance-lifecycle/1',event_id:'w0-superseded-W0-prior',parent_a0_id:'A0-fixture',w0_authorization_id:prior.authorization_id,w0_state:'superseded',pr_number:7,base_sha:base,head_sha:oldHead,merge_commit_sha:merge,reason:'merge confirmed as predecessor',recorded_at:'2026-10-01T09:01:00Z'})+'\n<!-- /AIW-A0-W0-LIFECYCLE/1 -->'},
+  ];
+  const originalFetch=global.fetch;
+  global.fetch=async (url)=>{
+    const p=new URL(url).pathname;
+    let data;
+    if(p.endsWith('/pulls/7'))data={number:7,merged:true,base:{ref:'main',sha:base,repo:{full_name:prior.repository}},head:{sha:oldHead,repo:{full_name:prior.repository}},merge_commit_sha:merge};
+    else if(p.endsWith('/commits/'+merge))data={sha:merge,parents:[{sha:base}]};
+    else if(p.endsWith('/pulls/7/files'))data=[{filename:'one',status:'added'},{filename:'two',status:'added'}];
+    else if(p.endsWith('/commits/'+oldHead+'/check-runs'))data={total_count:0,check_runs:[]};
+    else throw new Error('unexpected endpoint '+p);
+    return {ok:true,json:async()=>data};
+  };
+  try {
+    const result=await witness.verifyPredecessorW0({a0:{authorization_id:'A0-fixture',repository:{base_sha:base}},authorization:cur,comments:issueComments,token:'fixture'});
+    assert.equal(result.authorization_id,prior.authorization_id);
+    assert.equal(result.merge_commit_sha,merge);
+    assert.deepEqual(result.changed_paths,['one','two']);
+    assert.equal(result.w0_steps.length,1);
+    assert.equal(result.superseded_lifecycle.duplicate_record_count,2);
+  } finally { global.fetch=originalFetch; }
+}
+predecessorChainFixture().then(()=>console.log('PASS: merged predecessor W0 chain is verified before successor evidence')).catch(error=>{console.error(error);process.exitCode=1});
 NODE
