@@ -1,21 +1,6 @@
 {
   "manifest_version": "1.0.0",
   "servers": {
-    "github": {
-      "description": "Repository operations for reviewer/deployer agents",
-      "enabled": true,
-      "required": false,
-      "transport": "stdio",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github@2025.4.8"],
-      "args": [],
-      "url": null,
-      "env_refs": {"GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"},
-      "headers": {},
-      "cwd": null,
-      "timeout_ms": 5000,
-      "trust": "prompt",
-      "compatibility": ["opencode", "claude-code", "cursor", "copilot-cli", "cursor-ide", "vscode-copilot"]
-    },
     "brave-search": {
       "description": "Web search for agents that need current documentation or references",
       "enabled": true,

@@ -1,7 +1,6 @@
 ---
 description: Automated test suite generation from code artifacts and specifications. Invoked after code generation is validated.
 mode: subagent
-model: github-copilot/claude-haiku-4.5
 permission: allow
 ---
 

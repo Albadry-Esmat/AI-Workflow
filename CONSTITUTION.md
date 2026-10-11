@@ -38,7 +38,7 @@ AI-assisted delivery workflows.
 | Runtime | Node.js 20 LTS | Existing codebase; ecosystem fit |
 | Language | TypeScript (strict mode) | Type safety; existing codegen templates |
 | Package manager | npm | Existing lock file; no pnpm migration planned |
-| CI | GitHub Actions | Existing workflows in `.github/workflows/` |
+| CI | Local validation scripts are authoritative; no hosted CI is part of this product | Product operation and required verification must not depend on GitHub or any hosted repository automation |
 | Hosting | Vercel (website) | Existing deployment; serverless edge |
 
 ---
@@ -49,6 +49,14 @@ AI-assisted delivery workflows.
 
 - **Skill isolation:** Each skill in `.agents/skills/` is self-contained. Skills MUST NOT
   import from each other at runtime — all inter-skill communication is via the orchestrator.
+- **GitHub independence:** AI Workflow's installation, configuration, core execution,
+  authorization, persistence, recovery, and required validation MUST NOT depend on a
+  GitHub-hosted repository, GitHub account/API/token, GitHub Actions runner, or Marketplace
+  Action. Product workflows MUST NOT call GitHub APIs, contain or generate GitHub Actions
+  workflows, or trigger GitHub Actions. Mandatory
+  checks MUST have a locally runnable implementation. Git-hosted distribution or optional
+  model-provider authentication is not a runtime dependency and MUST NOT be required by
+  product workflows.
 - **Flat-file persistence:** No database. State is stored in `.opencode/state/` as JSON files.
   Any proposal to add a database requires a CONSTITUTION amendment.
 - **No secrets in code:** All tokens and credentials are environment variables. The pipeline
@@ -85,7 +93,7 @@ AI-assisted delivery workflows.
 | Test framework | Jest |
 | Commit format | Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`) |
 | Branch naming | `feature/<id>-<slug>`, `fix/<id>-<slug>` |
-| PR requirement | Passing CI + 1 approval before merge |
+| Change review | Required checks and review must be locally verifiable; hosted PR/CI flows may only mirror them |
 | API versioning | Semantic versioning; breaking changes bump MAJOR |
 
 ---
@@ -110,6 +118,7 @@ AI-assisted delivery workflows.
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-07-09 | Initial constitution created | AI Workflow Pipeline |
+| 2026-10-11 | Require GitHub-independent operation and locally verifiable mandatory checks | User-directed |
 
 ---
 

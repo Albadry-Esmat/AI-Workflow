@@ -31,7 +31,7 @@ The shared bundle contract is `config/operational-evidence-bundle-schema.json`. 
 
 ## Supply-chain controls
 
-The pinned `.github/workflows/supply-chain.yml` checks both repositories’ `package-lock.json` files, generates `artifacts/sbom.cdx.json` in CycloneDX 1.5 format, and runs the offline-safe lockfile and immutable-action scanner. `config/supply-chain-policy.json` requires lockfiles, SBOM generation before release, immutable CI action pins, no moving `latest`/`master`/`main` tags, and blocking treatment for critical and high findings.
+The local supply-chain tools check the current checkout's lockfiles, can generate `artifacts/sbom.cdx.json` in CycloneDX 1.5 format, and run offline-safe lockfile checks. No hosted workflow or action-pin scan is part of the product. `config/supply-chain-policy.json` requires lockfiles, SBOM generation before release, and blocking treatment for critical and high findings.
 
 The local scanner deliberately reports `advisory_database_available: false` because it does not download or assume a vulnerability advisory database. It therefore verifies lockfile integrity, direct dependency coverage, package versions, and workflow pinning only. An environment with advisory access must run `npm audit` or an equivalent OSV/SCA service before production promotion; this limitation is not silently converted into a clean vulnerability verdict.
 

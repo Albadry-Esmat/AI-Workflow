@@ -12,7 +12,6 @@
 .PHONY: help setup health validate validate-runtime-parity validate-contracts validate-pipeline-references validate-model-requirements test-model-boundary test-runtime-selection test-mcp-projections test-aiw-init validate-batch6 validate-batch7 validate-batch8 validate-batch9 validate-onboarding-o0 validate-onboarding-o1 validate-onboarding-o2 validate-onboarding-o3 validate-onboarding-o4 validate-onboarding-o5 validate-onboarding-o6 validate-onboarding-o7 toolchain-check validate-traceability test-context-preservation validate-evals eval-quick-review eval-quality-vector operational-evidence measure-slos evaluate-model-compatibility test-telemetry-privacy simulate-incident-containment generate-sbom scan-supply-chain check-release-compatibility skill-create skill-apply feedback-to-eval autonomy-experiments consolidation-analysis quick-review clean reset sync sync-runtimes sync-push website sessions sessions-delete update graph install-cli backup doctor lint start status demo recover onboarding onboarding-install-plan onboarding-install-verify onboarding-install onboarding-execute-plan onboarding-artifact-hash onboarding-execute onboarding-attestation-plan onboarding-attestation-verify onboarding-verifier-plan onboarding-verifier-verify onboarding-verifier-refresh-plan onboarding-verifier-refresh
 
 .DEFAULT_GOAL := help
-WEBSITE_ROOT ?= ../ASE-OS-Website
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -79,6 +78,9 @@ validate: ## Run the full skill, contract, Batch 6/7/8/9, evaluation, and operat
 	@$(MAKE) validate-onboarding-o6
 	@$(MAKE) validate-onboarding-o7
 	@$(MAKE) validate-evals
+
+preflight: ## Run the local, no-remote preflight checks
+	@bash scripts/preflight-check.sh
 
 validate-contracts: ## Validate versioned execution contracts and fixtures
 	@$(PYTHON) scripts/validate-execution-contracts.py
@@ -228,13 +230,11 @@ operational-evidence: ## Record generalized dry-run evidence for two additional 
 	@$(PYTHON) scripts/run-operational-evidence.py --pipeline full-pipeline
 	@$(PYTHON) scripts/run-operational-evidence.py --pipeline insights-adaptation-pipeline
 
-generate-sbom: ## Generate the deterministic CycloneDX SBOM for both repositories
-	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
-	@$(PYTHON) scripts/generate-sbom.py --website-root "$(WEBSITE_ROOT)"
+generate-sbom: ## Generate the deterministic CycloneDX SBOM for this repository
+	@$(PYTHON) scripts/generate-sbom.py
 
-scan-supply-chain: ## Check both lockfiles and immutable supply-chain workflow pins
-	@test -d "$(WEBSITE_ROOT)" || (echo "WEBSITE_ROOT=$(WEBSITE_ROOT) is required"; exit 2)
-	@$(PYTHON) scripts/scan-supply-chain.py --website-root "$(WEBSITE_ROOT)"
+scan-supply-chain: ## Check this repository's lockfile integrity and supply-chain policy
+	@$(PYTHON) scripts/scan-supply-chain.py
 	@$(PYTHON) scripts/validate-batch8-controls.py --supply-chain-only
 
 test-telemetry-privacy: ## Test Batch 8 opt-out, redaction, allowlist, and retention invariants
@@ -294,14 +294,15 @@ backup: ## Backup .opencode/state/ to backups/ directory
 validate-runtime-parity: ## P0 runtime-neutral parity gates (canonical counts, no duplication, adapter drift, discovery, catalog, secrets)
 	@bash scripts/validate-runtime-parity.sh
 
-sync: ## Sync website/data/ from source files (skills/, docs/, .agents/skills/) — CI does this automatically on push
+sync: ## Sync the local website/data mirror from source files
 	@bash scripts/sync-website-data.sh
 
 sync-runtimes: ## Sync runtime adapters from .agents/skills/ (P0: .claude/skills links; --check for CI)
 	@bash scripts/sync-runtimes.sh
 
-sync-push: ## Sync website/data/ AND push the result to ASE-OS-Website repo
-	@bash scripts/sync-website-data.sh --website
+sync-push: ## Retired: external website publishing is not supported
+	@echo "External repository publishing is disabled." >&2
+	@false
 
 graph: ## Rebuild the knowledge graph after code changes (requires graphify — optional)
 	@./aiw graph

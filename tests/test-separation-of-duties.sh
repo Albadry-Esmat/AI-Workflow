@@ -33,7 +33,7 @@ if(!r.allowed||r.codes.length!==0)process.exit(1);
 node -e "$PRE
 const r=sod.evaluate({subjectHash:'$SUB',
   producers:[{principal:{type:'agent',id:'builder'},subject_hash:'$SUB'}],
-  reviewer:{reviewer_identity:id.createLauncherIdentity({agent:'github-reviewer',executionId:'e-r',source:'t'}),subject_hash:'$SUB',execution_id:'e-r',outcome:'approve'},
+  reviewer:{reviewer_identity:id.createLauncherIdentity({agent:'reviewer',executionId:'e-r',source:'t'}),subject_hash:'$SUB',execution_id:'e-r',outcome:'approve'},
   gatePrincipal:{type:'human',id:'g',authenticated:true,source:'t'},gateRole:'gatekeeper'});
 if(!r.allowed)process.exit(1);
 " && ok "mapped reviewer role passes" || bad "reviewer role"

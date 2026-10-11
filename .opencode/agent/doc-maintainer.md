@@ -1,7 +1,6 @@
 ---
 description: Autonomous documentation maintenance engine — detects system changes and keeps /docs in sync. Triggered after every system change.
 mode: subagent
-model: github-copilot/claude-haiku-4.5
 permission: allow
 ---
 

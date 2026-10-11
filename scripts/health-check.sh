@@ -122,18 +122,9 @@ else
   _fail ".env not found — run: make setup  (or: cp .env.example .env)"
 fi
 
-# ── 5. Optional credentials ────────────────────────────────────────────────────
-header "Optional credentials"
-
-if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-  MASKED="${GITHUB_TOKEN:0:4}********************"
-  _ok "GITHUB_TOKEN is set  ($MASKED)"
-else
-  _warn "GITHUB_TOKEN is not set — optional provider/GitHub operations will request approved auth later; use short-lived, fine-grained credentials and rotate them"
-fi
-
-# ── 6. Optional env vars ──────────────────────────────────────────────────────
+# ── 5. Optional env vars ──────────────────────────────────────────────────────
 header "Optional environment variables"
+echo "Use scoped, short-lived credentials for optional providers and rotate them regularly."
 
 for var_pair in \
   "CONTEXT7_API_KEY:Context7 (library docs in context)" \

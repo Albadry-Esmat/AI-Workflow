@@ -90,7 +90,7 @@ agents:
     fallbacks: []
     on_unavailable: fail_closed
   test-generator:
-    model: github-copilot/claude-haiku-4.5
+    model: null
     provider: null
     capabilities: [test-generation]
     tier_hint: cheap
@@ -104,7 +104,7 @@ agents:
     fallbacks: []
     on_unavailable: fail_closed
   deployer:
-    model: github-copilot/claude-haiku-4.5
+    model: null
     provider: null
     capabilities: [deployment-strategy]
     tier_hint: cheap
@@ -118,7 +118,7 @@ agents:
     fallbacks: []
     on_unavailable: fail_closed
   doc-maintainer:
-    model: github-copilot/claude-haiku-4.5
+    model: null
     provider: null
     capabilities: [documentation-maintenance]
     tier_hint: cheap
@@ -166,31 +166,10 @@ agents:
     tier_hint: balanced
     fallbacks: []
     on_unavailable: fail_closed
-  github-reviewer:
-    model: null
-    provider: null
-    capabilities: [pr-review, code-review]
-    tier_hint: balanced
-    fallbacks: []
-    on_unavailable: fail_closed
-  merge-gatekeeper:
-    model: null
-    provider: null
-    capabilities: [merge-gate-evaluation]
-    tier_hint: balanced
-    fallbacks: []
-    on_unavailable: fail_closed
   investigation:
     model: null
     provider: null
     capabilities: [evidence-gathering]
-    tier_hint: cheap
-    fallbacks: []
-    on_unavailable: fail_closed
-  issue-manager:
-    model: github-copilot/claude-haiku-4.5
-    provider: null
-    capabilities: [issue-lifecycle]
     tier_hint: cheap
     fallbacks: []
     on_unavailable: fail_closed

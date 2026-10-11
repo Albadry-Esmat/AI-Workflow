@@ -1,8 +1,8 @@
 ---
 name: ci-pipeline-generator
-version: 1.0.0
+version: 1.1.0
 domain: deployment
-description: 'Use when generating executable CI/CD pipeline files from a deployment strategy. Triggers on: "generate the pipeline", "create GitHub Actions workflow", "CI/CD scaffold", "write the Dockerfile", "generate pipeline YAML", "create CI config". Do NOT use before deployment-strategy has run — this skill requires deployment_strategy output as its primary input.'
+description: 'Use when generating executable CI/CD pipeline files from a deployment strategy for supported non-GitHub platforms or local execution. GitHub Actions and GitHub-hosted automation are prohibited. Triggers on: "generate the pipeline", "CI/CD scaffold", "write the Dockerfile", "generate pipeline YAML", "create CI config". Do NOT use before deployment-strategy has run — this skill requires deployment_strategy output as its primary input.'
 author: ASE-OS
 ---
 
@@ -10,7 +10,7 @@ author: ASE-OS
 
 **Version:** 1.0.0 | **Last updated:** 2026-06-18
 
-Closes the deployment artifact gap: `deployment-strategy` produces a strategy document, this skill produces the **executable files** — GitHub Actions workflows, GitLab CI YAML, Dockerfiles, docker-compose specs, and environment variable templates. It runs after `deployment-strategy` and before the final production release gate.
+Closes the deployment artifact gap: `deployment-strategy` produces a strategy document, this skill produces **executable files** for supported non-GitHub CI platforms, local runners, Docker, and environment configuration. GitHub Actions output is prohibited. It runs after `deployment-strategy` and before the final production release gate.
 
 ---
 
@@ -18,11 +18,11 @@ Closes the deployment artifact gap: `deployment-strategy` produces a strategy do
 
 ```yaml
 name: ci-pipeline-generator
-version: 1.0.0
+version: 1.1.0
 domain: deployment
 description: >
   Use when generating executable CI/CD pipeline files from a deployment strategy.
-  Triggers on: "generate the pipeline", "create GitHub Actions workflow", "CI/CD scaffold",
+  Triggers on: "generate the pipeline", "CI/CD scaffold",
   "write the Dockerfile", "generate pipeline YAML", "create CI config".
   Do NOT use before deployment-strategy has run.
 author: ASE-OS
@@ -34,7 +34,7 @@ author: ASE-OS
 
 `ci-pipeline-generator` bridges the gap between the deployment strategy document and runnable infrastructure files. It reads the deployment strategy output and generates:
 
-- **GitHub Actions** `.github/workflows/*.yml` or **GitLab CI** `.gitlab-ci.yml`
+- **GitLab CI** `.gitlab-ci.yml`, Bitbucket Pipelines, Azure Pipelines, or local runner configuration
 - A multi-stage `Dockerfile` tuned to the detected language and runtime
 - A `docker-compose.yml` for local development
 - A `.env.example` file documenting all required environment variables
@@ -89,7 +89,7 @@ All generated files are returned as structured artifacts (path + content) that `
       "properties": {
         "platform": {
           "type": "string",
-          "enum": ["github", "gitlab", "bitbucket", "azure_devops"]
+          "enum": ["gitlab", "bitbucket", "azure_devops", "local"]
         },
         "language_stack": {
           "type": "array",
@@ -102,7 +102,7 @@ All generated files are returned as structured artifacts (path + content) that `
         },
         "container_registry": {
           "type": "string",
-          "enum": ["ghcr", "docker_hub", "ecr", "gcr", "acr", "none"],
+          "enum": ["docker_hub", "ecr", "gcr", "acr", "none"],
           "default": "ghcr"
         },
         "deployment_target": {
@@ -147,7 +147,6 @@ Step 1 — Detect language stack and runtime
   Output: detected_stack { language, runtime, db_engine, pkg_manager, test_runner }
 
 Step 2 — Select CI platform template
-  github      → .github/workflows/ (YAML, GitHub Actions syntax)
   gitlab      → .gitlab-ci.yml (YAML, GitLab CI syntax)
   bitbucket   → bitbucket-pipelines.yml
   azure_devops → azure-pipelines.yml
@@ -175,7 +174,7 @@ Step 3 — Build CI pipeline stages
 Step 4 — Generate CI YAML content
   Render ci_stages into platform-specific YAML.
   Apply:
-    - Environment variable references (no hardcoded secrets — all use ${{ secrets.* }} syntax)
+    - Platform-appropriate secret references (no hardcoded secrets)
     - Cache step for pkg_manager dependencies
     - Artifact upload for build outputs
     - Deployment environment protection rules from deployment_strategy.environments
@@ -228,7 +227,7 @@ Step 8 — Generate Kubernetes manifests (if deployment_target == "kubernetes")
 
 Step 9 — Assemble artifacts
   Collect all generated files:
-    { path: ".github/workflows/ci.yml", content: ci_yaml_content }
+    { path: ".gitlab-ci.yml", content: ci_yaml_content }
     { path: "Dockerfile", content: dockerfile_content }
     { path: "docker-compose.yml", content: docker_compose_content }
     { path: ".env.example", content: env_example_content }
@@ -434,4 +433,4 @@ composes:
 
 | Version | Date | Change |
 |---------|------|--------|
-| 1.0.0 | 2026-06-18 | Initial release — generates GitHub Actions / GitLab CI YAML, Dockerfile, docker-compose.yml, .env.example, and optional Kubernetes manifests from deployment-strategy output |
+| 1.1.0 | 2026-10-11 | Prohibit GitHub Actions output; support GitLab, Bitbucket, Azure, and local pipelines |

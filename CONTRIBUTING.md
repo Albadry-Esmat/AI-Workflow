@@ -19,15 +19,14 @@ Thank you for contributing! This guide covers everything you need to add a skill
 
 ## Setup
 
-Clone the repo and run the single setup command:
+Use an approved local checkout or source archive and run the single setup command:
 
 ```bash
-git clone https://github.com/Albadry-Esmat/AI-Workflow.git
-cd AI-Workflow
+cd /path/to/AI-Workflow
 make setup
 ```
 
-This installs the `aiw` CLI and configures your environment. Then open `.env` and set `GITHUB_TOKEN`. That's all you need to start contributing.
+This installs the `aiw` CLI and configures your environment. No Git hosting account, token, or hosted automation is required for local development.
 
 ```bash
 aiw health      # verify your environment
@@ -39,18 +38,9 @@ Type `aiw help` for a full list of available commands.
 
 ---
 
-## Branching strategy
+## Local change workflow
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Clean public framework. Only framework improvements land here. No personal project data. |
-| `develop` (or your fork) | Your project work — tasks, features, bugs, planning docs. Never merge personal project data into `main`. |
-
-**Workflow:**
-1. Fork the repo (or branch from `main` for framework changes).
-2. Make your changes.
-3. Open a PR targeting `main`.
-4. Framework improvements (new skills, pipeline fixes, docs) are welcome on `main`. Project-specific content (your work-items, personal identity) stays in your fork/branch.
+Use local branches or another version-control workflow chosen by the repository owner. Run `make validate` and the relevant focused tests before considering a change complete. No pull request, hosted runner, or remote repository is required by AI Workflow itself.
 
 ---
 

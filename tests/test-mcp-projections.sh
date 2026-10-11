@@ -26,12 +26,11 @@ import json, jsonschema
 jsonschema.validate(json.load(open('config/mcp-manifest.json')), json.load(open('config/mcp-manifest-schema.json')))
 "; then _ok "valid manifest validates"; else _fail "valid manifest rejected"; fi
 
-python3 -c "import json; d=json.load(open('config/mcp-manifest.json')); d['servers']['github']['transport']='bogus'" 2>/dev/null || true
 BAD="$FIX/bad-manifest.json"
 python3 -c "
 import json
 d = json.load(open('config/mcp-manifest.json'))
-d['servers']['github']['transport'] = 'bogus-transport'
+d['servers']['memory']['transport'] = 'bogus-transport'
 json.dump(d, open('$BAD', 'w'))
 "
 if AIW_MCP_MANIFEST="$BAD" node scripts/sync-mcp.js --check >/dev/null 2>&1; then
@@ -43,7 +42,7 @@ fi
 python3 -c "
 import json
 d = json.load(open('config/mcp-manifest.json'))
-d['servers']['github']['env_refs']['GITHUB_PERSONAL_ACCESS_TOKEN'] = 'ghp_literalSECRET1234567890'
+d['servers']['memory']['env_refs']['TEST_TOKEN'] = 'ghp_literalSECRET1234567890'
 json.dump(d, open('$BAD', 'w'))
 "
 if AIW_MCP_MANIFEST="$BAD" node scripts/sync-mcp.js --check >/dev/null 2>&1; then
@@ -71,20 +70,22 @@ if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _fail "edited projecti
 node scripts/sync-mcp.js --write >/dev/null 2>&1
 if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _ok "restored to clean"; else _fail "restore failed"; fi
 
-echo "=== disabled excluded / opencode retains flag ==="
-if node -e "const m=require('./.mcp.json'); if (m.mcpServers.slack||m.mcpServers.vercel) process.exit(1)"; then
-  _ok "disabled servers excluded from .mcp.json"
+echo "=== GitHub integration is absent from all runtime projections ==="
+if node -e "const m=require('./.mcp.json'); const c=require('./.cursor/mcp.json'); const v=require('./.vscode/mcp.json'); const o=require('./opencode.json'); const manifest=require('./config/mcp-manifest.json'); if (manifest.servers.github || m.mcpServers.github || c.mcpServers.github || v.servers.github || o.mcp.github) process.exit(1)"; then
+  _ok "GitHub MCP is absent from manifest and runtime projections"
 else
-  _fail "disabled server leaked into .mcp.json"
+  _fail "GitHub MCP integration is still present"
 fi
-if node -e "const o=require('./opencode.json'); if (o.mcp.slack && o.mcp.slack.enabled===false && o.mcp.vercel) process.exit(0); process.exit(1)"; then
-  _ok "disabled servers retained with enabled:false in opencode.json"
+
+echo "=== unrelated disabled integrations remain disabled ==="
+if node -e "const m=require('./.mcp.json'); const c=require('./.cursor/mcp.json'); const v=require('./.vscode/mcp.json'); const o=require('./opencode.json'); if (m.mcpServers.slack || m.mcpServers.vercel || c.mcpServers.slack || c.mcpServers.vercel || v.servers.slack || v.servers.vercel || o.mcp.slack?.enabled !== false || o.mcp.vercel?.enabled !== false) process.exit(1)"; then
+  _ok "Slack and Vercel remain excluded from active projections"
 else
-  _fail "opencode disabled entries wrong"
+  _fail "disabled integration leaked into an active projection"
 fi
 
 echo "=== S2-B .vscode/mcp.json projection ==="
-if node -e 'const v = require("./.vscode/mcp.json"); if (!v.servers || typeof v.servers !== "object") process.exit(1); if (v.servers.slack || v.servers.vercel) process.exit(1); if (!v.servers.github || !v.servers.memory) process.exit(1); const env = v.servers.github.env || {}; const re = new RegExp("^\\$\\{env:[A-Za-z_][A-Za-z0-9_]*\\}$"); if (!Object.values(env).every((s) => re.test(s))) process.exit(1);'; then _ok ".vscode projection shape valid (servers, enabled-only, env refs)"; else _fail ".vscode projection shape wrong"; fi
+if node -e 'const v = require("./.vscode/mcp.json"); if (!v.servers || typeof v.servers !== "object") process.exit(1); if (v.servers.github) process.exit(1); if (!v.servers.memory) process.exit(1);'; then _ok ".vscode projection has no GitHub server"; else _fail ".vscode projection shape wrong"; fi
 cp .vscode/mcp.json "$FIX/vscode.backup"
 echo " " >> .vscode/mcp.json
 if node scripts/sync-mcp.js --check >/dev/null 2>&1; then _fail "edited .vscode projection not detected"; else _ok "edited .vscode projection detected"; fi
@@ -105,7 +106,7 @@ if node -e "
   }
   const mcp=JSON.parse(fs.readFileSync('.mcp.json','utf8'));
   const vals=JSON.stringify(Object.values(mcp.mcpServers).map(s=>s.env||{}));
-  if (!/GITHUB_TOKEN|BRAVE_API_KEY|CONTEXT7_API_KEY/.test(vals)) process.exit(1);
+  if (!/BRAVE_API_KEY|CONTEXT7_API_KEY/.test(vals)) process.exit(1);
 "; then _ok "env values are references only"; else _fail "env reference check failed"; fi
 
 echo "=== optional vs required env (hermetic manifest) ==="

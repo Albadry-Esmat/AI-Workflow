@@ -10,10 +10,11 @@ path_rules:
     level: HIGH
   - pattern: "migrations/**"
     level: HIGH
-  - pattern: ".github/workflows/**"
-    level: GOVERNANCE
   - pattern: "infra/**"
     level: HIGH
+  # Reject any attempted reintroduction of hosted automation as a governance change.
+  - pattern: ".github/workflows/**"
+    level: GOVERNANCE
   - pattern: "package-lock.json"
     level: MEDIUM
   - pattern: "package.json"

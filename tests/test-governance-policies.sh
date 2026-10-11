@@ -49,16 +49,34 @@ if (r.mode !== 'deterministic-rules') process.exit(1);
 if (!r.path_rules.some(x => x.pattern === '.github/workflows/**' && x.level === 'GOVERNANCE')) process.exit(1);
 " && ok "risk policy deterministic" || bad "risk policy"
 
-# 6. PR template has tiered sections, no placeholder guidance
-grep -q "## Workflow ID" "$ROOT/.github/pull_request_template.md" && ok "PR template tiers" || bad "PR template"
-grep -q "validator rejects" "$ROOT/.github/pull_request_template.md" && ok "PR placeholder rejection note" || bad "PR note"
+# 6. Hosted workflows are removed; local validators remain the required gate.
+if [[ ! -d "$ROOT/.github/workflows" ]] && [[ -f "$ROOT/scripts/validate-skills.sh" ]]; then
+  ok "no hosted workflow dependency; local validator available"
+else
+  bad "GitHub-independent validation"
+fi
 
-# 7. skill version consistency (github-pr-review 1.2.0)
+# 7. No GitHub-bound skills or agents remain active in the local product catalog.
 node -e "
 const fs = require('fs');
-const md = fs.readFileSync('$ROOT/.agents/skills/github-pr-review/SKILL.md', 'utf8');
-if (!md.includes('version: 1.2.0') || !md.includes('fingerprint v2')) process.exit(1);
-" && ok "skill 1.2.0 + fingerprint v2" || bad "skill version"
+const yaml = require('js-yaml');
+const index = yaml.load(fs.readFileSync('$ROOT/skills/index.yaml', 'utf8')).skills;
+const config = JSON.parse(fs.readFileSync('$ROOT/opencode.json', 'utf8'));
+const retired = new Set(['github-pr-review', 'github-merge-gate', 'skill-registry-client']);
+if (index.some(s => retired.has(String(s.executable_skill || '').split('/').slice(-2, -1)[0]))) process.exit(1);
+if (['github-reviewer', 'merge-gatekeeper', 'issue-manager'].some(a => config.agent[a])) process.exit(1);
+const exporter = fs.readFileSync('$ROOT/.agents/skills/work-item-exporter/SKILL.md', 'utf8');
+if (/api\\.github\\.com|github_token_env|github_repo/.test(exporter)) process.exit(1);
+const specAdapterPath = '$ROOT/.agents/skills/speckit-taskstoissues/SKILL.md';
+if (fs.existsSync(specAdapterPath)) {
+  const specAdapter = fs.readFileSync(specAdapterPath, 'utf8');
+  if (/api\\.github\\.com|GitHub MCP|GITHUB_TOKEN|fetch existing issues/i.test(specAdapter)) process.exit(1);
+}
+const sync = fs.readFileSync('$ROOT/scripts/sync-website-data.sh', 'utf8');
+if (/git clone|git push|PUSH_WEBSITE|WEBSITE_REPO/.test(sync)) process.exit(1);
+const makefile = fs.readFileSync('$ROOT/Makefile', 'utf8');
+if (/WEBSITE_ROOT=|ASE-OS-Website/.test(makefile)) process.exit(1);
+" && ok "GitHub-bound skills, agents, and exporter API are retired" || bad "active GitHub product capability"
 
 echo ""
 echo "governance: $PASS passed, $FAIL failed"

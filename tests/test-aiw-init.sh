@@ -28,7 +28,8 @@ else
   _fail "empty target install incomplete"
 fi
 count="$(find "$FIX/t1/.agents/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
-if [[ "$count" -eq 126 ]]; then _ok "126 skills installed"; else _fail "skill count $count"; fi
+expected_count="$(find "$ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
+if [[ "$count" -eq "$expected_count" ]]; then _ok "$expected_count skills installed"; else _fail "skill count $count (expected $expected_count)"; fi
 if [[ -L "$FIX/t1/.claude/skills/clean-code-review" && -f "$FIX/t1/.claude/skills/clean-code-review/SKILL.md" ]]; then
   _ok "claude links resolve inside target"
 else
@@ -85,10 +86,10 @@ mkdir -p "$FIX/t5" "$FIX/t6"
 ./aiw init "$FIX/t5" --for cursor-ide >/dev/null 2>&1
 if [[ -f "$FIX/t5/.cursor/mcp.json" && -f "$FIX/t5/AGENTS.md" ]]; then _ok "cursor-ide installs shared cursor projection"; else _fail "cursor-ide install incomplete"; fi
 ./aiw init "$FIX/t6" --for vscode-copilot >/dev/null 2>&1
-if node -e "const v=require('$FIX/t6/.vscode/mcp.json');if(!v.servers||!v.servers.github)process.exit(1)"; then _ok "vscode-copilot installs vscode projection"; else _fail "vscode-copilot install incomplete"; fi
-echo '{"mcpServers":{"user-srv":{"command":"x"},"github":{"command":"y"}}}' > "$FIX/t5/.cursor/mcp.json"
+if node -e "const v=require('$FIX/t6/.vscode/mcp.json');if(!v.servers||v.servers.github)process.exit(1)"; then _ok "vscode-copilot installs GitHub-independent vscode projection"; else _fail "vscode-copilot install incomplete"; fi
+echo '{"mcpServers":{"user-srv":{"command":"x"},"memory":{"command":"y"}}}' > "$FIX/t5/.cursor/mcp.json"
 ./aiw init "$FIX/t5" --for cursor-ide --merge > "$FIX/merge-assist.log" 2>&1
-if grep -q "target-only servers (kept): user-srv" "$FIX/merge-assist.log" && grep -q "differing servers (kept target version): github" "$FIX/merge-assist.log"; then
+if grep -q "target-only servers (kept): user-srv" "$FIX/merge-assist.log" && grep -q "differing servers (kept target version): memory" "$FIX/merge-assist.log"; then
   _ok "merge-assist explains MCP conflict per server"
 else
   _fail "merge-assist explanation missing (see $FIX/merge-assist.log)"

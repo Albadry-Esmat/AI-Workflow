@@ -13,7 +13,7 @@ author: system
 
 ## Purpose
 
-The devsecops-pipeline-designer skill systematically embeds security controls into CI/CD pipelines following the shift-left security principle. Rather than treating security as a post-deployment gate, this skill produces executable, ready-to-paste pipeline stage definitions that integrate scanning at every code transition point — from first commit through build, test, and promotion. It selects, configures, and tunes the optimal security toolchain for each supported CI platform (GitHub Actions, GitLab CI, Jenkins, Azure DevOps, CircleCI) and any combination of application technology stacks.
+The devsecops-pipeline-designer skill systematically embeds security controls into CI/CD pipelines following the shift-left security principle. Rather than treating security as a post-deployment gate, this skill produces executable pipeline stage definitions for local runners and supported non-GitHub CI platforms. GitHub Actions and GitHub-hosted automation are prohibited by the project constitution.
 
 The skill covers the full spectrum of automated DevSecOps controls: Static Application Security Testing (SAST) via SonarQube (`sonar-scanner` with `sonar.qualitygate.wait=true`), Semgrep (`semgrep --config=p/owasp-top-ten,p/security-audit`), CodeQL (`codeql database analyze --suite security-extended`), and Bandit (`bandit -r . -f json -ll`); Dynamic Application Security Testing (DAST) via OWASP ZAP (`zap-baseline.py`, `zap-full-scan.py`) and Burp Suite Enterprise API; Software Composition Analysis (SCA) via Snyk (`snyk test --severity-threshold=high`), Grype (`grype dir:. --fail-on high`), Trivy (`trivy fs . --security-checks vuln`), and Dependabot; container image scanning via Trivy, Clair, and Docker Scout; SBOM generation in CycloneDX JSON format using Syft (`syft image:tag -o cyclonedx-json=sbom.json`); supply-chain integrity via SLSA framework levels 1–3 with Sigstore cosign; policy-as-code enforcement via OPA bundles and Conftest Rego policies; secret scanning via Gitleaks and TruffleHog; and license compliance via FOSSA and LicenseFinder.
 
@@ -171,7 +171,6 @@ Step 9 — Generate policy-as-code gates (OPA / Conftest)
 Step 10 — Assemble full pipeline and estimate overhead
   Compose all stage YAMLs with correct needs/depends_on ordering:
     secrets → sast → sca → [build] → container → sbom → [deploy-staging] → dast → policy
-  GitHub Actions: single .github/workflows/devsecops.yml with job dependency graph.
   GitLab CI: .gitlab-ci.yml stages[] with parallel jobs per gate.
   Jenkins: Declarative Jenkinsfile with parallel stage blocks inside pipeline{}.
   Azure DevOps: azure-pipelines.yml with stages and dependsOn arrays.

@@ -257,9 +257,9 @@ policy; the runtime is authoritative for availability.
 
 | Model ID | Tier | Strength | Best for |
 |----------|------|----------|----------|
-| `github-copilot/claude-sonnet-4.6` | Standard | Balanced reasoning + code | General-purpose default |
-| `github-copilot/claude-opus-4.8` | Premium | Deepest reasoning | architect, security-specialist, reviewer |
-| `github-copilot/claude-haiku-4.5` | Lightweight | Fast, low cost | doc-maintainer, test-generator |
+| `github-copilot/claude-sonnet-4.6` | Standard | Balanced reasoning + code | Optional runtime-selected model; not required by AI Workflow |
+| `github-copilot/claude-opus-4.8` | Premium | Deepest reasoning | Optional runtime-selected model; not required by AI Workflow |
+| `github-copilot/claude-haiku-4.5` | Lightweight | Fast, low cost | Optional runtime-selected model; not required by AI Workflow |
 
 ### OpenAI (GPT)
 

@@ -4,13 +4,12 @@
 
 ## Overview
 
-ASE-OS integrates eight configured Model Context Protocol (MCP) servers that extend the pipeline with external capabilities such as GitHub, web search, persistent memory, documentation lookup, and browser automation. MCPs are configured in `opencode.json` under the `mcp` key. They are a separate capability channel from `bash` and `edit` permissions, so availability must not be treated as authorization; high-impact actions require an enforceable policy boundary and human approval.
+AI Workflow integrates optional Model Context Protocol (MCP) servers for web search, persistent memory, documentation lookup, and browser automation. MCPs are configured in `opencode.json` under the `mcp` key. They are a separate capability channel from `bash` and `edit` permissions, so availability must not be treated as authorization; high-impact actions require an enforceable policy boundary and human approval. No GitHub MCP or GitHub API integration is supported.
 
 ## Enabled Servers
 
 | Key | Package | Status | Auth |
 |-----|---------|--------|------|
-| `github` | `@modelcontextprotocol/server-github` | ✅ enabled | `GITHUB_TOKEN` |
 | `brave-search` | `@modelcontextprotocol/server-brave-search` | ✅ enabled | `BRAVE_API_KEY` |
 | `memory` | `@modelcontextprotocol/server-memory` | ✅ enabled | none |
 | `fetch` | `@modelcontextprotocol/server-fetch` | ⏸ disabled | none |
@@ -19,30 +18,11 @@ ASE-OS integrates eight configured Model Context Protocol (MCP) servers that ext
 | `slack` | `@modelcontextprotocol/server-slack` | ⏸ disabled | `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID` |
 | `vercel` | `vercel-mcp` | ⏸ disabled | `VERCEL_TOKEN` |
 
-Disabled servers are pre-configured — set `"enabled": true` in `opencode.json` and fill in their `.env` credentials to activate.
+Disabled servers are optional extensions. Enable one in `config/mcp-manifest.json`, regenerate editor projections with `node scripts/sync-mcp.js --write`, then provide any credentials it requires. Product workflows do not connect to GitHub or invoke hosted actions.
 
 ---
 
 ## Server Reference
-
-### `github` — GitHub MCP
-**Package:** [`@modelcontextprotocol/server-github`](https://github.com/modelcontextprotocol/servers/tree/main/src/github)
-
-**Auth:** Add a short-lived fine-grained `GITHUB_TOKEN` to the ignored `.env`, scoped only to the repositories required by the current task. Start with repository Metadata and Contents read access; add Issues or Pull requests permissions only for workflows that explicitly need them. Do not use a broad legacy token or an organization-wide credential.
-
-**Tools exposed:**
-- `create_issue`, `update_issue`, `list_issues` — bridges the `work-item-exporter`, `defect-manager`, and `change-request-manager` skills to real GitHub Issues
-- `get_pull_request`, `list_pull_request_files` — feeds `change-impact-analyzer` with real PR diffs
-- `list_workflow_runs`, `get_workflow_run` — lets the `deployer` agent check CI status without `bash` access
-- `create_pull_request`, `merge_pull_request` — automatable via the `builder` agent under HITL approval
-
-**Agents that benefit most:**
-- `builder` → `work-item-exporter` writes GitHub Issues directly
-- `analyzer` → `defect-manager` creates bug reports as Issues
-- `deployer` → reads GitHub Actions workflow run status during pre-deploy gate
-- `gatekeeper` → `implementation-completeness-guard` checks linked PR status
-
----
 
 ### `brave-search` — Brave Search MCP
 **Package:** [`@modelcontextprotocol/server-brave-search`](https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search)
@@ -205,8 +185,7 @@ use library /vercel/next.js for Next.js 15 docs
 All MCP credentials are stored in `.env` (gitignored). See `.env` for the current state.
 
 ```bash
-# Store short-lived, least-privilege credentials only in the ignored .env
-GITHUB_TOKEN=...        # Fine-grained GitHub MCP token, repository-scoped
+# Optional integrations only; local execution does not require these values.
 VERCEL_TOKEN=...        # Project-scoped Vercel token, only when enabled
 
 # Add these
@@ -239,7 +218,7 @@ In `opencode.json`, toggle any server:
 - MCP tools are a separate capability channel from `bash` and `edit`; access must be reviewed and enforced separately, not assumed from agent permissions.
 - The `playwright` MCP runs `--isolated` — no persistent browser profile is created between invocations.
 - The `memory` MCP stores only structured JSON entities, never raw source code or user-inputted content.
-- GitHub, Slack, and Vercel credentials must be repository/project-scoped, short-lived, stored only in the ignored `.env` or CI secret store, and rotated before expiry.
+- Slack and Vercel credentials must be project-scoped, short-lived, stored only in the ignored `.env` or the relevant provider secret store, and rotated before expiry.
 - High-impact MCP actions such as writes, deletes, merges, publishes, deploys, and credential changes require explicit approval and an auditable policy decision.
 
 ---
@@ -250,4 +229,3 @@ The HITL gate rules in `docs/governance.md` are unchanged. MCPs provide tools th
 
 - The **deploy gate** (`bypass_on_timeout: false`) remains hardcoded — the Slack MCP can *notify* about the gate but cannot approve it
 - The **memory MCP** stores agent artifacts but cannot modify `skills/registry.json`, `opencode.json`, or any governance file without the primary agent writing them through the normal file edit flow
-- The **GitHub MCP** can create Issues and PRs but cannot merge to `main` without the HITL approval flow defined in `docs/governance.md §Change Approval Process`
