@@ -79,8 +79,8 @@ def main() -> int:
     check("contract keeps online refresh explicit and mutation-free", contract["network_refresh"]["default"] == "disabled" and contract["network_refresh"]["active_root_overwrite"] == "not-authorized" and contract["execution"]["target_project_mutations"] == 0)
 
     records = catalog["records"]
-    check("catalog has four neutral records", len(records) == 4)
-    check("catalog covers GitHub, Cosign, npm, and local delegate", {record["kind"] for record in records} == {"github-cli", "cosign", "npm-cli", "local-fixture"})
+    check("catalog has three provider-neutral records", len(records) == 3)
+    check("catalog covers Cosign, npm, and local delegate", {record["kind"] for record in records} == {"cosign", "npm-cli", "local-fixture"})
     check("all records are no-install/no-execute", all(record["authority"] == {"installation": False, "execution": False, "authentication": "deferred", "target_mutations": 0, "launch": "deferred"} for record in records))
     fingerprints_ok = True
     for record in records:
@@ -105,7 +105,7 @@ def main() -> int:
         shutil.copy2(ROOT / "evals/onboarding-o5/safe-runtime-probe.py", artifact)
         env = {"AIW_O7_STATE_ROOT": str(state_root), "AIW_O5_STAGING_ROOT": str(staging)}
         plan = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-plan", "--adapter", "auto", "--json"], env=env).stdout)
-        check("adapter plan is offline-first and zero-network", plan["verdict"] == "pass" and len(plan["records"]) == 4 and plan["network"] == "disabled" and plan["requests"] == 0 and plan["raw_secret_values"] == 0)
+        check("adapter plan is offline-first and zero-network", plan["verdict"] == "pass" and len(plan["records"]) == 3 and plan["network"] == "disabled" and plan["requests"] == 0 and plan["raw_secret_values"] == 0)
         check("adapter plan blocks install, execute, auth, target, and launch", all(record["installation_authorized"] is False and record["execution_authorized"] is False and record["authentication"] == "deferred" and record["target_project_mutations"] == 0 and record["launch"] == "deferred" for record in plan["records"]))
 
         verified = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-verify", "--adapter", "LOCAL-FIXTURE-O6-DELEGATE", "--artifact", str(artifact), "--json"], env=env).stdout)
@@ -121,11 +121,11 @@ def main() -> int:
         npm = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-verify", "--adapter", "NPM-REGISTRY-PROVENANCE", "--artifact", str(artifact), "--json"], env=env, expect=1).stdout)
         check("online-only adapter fails closed without network", npm["verdict"] == "fail" and npm["network"]["performed"] is False and npm["installation_authorized"] is False and npm["execution_authorized"] is False)
 
-        refresh_plan = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh-plan", "--adapter", "GITHUB-CLI-ATTESTATION", "--json"], env=env).stdout)
+        refresh_plan = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh-plan", "--adapter", "COSIGN-BLOB-ATTESTATION", "--json"], env=env).stdout)
         check("refresh plan exposes bounded candidate-only policy", refresh_plan["verdict"] == "pass" and refresh_plan["default_network"] == "disabled" and refresh_plan["active_root_overwrite"] is False and refresh_plan["source_digest_required"] and refresh_plan["evidence_required"] and refresh_plan["requests"] == 0)
-        no_consent = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh", "--adapter", "GITHUB-CLI-ATTESTATION", "--source-url", "https://api.github.com/meta", "--json"], env=env, expect=1).stdout)
+        no_consent = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh", "--adapter", "COSIGN-BLOB-ATTESTATION", "--source-url", "https://tuf-repo-cdn.sigstore.dev/root.json", "--json"], env=env, expect=1).stdout)
         check("refresh requires explicit consent", no_consent["error_code"] == "O7-CONSENT-REQUIRED" and no_consent["network"] is False)
-        blocked_host = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh", "--adapter", "GITHUB-CLI-ATTESTATION", "--source-url", "https://evil.example.invalid/roots.json", "--yes", "--json"], env=env, expect=1).stdout)
+        blocked_host = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-refresh", "--adapter", "COSIGN-BLOB-ATTESTATION", "--source-url", "https://evil.example.invalid/roots.json", "--yes", "--json"], env=env, expect=1).stdout)
         check("refresh rejects unallowlisted hosts before network", blocked_host["error_code"] == "O7-HOST-NOT-ALLOWLISTED" and blocked_host["network"] is False)
 
         unknown = json.loads(run([PYTHON, "scripts/onboarding-o7.py", "verifier-verify", "--adapter", "UNKNOWN-O7", "--artifact", str(artifact), "--json"], env=env, expect=1).stdout)
