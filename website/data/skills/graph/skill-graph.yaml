@@ -1,8 +1,8 @@
 meta:
   version: 3.1.0
   last_updated: '2026-09-29'
-  total_nodes: 126
-  total_edges: 399
+  total_nodes: 123
+  total_edges: 392
   schema: skills/graph/graph-schema.yaml
 nodes:
 - id: SKL-001
@@ -296,7 +296,7 @@ nodes:
   name: ci-pipeline-generator
   domain: deployment
   mastery_level: advanced
-  version: 1.0.0
+  version: 1.1.0
   status: active
   layer: pipeline-execution
 - id: SKL-043
@@ -401,7 +401,7 @@ nodes:
   name: work-item-exporter
   domain: integration
   mastery_level: beginner
-  version: 2.3.0
+  version: 3.0.0
   status: active
   layer: integration
 - id: SKL-058
@@ -789,27 +789,6 @@ nodes:
   version: 1.0.0
   status: active
   layer: utility
-- id: SKL-119
-  name: skill-registry-client
-  domain: platform
-  mastery_level: advanced
-  version: 1.0.0
-  status: active
-  layer: platform
-- id: SKL-126
-  name: github-pr-review
-  domain: review
-  mastery_level: intermediate
-  version: 1.2.0
-  status: active
-  layer: pipeline-quality
-- id: SKL-127
-  name: github-merge-gate
-  domain: review
-  mastery_level: intermediate
-  version: 1.0.0
-  status: active
-  layer: pipeline-quality
 - id: SKL-120
   name: delegate
   domain: orchestration
@@ -2351,14 +2330,6 @@ edges:
   to: SKL-010
   type: composition
   label: cost-estimator approval_status gates orchestrator pipeline execution; rejection aborts pipeline
-- from: SKL-119
-  to: SKL-021
-  type: dependency
-  label: skill-registry-client reads and writes skills/index.yaml via state-manager on install/uninstall
-- from: SKL-119
-  to: SKL-010
-  type: dependency
-  label: skill-registry-client used by orchestrator for community skill management operations
 - from: SKL-120
   to: SKL-010
   type: composition
@@ -2367,26 +2338,6 @@ edges:
   to: SKL-120
   type: dependency
   label: orchestrator uses delegate for intra-phase sub-task handoff to named agents
-- from: SKL-126
-  to: SKL-004
-  type: composition
-  label: github-pr-review composes clean-code-review over changed files
-- from: SKL-126
-  to: SKL-006
-  type: composition
-  label: github-pr-review composes security-review over the PR diff
-- from: SKL-126
-  to: SKL-055
-  type: dependency
-  label: github-pr-review feeds critical findings to defect-manager intake
-- from: SKL-127
-  to: SKL-126
-  type: dependency
-  label: github-merge-gate consumes github-pr-review verdict
-- from: SKL-127
-  to: SKL-055
-  type: dependency
-  label: github-merge-gate holds on open blocking defect-manager issues
 - from: SKL-005
   to: SKL-003
   type: dependency

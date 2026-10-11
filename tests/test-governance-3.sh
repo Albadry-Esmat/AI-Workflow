@@ -158,13 +158,6 @@ if (rec.agent_identity.agent !== 'reviewer' || rec.gate_id !== 'GATE-003') proce
 if (!ajv.compile(schema)(rec)) process.exit(1);
 " && ok "trace identity/gate/subject fields validate" || bad "trace fields"
 
-# 6. Merge-gate audit location fixed (no location-less audit claims).
-if grep -q "artifacts/merge-gate-audit.jsonl" "$ROOT/.agents/skills/github-merge-gate/SKILL.md"; then
-  ok "merge audit location fixed"
-else
-  bad "merge audit location"
-fi
-
 echo ""
 echo "governance-3: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

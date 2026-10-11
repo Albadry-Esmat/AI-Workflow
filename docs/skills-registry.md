@@ -503,8 +503,8 @@ Guard skills run as `validation_check` gates. A `block` verdict halts the pipeli
 | ID | SKL-042 |
 | Domain | `deployment` |
 | File | `.agents/skills/ci-pipeline-generator/SKILL.md` |
-| Version | 1.0.0 |
-| Purpose | Generate executable CI/CD files (GitHub Actions / GitLab CI YAML, Dockerfile, docker-compose.yml, .env.example, Kubernetes manifests) from deployment-strategy output; includes secret scan before any file write |
+| Version | 1.1.0 |
+| Purpose | Generate executable non-GitHub CI/CD files (GitLab CI, local runners, Dockerfile, docker-compose.yml, .env.example, Kubernetes manifests) from deployment-strategy output; GitHub Actions output is prohibited |
 | Consumes from | `deployment-strategy`, `architecture-design` |
 | Produces for | — (final artifact step) |
 

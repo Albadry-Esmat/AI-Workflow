@@ -100,7 +100,7 @@ Step 2 — Design vault architecture topology
   Authentication method per environment:
     k8s:         Vault Kubernetes auth method (service account JWT validation).
     ecs:         AWS IAM auth method (task role ARN binding).
-    serverless:  AWS IAM auth (Lambda execution role) or JWT/OIDC (GitHub Actions OIDC for CI).
+    serverless:  AWS IAM auth (Lambda execution role) or provider-neutral JWT/OIDC for an independently operated runner.
     vm:          AppRole (machine-identity) or AWS/GCP/Azure metadata auth.
   Namespaces (Vault Enterprise) or separate clusters (OSS) for environment isolation:
     prod namespace, staging namespace, dev namespace, infra namespace.

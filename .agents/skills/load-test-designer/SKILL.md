@@ -16,7 +16,7 @@ The load-test-designer skill produces complete, executable load and performance 
 
 For each scenario, the skill produces fully parameterized test scripts in the selected tool — k6 (JavaScript ES6 modules with `SharedArray`, `check`, `group`, and `sleep`), Gatling (Scala simulation extending `Simulation` with `feeder` + `csv`), Locust (Python `HttpUser` with `TaskSet` and `wait_time`), or JMeter (JMX XML with `ThreadGroup`, `CSVDataSet`, `HTTPSamplerProxy`, and `ResponseAssertion`) — complete with virtual user ramp-up curves derived from Little's Law, think-time distributions, realistic data parameterization, and environment variable injection for CI/CD portability. SLO-based acceptance thresholds are emitted in each tool's native format (k6 `thresholds` block, Gatling `global` assertions, Locust custom stats hooks, JMeter aggregate assertions).
 
-The skill is the bridge between testing-strategy (which defines what to test) and production-readiness verification (which validates the result). Output includes GitHub Actions / GitLab CI job YAML with baseline regression comparison logic (fail if p99 regresses more than 10% from previous build) and a structured JSON baseline report template for tracking performance trends across releases.
+The skill is the bridge between testing-strategy (which defines what to test) and production-readiness verification (which validates the result). Output may include GitLab CI job YAML or a local-runner configuration with baseline regression comparison logic (fail if p99 regresses more than 10% from previous build) and a structured JSON baseline report template for tracking performance trends across releases. GitHub Actions output is prohibited by the project constitution.
 
 ## Inputs
 
@@ -179,7 +179,7 @@ Step 5 — Design data parameterization strategy
   Output: data_parameterization { strategy, sample_csv_header, sample_rows[], generator_snippets{} }
 
 Step 6 — Generate CI integration job YAML
-  GitHub Actions: job using grafana/k6-action@v0.3.0 (k6) or enricosecco/setup-gatling@v1.
+  Local execution: invoke k6 or Gatling directly from the approved local runner. Do not generate hosted workflow files.
     Steps: [checkout, setup-tool, run-test, upload-artifact: reports/].
     Threshold failure exits non-zero, failing the CI job.
     Baseline comparison: download baseline artifact, run compare_baseline.sh (p99 regression > 10% = fail).

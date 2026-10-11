@@ -2,7 +2,8 @@
 # scripts/sync-website-data.sh — Sync website/data/ from authoritative source files.
 #
 # Run from the project root:  aiw sync             (sync this repo's website/data/)
-#                             aiw sync --website   (sync + push to ASE-OS-Website repo)
+# This command only updates the local website/data mirror. It never contacts or
+# writes to an external repository.
 #
 # The website reads from website/data/ at build time. This script keeps that
 # directory in sync with the source-of-truth files in the project root.
@@ -52,11 +53,7 @@
 #
 # Flags:
 #   --dry-run    Show what would be synced without writing anything
-#   --check      Exit 1 if any file is out of sync (for CI use)
-#   --website    After syncing website/data/, also push to ASE-OS-Website repo
-
-WEBSITE_REPO="https://github.com/Albadry-Esmat/ASE-OS-Website.git"
-WEBSITE_REPO_DIR=""   # set below if --website is passed
+#   --check      Exit 1 if any file is out of sync
 
 set -euo pipefail
 
@@ -70,7 +67,6 @@ source "$ROOT/scripts/lib/common.sh"
 DATA_DIR="${AIW_SYNC_DATA_DIR:-$ROOT/website/data}"
 DRY_RUN=false
 CHECK_MODE=false
-PUSH_WEBSITE=false
 TEST_DELETION=false
 SYNCED=0
 UP_TO_DATE=0
@@ -80,13 +76,12 @@ for arg in "$@"; do
   case "$arg" in
     --dry-run)  DRY_RUN=true       ;;
     --check)    CHECK_MODE=true    ;;
-    --website)       PUSH_WEBSITE=true  ;;
+    --website|--push) echo "Remote publishing is not supported; this command only updates the local mirror." >&2; exit 2 ;;
     --test-deletion) TEST_DELETION=true  ;;
     --help|-h)
-      echo "Usage: $0 [--dry-run] [--check] [--website]"
+      echo "Usage: $0 [--dry-run] [--check] [--test-deletion]"
       echo "  --dry-run    Show what would be synced without writing anything"
-      echo "  --check      Exit 1 if any file is out of sync (for CI use)"
-      echo "  --website       Sync website/data/ then push to ASE-OS-Website repo"
+      echo "  --check      Exit 1 if any file is out of sync"
       echo "  --test-deletion Run an isolated stale-file deletion regression test"
       exit 0
       ;;
@@ -111,12 +106,7 @@ fi
 if [[ ! -d "$DATA_DIR" ]]; then
   warn "website/data/ not found — skipping sync"
   echo "  Expected path: $DATA_DIR"
-  echo "  This directory is the data mirror for the ASE-OS Website."
-  echo "  It should already exist in the repo. If it was deleted, restore it with:"
-  echo "    git checkout HEAD -- website/data/"
-  echo ""
-  echo "  Website source repo: https://github.com/Albadry-Esmat/ASE-OS-Website"
-  echo "  Live site:           https://ase-os.vercel.app"
+  echo "  The local website data mirror is optional; no remote checkout is required."
   exit 0
 fi
 
@@ -323,78 +313,5 @@ else
 fi
 echo -e "${BOLD}════════════════════════════════════════${NC}"
 echo
-
-# ── Push to ASE-OS-Website repo (--website flag) ──────────────────────────────
-if [[ "$PUSH_WEBSITE" == "true" ]] && [[ "$CHECK_MODE" == "false" ]] && [[ "$DRY_RUN" == "false" ]]; then
-  header "Pushing to ASE-OS-Website"
-
-  # Clone the Dev branch into a temp dir
-  WEBSITE_REPO_DIR="$(mktemp -d)"
-  trap 'rm -rf "$WEBSITE_REPO_DIR"' EXIT
-
-  step "Cloning $WEBSITE_REPO ..."
-  if ! git clone --depth 1 --branch Dev "$WEBSITE_REPO" "$WEBSITE_REPO_DIR" --quiet; then
-    fail "Could not clone ASE-OS-Website — check your GITHUB_TOKEN and network."
-    exit 1
-  fi
-  ok "Cloned into $WEBSITE_REPO_DIR"
-
-  # Mirror website/data/ → data/ in the website repo exactly, including deletions
-  step "Copying data files..."
-  rm -rf "$WEBSITE_REPO_DIR/data"
-  mkdir -p "$WEBSITE_REPO_DIR/data"
-  cp -a "$DATA_DIR/." "$WEBSITE_REPO_DIR/data/"
-
-  # Generate a manifest over the exact mirrored data tree. The manifest itself
-  # is excluded from the data hash so it can safely record that hash.
-  DATA_HASH=$(python3 "$ROOT/scripts/data-integrity.py" hash "$DATA_DIR")
-  python3 "$ROOT/scripts/generate-release-manifest.py" \
-    --source-root "$ROOT" \
-    --website-root "$WEBSITE_REPO_DIR" \
-    --data-hash "sha256:${DATA_HASH}" \
-    --source-validation pass \
-    --website-validation not-run \
-    --website-build not-run \
-    --output "$WEBSITE_REPO_DIR/data/release-manifest.json" \
-    --validate
-
-  # Check if anything actually changed
-  cd "$WEBSITE_REPO_DIR"
-  CHANGED=$(git status --short | wc -l | tr -d ' ')
-
-  if [[ "$CHANGED" -eq 0 ]]; then
-    ok "ASE-OS-Website is already up to date — nothing to push"
-  else
-    # Detect version from changelog for commit message
-    VERSION=$(grep -m1 '## \[' "$ROOT/docs/changelog.md" 2>/dev/null \
-              | sed 's/.*\[\(.*\)\].*/\1/' || echo "latest")
-
-    step "Committing $CHANGED changed file(s)..."
-    git add data/
-    git commit -m "sync: update data/ from AI-Workflow v${VERSION}
-
-Automated sync from AI-Workflow repository.
-Source: https://github.com/Albadry-Esmat/AI-Workflow" --quiet
-
-    step "Pushing to origin/Dev..."
-    if git push origin Dev --quiet; then
-      ok "Pushed $CHANGED file(s) to ASE-OS-Website"
-      echo ""
-      echo -e "  ${GREEN}${BOLD}ASE-OS-Website data is now up to date.${NC}"
-      echo -e "  Live site will rebuild automatically: ${CYAN}https://ase-os.vercel.app${NC}"
-      echo ""
-      echo -e "  ${YELLOW}Note:${NC} this sync covers all data files including site-content.json."
-      echo -e "  All website prose, features, agents, pipeline phases, and section content"
-      echo -e "  are driven from ${CYAN}website/data/site-content.json${NC}."
-    else
-      fail "Push failed — check your GITHUB_TOKEN has write access to ASE-OS-Website."
-      exit 1
-    fi
-  fi
-
-  echo ""
-  echo -e "${BOLD}════════════════════════════════════════${NC}"
-  echo
-fi
 
 [[ "$ERRORS" -eq 0 ]]

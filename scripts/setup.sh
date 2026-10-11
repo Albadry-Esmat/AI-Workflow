@@ -148,13 +148,13 @@ header "Environment configuration (.env)"
 
 if [[ -f "$ROOT/.env" ]]; then
   _ok ".env already exists — skipping copy"
-  info "Edit .env to update values (especially GITHUB_TOKEN)"
+  info "Edit .env only if you need optional provider integrations"
 else
   if [[ -f "$ROOT/.env.example" ]]; then
     cp "$ROOT/.env.example" "$ROOT/.env"
     _ok ".env created from .env.example"
     echo
-    echo "  Optional: add provider or GitHub credentials later through the approved auth flow."
+    echo "  Optional: configure only the independent providers you choose to use."
     echo "  Prefer short-lived, fine-grained credentials and rotate them regularly."
     echo "  The core no-secret demo and validation path do not require credentials."
     echo

@@ -9,16 +9,15 @@ AI Workflow provides a structured skill system — 126 skills, 24 agents, and 25
 ## Quick Start
 
 ```bash
-git clone https://github.com/Albadry-Esmat/AI-Workflow.git
-cd AI-Workflow
+# Obtain an approved local checkout or source archive from any distribution channel.
+cd /path/to/AI-Workflow
 ./aiw setup
 ```
 
-`./aiw setup` works straight from the cloned repo — no install needed first. It checks prerequisites, installs dependencies, creates your `.env`, and adds `aiw` to your PATH. Then:
+`./aiw setup` works straight from the local source directory. It checks prerequisites, installs dependencies, creates your `.env`, and adds `aiw` to your PATH. Core setup, operation, and validation do not contact a Git hosting service. Then:
 
 ```bash
-# Edit .env and set your GITHUB_TOKEN
-# Use a fine-grained, expiring token with only the repository permissions you need.
+# No GitHub account or token is required for local AI Workflow use.
 aiw health                       # verify everything is configured
 aiw start /path/to/your-project  # launch on your project
 ```
@@ -104,6 +103,7 @@ The `aiw` CLI is the primary interface. Run `aiw help` for the full list.
 | Command | What it does |
 |---------|-------------|
 | `aiw validate` | Run the full 11-check skill validation suite |
+| `make preflight` | Run local validation gates without hosted CI or remote operations |
 | `aiw lint` | Quick YAML + schema syntax check (checks 0-1 only) |
 | `aiw doctor` | Comprehensive diagnostic: health + validation + git status |
 
@@ -171,7 +171,6 @@ cp .env.example .env
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GITHUB_TOKEN` | **Yes** | GitHub PAT — used by the `github` MCP server |
 | `CONTEXT7_API_KEY` | No | Context7 library docs in agent context |
 | `BRAVE_API_KEY` | No | Brave Search for agent web lookups |
 | `VERCEL_TOKEN` | No | Vercel deployment operations |
@@ -328,9 +327,6 @@ Run `make install-cli` to symlink the CLI to `/usr/local/bin/`, or use `./aiw` d
 ### `opencode: command not found`
 Install opencode from [opencode.ai](https://opencode.ai).
 
-### `GITHUB_TOKEN is not set`
-Open `.env` and add your token. Create one at [github.com/settings/tokens](https://github.com/settings/tokens) with scopes: `repo`, `read:org`.
-
 ### `ajv: command not found` during validation
 Run: `npm install -g ajv-cli ajv-formats` (or just re-run `aiw setup`).
 
@@ -341,14 +337,7 @@ Every SKILL.md directory under `.agents/skills/` must have a corresponding `- id
 Run: `aiw update`.
 
 ### Website won't start (`website/package.json not found`)
-The website source lives in a separate repository: [ASE-OS-Website](https://github.com/Albadry-Esmat/ASE-OS-Website). The `website/` directory in this repo contains only the data mirror (`website/data/`). To work on the website locally:
-
-```bash
-git clone https://github.com/Albadry-Esmat/ASE-OS-Website.git
-cd ASE-OS-Website
-npm install
-npm run dev
-```
+The `website/data/` directory is a local generated content mirror. AI Workflow does not fetch or publish it to an external repository. The separate website application can be developed only when its source is independently available on the local machine.
 
 To update the data mirror after changing skills or pipelines:
 ```bash

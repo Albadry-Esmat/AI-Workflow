@@ -58,7 +58,6 @@
   "authentication_boundaries": {
     "aiw_secret_storage": "none",
     "runtime_login_delegation": true,
-    "github_login_delegation": "gh-auth-login-or-approved-flow",
     "no_secret_demo": true,
     "scope_validation": true,
     "log_redaction": true
@@ -68,7 +67,7 @@
     "Explicit adapter selection must never silently fall back to another adapter.",
     "Automatic adapter selection must be deterministic and recorded in evidence.",
     "AI-Workflow must not install an agent runtime without explicit user consent.",
-    "AI-Workflow must not store raw runtime, provider, or GitHub secrets.",
+    "AI-Workflow must not store raw runtime, provider, or external-service secrets.",
     "The no-secret demo must complete without provider authentication.",
     "Unknown adapter capabilities must be reported as unknown and fail closed for claims.",
     "Generic command support must not claim runtime-specific safety or evidence.",

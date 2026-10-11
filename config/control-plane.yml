@@ -58,8 +58,6 @@ protected_paths:
   - .agents/skills/cross-artifact-consistency/
   - .agents/skills/compliance-gate/
   - .agents/skills/work-item-lifecycle-guard/
-  - .agents/skills/github-merge-gate/
-  - .agents/skills/github-pr-review/
   - .agents/skills/delegate/
   - .agents/skills/plan-debate/
   - .agents/skills/multi-agent-debate/

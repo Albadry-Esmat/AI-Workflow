@@ -28,24 +28,13 @@ for (const f of yes) if (!isGovernancePath(f,policies)){console.error('missed: '
 for (const f of no) if (isGovernancePath(f,policies)){console.error('overmatch: '+f);process.exit(1);}
 " && ok "control-plane classifier covers governance surface" || bad "classifier"
 
-# 2. CI requires governance approval: require-approval job fails closed without
-#    the label (static shape check — the job must exist and reference the label).
-if grep -q "require-approval" "$ROOT/.github/workflows/governance-gate.yml" \
-  && grep -q "governance-approved" "$ROOT/.github/workflows/governance-gate.yml" \
-  && grep -q "setFailed" "$ROOT/.github/workflows/governance-gate.yml"; then
-  ok "governance-approval blocking check in CI"
+# 2. Hosting independence: no hosted workflows remain; local validators are the
+#    authoritative checks and governance paths remain protected by policy.
+if [[ ! -d "$ROOT/.github/workflows" ]] && [[ -x "$ROOT/scripts/validate-skills.sh" ]] \
+  && node -e "const p=require('$ROOT/scripts/policy-loader'); const x=p.loadPolicies().policies; if(!p.isGovernancePath('.github/workflows/forbidden.yml',x))process.exit(1)"; then
+  ok "hosted workflows removed; local validation and governance policy remain"
 else
-  bad "governance-approval check"
-fi
-if grep -q "Deterministic review gate" "$ROOT/.github/workflows/agent-review.yml" \
-  && grep -q "branch-protection" "$ROOT/docs/branch-protection.md" 2>/dev/null; then
-  : # agent-review job presence already covered by workflow file existing
-fi
-if grep -q "Require status checks to pass" "$ROOT/docs/branch-protection.md" \
-  && grep -q "require-approval" "$ROOT/docs/branch-protection.md"; then
-  ok "branch-protection spec documents required checks"
-else
-  bad "branch-protection spec"
+  bad "GitHub-independent local governance"
 fi
 
 # 3. Separation: reviewer produces only; gatekeeper enforces only.

@@ -224,7 +224,7 @@ the registry already reports `authority.sufficient_for_high_stakes` per decision
 - HITL gate changes require updating the orchestrator AND this file.
 - Permission changes require updating agent configuration AND this file.
 - Adding a guard skill requires updating the Guard Inventory table AND `skills-registry.md`.
-- Model changes to `reviewer`, `gatekeeper`, `security-specialist`, or `recovery` agents require a PR comment with justification. Downgrading these agents to a lightweight model (e.g. `github-copilot/claude-haiku-4.5`) without documented rationale is not permitted. See [`docs/models.md`](models.md) and the authoritative `config/model-requirements.yml` for explicit model overrides. Availability is verified via `runtime.listAvailableModels()`; unavailable explicit models fail closed with no silent inheritance.
+- Model changes to `reviewer`, `gatekeeper`, `security-specialist`, or `recovery` agents require a locally verifiable change record with justification. A hosted PR comment may mirror that record but is not authoritative or required. Downgrading these agents to a lightweight model (e.g. `github-copilot/claude-haiku-4.5`) without documented rationale is not permitted. See [`docs/models.md`](models.md) and the authoritative `config/model-requirements.yml` for explicit model overrides. Availability is verified via `runtime.listAvailableModels()`; unavailable explicit models fail closed with no silent inheritance.
 
 ## Agent Resource Limits
 
@@ -370,13 +370,12 @@ This section governs the use of Model Context Protocol (MCP) servers registered 
 | MCP tools bypass `bash: deny` | MCP layer (separate from bash permission) | All agents with MCP access can use registered servers even if bash is denied |
 | Credentials must use `${ENV_VAR}` syntax | `opencode.json` convention | Credentials must not be hardcoded in the MCP command or env block |
 | Disabled servers (`"enabled": false`) must not be activated without credentials | Convention + PR review | Activating a pre-configured server without setting its credentials causes MCP startup failure |
-| MCP writes to external systems (GitHub, Slack, Vercel) require the same HITL approval as any state-writing operation | Governance rule | Agents must not use write-capable MCP tools autonomously without user confirmation |
+| MCP writes to external systems (Slack, Vercel) require the same HITL approval as any state-writing operation | Governance rule | Agents must not use write-capable MCP tools autonomously without user confirmation |
 
 ### MCP Server Registry
 
 | Server | Package | Default State | Credentials Required |
 |--------|---------|--------------|---------------------|
-| `github` | `@modelcontextprotocol/server-github@2025.4.8` | Enabled | `GITHUB_TOKEN` |
 | `brave-search` | `@modelcontextprotocol/server-brave-search@0.6.2` | Enabled | `BRAVE_API_KEY` |
 | `memory` | `@modelcontextprotocol/server-memory@2026.7.4` | Enabled | None |
 | `fetch` | `@modelcontextprotocol/server-fetch` | Enabled | None |

@@ -63,10 +63,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `cloud-platform` | `cloud-architecture-reviewer`, `serverless-architect`, `container-orchestration-architect` | `subagent` | read-only |
 | `security-specialist` | `threat-model-designer`, `secrets-management-architect`, `devsecops-pipeline-designer` | `subagent` | read-only |
 | `sre` | `slo-sla-designer`, `load-test-designer`, `profiling-advisor`, `runbook-generator`, `chaos-engineering-designer` | `subagent` | read-only |
-| `github-reviewer` | `github-pr-review` | `subagent` | edit: ask |
-| `merge-gatekeeper` | `github-merge-gate` | `subagent` | edit: ask |
 | `investigation` | — (read-only diagnostics) | `subagent` | read-only |
-| `issue-manager` | `—` (GitHub issues API) | `subagent` | read-only |
 
 ### Subagent Capability Mapping
 
@@ -91,10 +88,7 @@ The primary agent receives user requests, delegates skill execution to subagents
 | `cloud-platform` | architecture, deployment strategy | WAF reviews, serverless topologies, Kubernetes cluster designs | deployer, architect |
 | `security-specialist` | architecture, security review | STRIDE threat models, secrets management architecture, DevSecOps pipeline designs | reviewer |
 | `sre` | architecture, deployment strategy | SLO/SLA designs, load test scenarios, runbooks, chaos experiments | deployer, tester |
-| `github-reviewer` | PR metadata, diff, CI status | review_report, labels_applied, merge-gate summary | reviewer |
-| `merge-gatekeeper` | live PR state, review verdict | merge/hold decision, audit log | reviewer |
 | `investigation` | finding, repo, environment | RESOLVED evidence or UNRESOLVED + missing list | reviewer |
-| `issue-manager` | findings, issues API | deduped/linked/labeled issues, closures | reviewer |
 
 ## Agent Configuration
 
@@ -162,14 +156,6 @@ All agents are configured in `opencode.json` and have corresponding instruction 
         ".agents/skills/api-contract-guard/SKILL.md",
         ".agents/skills/bundle-size-guard/SKILL.md",
         ".agents/skills/i18n-compliance-guard/SKILL.md"
-      ]
-    },
-    "github-reviewer": {
-      "mode": "subagent",
-      "permission": { "edit": "ask", "bash": "deny" },
-      "description": "GitHub review automation — PR reviews, bug-issue triage, merge-gate summaries. Advisory only; merge authority stays human.",
-      "skills": [
-        ".agents/skills/github-pr-review/SKILL.md"
       ]
     },
     "tester": {
@@ -334,11 +320,9 @@ agents:
 An explicit override that is unavailable blocks execution — it never falls back
 silently. Omitting `model` (or `null`) means inherit.
 
-Pinned lightweight tier (Phase 4, E-0052): `test-generator`, `deployer`,
-`doc-maintainer`, and `issue-manager` require `github-copilot/claude-haiku-4.5`
-(structural/validation workloads with downstream verification). Reasoning-critical
-agents (`architect`, `reviewer`, `planner`, `gatekeeper`, `security-specialist`)
-always inherit — never pinned to a lightweight tier.
+All agents currently inherit the invoking runtime's model. No agent requires a
+GitHub Copilot account or a provider-specific model pin. Explicit model overrides
+remain available only when deliberately configured in `config/model-requirements.yml`.
 
 **Full reference** → [`docs/models.md`](models.md) — precedence, inheritance vs
 explicit semantics, provider neutrality, and governance rules for safety-critical agents.

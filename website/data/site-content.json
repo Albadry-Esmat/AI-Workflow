@@ -1,20 +1,20 @@
 {
   "$schema": "site-content-schema",
   "$version": "5.3.1",
-  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 126 skills, 28 agents, 25 pipelines, 37 phases.",
+  "$description": "Single source of truth for all ASE-OS website content. Synced to ASE-OS-Website via `aiw sync --website`. Last synced: pipeline v4.0.0 — 123 skills, 25 agents, 25 pipelines, 37 phases.",
   "meta": {
     "title": "ASE-OS — AI Software Engineering Operating System",
     "titleTemplate": "%s — ASE-OS",
-    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. 126 skills · 28 agents · 25 pipeline templates · v4.0.0.",
+    "description": "A unified, skill-driven, event-driven AI engineering system that designs, generates, tests, and documents software autonomously. 123 skills · 25 agents · 25 pipeline templates · v4.0.0.",
     "openGraph": {
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. 126 skills, 28 agents, 25 pipeline templates.",
+      "description": "A unified, skill-driven AI system that takes your idea from requirements to deployed software — automatically, with zero documentation drift. 123 skills, 25 agents, 25 pipeline templates.",
       "siteName": "ASE-OS"
     },
     "twitter": {
       "card": "summary_large_image",
       "title": "ASE-OS — AI Software Engineering Operating System",
-      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v4.0.0 — 126 skills, 28 agents."
+      "description": "Skill-driven AI engineering. Full requirements traceability. Ideas to deployed software, automatically. v4.0.0 — 123 skills, 25 agents."
     }
   },
   "hero": {
@@ -47,9 +47,9 @@
       "Agents"
     ],
     "statsValues": [
-      "126",
+      "123",
       "37",
-      "28"
+      "25"
     ]
   },
   "features": {

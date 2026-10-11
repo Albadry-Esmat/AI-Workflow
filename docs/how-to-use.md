@@ -11,17 +11,14 @@
 Clone the repository and run setup directly — no install needed first:
 
 ```bash
-git clone https://github.com/Albadry-Esmat/AI-Workflow.git
-cd AI-Workflow
+# Obtain an approved local checkout or source archive from any distribution channel.
+cd /path/to/AI-Workflow
 ./aiw setup
 ```
 
-`./aiw` runs straight from the repo before anything is installed. Setup will add `aiw` to your PATH so you can use it globally from that point on. Then open `.env` and fill in your credentials:
+`./aiw` runs straight from the local source directory before anything is installed. Setup will add `aiw` to your PATH so you can use it globally from that point on. No GitHub remote, account, or token is required. Add provider credentials only for optional integrations you enable:
 
 ```bash
-# Minimum required — use a short-lived fine-grained token scoped to this repo
-GITHUB_TOKEN=github_fine_grained_token  # https://github.com/settings/personal-access-tokens/fine-grained
-
 # Optional but recommended
 CONTEXT7_API_KEY=...           # https://context7.com
 BRAVE_API_KEY=...              # https://api.search.brave.com/app/keys
@@ -74,7 +71,6 @@ This copies `opencode.json`, `.opencode/` (all 126 skills + 24 agents), and your
 | `aiw lint` | Quick YAML + schema syntax check |
 | `aiw doctor` | Full diagnostic: health + validation + git |
 | `aiw sync` | Sync `website/data/` from source files |
-| `aiw sync --website` | Sync + push directly to ASE-OS-Website repo |
 | `aiw graph` | Rebuild the knowledge graph |
 | `aiw status` | Show project status (git, sessions, skills) |
 | `aiw clean` | Remove build artifacts |
@@ -178,7 +174,6 @@ This copies `opencode.json`, `.opencode/` (all 126 skills + 24 agents), and your
 | Skill not found | Registry not updated | Run `make validate` to find which entry is missing |
 | Agent permission denied | Incorrect agent config | Check permission in `opencode.json` |
 | `schema validator not found` | Project-local Node dependencies are missing | Run `make setup`, then `aiw toolchain-check` |
-| `GITHUB_TOKEN is not set` | Missing env var | Add a short-lived fine-grained token to the ignored `.env`; do not commit it |
 
 ---
 

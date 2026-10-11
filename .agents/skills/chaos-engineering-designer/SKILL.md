@@ -183,7 +183,7 @@ Step 7 — Design scheduling plan and GameDay agenda
   If continuous_chaos == true:
     Select top 3 lowest-blast-radius experiments (blast_radius == "service" only) as CI suite.
     Combined CI suite runtime MUST be <= 300s; reject any candidate experiment exceeding budget.
-    Generate GitHub Actions job YAML: trigger on push to staging branch; environment: staging only.
+    Generate a local-runner procedure for staging-only execution. Do not generate hosted workflow files.
     Add chaos_gate step: fail pipeline if any steady_state_hypothesis threshold breaches detected.
   Output: scheduling_plan { phases[], total_duration_min, gameday_agenda, continuous_chaos_suite? }
 

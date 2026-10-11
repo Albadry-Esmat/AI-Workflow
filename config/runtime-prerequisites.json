@@ -16,15 +16,6 @@
       "notes": "How the runtime is installed belongs to the operator/runtime. AIW only verifies availability and consumes the existing connection."
     },
     {
-      "id": "github-capability",
-      "required_runtime": "github-connection",
-      "required_capability": "repository_operations_as_permitted",
-      "installation_owner": "operator/runtime",
-      "managed_by_aiw": false,
-      "verification": "capability presence check only; never install GitHub CLI, run gh auth login, create PATs, or configure accounts",
-      "notes": "AIW verifies the GitHub capability exists, consumes the existing connection, and performs permitted operations. Establishing the connection is operator-owned."
-    },
-    {
       "id": "provider-authentication",
       "required_runtime": "selected-agent-runtime",
       "required_capability": "authenticated_model_execution",
